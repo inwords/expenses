@@ -1,0 +1,63 @@
+[versions]
+kotlin = "1.9.23"
+ksp = "1.9.23-1.0.20"
+
+room = "2.7.0-alpha01"
+ktor = "2.3.0"
+okHttpBom = "4.10.0"
+
+coroutines = "1.8.0"
+
+kotlinxSerialization = "1.6.3"
+kotlinxDatetime = "0.6.0-RC.2"
+
+coil = "2.3.0"
+
+lifecycle = "2.7.0"
+core = "1.13.1"
+annotation = "1.7.1"
+
+composeBom = "2024.05.00"
+composeCompilerExtension = "1.5.12"
+navigationCompose = "2.8.0-alpha08"
+activityCompose = "1.9.0"
+
+constraintLayoutCompose = "1.0.1"
+
+[libraries]
+roomRuntime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+roomCompiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+ktorClientOkHttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
+ktorClientContentNegotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+ktorSerializationKotlinxJson = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktorClientLoggingJvm = { group = "io.ktor", name = "ktor-client-logging-jvm", version.ref = "ktor" }
+okHttpBom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref = "okHttpBom" }
+okHttp = { group = "com.squareup.okhttp3", name = "okhttp" }
+
+coroutinesAndroid = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+
+kotlinxSerializationJson = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+kotlinxDatetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
+
+coilBase = { group = "io.coil-kt", name = "coil-base", version.ref = "coil" }
+coilComposeBase = { group = "io.coil-kt", name = "coil-compose-base", version.ref = "coil" }
+
+lifecycleRuntimeKtx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
+lifecycleRuntimeCompose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
+lifecycleViewModelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+coreKtx = { group = "androidx.core", name = "core-ktx", version.ref = "core" }
+annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
+
+composeBom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+composeUi = { group = "androidx.compose.ui", name = "ui" }
+composeRuntime = { group = "androidx.compose.runtime", name = "runtime" }
+composeUiToolingPreview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+composeMaterial3 = { group = "androidx.compose.material3", name = "material3" }
+activityCompose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+navigationCompose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+
+constraintLayoutCompose = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "constraintLayoutCompose" }
+
+[plugins]
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
