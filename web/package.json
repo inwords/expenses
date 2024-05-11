@@ -1,0 +1,27 @@
+{
+  "name": "expenses",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node_modules/.bin/next dev",
+    "build": "node_modules/.bin/next build",
+    "start": "node_modules/.bin/next start",
+    "lint": "node_modules/.bin/next lint"
+  },
+  "dependencies": {
+    "next": "14.2.3",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "eslint-config-prettier": "9.1.0",
+    "@trivago/prettier-plugin-sort-imports": "4.2.0",
+    "@types/node": "20.12.11",
+    "@types/react": "18.3.2",
+    "@types/react-dom": "18.3.0",
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.3",
+    "prettier": "3.2.5",
+    "typescript": "5.4.5"
+  }
+}
