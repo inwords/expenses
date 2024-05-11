@@ -11,8 +11,14 @@ android {
 }
 
 dependencies {
+    implementation(project(":shared:core:utils"))
+    implementation(project(":shared:core:ktor-client-cronet"))
+
     implementation(shared.ktorClientOkHttp)
     implementation(shared.ktorClientContentNegotiation)
     implementation(shared.ktorSerializationKotlinxJson)
     implementation(shared.ktorClientLoggingJvm)
+
+    implementation(shared.cronetApi)
+
 }

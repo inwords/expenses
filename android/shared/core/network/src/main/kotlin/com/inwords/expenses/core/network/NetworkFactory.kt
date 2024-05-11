@@ -1,40 +1,76 @@
 package com.inwords.expenses.core.network
 
+import android.content.Context
 import android.util.Log
+import com.inwords.expenses.core.ktor_client_cronet.Cronet
+import com.inwords.expenses.core.utils.IO
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.HttpClientConfig
+import io.ktor.client.engine.HttpClientEngineConfig
+import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.MessageLengthLimitingLogger
-import io.ktor.client.request.header
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
-import okhttp3.OkHttpClient
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.withContext
+import org.chromium.net.ConnectionMigrationOptions
+import org.chromium.net.CronetEngine
+import org.chromium.net.DnsOptions
+import java.io.File
 
 class NetworkFactory {
 
-    fun createOkHttp(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .callTimeout(60, TimeUnit.SECONDS)
-            .connectTimeout(30, TimeUnit.SECONDS)
+    suspend fun createHttpClient(context: Context) = withContext(IO) {
+        val cronet = createCronet(context)
+        createKtor(cronet)
+    }
+
+    private fun createCronet(context: Context): CronetEngine {
+        val storagePath = context.cacheDir.absolutePath + "/cronet"
+        val storageFile = File(storagePath)
+        if (!storageFile.exists()) {
+            storageFile.mkdirs()
+        }
+
+        return CronetEngine.Builder(context)
+            .enableHttp2(true)
+            .enableQuic(true)
+            .enableBrotli(true)
+            .setConnectionMigrationOptions(
+                ConnectionMigrationOptions.builder()
+                    .enableDefaultNetworkMigration(true)
+                    .build()
+            )
+            .setDnsOptions(
+                DnsOptions.builder()
+                    .persistHostCache(true)
+                    .build()
+            )
+            .setStoragePath(storagePath)
+            .setUserAgent("Android/Expenses/1.0") // TODO choose good user agent
             .build()
     }
 
-    fun createKtor(okHttp: OkHttpClient): HttpClient {
-        return HttpClient(OkHttp) {
+    private fun createKtor(cronetEngine: CronetEngine): HttpClient {
+        return createKtor(Cronet(cronetEngine)) {
             engine {
-                this.preconfigured = okHttp
                 this.pipelining = true
-
-                config {
-                    dispatcher(okHttp.dispatcher) // overridden by ktor for some reason
-                }
+                this.followRedirects = false
+                this.threadsCount = 24
             }
+        }
+    }
+
+    private fun <T : HttpClientEngineConfig> createKtor(
+        httpClientEngine: HttpClientEngineFactory<T>,
+        block: HttpClientConfig<T>.() -> Unit
+    ): HttpClient {
+        return HttpClient(httpClientEngine) {
+            block.invoke(this)
+
+            followRedirects = false
 
             install(ContentNegotiation) {
                 json()
@@ -47,10 +83,6 @@ class NetworkFactory {
                     }
                 })
                 level = LogLevel.ALL
-            }
-
-            install(DefaultRequest) {
-                header(HttpHeaders.ContentType, ContentType.Application.Json)
             }
         }
     }

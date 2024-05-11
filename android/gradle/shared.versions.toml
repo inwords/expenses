@@ -5,6 +5,7 @@ ksp = "1.9.23-1.0.20"
 room = "2.7.0-alpha01"
 ktor = "2.3.0"
 okHttpBom = "4.10.0"
+cronet = "119.6045.31"
 
 coroutines = "1.8.0"
 
@@ -27,14 +28,18 @@ constraintLayoutCompose = "1.0.1"
 [libraries]
 roomRuntime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 roomCompiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+ktorClientCore = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
 ktorClientOkHttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
 ktorClientContentNegotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktorSerializationKotlinxJson = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktorClientLoggingJvm = { group = "io.ktor", name = "ktor-client-logging-jvm", version.ref = "ktor" }
 okHttpBom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref = "okHttpBom" }
 okHttp = { group = "com.squareup.okhttp3", name = "okhttp" }
+cronet = { group = "org.chromium.net", name = "cronet-embedded", version.ref = "cronet" }
+cronetApi = { group = "org.chromium.net", name = "cronet-api", version.ref = "cronet" }
 
 coroutinesAndroid = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+coroutinesPlayServices = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines" }
 
 kotlinxSerializationJson = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 kotlinxDatetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
