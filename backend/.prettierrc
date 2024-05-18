@@ -1,0 +1,16 @@
+{
+  "singleQuote": true,
+  "trailingComma": "all",
+  "bracketSpacing": false,
+  "printWidth": 120,
+  "tabWidth": 2,
+  "importOrder": [
+    "react(?=[a-zA-Z\\-\\/]+$)*",
+    "^[a-zA-Z\\-\\/]+$",
+    "^@resources$",
+    "^@\\/([a-zA-Z\\/-]*)$",
+    "^(\\.{1,2}\\/)+[a-zA-Z\\/]+$"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
+}
