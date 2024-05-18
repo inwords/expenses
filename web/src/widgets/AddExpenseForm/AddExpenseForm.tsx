@@ -5,6 +5,7 @@ import {ExpenseAmountInput} from '@/features/AddExpense/ui/ExpenseAmountInput';
 import {SelectExpenseOwner} from '@/features/AddExpense/ui/SelectExpenseOwner';
 import {SelectCurrency} from '@/features/AddExpense/ui/SelectCurrency';
 import React from 'react';
+import {SplitOptions} from '@/features/AddExpense/ui/SplitOption';
 
 export const AddExpenseForm = () => {
   const {control} = useForm();
@@ -24,12 +25,14 @@ export const AddExpenseForm = () => {
 
         <SelectCurrency />
 
+        <SplitOptions />
+
         {fields.map((field, index) => (
           <React.Fragment key={field.id}>
-            <TextFieldElement name={`users.${index}.amount`} label={'Сумма долга'} required />
+            <TextFieldElement name={`users.${index}.amount`} label={'Сумма к возврату'} required />
 
             <SelectElement
-              label="Кто оплачивал"
+              label="Кто должен"
               name={`users.${index}.person`}
               options={[
                 {

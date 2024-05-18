@@ -2,7 +2,7 @@ import {SelectUserList} from '@/widgets/SelectUserList/SelectUserList';
 import {Typography} from '@mui/material';
 import {ExpensesTabs} from '@/widgets/ExpensesTabs/ExpensesTabs';
 import {CreateExpense} from '@/features/CreateExpense/CreateExpense';
-import {CreateExpenseModal} from '@/widgets/CreateExpenseModal/CreateExpenseModal';
+import {AddExpenseModal} from '@/widgets/AddExpenseModal/AddExpenseModal';
 import {useState} from 'react';
 
 export const EventPage = () => {
@@ -20,7 +20,7 @@ export const EventPage = () => {
 
       <CreateExpense setIsOpen={setIsDialogOpen} />
 
-      <CreateExpenseModal isOpen={isDialogOpen} setIsOpen={setIsDialogOpen} />
+      <AddExpenseModal isOpen={isDialogOpen} setIsOpen={setIsDialogOpen} />
     </>
   );
 };

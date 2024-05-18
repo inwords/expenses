@@ -1,18 +1,18 @@
 import {Dialog, DialogContent, DialogTitle} from '@mui/material';
-import {AddExpenseForm} from '@/widgets/AddExpenseForm/AddExpenseForm';
+import {CreateEventForm} from '@/widgets/CreateEventForm/CreateEventForm';
 
 interface Props {
   isOpen: boolean;
   setIsOpen: (status: boolean) => void;
 }
 
-export const CreateExpenseModal = ({isOpen, setIsOpen}: Props) => {
+export const CreateEventModal = ({isOpen, setIsOpen}: Props) => {
   return (
     <Dialog open={isOpen} fullWidth={true} onClose={() => setIsOpen(false)}>
-      <DialogTitle id="alert-dialog-title">Добавление траты</DialogTitle>
+      <DialogTitle id="alert-dialog-title">Создание поездки</DialogTitle>
 
       <DialogContent>
-        <AddExpenseForm />
+        <CreateEventForm />
       </DialogContent>
     </Dialog>
   );
