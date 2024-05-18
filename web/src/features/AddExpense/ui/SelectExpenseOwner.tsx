@@ -1,24 +1,5 @@
-import {SelectElement} from 'react-hook-form-mui';
+import {SelectUser} from '@/entities/user/ui/SelectUser';
 
 export const SelectExpenseOwner = () => {
-  return (
-    <SelectElement
-      label="Кто оплачивал"
-      name="owner"
-      options={[
-        {
-          id: '1',
-          label: 'Ignat',
-        },
-        {
-          id: '2',
-          label: 'Vasya',
-        },
-        {
-          id: '3',
-          label: 'Dog',
-        },
-      ]}
-    />
-  );
+  return <SelectUser label="Кто оплачивал" name="owner" />;
 };

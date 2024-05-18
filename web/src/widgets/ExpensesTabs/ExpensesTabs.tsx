@@ -17,6 +17,10 @@ export const ExpensesTabs = () => {
           <Tab label="Мои траты" />
 
           <Tab label="Общие траты" />
+
+          <Tab label="Мои задолжности" />
+
+          <Tab label="Мои поступления" />
         </Tabs>
       </Box>
 
