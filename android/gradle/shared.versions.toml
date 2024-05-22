@@ -1,26 +1,26 @@
 [versions]
-kotlin = "1.9.23"
-ksp = "1.9.23-1.0.20"
+kotlin = "2.0.0"
+ksp = "2.0.0-1.0.21"
 
-room = "2.7.0-alpha01"
+room = "2.7.0-alpha02"
 ktor = "2.3.0"
 okHttpBom = "4.10.0"
 cronet = "119.6045.31"
 
 coroutines = "1.8.0"
 
-kotlinxSerialization = "1.6.3"
+kotlinxSerialization = "1.7.0-RC"
 kotlinxDatetime = "0.6.0-RC.2"
 
 coil = "2.3.0"
 
-lifecycle = "2.7.0"
+lifecycle = "2.8.0"
 core = "1.13.1"
-annotation = "1.7.1"
+annotation = "1.8.0"
 
 composeBom = "2024.05.00"
-composeCompilerExtension = "1.5.12"
-navigationCompose = "2.8.0-alpha08"
+composeCompilerExtension = "1.5.14"
+navigationCompose = "2.8.0-beta01"
 activityCompose = "1.9.0"
 
 constraintLayoutCompose = "1.0.1"
@@ -64,5 +64,6 @@ navigationCompose = { group = "androidx.navigation", name = "navigation-compose"
 constraintLayoutCompose = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "constraintLayoutCompose" }
 
 [plugins]
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

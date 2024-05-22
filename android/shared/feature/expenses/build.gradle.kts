@@ -1,6 +1,7 @@
 plugins {
     id("shared-library-plugin")
     id(shared.plugins.kotlin.serialization.get().pluginId)
+    alias(shared.plugins.compose.compiler)
 }
 
 android {

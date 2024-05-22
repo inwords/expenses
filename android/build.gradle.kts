@@ -11,6 +11,7 @@ plugins {
     id(buildSrc.plugins.android.application.get().pluginId) apply false
     id(buildSrc.plugins.android.library.get().pluginId) apply false
     id(buildSrc.plugins.kotlin.android.get().pluginId) apply false
+    alias(shared.plugins.compose.compiler) apply false
     alias(shared.plugins.kotlin.serialization) apply false
     alias(shared.plugins.ksp) apply false
 }

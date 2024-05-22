@@ -1,6 +1,7 @@
 plugins {
     id(buildSrc.plugins.android.application.get().pluginId)
     id(buildSrc.plugins.kotlin.android.get().pluginId)
+    alias(shared.plugins.compose.compiler)
     alias(shared.plugins.kotlin.serialization)
 }
 

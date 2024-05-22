@@ -23,9 +23,9 @@ import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.chromium.net.CronetException
 import org.chromium.net.UploadDataProvider
-import org.chromium.net.UploadDataProviders
 import org.chromium.net.UrlRequest
 import org.chromium.net.UrlResponseInfo
+import org.chromium.net.apihelpers.UploadDataProviders
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.channels.Channels

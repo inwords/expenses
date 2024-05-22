@@ -1,5 +1,6 @@
 plugins {
     id("shared-library-plugin")
+    alias(shared.plugins.compose.compiler)
 }
 
 android {
