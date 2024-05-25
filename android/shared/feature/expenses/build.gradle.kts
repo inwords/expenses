@@ -14,9 +14,6 @@ android {
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = shared.versions.composeCompilerExtension.get()
-    }
 }
 
 dependencies {
@@ -26,7 +23,7 @@ dependencies {
     implementation(project(":shared:core:navigation"))
     implementation(project(":shared:feature:events"))
 
-    implementation(shared.coroutinesAndroid)
+    implementation(shared.coroutines.android)
 
     implementation(shared.kotlinxSerializationJson)
     implementation(shared.kotlinxDatetime)

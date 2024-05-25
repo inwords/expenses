@@ -12,7 +12,7 @@ android {
 }
 
 dependencies {
-    implementation(shared.coroutinesAndroid)
+    implementation(shared.coroutines.android)
 
     implementation(shared.roomRuntime)
 

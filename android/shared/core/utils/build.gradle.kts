@@ -12,5 +12,5 @@ android {
 
 dependencies {
     // coroutines
-    implementation(shared.coroutinesAndroid)
+    implementation(shared.coroutines.android)
 }

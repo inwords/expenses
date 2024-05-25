@@ -7,7 +7,7 @@ ktor = "2.3.0"
 okHttpBom = "4.10.0"
 cronet = "119.6045.31"
 
-coroutines = "1.8.0"
+coroutines = "1.8.1"
 
 kotlinxSerialization = "1.7.0-RC"
 kotlinxDatetime = "0.6.0-RC.2"
@@ -21,7 +21,6 @@ core = "1.13.1"
 annotation = "1.8.0"
 
 composeBom = "2024.05.00"
-composeCompilerExtension = "1.5.14"
 navigationCompose = "2.8.0-beta01"
 activityCompose = "1.9.0"
 
@@ -40,7 +39,8 @@ okHttp = { group = "com.squareup.okhttp3", name = "okhttp" }
 cronet = { group = "org.chromium.net", name = "cronet-embedded", version.ref = "cronet" }
 cronetApi = { group = "org.chromium.net", name = "cronet-api", version.ref = "cronet" }
 
-coroutinesAndroid = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 coroutinesPlayServices = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines" }
 
 kotlinxSerializationJson = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }

@@ -27,7 +27,7 @@ dependencies {
 
     implementation(shared.annotation)
 
-    implementation(shared.coroutinesAndroid)
+    implementation(shared.coroutines.android)
 
     implementation(shared.kotlinxDatetime)
 
