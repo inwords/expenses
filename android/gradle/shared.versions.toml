@@ -11,6 +11,8 @@ coroutines = "1.8.0"
 
 kotlinxSerialization = "1.7.0-RC"
 kotlinxDatetime = "0.6.0-RC.2"
+protobuf-plugin = "0.9.4"
+protobuf-library = "4.26.1"
 
 coil = "2.3.0"
 
@@ -43,6 +45,8 @@ coroutinesPlayServices = { group = "org.jetbrains.kotlinx", name = "kotlinx-coro
 
 kotlinxSerializationJson = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 kotlinxDatetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
+protobuf-javalite = { group = "com.google.protobuf", name = "protobuf-javalite", version.ref = "protobuf-library" }
+protobuf-protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "protobuf-library" }
 
 coilBase = { group = "io.coil-kt", name = "coil-base", version.ref = "coil" }
 coilComposeBase = { group = "io.coil-kt", name = "coil-compose-base", version.ref = "coil" }
@@ -67,3 +71,4 @@ constraintLayoutCompose = { group = "androidx.constraintlayout", name = "constra
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }

@@ -14,4 +14,5 @@ plugins {
     alias(shared.plugins.compose.compiler) apply false
     alias(shared.plugins.kotlin.serialization) apply false
     alias(shared.plugins.ksp) apply false
+    alias(shared.plugins.protobuf) apply false
 }
