@@ -60,7 +60,7 @@ annotation = { group = "androidx.annotation", name = "annotation", version.ref =
 composeBom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 composeUi = { group = "androidx.compose.ui", name = "ui" }
 composeRuntime = { group = "androidx.compose.runtime", name = "runtime" }
-composeUiToolingPreview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 composeMaterial3 = { group = "androidx.compose.material3", name = "material3" }
 activityCompose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 navigationCompose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }

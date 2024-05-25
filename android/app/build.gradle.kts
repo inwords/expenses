@@ -82,7 +82,7 @@ dependencies {
     androidTestImplementation(composeBom)
 
     implementation(shared.composeUi)
-    implementation(shared.composeUiToolingPreview)
+    implementation(shared.compose.ui.tooling)
     implementation(shared.composeMaterial3)
 
     // other UI-related staff

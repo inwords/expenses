@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlin.experimental.ExperimentalTypeInference
 
-val Main = Dispatchers.Main
+val UI = Dispatchers.Main
 val IO = Dispatchers.IO
 
 fun <T> Flow<T>.collectIn(
