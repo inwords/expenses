@@ -1,5 +1,6 @@
 plugins {
     id("shared-library-plugin")
+    id(shared.plugins.kotlin.serialization.get().pluginId)
     alias(shared.plugins.compose.compiler)
 }
 
@@ -9,14 +10,27 @@ android {
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
     }
+
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {
+    implementation(project(":shared:core:utils"))
+    implementation(project(":shared:core:storage-utils"))
+    implementation(project(":shared:core:ui-utils"))
+    implementation(project(":shared:core:navigation"))
+
     implementation(shared.coroutines.android)
 
-    implementation(shared.roomRuntime)
-
+    implementation(shared.kotlinxSerializationJson)
     implementation(shared.kotlinxDatetime)
+
+    implementation(shared.lifecycleRuntimeCompose)
+    implementation(shared.lifecycleViewModelCompose)
+
+    implementation(shared.roomRuntime)
 
     implementation(shared.navigationCompose)
 
@@ -25,5 +39,5 @@ dependencies {
     androidTestImplementation(composeBom)
     implementation(shared.composeUi)
     implementation(shared.composeMaterial3)
-    implementation(shared.compose.ui.tooling)
+    debugImplementation(shared.compose.ui.tooling)
 }

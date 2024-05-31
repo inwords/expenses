@@ -6,18 +6,19 @@ import androidx.room.Transaction
 import androidx.room.Upsert
 import com.inwords.expenses.feature.events.data.db.entity.EventEntity
 import com.inwords.expenses.feature.events.data.db.entity.EventWithDetailsQuery
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface EventsDao {
 
     @Upsert
-    suspend fun insert(eventEntity: EventEntity)
+    suspend fun insert(eventEntity: EventEntity): Long
 
     @Query("SELECT * FROM ${EventEntity.TABLE_NAME}")
-    suspend fun queryAll(): List<EventEntity>
+    fun queryAll(): Flow<List<EventEntity>>
 
     @Transaction
     @Query("SELECT * FROM ${EventEntity.TABLE_NAME} WHERE ${EventEntity.ColumnNames.ID} = :eventId")
-    suspend fun queryEventWithDetailsById(eventId: Long): EventWithDetailsQuery
+    fun queryEventWithDetailsById(eventId: Long): Flow<EventWithDetailsQuery>
 
 }

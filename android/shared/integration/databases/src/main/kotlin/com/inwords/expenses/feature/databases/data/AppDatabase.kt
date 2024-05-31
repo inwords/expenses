@@ -45,6 +45,6 @@ internal fun createAppDatabase(context: Context): AppDatabase {
     return Room.databaseBuilder(context, "app_db") { AppDatabase::class.instantiateImpl() }
         .setQueryCoroutineContext(queryCoroutineContext)
         .setJournalMode(RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
-        .fallbackToDestructiveMigration(dropAllTables = true) // TODO remove before prod
+        .fallbackToDestructiveMigration(dropAllTables = true) // FIXME remove before prod
         .build()
 }

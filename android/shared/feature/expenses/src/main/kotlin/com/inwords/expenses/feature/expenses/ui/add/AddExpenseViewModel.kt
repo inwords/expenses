@@ -5,12 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.utils.IO
+import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.expenses.domain.model.Expense
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -24,7 +27,7 @@ internal class AddExpenseViewModel(
     private val eventsInteractor: EventsInteractor,
     private val expensesInteractor: ExpensesInteractor,
     private val homeScreenDestination: Destination,
-) : ViewModel() {
+) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
     private val _state = MutableStateFlow(mockAddExpenseScreenUiModel())
     val state: StateFlow<AddExpenseScreenUiModel> = _state
@@ -95,11 +98,12 @@ internal class AddExpenseViewModel(
         )
 
         viewModelScope.launch {
-            withContext(IO) {
-                expensesInteractor.addExpense(eventsInteractor.getCurrentEvent(), expense)
-            }
+            val currentEvent = eventsInteractor.currentEvent.value ?: return@launch // TODO mvp
+            expensesInteractor.addExpense(currentEvent, expense)
 
-            navigationController.popBackStack()
+            withContext(UI) {
+                navigationController.popBackStack()
+            }
         }
     }
 

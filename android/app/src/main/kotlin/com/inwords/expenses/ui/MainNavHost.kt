@@ -10,7 +10,15 @@ import com.inwords.expenses.core.navigation.DefaultNavigationController
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.feature.databases.data.dbComponent
 import com.inwords.expenses.feature.events.api.EventsComponent
+import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
+import com.inwords.expenses.feature.events.data.db.dao.EventsDao
+import com.inwords.expenses.feature.events.data.db.dao.PersonsDao
 import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.ui.create.CreateEventScreenDestination
+import com.inwords.expenses.feature.events.ui.create.addCreateEventScreen
+import com.inwords.expenses.feature.events.ui.join.addJoinEventScreen
+import com.inwords.expenses.feature.events.ui.list.AddPersonsScreenDestination
+import com.inwords.expenses.feature.events.ui.list.addAddPersonsScreen
 import com.inwords.expenses.feature.expenses.api.ExpensesComponent
 import com.inwords.expenses.feature.expenses.data.db.dao.ExpensesDao
 import com.inwords.expenses.feature.expenses.ui.add.addExpenseScreen
@@ -24,11 +32,22 @@ import com.inwords.expenses.ui.home.homeScreen
 internal fun MainNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: Destination = HomeScreenDestination
+    startDestination: Destination = CreateEventScreenDestination
 ) {
     val navigationController = remember { DefaultNavigationController(navController) }
 
-    val eventsComponent = remember { EventsComponent(deps = object : EventsComponent.Deps {}) }
+    val eventsComponent = remember {
+        EventsComponent(
+            deps = object : EventsComponent.Deps {
+                override val eventsDao: EventsDao
+                    get() = dbComponent.eventsDao
+                override val personsDao: PersonsDao
+                    get() = dbComponent.personsDao
+                override val currenciesDao: CurrenciesDao
+                    get() = dbComponent.currenciesDao
+            }
+        )
+    }
 
     val expensesComponent = remember {
         ExpensesComponent(
@@ -47,9 +66,26 @@ internal fun MainNavHost(
         navController = navController,
         startDestination = startDestination
     ) {
-        homeScreen( // TODO tmp screen
+        homeScreen( // FIXME remove tmp screen
             onNavigateToExpenses = { navController.navigate(ExpensesScreenDestination) }
         )
+
+        addJoinEventScreen(
+            navigationController = navigationController,
+            eventsInteractor = eventsComponent.eventsInteractor,
+            expensesScreenDestination = ExpensesScreenDestination,
+        )
+        addCreateEventScreen(
+            navigationController = navigationController,
+            eventsInteractor = eventsComponent.eventsInteractor,
+            addParticipantsDestination = AddPersonsScreenDestination,
+        )
+        addAddPersonsScreen(
+            navigationController = navigationController,
+            eventsInteractor = eventsComponent.eventsInteractor,
+            expensesScreenDestination = ExpensesScreenDestination
+        )
+
         addExpenseScreen(
             navigationController = navigationController,
             eventsInteractor = eventsComponent.eventsInteractor,

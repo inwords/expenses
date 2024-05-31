@@ -9,7 +9,7 @@ import com.inwords.expenses.feature.events.data.db.entity.PersonEntity
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-// TODO fix this
+// FIXME costyl
 lateinit var appContext: Context
 
 val dbComponent = DatabasesComponent(object : DatabasesComponent.Deps {

@@ -23,5 +23,19 @@ data class EventWithDetailsQuery(
         entityColumn = CurrencyEntity.ColumnNames.ID,
         associateBy = Junction(EventCurrencyCrossRef::class)
     )
-    val currencies: List<CurrencyEntity>
+    val currencies: List<CurrencyEntity>,
+
+    @Relation(
+        entity = CurrencyEntity::class,
+        parentColumn = EventEntity.ColumnNames.PRIMARY_CURRENCY,
+        entityColumn = CurrencyEntity.ColumnNames.ID
+    )
+    val primaryCurrency: CurrencyEntity,
+
+    @Relation(
+        entity = PersonEntity::class,
+        parentColumn = EventEntity.ColumnNames.PRIMARY_PERSON_ID,
+        entityColumn = PersonEntity.ColumnNames.ID
+    )
+    val primaryPerson: PersonEntity,
 )

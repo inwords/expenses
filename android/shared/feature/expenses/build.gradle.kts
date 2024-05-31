@@ -40,5 +40,5 @@ dependencies {
     androidTestImplementation(composeBom)
     implementation(shared.composeUi)
     implementation(shared.composeMaterial3)
-    implementation(shared.compose.ui.tooling)
+    debugImplementation(shared.compose.ui.tooling)
 }

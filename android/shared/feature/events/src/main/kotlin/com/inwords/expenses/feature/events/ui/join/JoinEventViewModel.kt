@@ -1,0 +1,61 @@
+package com.inwords.expenses.feature.events.ui.join
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.inwords.expenses.core.navigation.DefaultNavigationController
+import com.inwords.expenses.core.navigation.Destination
+import com.inwords.expenses.core.utils.IO
+import com.inwords.expenses.core.utils.UI
+import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.EventsInteractor.JoinEventResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+internal class JoinEventViewModel(
+    private val navigationController: DefaultNavigationController,
+    private val eventsInteractor: EventsInteractor,
+    private val expensesScreenDestination: Destination,
+) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
+
+    private var confirmJob: Job? = null
+
+    private val _state = MutableStateFlow(JoinEventScreenUiModel("", ""))
+    val state: StateFlow<JoinEventScreenUiModel> = _state
+
+    fun onEventIdChanged(eventId: String) {
+        _state.update { value ->
+            value.copy(eventId = eventId.filter { it.isDigit() })
+        }
+    }
+
+    fun onEventAccessCodeChanged(eventAccessCode: String) {
+        _state.update { value ->
+            value.copy(eventAccessCode = eventAccessCode.filter { it.isDigit() })
+        }
+    }
+
+    fun onConfirmClicked() {
+        confirmJob?.cancel()
+        confirmJob = viewModelScope.launch {
+            val state = _state.value
+            val result = eventsInteractor.joinEvent(
+                eventId = state.eventId.toLong(),
+                accessCode = state.eventAccessCode
+            )
+            when (result) {
+                is JoinEventResult.NewCurrentEvent -> withContext(UI) {
+                    navigationController.navigateTo(expensesScreenDestination)
+                }
+
+                JoinEventResult.InvalidAccessCode -> Unit
+                JoinEventResult.EventNotFound -> Unit // TODO mvp
+            }
+        }
+    }
+}
