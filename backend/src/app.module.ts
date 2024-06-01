@@ -4,6 +4,8 @@ import {AppService} from './app.service';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {config} from './config';
 import {ConfigModule, ConfigService} from '@nestjs/config';
+import {Currency} from './currency/currency.entity';
+import {Event} from './event/event.entity';
 
 @Module({
   imports: [
@@ -16,7 +18,8 @@ import {ConfigModule, ConfigService} from '@nestjs/config';
         username: configService.get('POSTGRES_USER_NAME'),
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DATABASE'),
-        entities: [],
+        entities: [Currency, Event],
+        migrations: ['migrations/default/**/*.{ts,js}'],
       }),
       inject: [ConfigService],
       imports: [ConfigModule],
