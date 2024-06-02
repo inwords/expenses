@@ -20,6 +20,7 @@ internal class CreateEventViewModel(
     private val navigationController: DefaultNavigationController,
     private val eventsInteractor: EventsInteractor,
     private val addParticipantsDestination: Destination,
+    private val homeScreenDestination: Destination,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
     private var confirmJob: Job? = null
@@ -42,7 +43,10 @@ internal class CreateEventViewModel(
                 eventName = state.eventName
             )
             withContext(UI) {
-                navigationController.navigateTo(addParticipantsDestination)
+                navigationController.navigateTo(
+                    screen = addParticipantsDestination,
+                    popUpTo = homeScreenDestination
+                )
             }
         }
     }

@@ -8,6 +8,6 @@ import com.inwords.expenses.feature.events.data.db.entity.PersonEntity
 interface PersonsDao {
 
     @Upsert
-    suspend fun insert(personEntity: PersonEntity): Long
+    suspend fun insert(personEntities: List<PersonEntity>): List<Long>
 
 }

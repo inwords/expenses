@@ -12,11 +12,15 @@ object HomeScreenDestination : Destination
 
 fun NavGraphBuilder.homeScreen(
     onNavigateToExpenses: () -> Unit,
+    onNavigateToCreateEvent: () -> Unit,
+    onNavigateToJoinEvent: () -> Unit,
 ) {
     composable<HomeScreenDestination> {
         val viewModel = viewModel<HomeViewModel>(it)
         HomeScreen(
             onNavigateToExpenses = onNavigateToExpenses,
+            onNavigateToCreateEvent = onNavigateToCreateEvent,
+            onNavigateToJoinEvent = onNavigateToJoinEvent,
             state = viewModel.state.collectAsStateWithLifecycle().value,
         )
     }

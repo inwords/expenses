@@ -11,12 +11,12 @@ internal class PersonsRepositoryImpl(
 
     private val personsDao by personsDaoLazy
 
-    override suspend fun insert(person: Person): Person {
-        val id = personsDao.insert(person.toEntity()).takeIf { it != -1L }
-        return if (id == null) {
-            person
-        } else {
-            person.copy(id = id)
+    override suspend fun insert(persons: List<Person>): List<Person> {
+        val personEntities = persons.map { it.toEntity() }
+        val ids = personsDao.insert(personEntities)
+
+        return persons.zip(ids) { person, id ->
+            id.takeIf { it != -1L }?.let { person.copy(id = it) } ?: person
         }
     }
 

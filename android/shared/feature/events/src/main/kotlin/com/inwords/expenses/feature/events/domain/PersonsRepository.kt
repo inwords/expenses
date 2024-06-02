@@ -4,5 +4,5 @@ import com.inwords.expenses.feature.events.domain.model.Person
 
 internal interface PersonsRepository {
 
-    suspend fun insert(person: Person): Person
+    suspend fun insert(persons: List<Person>): List<Person>
 }

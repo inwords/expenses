@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package settings;
+
+option java_package = "com.inwords.expenses.feature.settings.data";
+option java_multiple_files = true;
+
+message Settings {
+  int64 current_event_id = 1;
+}

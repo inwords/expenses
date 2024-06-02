@@ -20,12 +20,12 @@ internal class CurrenciesRepositoryImpl(
         }
     }
 
-    override suspend fun insert(currency: Currency): Currency {
-        val id = currenciesDao.insert(currency.toEntity()).takeIf { it != -1L }
-        return if (id == null) {
-            currency
-        } else {
-            currency.copy(id = id)
+    override suspend fun insert(currencies: List<Currency>): List<Currency> {
+        val currencyEntities = currencies.map { it.toEntity() }
+        val ids = currenciesDao.insert(currencyEntities)
+
+        return currencies.zip(ids) { currency, id ->
+            id.takeIf { it != -1L }?.let { currency.copy(id = it) } ?: currency
         }
     }
 

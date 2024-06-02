@@ -1,6 +1,7 @@
 package com.inwords.expenses.feature.databases.api
 
 import android.content.Context
+import androidx.room.RoomDatabase
 import com.inwords.expenses.feature.databases.data.createAppDatabase
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
@@ -13,13 +14,15 @@ class DatabasesComponent(private val deps: Deps) {
         val context: Context
     }
 
-    private val db by lazy {
+    private val roomDb by lazy {
         createAppDatabase(deps.context)
     }
 
+    val db: RoomDatabase get() = roomDb
+
     // Room DAOs are lazy initialized by Room itself
-    val eventsDao: EventsDao get() = db.eventsDao()
-    val expensesDao: ExpensesDao get() = db.expensesDao()
-    val currenciesDao: CurrenciesDao get() = db.currenciesDao()
-    val personsDao: PersonsDao get() = db.personsDao()
+    val eventsDao: EventsDao get() = roomDb.eventsDao()
+    val expensesDao: ExpensesDao get() = roomDb.expensesDao()
+    val currenciesDao: CurrenciesDao get() = roomDb.currenciesDao()
+    val personsDao: PersonsDao get() = roomDb.personsDao()
 }

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 interface CurrenciesDao {
 
     @Upsert
-    suspend fun insert(personEntity: CurrencyEntity): Long
+    suspend fun insert(currencyEntities: List<CurrencyEntity>): List<Long>
 
     @Query("SELECT * FROM ${CurrencyEntity.TABLE_NAME}")
     fun queryAll(): Flow<List<CurrencyEntity>>

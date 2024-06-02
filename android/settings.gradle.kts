@@ -37,6 +37,7 @@ include(":shared:core:storage-utils")
 include(":shared:core:ui-utils")
 
 include("shared:feature")
+include("shared:feature:settings")
 include("shared:feature:events")
 include("shared:feature:expenses")
 

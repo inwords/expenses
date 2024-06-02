@@ -17,6 +17,8 @@ import com.inwords.expenses.ui.theme.ExpensesTheme
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
     onNavigateToExpenses: () -> Unit,
+    onNavigateToCreateEvent: () -> Unit,
+    onNavigateToJoinEvent: () -> Unit,
     state: HomeScreenUiModel,
 ) {
     Column(
@@ -26,6 +28,12 @@ internal fun HomeScreen(
     ) {
         Button(onClick = onNavigateToExpenses) {
             Text(text = "Expenses")
+        }
+        Button(onClick = onNavigateToCreateEvent) {
+            Text(text = "Create event")
+        }
+        Button(onClick = onNavigateToJoinEvent) {
+            Text(text = "Join event")
         }
     }
 }
@@ -37,6 +45,8 @@ private fun HomeScreenPreview() {
         Surface {
             HomeScreen(
                 onNavigateToExpenses = {},
+                onNavigateToCreateEvent = {},
+                onNavigateToJoinEvent = {},
                 state = HomeScreenUiModel(
                     "Дайте ещё этих сладких Французских булок",
                 ),

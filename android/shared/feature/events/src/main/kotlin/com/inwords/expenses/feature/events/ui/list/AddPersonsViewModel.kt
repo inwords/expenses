@@ -54,7 +54,7 @@ internal class AddPersonsViewModel(
             val state = _state.value
 
             eventsInteractor.draftOwner(state.ownerName)
-            eventsInteractor.draftPersons(state.persons)
+            eventsInteractor.draftOtherPersons(state.persons)
             eventsInteractor.createEvent()
 
             withContext(UI) {

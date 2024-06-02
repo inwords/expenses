@@ -7,5 +7,5 @@ internal interface CurrenciesRepository {
 
     fun getCurrencies(): Flow<List<Currency>>
 
-    suspend fun insert(currency: Currency): Currency
+    suspend fun insert(currencies: List<Currency>): List<Currency>
 }

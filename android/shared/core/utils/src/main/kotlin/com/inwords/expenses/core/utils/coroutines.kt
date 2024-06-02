@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlin.experimental.ExperimentalTypeInference
@@ -20,6 +21,16 @@ fun <T> Flow<T>.collectIn(
     val flow = this
     scope.launch {
         flow.collect(collector)
+    }
+}
+
+fun <T> Flow<T>.collectLatestIn(
+    scope: CoroutineScope,
+    action: suspend (value: T) -> Unit
+) {
+    val flow = this
+    scope.launch {
+        flow.collectLatest(action)
     }
 }
 

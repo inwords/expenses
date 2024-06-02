@@ -9,5 +9,8 @@ interface NavigationController {
     fun navigateTo(screen: Destination)
 
     @MainThread
+    fun navigateTo(screen: Destination, popUpTo: Destination)
+
+    @MainThread
     fun popBackStack()
 }

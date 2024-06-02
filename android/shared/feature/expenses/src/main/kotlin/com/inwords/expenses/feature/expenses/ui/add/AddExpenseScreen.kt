@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
@@ -34,9 +35,48 @@ import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.Curr
 import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.PersonInfoUiModel
 import java.math.BigDecimal
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun AddExpenseScreen(
+    modifier: Modifier = Modifier,
+    onHomeClicked: () -> Unit,
+    onAmountChanged: (String) -> Unit,
+    onCurrencyClicked: (Currency) -> Unit,
+    onExpenseTypeClicked: (ExpenseType) -> Unit,
+    onPersonClicked: (Person) -> Unit,
+    onSubjectPersonClicked: (Person) -> Unit,
+    onConfirmClicked: () -> Unit,
+    state: SimpleScreenState<AddExpenseScreenUiModel>,
+) {
+    when (state) {
+        is SimpleScreenState.Success -> AddExpenseScreenSuccess(
+            modifier = modifier,
+            onHomeClicked = onHomeClicked,
+            onAmountChanged = onAmountChanged,
+            onCurrencyClicked = onCurrencyClicked,
+            onExpenseTypeClicked = onExpenseTypeClicked,
+            onPersonClicked = onPersonClicked,
+            onSubjectPersonClicked = onSubjectPersonClicked,
+            onConfirmClicked = onConfirmClicked,
+            state = state.data
+        )
+
+        is SimpleScreenState.Loading -> {
+            Text(text = "Loading")
+        }
+
+        is SimpleScreenState.Error -> {
+            Text(text = "Error")
+        }
+
+        SimpleScreenState.Empty -> {
+            Text(text = "No expenses")
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun AddExpenseScreenSuccess(
     modifier: Modifier = Modifier,
     onHomeClicked: () -> Unit,
     onAmountChanged: (String) -> Unit,
@@ -187,16 +227,16 @@ fun ButtonRound(
 
 @Preview(showBackground = true)
 @Composable
-private fun ExpensesScreenPreview() {
-    AddExpenseScreen(
+private fun ExpensesScreenSuccessPreview() {
+    AddExpenseScreenSuccess(
         onHomeClicked = {},
-        state = mockAddExpenseScreenUiModel(),
         onAmountChanged = {},
         onCurrencyClicked = {},
         onExpenseTypeClicked = {},
         onPersonClicked = {},
         onSubjectPersonClicked = {},
         onConfirmClicked = {},
+        state = mockAddExpenseScreenUiModel(),
     )
 }
 
