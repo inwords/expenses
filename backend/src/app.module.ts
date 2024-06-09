@@ -7,6 +7,7 @@ import {ConfigModule, ConfigService} from '@nestjs/config';
 import {join} from 'path';
 import {SnakeNamingStrategy} from 'typeorm-naming-strategies';
 import {EventModule} from './event/event.module';
+import {HashingModule} from "./hashing/hashing.module";
 
 console.log(join(__dirname, `migrations/default/**/*.{ts,js}`));
 console.log(join(__dirname, `**/*.entity.{ts,js}`));
@@ -26,7 +27,7 @@ console.log(join(__dirname, `**/*.entity.{ts,js}`));
         namingStrategy: new SnakeNamingStrategy(),
       }),
       inject: [ConfigService],
-      imports: [ConfigModule, EventModule],
+      imports: [ConfigModule, EventModule, HashingModule],
     }),
   ],
   controllers: [AppController],

@@ -20,6 +20,9 @@ export class Event {
   @Column({type: 'jsonb'})
   users: string | Array<User>;
 
+  @Column()
+  pinCode: string;
+
   @ManyToOne(() => Currency)
   @JoinColumn({name: 'currency_id'})
   currency: Currency;

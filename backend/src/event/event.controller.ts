@@ -1,19 +1,21 @@
-import {Body, Controller, HttpCode, Post} from '@nestjs/common';
-import {EVENT_ROUTES} from './constants';
+import {Body, Controller, Get, HttpCode, Param, Post, Query} from '@nestjs/common';
+import {EVENT_ROUTES, ROOT_PATH} from './constants';
 import {EventService} from './event.service';
-import {CrateEventBodyDto} from './dto/event';
-import {ulid} from 'ulid';
+import {CrateEventBodyDto, EventIdDto, GetEventInfoQueryDto} from './dto/event';
 
-@Controller(EVENT_ROUTES)
+@Controller(ROOT_PATH)
 export class EventController {
   constructor(private readonly eventService: EventService) {}
-  @Post('/')
+  @Post(EVENT_ROUTES.event)
   @HttpCode(201)
-  createEvent(@Body() body: CrateEventBodyDto) {
-    const mappedUsers = body.users.map((user) => {
-      return {...user, id: ulid()};
-    });
+  async createEvent(@Body() body: CrateEventBodyDto) {
+    return this.eventService.saveEvent(body);
+  }
 
-    return this.eventService.saveEvent({...body, users: mappedUsers});
+  @Get(EVENT_ROUTES.getEventInfo)
+  async getEventInfo(@Param() {eventId}: EventIdDto, @Query() query: GetEventInfoQueryDto) {
+    console.log("-> eventId", eventId);
+    console.log("-> query", query);
+    return this.eventService.getEventInfo(eventId, query.pinCode);
   }
 }

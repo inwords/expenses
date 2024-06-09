@@ -30,4 +30,20 @@ export class CrateEventBodyDto {
   @ValidateNested()
   @Type(() => UserDto)
   users!: Array<Omit<User, 'id'>>;
+
+  @ApiProperty()
+  @IsString()
+  pinCode!: string;
+}
+
+export class GetEventInfoQueryDto {
+  @ApiProperty()
+  @IsString()
+  pinCode!: string
+}
+
+export class EventIdDto {
+  @ApiProperty()
+  @IsString()
+  eventId!: string
 }
