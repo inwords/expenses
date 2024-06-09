@@ -10,10 +10,6 @@ export const createEvent = async (event: CreateEvent) => {
       body: JSON.stringify(event),
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
     const responseData = await response.json();
     return responseData;
   } catch (error) {}
@@ -30,10 +26,6 @@ export const getEventInfo = async (eventId: string, queryParams: Record<string, 
         'Content-Type': 'application/json',
       },
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
 
     const responseData = await response.json();
     return responseData;
