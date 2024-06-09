@@ -17,9 +17,11 @@ export class EventService {
       return {...user, id: String(idx)};
     });
 
-    return await this.entityManager
+    const {pinCode, ...rest} = await this.entityManager
       .getRepository(Event)
       .save({...event, users: mappedUsers, pinCode: await this.hashingService.getHash(event.pinCode)});
+
+    return rest;
   }
 
   public async getEventInfo(eventId: string, pinCode: string) {
