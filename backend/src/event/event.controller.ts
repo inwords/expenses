@@ -14,8 +14,6 @@ export class EventController {
 
   @Get(EVENT_ROUTES.getEventInfo)
   async getEventInfo(@Param() {eventId}: EventIdDto, @Query() query: GetEventInfoQueryDto) {
-    console.log('-> eventId', eventId);
-    console.log('-> query', query);
     return this.eventService.getEventInfo(eventId, query.pinCode);
   }
 }
