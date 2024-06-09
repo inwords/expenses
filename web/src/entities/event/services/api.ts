@@ -1,13 +1,13 @@
 import {CreateEvent} from '@/entities/event/types/types';
 
-export const createEvent = async (entity: CreateEvent) => {
+export const createEvent = async (event: CreateEvent) => {
   try {
     const response = await fetch('http://localhost:3001/event', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(entity),
+      body: JSON.stringify(event),
     });
 
     if (!response.ok) {
