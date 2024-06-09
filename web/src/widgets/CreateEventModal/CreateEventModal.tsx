@@ -1,5 +1,5 @@
 import {Dialog, DialogContent, DialogTitle} from '@mui/material';
-import {CreateEventForm} from '@/widgets/CreateEventForm/CreateEventForm';
+import {CreateEventForm} from "@/features/CreateEvent/ui/CreateEventForm";
 
 interface Props {
   isOpen: boolean;

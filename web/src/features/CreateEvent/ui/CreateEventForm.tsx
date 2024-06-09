@@ -6,12 +6,16 @@ import {EventNameInput} from '@/features/CreateEvent/ui/EventNameInput';
 import {EventUsers} from '@/features/CreateEvent/ui/EventUsers';
 import {SelectCurrency} from '@/features/AddExpense/ui/SelectCurrency';
 import {SelectEventOwner} from '@/features/CreateEvent/ui/SelectEventOwner';
+import {createEvent} from '@/entities/event/services/api';
+import {EventPinCodeInput} from "@/entities/event/ui/EventPinCodeInput";
 
 export const CreateEventForm = () => {
   return (
-    <FormContainer onSuccess={(d) => console.log(d)}>
+    <FormContainer onSuccess={(data) => createEvent(data)}>
       <Stack spacing={2} maxWidth={600}>
         <EventNameInput />
+
+        <EventPinCodeInput />
 
         <EventUsers />
 
@@ -22,7 +26,7 @@ export const CreateEventForm = () => {
 
       <Stack justifyContent="end" marginTop={'16px'}>
         <Button type={'submit'} variant="contained">
-          Добавить трату
+          Создать поездку
         </Button>
       </Stack>
     </FormContainer>
