@@ -4,9 +4,12 @@ import {AppService} from './app.service';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {config} from './config';
 import {ConfigModule, ConfigService} from '@nestjs/config';
-import {Currency} from './currency/currency.entity';
-import {Event} from './event/event.entity';
+import {join} from 'path';
+import {SnakeNamingStrategy} from 'typeorm-naming-strategies';
+import {EventModule} from './event/event.module';
 
+console.log(join(__dirname, `migrations/default/**/*.{ts,js}`));
+console.log(join(__dirname, `**/*.entity.{ts,js}`));
 @Module({
   imports: [
     ConfigModule.forRoot({envFilePath: '.env', load: [config]}),
@@ -18,11 +21,12 @@ import {Event} from './event/event.entity';
         username: configService.get('POSTGRES_USER_NAME'),
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DATABASE'),
-        entities: [Currency, Event],
-        migrations: ['migrations/default/**/*.{ts,js}'],
+        entities: [join(__dirname, `/**/*.entity.{ts,js}`)],
+        migrations: [join(__dirname, `migrations/default/**/*.{ts,js}`)],
+        namingStrategy: new SnakeNamingStrategy(),
       }),
       inject: [ConfigService],
-      imports: [ConfigModule],
+      imports: [ConfigModule, EventModule],
     }),
   ],
   controllers: [AppController],
