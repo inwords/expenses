@@ -1,1 +1,5 @@
-export const EVENT_ROUTES = '/event';
+export const EVENT_ROUTES = {
+  root: '/event',
+  event: `/`,
+  getEventInfo: `/:eventId`,
+};

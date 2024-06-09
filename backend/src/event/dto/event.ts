@@ -1,5 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {IsString, ValidateNested} from 'class-validator';
+import {IsString, MaxLength, ValidateNested} from 'class-validator';
 import {User} from '../types';
 import {Type} from 'class-transformer';
 
@@ -30,4 +30,21 @@ export class CrateEventBodyDto {
   @ValidateNested()
   @Type(() => UserDto)
   users!: Array<Omit<User, 'id'>>;
+
+  @ApiProperty()
+  @IsString()
+  pinCode!: string;
+}
+
+export class GetEventInfoQueryDto {
+  @ApiProperty()
+  @IsString()
+  @MaxLength(4)
+  pinCode!: string;
+}
+
+export class EventIdDto {
+  @ApiProperty()
+  @IsString()
+  eventId!: string;
 }
