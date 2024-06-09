@@ -24,7 +24,9 @@ async function bootstrap() {
     .addTag('expenses')
     .build();
   const document = SwaggerModule.createDocument(app, config);
+
   SwaggerModule.setup('swagger/api', app, document);
+  app.enableCors({origin: '*'});
 
   await app.listen(3001);
 }

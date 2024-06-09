@@ -2,20 +2,17 @@ import {FormContainer} from 'react-hook-form-mui';
 import {EventInput} from '@/features/FindEvent/ui/EventInput';
 import {FindEventButton} from '@/features/FindEvent/ui/FindEventButton';
 import {Box, Stack} from '@mui/material';
-import {EventCodeInput} from '@/features/FindEvent/ui/EvenCodetInput';
-import {useNavigate} from 'react-router';
-import {ROUTES} from '@/shared/routing/constants';
+import {EventPinCodeInput} from '@/entities/event/ui/EventPinCodeInput';
+import {getEventInfo} from '@/entities/event/services/api';
 
 export const FindEventForm = () => {
-  const navigate = useNavigate();
-
   return (
     <Box display="flex" justifyContent="center" marginTop={'20px'}>
-      <FormContainer onSuccess={(d) => navigate(`${ROUTES.Event(d.eventId)}`)}>
+      <FormContainer onSuccess={(d) => getEventInfo(d.eventId, {pinCode: d.pinCode})}>
         <Stack direction="column" spacing={2} minWidth={300}>
           <EventInput />
 
-          <EventCodeInput />
+          <EventPinCodeInput />
 
           <FindEventButton />
         </Stack>
