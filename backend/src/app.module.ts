@@ -4,6 +4,10 @@ import {AppService} from './app.service';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {config} from './config';
 import {ConfigModule, ConfigService} from '@nestjs/config';
+import {join} from 'path';
+import {SnakeNamingStrategy} from 'typeorm-naming-strategies';
+import {EventModule} from './event/event.module';
+import {HashingModule} from './hashing/hashing.module';
 
 @Module({
   imports: [
@@ -16,10 +20,12 @@ import {ConfigModule, ConfigService} from '@nestjs/config';
         username: configService.get('POSTGRES_USER_NAME'),
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DATABASE'),
-        entities: [],
+        entities: [join(__dirname, `/**/*.entity.{ts,js}`)],
+        migrations: [join(__dirname, `migrations/default/**/*.{ts,js}`)],
+        namingStrategy: new SnakeNamingStrategy(),
       }),
       inject: [ConfigService],
-      imports: [ConfigModule],
+      imports: [ConfigModule, EventModule, HashingModule],
     }),
   ],
   controllers: [AppController],

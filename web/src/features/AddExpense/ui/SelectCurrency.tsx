@@ -4,7 +4,7 @@ export const SelectCurrency = () => {
   return (
     <SelectElement
       label="Валюта"
-      name="currency"
+      name="currencyId"
       options={[
         {
           id: '1',
