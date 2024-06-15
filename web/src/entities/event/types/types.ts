@@ -3,8 +3,7 @@ import {User} from '@/entities/user/types/types';
 export interface Event {
   id: string;
   name: string;
-  ownerId: string;
-  currencyId: string;
+  currencyId: number;
   users: Array<User>;
   pinCode: string;
 }

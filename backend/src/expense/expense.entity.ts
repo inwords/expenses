@@ -1,30 +1,31 @@
-import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {Currency} from '../currency/currency.entity';
 import {SplitInfo} from './types';
-import {Event} from "../event/event.entity";
+import {Event} from '../event/event.entity';
+import {User} from '../user/user.entity';
 
 @Entity('expense')
 export class Expense {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column()
-  name: string;
-
-  @Column('decimal', {precision: 10, scale: 2})
-  amount: number;
+  description: string;
 
   @Column()
-  userWhoPaid: string;
+  userWhoPaidId: number;
 
   @Column()
-  currencyId: string;
+  currencyId: number;
 
   @Column()
-  eventId: string;
+  eventId: number;
 
   @Column({type: 'jsonb'})
   splitInformation: string | Array<SplitInfo>;
+
+  @CreateDateColumn({type: 'timestamptz'})
+  createdAt!: Date;
 
   @ManyToOne(() => Currency)
   @JoinColumn({name: 'currency_id'})
@@ -33,4 +34,8 @@ export class Expense {
   @ManyToOne(() => Event)
   @JoinColumn({name: 'event_id'})
   event: Event;
+
+  @ManyToOne(() => Currency)
+  @JoinColumn({name: 'user_who_paid_id'})
+  user: User;
 }

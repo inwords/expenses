@@ -11,15 +11,15 @@ export const SelectUser = ({name, label}: Props) => {
       label={label}
       options={[
         {
-          id: '1',
+          id: 1,
           label: 'Ignat',
         },
         {
-          id: '2',
+          id: 2,
           label: 'Vasya',
         },
         {
-          id: '3',
+          id: 3,
           label: 'Dog',
         },
       ]}
