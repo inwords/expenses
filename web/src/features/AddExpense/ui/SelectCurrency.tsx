@@ -7,15 +7,15 @@ export const SelectCurrency = () => {
       name="currencyId"
       options={[
         {
-          id: '1',
+          id: 2,
           label: 'EUR',
         },
         {
-          id: '2',
+          id: 1,
           label: 'USD',
         },
         {
-          id: '3',
+          id: 3,
           label: 'RUB',
         },
       ]}

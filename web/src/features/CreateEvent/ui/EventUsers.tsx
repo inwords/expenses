@@ -16,8 +16,6 @@ export const EventUsers = () => {
         return (
           <React.Fragment key={field.id}>
             <TextFieldElement name={`users.${index}.name`} label={'Имя'} required />
-
-            <TextFieldElement name={`users.${index}.phone`} label={'Номер телефона'} required />
           </React.Fragment>
         );
       })}
