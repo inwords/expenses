@@ -5,7 +5,6 @@ import React from 'react';
 import {EventNameInput} from '@/features/CreateEvent/ui/EventNameInput';
 import {EventUsers} from '@/features/CreateEvent/ui/EventUsers';
 import {SelectCurrency} from '@/features/AddExpense/ui/SelectCurrency';
-import {SelectEventOwner} from '@/features/CreateEvent/ui/SelectEventOwner';
 import {createEvent} from '@/entities/event/services/api';
 import {EventPinCodeInput} from "@/entities/event/ui/EventPinCodeInput";
 
@@ -18,8 +17,6 @@ export const CreateEventForm = () => {
         <EventPinCodeInput />
 
         <EventUsers />
-
-        <SelectEventOwner />
 
         <SelectCurrency />
       </Stack>

@@ -1,6 +1,8 @@
 import {CreateEvent} from '@/entities/event/types/types';
 
 export const createEvent = async (event: CreateEvent) => {
+  console.log("-> event", event);
+
   try {
     const response = await fetch('http://localhost:3001/event', {
       method: 'POST',

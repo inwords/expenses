@@ -7,7 +7,8 @@ import {ConfigModule, ConfigService} from '@nestjs/config';
 import {join} from 'path';
 import {SnakeNamingStrategy} from 'typeorm-naming-strategies';
 import {EventModule} from './event/event.module';
-import {HashingModule} from './hashing/hashing.module';
+import {CurrencyModule} from './currency/currency.module';
+import {ExpenseModule} from './expense/expense.module';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import {HashingModule} from './hashing/hashing.module';
         namingStrategy: new SnakeNamingStrategy(),
       }),
       inject: [ConfigService],
-      imports: [ConfigModule, EventModule, HashingModule],
+      imports: [ConfigModule, EventModule, CurrencyModule, ExpenseModule],
     }),
   ],
   controllers: [AppController],
