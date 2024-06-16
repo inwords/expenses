@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":shared:core:ui-utils"))
     implementation(project(":shared:core:navigation"))
     implementation(project(":shared:feature:events"))
+    implementation(project(":shared:feature:settings"))
 
     implementation(shared.coroutines.android)
 

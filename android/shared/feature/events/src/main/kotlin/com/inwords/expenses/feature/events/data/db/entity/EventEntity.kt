@@ -15,16 +15,9 @@ import androidx.room.PrimaryKey
             childColumns = [EventEntity.ColumnNames.PRIMARY_CURRENCY],
             onDelete = ForeignKey.RESTRICT
         ),
-        ForeignKey(
-            entity = PersonEntity::class,
-            parentColumns = [PersonEntity.ColumnNames.ID],
-            childColumns = [EventEntity.ColumnNames.PRIMARY_PERSON_ID],
-            onDelete = ForeignKey.RESTRICT
-        )
     ],
     indices = [
         Index(value = [EventEntity.ColumnNames.PRIMARY_CURRENCY]),
-        Index(value = [EventEntity.ColumnNames.PRIMARY_PERSON_ID])
     ]
 )
 data class EventEntity(
@@ -37,9 +30,6 @@ data class EventEntity(
 
     @ColumnInfo(ColumnNames.PRIMARY_CURRENCY)
     val primaryCurrencyId: Long,
-
-    @ColumnInfo(ColumnNames.PRIMARY_PERSON_ID)
-    val primaryPersonId: Long,
 ) {
     companion object {
 
@@ -51,6 +41,5 @@ data class EventEntity(
         const val ID = "event_id"
         const val NAME = "name"
         const val PRIMARY_CURRENCY = "primary_currency_id"
-        const val PRIMARY_PERSON_ID = "primary_person_id"
     }
 }

@@ -4,22 +4,23 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +39,6 @@ import java.math.BigDecimal
 @Composable
 internal fun AddExpenseScreen(
     modifier: Modifier = Modifier,
-    onHomeClicked: () -> Unit,
     onAmountChanged: (String) -> Unit,
     onCurrencyClicked: (Currency) -> Unit,
     onExpenseTypeClicked: (ExpenseType) -> Unit,
@@ -50,7 +50,6 @@ internal fun AddExpenseScreen(
     when (state) {
         is SimpleScreenState.Success -> AddExpenseScreenSuccess(
             modifier = modifier,
-            onHomeClicked = onHomeClicked,
             onAmountChanged = onAmountChanged,
             onCurrencyClicked = onCurrencyClicked,
             onExpenseTypeClicked = onExpenseTypeClicked,
@@ -78,7 +77,6 @@ internal fun AddExpenseScreen(
 @Composable
 private fun AddExpenseScreenSuccess(
     modifier: Modifier = Modifier,
-    onHomeClicked: () -> Unit,
     onAmountChanged: (String) -> Unit,
     onCurrencyClicked: (Currency) -> Unit,
     onExpenseTypeClicked: (ExpenseType) -> Unit,
@@ -88,37 +86,33 @@ private fun AddExpenseScreenSuccess(
     state: AddExpenseScreenUiModel,
 ) {
     Column(
-        horizontalAlignment = Alignment.Start,
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Bottom,
-        modifier = modifier.fillMaxSize()
     ) {
-        Button(
+        Text(
+            modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
+            text = "Оплатил",
+            style = MaterialTheme.typography.headlineMedium
+        )
+        FlowRow(
             modifier = Modifier
-                .padding(
-                    horizontal = 8.dp,
-                    vertical = 32.dp
-                ),
-            onClick = onHomeClicked
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(text = "Home")
+            state.persons.forEach { person ->
+                InputChip(
+                    selected = person.selected,
+                    onClick = { onPersonClicked.invoke(person.person) },
+                    label = { Text(text = person.person.name) }
+                )
+            }
         }
 
-        TextField(
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .fillMaxWidth(),
-            textStyle = MaterialTheme.typography.displaySmall,
-            value = state.amount?.toString().orEmpty(),
-            label = { Text(text = "Сумма") },
-            onValueChange = onAmountChanged,
-            keyboardOptions = KeyboardOptions(
-                autoCorrectEnabled = false,
-                keyboardType = KeyboardType.Decimal,
-                imeAction = ImeAction.Done,
-            ),
-            singleLine = true
+        Text(
+            modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
+            text = "Валюта",
+            style = MaterialTheme.typography.headlineMedium
         )
-
         FlowRow(
             modifier = Modifier
                 .padding(horizontal = 8.dp),
@@ -133,6 +127,11 @@ private fun AddExpenseScreenSuccess(
             }
         }
 
+        Text(
+            modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
+            text = "Операция",
+            style = MaterialTheme.typography.headlineMedium
+        )
         FlowRow(
             modifier = Modifier
                 .padding(horizontal = 8.dp),
@@ -150,20 +149,28 @@ private fun AddExpenseScreenSuccess(
             )
         }
 
-        FlowRow(
-            modifier = Modifier
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            state.persons.forEach { person ->
-                InputChip(
-                    selected = person.selected,
-                    onClick = { onPersonClicked.invoke(person.person) },
-                    label = { Text(text = person.person.name) }
-                )
-            }
+        Text(
+            modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
+            text = "Разделить",
+            style = MaterialTheme.typography.headlineMedium
+        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                text = "Поровну",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Switch(
+                checked = true,
+                onCheckedChange = { /*TODO*/ }, // TODO: Implement
+                modifier = Modifier.padding(end = 8.dp)
+            )
+            Text(
+                modifier = Modifier.padding(end = 8.dp),
+                text = "между:",
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
-
         FlowRow(
             modifier = Modifier
                 .padding(horizontal = 8.dp),
@@ -177,6 +184,23 @@ private fun AddExpenseScreenSuccess(
                 )
             }
         }
+
+        OutlinedTextField(
+            modifier = Modifier
+                .padding(start = 8.dp, top = 12.dp, end = 8.dp, bottom = 24.dp)
+                .fillMaxWidth(),
+            textStyle = MaterialTheme.typography.displaySmall,
+            value = state.amount?.toString().orEmpty(),
+            label = { Text(text = "Сумма") },
+            onValueChange = onAmountChanged,
+            keyboardActions = KeyboardActions(onDone = { onConfirmClicked.invoke() }),
+            keyboardOptions = KeyboardOptions(
+                autoCorrectEnabled = false,
+                keyboardType = KeyboardType.Decimal,
+                imeAction = ImeAction.Done,
+            ),
+            singleLine = true
+        )
 
         Button(
             modifier = Modifier
@@ -195,41 +219,10 @@ private fun AddExpenseScreenSuccess(
     }
 }
 
-@Composable
-fun ButtonRound(
-    modifier: Modifier = Modifier,
-    isSelected: Boolean,
-    text: String,
-    onClick: () -> Unit
-) {
-    val containerColor = if (isSelected) {
-        MaterialTheme.colorScheme.secondaryContainer
-    } else {
-        MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
-    }
-    val contentColor = if (isSelected) {
-        MaterialTheme.colorScheme.onSecondaryContainer
-    } else {
-        MaterialTheme.colorScheme.onSecondary
-    }
-    Button(
-        onClick = onClick,
-        modifier = modifier,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = containerColor,
-            contentColor = contentColor
-        ),
-        shape = CircleShape
-    ) {
-        Text(text)
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun ExpensesScreenSuccessPreview() {
     AddExpenseScreenSuccess(
-        onHomeClicked = {},
         onAmountChanged = {},
         onCurrencyClicked = {},
         onExpenseTypeClicked = {},
@@ -305,6 +298,10 @@ internal fun mockAddExpenseScreenUiModel(): AddExpenseScreenUiModel {
             ),
         ),
         subjectPersons = listOf(
+            PersonInfoUiModel(
+                person = person1,
+                selected = true
+            ),
             PersonInfoUiModel(
                 person = person2,
                 selected = true

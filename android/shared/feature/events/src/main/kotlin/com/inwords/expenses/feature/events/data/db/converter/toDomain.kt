@@ -22,7 +22,6 @@ internal fun EventWithDetailsQuery.toDomain(): EventDetails {
         currencies = currencies.map { it.toDomain() },
         persons = persons.map { it.toDomain() },
         primaryCurrency = primaryCurrency.toDomain(),
-        primaryPerson = primaryPerson.toDomain(),
     )
 }
 

@@ -1,4 +1,4 @@
-package com.inwords.expenses.feature.events.ui.list
+package com.inwords.expenses.feature.events.ui.add_persons
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,8 +17,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.feature.events.ui.common.PersonNameField
@@ -42,6 +48,8 @@ internal fun AddPersonsScreen(
                 .verticalScroll(scrollState)
                 .align(Alignment.Center),
         ) {
+            val focusRequester = remember { FocusRequester() }
+            var requestFocus = remember { mutableStateOf(false) }
             Text(
                 modifier = Modifier.padding(bottom = 4.dp),
                 text = "Меня зовут",
@@ -50,7 +58,12 @@ internal fun AddPersonsScreen(
             PersonNameField(
                 modifier = Modifier.padding(bottom = 16.dp),
                 participantName = state.ownerName,
-                onParticipantNameChanged = onOwnerNameChanged
+                imeAction = ImeAction.Next,
+                onImeAction = {
+                    onAddParticipantClicked.invoke()
+                    requestFocus.value = true
+                },
+                onParticipantNameChanged = onOwnerNameChanged,
             )
 
             Text(
@@ -60,10 +73,29 @@ internal fun AddPersonsScreen(
             )
             state.persons.forEachIndexed { i, name ->
                 PersonNameField(
-                    modifier = Modifier.padding(bottom = 8.dp),
+                    modifier = if (i == state.persons.size - 1) {
+                        Modifier
+                            .padding(bottom = 8.dp)
+                            .focusRequester(focusRequester)
+                            .onGloballyPositioned {
+                                if (requestFocus.value) {
+                                    focusRequester.requestFocus()
+                                    requestFocus.value = false
+                                }
+                            }
+                    } else {
+                        Modifier
+                            .padding(bottom = 8.dp)
+                    },
                     participantName = name,
+                    imeAction = ImeAction.Next,
+                    onImeAction = {
+                        onAddParticipantClicked.invoke()
+                        requestFocus.value = true
+                    },
                     onParticipantNameChanged = { onParticipantNameChanged(i, it) }
                 )
+
             }
             OutlinedButton(onClick = onAddParticipantClicked) {
                 Text(text = "Добавить участника")

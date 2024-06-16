@@ -14,4 +14,12 @@ internal class SettingsRepositoryImpl(
     override fun getCurrentEventId(): Flow<Long?> {
         return settingsLocalDataSource.getCurrentEventId()
     }
+
+    override suspend fun setCurrentPersonId(userId: Long) {
+        settingsLocalDataSource.setCurrentPersonId(userId)
+    }
+
+    override fun getCurrentPersonId(): Flow<Long?> {
+        return settingsLocalDataSource.getCurrentPersonId()
+    }
 }

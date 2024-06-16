@@ -16,7 +16,6 @@ internal interface EventsRepository {
         eventToInsert: Event,
         personsToInsert: List<Person>,
         currenciesToInsert: List<Currency>,
-        primaryPersonIndex: Int,
         primaryCurrencyIndex: Int
     ): EventDetails
 }

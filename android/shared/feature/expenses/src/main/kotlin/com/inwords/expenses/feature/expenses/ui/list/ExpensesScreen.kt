@@ -15,12 +15,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,22 +34,22 @@ import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.domain.model.Expense
+import com.inwords.expenses.feature.expenses.domain.model.ExpenseSplitWithPerson
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.ExpenseUiModel
+import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
 import kotlinx.datetime.Clock
 
 @Composable
 internal fun ExpensesScreen(
     modifier: Modifier = Modifier,
     onAddExpenseClick: () -> Unit,
-    onHomeClick: () -> Unit,
     state: SimpleScreenState<ExpensesScreenUiModel>,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         when (state) {
             is SimpleScreenState.Success -> ExpensesScreenSuccess(
                 modifier = modifier,
-                onHomeClick = onHomeClick,
                 state = state.data,
             )
 
@@ -72,7 +74,7 @@ internal fun ExpensesScreen(
         ) {
             Icon(Icons.Outlined.Add, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Добавить расход")
+            Text(text = "Операция")
         }
     }
 }
@@ -80,29 +82,59 @@ internal fun ExpensesScreen(
 @Composable
 internal fun ExpensesScreenSuccess(
     modifier: Modifier = Modifier,
-    onHomeClick: () -> Unit,
     state: ExpensesScreenUiModel
 ) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-        Button(
+        Row(
             modifier = Modifier
-                .padding(
-                    horizontal = 8.dp,
-                    vertical = 32.dp
-                ),
-            onClick = onHomeClick
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "Home")
+            Text(
+                modifier = Modifier.padding(start = 8.dp),
+                text = "Долги",
+                style = MaterialTheme.typography.headlineMedium
+            )
+            TextButton(
+                onClick = { /*TODO*/ } // TODO
+            ) {
+                Text(
+                    text = "детализация",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
+            }
         }
 
+        state.creditors.forEach { creditor ->
+            OutlinedButton(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp),
+                onClick = { /*TODO*/ } // TODO
+            ) {
+                Text(
+                    text = "${creditor.amount.toRoundedString()},  ${creditor.person.name}",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
+            }
+        }
+
+        Text(
+            modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
+            text = "Операции",
+            style = MaterialTheme.typography.headlineMedium
+        )
         LazyColumn(
             modifier = Modifier
                 .padding(horizontal = 8.dp)
                 .fillMaxWidth(),
             contentPadding = PaddingValues(bottom = 80.dp),
-            reverseLayout = true
         ) {
             items(count = state.expenses.size,
                 key = {
@@ -135,7 +167,7 @@ internal fun ExpensesScreenSuccess(
                             ExpenseType.Replenishment -> "+"
                         }
                         Text(
-                            text = "$amountSign${expense.amount.toPlainString()}",
+                            text = "$amountSign${expense.totalAmount.toRoundedString()}",
                             style = MaterialTheme.typography.displaySmall,
                             maxLines = 1,
                             color = amountColor
@@ -180,32 +212,53 @@ internal fun ExpensesScreenSuccess(
 private fun ExpensesScreenPreview() {
     ExpensesScreen(
         onAddExpenseClick = {},
-        onHomeClick = {},
         state = SimpleScreenState.Success(mockExpensesScreenUiModel())
     )
 }
 
 internal fun mockExpensesScreenUiModel(): ExpensesScreenUiModel {
+    val person1 = Person(
+        id = 1,
+        name = "Василий"
+    )
+    val person2 = Person(
+        id = 2,
+        name = "Максим"
+    )
     return ExpensesScreenUiModel(
+        creditors = listOf(
+            ExpensesScreenUiModel.DebtorShortUiModel(
+                person = person1,
+                amount = 100.toBigDecimal()
+            ),
+            ExpensesScreenUiModel.DebtorShortUiModel(
+                person = person2,
+                amount = 150.toBigDecimal()
+            )
+        ),
         expenses = listOf(
             ExpenseUiModel(
                 expense = Expense(
                     expenseId = 1,
-                    amount = 100.toBigDecimal(),
                     currency = Currency(
                         id = 1,
                         code = "RUB",
                         name = "Russian Ruble",
                     ),
                     expenseType = ExpenseType.Spending,
-                    person = Person(
-                        id = 1,
-                        name = "Василий"
-                    ),
-                    subjectPersons = listOf(
-                        Person(
-                            id = 2,
-                            name = "Максим"
+                    person = person1,
+                    subjecExpenseSplitWithPersons = listOf(
+                        ExpenseSplitWithPerson(
+                            expenseSplitId = 1,
+                            expenseId = 1,
+                            person = person1,
+                            amount = 100.toBigDecimal()
+                        ),
+                        ExpenseSplitWithPerson(
+                            expenseSplitId = 2,
+                            expenseId = 1,
+                            person = person2,
+                            amount = 150.toBigDecimal()
                         )
                     ),
                     timestamp = Clock.System.now(),
@@ -215,21 +268,19 @@ internal fun mockExpensesScreenUiModel(): ExpensesScreenUiModel {
             ExpenseUiModel(
                 expense = Expense(
                     expenseId = 2,
-                    amount = 202322320.toBigDecimal(),
                     currency = Currency(
                         id = 2,
                         code = "USD",
                         name = "US Dollar",
                     ),
                     expenseType = ExpenseType.Replenishment,
-                    person = Person(
-                        id = 2,
-                        name = "Максим"
-                    ),
-                    subjectPersons = listOf(
-                        Person(
-                            id = 1,
-                            name = "Василий"
+                    person = person2,
+                    subjecExpenseSplitWithPersons = listOf(
+                        ExpenseSplitWithPerson(
+                            expenseSplitId = 4,
+                            expenseId = 2,
+                            person = person2,
+                            amount = 132423423.toBigDecimal()
                         )
                     ),
                     timestamp = Clock.System.now(),

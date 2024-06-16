@@ -1,4 +1,4 @@
-package com.inwords.expenses.feature.events.ui.list
+package com.inwords.expenses.feature.events.ui.add_persons
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

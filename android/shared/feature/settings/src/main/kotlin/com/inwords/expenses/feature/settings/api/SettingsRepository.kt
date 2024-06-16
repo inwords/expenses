@@ -7,4 +7,8 @@ interface SettingsRepository {
     suspend fun setCurrentEventId(eventId: Long)
 
     fun getCurrentEventId(): Flow<Long?>
+
+    suspend fun setCurrentPersonId(userId: Long)
+
+    fun getCurrentPersonId(): Flow<Long?>
 }

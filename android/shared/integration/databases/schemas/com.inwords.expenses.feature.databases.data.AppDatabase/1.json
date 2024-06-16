@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "64640eb685bb8947f208c6bf8ccb4814",
+    "identityHash": "40e572faa822a73216ea8d8ff946a612",
     "entities": [
       {
         "tableName": "event",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `primary_currency_id` INTEGER NOT NULL, `primary_person_id` INTEGER NOT NULL, FOREIGN KEY(`primary_currency_id`) REFERENCES `currency`(`currency_id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`primary_person_id`) REFERENCES `person`(`person_id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `primary_currency_id` INTEGER NOT NULL, FOREIGN KEY(`primary_currency_id`) REFERENCES `currency`(`currency_id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
         "fields": [
           {
             "fieldPath": "eventId",
@@ -23,12 +23,6 @@
           {
             "fieldPath": "primaryCurrencyId",
             "columnName": "primary_currency_id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "primaryPersonId",
-            "columnName": "primary_person_id",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -48,15 +42,6 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_event_primary_currency_id` ON `${TABLE_NAME}` (`primary_currency_id`)"
-          },
-          {
-            "name": "index_event_primary_person_id",
-            "unique": false,
-            "columnNames": [
-              "primary_person_id"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_event_primary_person_id` ON `${TABLE_NAME}` (`primary_person_id`)"
           }
         ],
         "foreignKeys": [
@@ -70,23 +55,12 @@
             "referencedColumns": [
               "currency_id"
             ]
-          },
-          {
-            "table": "person",
-            "onDelete": "RESTRICT",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "primary_person_id"
-            ],
-            "referencedColumns": [
-              "person_id"
-            ]
           }
         ]
       },
       {
         "tableName": "expense",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`expense_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `event_id` INTEGER NOT NULL, `amount_unscaled` BLOB NOT NULL, `scale` INTEGER NOT NULL, `currency_id` INTEGER NOT NULL, `expense_type` TEXT NOT NULL, `person_id` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `description` TEXT NOT NULL, FOREIGN KEY(`event_id`) REFERENCES `event`(`event_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`currency_id`) REFERENCES `currency`(`currency_id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`person_id`) REFERENCES `person`(`person_id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`expense_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `event_id` INTEGER NOT NULL, `currency_id` INTEGER NOT NULL, `expense_type` TEXT NOT NULL, `person_id` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `description` TEXT NOT NULL, FOREIGN KEY(`event_id`) REFERENCES `event`(`event_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`currency_id`) REFERENCES `currency`(`currency_id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`person_id`) REFERENCES `person`(`person_id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
         "fields": [
           {
             "fieldPath": "expenseId",
@@ -97,18 +71,6 @@
           {
             "fieldPath": "eventId",
             "columnName": "event_id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "amountUnscaled",
-            "columnName": "amount_unscaled",
-            "affinity": "BLOB",
-            "notNull": true
-          },
-          {
-            "fieldPath": "amountScale",
-            "columnName": "scale",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -199,6 +161,83 @@
             ],
             "referencedColumns": [
               "currency_id"
+            ]
+          },
+          {
+            "table": "person",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "person_id"
+            ],
+            "referencedColumns": [
+              "person_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "expense_split",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`expense_split_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `expense_id` INTEGER NOT NULL, `person_id` INTEGER NOT NULL, `amount_unscaled` BLOB NOT NULL, `scale` INTEGER NOT NULL, FOREIGN KEY(`expense_id`) REFERENCES `expense`(`expense_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`person_id`) REFERENCES `person`(`person_id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "expenseSplitId",
+            "columnName": "expense_split_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expenseId",
+            "columnName": "expense_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "personId",
+            "columnName": "person_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amountUnscaled",
+            "columnName": "amount_unscaled",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amountScale",
+            "columnName": "scale",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "expense_split_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_expense_split_person_id",
+            "unique": false,
+            "columnNames": [
+              "person_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_expense_split_person_id` ON `${TABLE_NAME}` (`person_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "expense",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "expense_id"
+            ],
+            "referencedColumns": [
+              "expense_id"
             ]
           },
           {
@@ -405,80 +444,11 @@
             ]
           }
         ]
-      },
-      {
-        "tableName": "expense_subject_person_cross_ref",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`expense_id` INTEGER NOT NULL, `person_id` INTEGER NOT NULL, PRIMARY KEY(`expense_id`, `person_id`), FOREIGN KEY(`expense_id`) REFERENCES `expense`(`expense_id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`person_id`) REFERENCES `person`(`person_id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
-        "fields": [
-          {
-            "fieldPath": "expenseId",
-            "columnName": "expense_id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "personId",
-            "columnName": "person_id",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "expense_id",
-            "person_id"
-          ]
-        },
-        "indices": [
-          {
-            "name": "index_expense_subject_person_cross_ref_expense_id",
-            "unique": false,
-            "columnNames": [
-              "expense_id"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_expense_subject_person_cross_ref_expense_id` ON `${TABLE_NAME}` (`expense_id`)"
-          },
-          {
-            "name": "index_expense_subject_person_cross_ref_person_id",
-            "unique": false,
-            "columnNames": [
-              "person_id"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_expense_subject_person_cross_ref_person_id` ON `${TABLE_NAME}` (`person_id`)"
-          }
-        ],
-        "foreignKeys": [
-          {
-            "table": "expense",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "expense_id"
-            ],
-            "referencedColumns": [
-              "expense_id"
-            ]
-          },
-          {
-            "table": "person",
-            "onDelete": "RESTRICT",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "person_id"
-            ],
-            "referencedColumns": [
-              "person_id"
-            ]
-          }
-        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '64640eb685bb8947f208c6bf8ccb4814')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '40e572faa822a73216ea8d8ff946a612')"
     ]
   }
 }

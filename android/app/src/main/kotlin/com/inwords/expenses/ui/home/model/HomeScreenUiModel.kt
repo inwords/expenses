@@ -1,8 +1,8 @@
 package com.inwords.expenses.ui.home.model
 
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.Immutable
 
-@Stable
+@Immutable
 data class HomeScreenUiModel(
     val title: String,
 )

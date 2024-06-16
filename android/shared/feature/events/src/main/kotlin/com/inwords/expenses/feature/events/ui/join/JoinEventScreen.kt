@@ -39,7 +39,11 @@ internal fun JoinEventScreen(
                 onEventIdChanged = onEventIdChanged
             )
 
-            EventAccessCodeField(state.eventAccessCode, onEventAccessCodeChanged)
+            EventAccessCodeField(
+                eventAccessCode = state.eventAccessCode,
+                onDone = onConfirmClicked,
+                onEventAccessCodeChanged = onEventAccessCodeChanged,
+            )
         }
 
         FilledTonalButton(

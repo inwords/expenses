@@ -15,18 +15,18 @@ import com.inwords.expenses.feature.events.data.db.entity.EventPersonCrossRef
 import com.inwords.expenses.feature.events.data.db.entity.PersonEntity
 import com.inwords.expenses.feature.expenses.data.db.dao.ExpensesDao
 import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseEntity
-import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseSubjectPersonCrossRef
+import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseSplitEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @Database(
     entities = [
         EventEntity::class,
         ExpenseEntity::class,
+        ExpenseSplitEntity::class,
         CurrencyEntity::class,
         PersonEntity::class,
         EventCurrencyCrossRef::class,
         EventPersonCrossRef::class,
-        ExpenseSubjectPersonCrossRef::class,
     ],
     version = 1
 )

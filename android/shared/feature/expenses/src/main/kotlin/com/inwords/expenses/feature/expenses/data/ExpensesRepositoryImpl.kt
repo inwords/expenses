@@ -25,11 +25,9 @@ internal class ExpensesRepositoryImpl(
     override suspend fun insert(event: Event, expense: Expense) {
         expensesDao.insert(
             expenseEntity = expense.toEntity(event),
-            subjectPersons = expense.subjectPersons,
+            subjectPersonSplitEntities = expense.subjecExpenseSplitWithPersons.map { it.toEntity() },
         )
     }
 
 
 }
-
-

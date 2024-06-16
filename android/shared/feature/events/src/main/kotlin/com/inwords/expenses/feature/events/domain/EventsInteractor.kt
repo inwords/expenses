@@ -49,6 +49,7 @@ class EventsInteractor internal constructor(
         } else {
             val newCurrentEvent = Event(1L, "Fruska")
             settingsRepository.setCurrentEventId(newCurrentEvent.id)
+            settingsRepository.setCurrentPersonId(1L) // TODO
             JoinEventResult.NewCurrentEvent(newCurrentEvent)
         }
     }
@@ -58,15 +59,15 @@ class EventsInteractor internal constructor(
     private var draftOtherPersons = emptyList<String>()
 
     internal suspend fun draftEventName(eventName: String) {
-        draftEventName = eventName // FIXME save to storage
+        draftEventName = eventName.trim() // FIXME save to storage
     }
 
     internal suspend fun draftOwner(owner: String) {
-        draftOwner = owner
+        draftOwner = owner.trim()
     }
 
     internal suspend fun draftOtherPersons(persons: List<String>) {
-        draftOtherPersons = persons
+        draftOtherPersons = persons.map { it.trim() }.filter { it.isNotEmpty() }
     }
 
     internal suspend fun createEvent(): EventDetails {
@@ -86,10 +87,10 @@ class EventsInteractor internal constructor(
             currenciesToInsert = currenciesToInsert,
             personsToInsert = personsToInsert,
             primaryCurrencyIndex = 1,
-            primaryPersonIndex = 0,
         )
 
         settingsRepository.setCurrentEventId(eventDetails.event.id)
+        settingsRepository.setCurrentPersonId(eventDetails.persons.first().id)
 
         return eventDetails
     }

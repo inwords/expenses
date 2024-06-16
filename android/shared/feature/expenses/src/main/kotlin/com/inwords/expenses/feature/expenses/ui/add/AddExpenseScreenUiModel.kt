@@ -1,12 +1,12 @@
 package com.inwords.expenses.feature.expenses.ui.add
 
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.Immutable
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
 import java.math.BigDecimal
 
-@Stable
+@Immutable
 internal data class AddExpenseScreenUiModel(
     val amount: BigDecimal?,
     val currencies: List<CurrencyInfoUiModel>,
@@ -15,11 +15,13 @@ internal data class AddExpenseScreenUiModel(
     val subjectPersons: List<PersonInfoUiModel>,
 ) {
 
+    @Immutable
     data class CurrencyInfoUiModel(
         val currency: Currency,
         val selected: Boolean,
     )
 
+    @Immutable
     data class PersonInfoUiModel(
         val person: Person,
         val selected: Boolean,

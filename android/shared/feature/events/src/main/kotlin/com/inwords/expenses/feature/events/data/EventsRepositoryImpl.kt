@@ -54,7 +54,6 @@ internal class EventsRepositoryImpl(
         eventToInsert: Event,
         personsToInsert: List<Person>,
         currenciesToInsert: List<Currency>,
-        primaryPersonIndex: Int,
         primaryCurrencyIndex: Int,
     ): EventDetails = db.withTransaction {
         coroutineScope {
@@ -68,7 +67,6 @@ internal class EventsRepositoryImpl(
                 event = eventToInsert,
                 persons = persons,
                 currencies = currencies,
-                primaryPerson = persons[primaryPersonIndex],
                 primaryCurrency = currencies[primaryCurrencyIndex],
             )
 

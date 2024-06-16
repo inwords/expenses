@@ -11,7 +11,6 @@ internal fun EventDetails.toEntity() = EventEntity(
     eventId = event.id,
     name = event.name,
     primaryCurrencyId = primaryCurrency.id,
-    primaryPersonId = primaryPerson.id,
 )
 
 internal fun Person.toEntity(): PersonEntity {

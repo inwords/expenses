@@ -32,10 +32,4 @@ data class EventWithDetailsQuery(
     )
     val primaryCurrency: CurrencyEntity,
 
-    @Relation(
-        entity = PersonEntity::class,
-        parentColumn = EventEntity.ColumnNames.PRIMARY_PERSON_ID,
-        entityColumn = PersonEntity.ColumnNames.ID
-    )
-    val primaryPerson: PersonEntity,
 )

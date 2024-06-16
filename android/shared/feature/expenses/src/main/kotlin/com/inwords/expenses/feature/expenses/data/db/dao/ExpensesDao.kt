@@ -6,23 +6,20 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseEntity
-import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseSubjectPersonCrossRef
+import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseSplitEntity
 import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseWithDetailsQuery
-import com.inwords.expenses.feature.events.domain.model.Person
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ExpensesDao {
 
     @Transaction
-    suspend fun insert(expenseEntity: ExpenseEntity, subjectPersons: List<Person>) {
-        val expenseEntityId = insert(expenseEntity)
+    suspend fun insert(expenseEntity: ExpenseEntity, subjectPersonSplitEntities: List<ExpenseSplitEntity>) {
+        val expenseId = insert(expenseEntity)
+
         insert(
-            subjectPersons.map { person ->
-                ExpenseSubjectPersonCrossRef(
-                    expenseId = expenseEntityId,
-                    personId = person.id
-                )
+            subjectPersonSplitEntities.map { personSplit ->
+                personSplit.copy(expenseId = expenseId)
             }
         )
     }
@@ -31,7 +28,7 @@ interface ExpensesDao {
     suspend fun insert(expenseEntity: ExpenseEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(subjectPersonsCrossRef: List<ExpenseSubjectPersonCrossRef>)
+    suspend fun insert(personSplitEntities: List<ExpenseSplitEntity>)
 
     @Transaction
     @Query("SELECT * FROM ${ExpenseEntity.TABLE_NAME} WHERE ${ExpenseEntity.ColumnNames.EVENT_ID} = :eventId")

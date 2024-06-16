@@ -1,7 +1,6 @@
 package com.inwords.expenses.feature.events.ui.create
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -28,11 +27,12 @@ internal fun CreateEventScreen(
     Box(
         modifier = modifier.fillMaxSize()
     ) {
-        Column(
+        EventNameField(
             modifier = modifier.align(Alignment.Center),
-        ) {
-            EventNameField(state.eventName, onEventNameChanged)
-        }
+            eventName = state.eventName,
+            onDone = onConfirmClicked,
+            onEventNameChanged = onEventNameChanged
+        )
 
         FilledTonalButton(
             modifier = Modifier

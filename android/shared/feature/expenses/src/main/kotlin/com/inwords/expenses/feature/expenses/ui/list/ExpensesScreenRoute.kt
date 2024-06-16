@@ -10,6 +10,7 @@ import com.inwords.expenses.core.navigation.DefaultNavigationController
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
+import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -19,7 +20,7 @@ fun NavGraphBuilder.expensesScreen(
     navigationController: DefaultNavigationController,
     eventsInteractor: EventsInteractor,
     expensesInteractor: ExpensesInteractor,
-    homeScreenDestination: Destination,
+    settingsRepository: SettingsRepository,
 ) {
     composable<ExpensesScreenDestination> {
         val viewModel = viewModel<ExpensesViewModel>(it, factory = viewModelFactory {
@@ -28,13 +29,12 @@ fun NavGraphBuilder.expensesScreen(
                     navigationController = navigationController,
                     eventsInteractor = eventsInteractor,
                     expensesInteractor = expensesInteractor,
-                    homeScreenDestination = homeScreenDestination,
+                    settingsRepository = settingsRepository,
                 )
             }
         })
         ExpensesScreen(
             onAddExpenseClick = viewModel::onAddExpenseClick,
-            onHomeClick = viewModel::onHomeClick,
             state = viewModel.state.collectAsStateWithLifecycle().value
         )
     }

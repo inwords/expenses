@@ -1,8 +1,8 @@
 package com.inwords.expenses.feature.events.ui.create
 
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.Immutable
 
-@Stable
+@Immutable
 internal data class CreateEventScreenUiModel(
     val eventName: String,
 )

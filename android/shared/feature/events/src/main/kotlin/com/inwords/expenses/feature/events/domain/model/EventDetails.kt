@@ -5,5 +5,4 @@ data class EventDetails(
     val currencies: List<Currency>,
     val persons: List<Person>,
     val primaryCurrency: Currency,
-    val primaryPerson: Person,
 )

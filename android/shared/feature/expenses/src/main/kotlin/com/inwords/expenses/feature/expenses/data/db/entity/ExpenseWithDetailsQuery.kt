@@ -1,7 +1,6 @@
 package com.inwords.expenses.feature.expenses.data.db.entity
 
 import androidx.room.Embedded
-import androidx.room.Junction
 import androidx.room.Relation
 import com.inwords.expenses.feature.events.data.db.entity.CurrencyEntity
 import com.inwords.expenses.feature.events.data.db.entity.PersonEntity
@@ -19,12 +18,11 @@ data class ExpenseWithDetailsQuery(
     val person: PersonEntity,
 
     @Relation(
-        entity = PersonEntity::class,
-        parentColumn = ExpenseEntity.ColumnNames.ID,
-        entityColumn = PersonEntity.ColumnNames.ID,
-        associateBy = Junction(ExpenseSubjectPersonCrossRef::class)
+        entity = ExpenseSplitEntity::class,
+        parentColumn = ExpenseSplitEntity.ColumnNames.EXPENSE_ID,
+        entityColumn = ExpenseEntity.ColumnNames.ID,
     )
-    val subjectPersons: List<PersonEntity>,
+    val expenseSplitWithPersons: List<ExpenseSplitWithPersonQuery>,
 
     @Relation(
         entity = CurrencyEntity::class,

@@ -11,13 +11,12 @@ import kotlinx.coroutines.flow.map
 import java.io.InputStream
 import java.io.OutputStream
 
+private val Context.settingsDataStore: DataStore<Settings> by dataStore(
+    fileName = "settings.pb",
+    serializer = SettingsSerializer()
+)
 
 internal class SettingsLocalDataSource(context: Context) {
-
-    private val Context.settingsDataStore: DataStore<Settings> by dataStore(
-        fileName = "settings.pb",
-        serializer = SettingsSerializer()
-    )
 
     private val settingsDataStore: DataStore<Settings> by lazy { context.settingsDataStore }
 
@@ -33,20 +32,33 @@ internal class SettingsLocalDataSource(context: Context) {
         return settingsDataStore.data.map { settings -> settings.currentEventId.takeIf { it != -1L } }
     }
 
-    private class SettingsSerializer : Serializer<Settings> {
-
-        override val defaultValue: Settings = Settings.newBuilder()
-            .setCurrentEventId(-1)
-            .build()
-
-        override suspend fun readFrom(input: InputStream): Settings {
-            try {
-                return Settings.parseFrom(input)
-            } catch (exception: InvalidProtocolBufferException) {
-                throw CorruptionException("Cannot read proto.", exception)
-            }
+    suspend fun setCurrentPersonId(userId: Long) {
+        settingsDataStore.updateData { currentSettings ->
+            currentSettings.toBuilder()
+                .setCurrentPersonId(userId)
+                .build()
         }
-
-        override suspend fun writeTo(t: Settings, output: OutputStream) = t.writeTo(output)
     }
+
+    fun getCurrentPersonId(): Flow<Long?> {
+        return settingsDataStore.data.map { settings -> settings.currentPersonId.takeIf { it != -1L } }
+    }
+}
+
+private class SettingsSerializer : Serializer<Settings> {
+
+    override val defaultValue: Settings = Settings.newBuilder()
+        .setCurrentEventId(-1)
+        .setCurrentPersonId(-1)
+        .build()
+
+    override suspend fun readFrom(input: InputStream): Settings {
+        try {
+            return Settings.parseFrom(input)
+        } catch (exception: InvalidProtocolBufferException) {
+            throw CorruptionException("Cannot read proto.", exception)
+        }
+    }
+
+    override suspend fun writeTo(t: Settings, output: OutputStream) = t.writeTo(output)
 }

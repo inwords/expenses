@@ -7,11 +7,13 @@ import java.math.BigDecimal
 
 data class Expense(
     val expenseId: Long,
-    val amount: BigDecimal,
     val currency: Currency,
     val expenseType: ExpenseType,
     val person: Person,
-    val subjectPersons: List<Person>,
+    val subjecExpenseSplitWithPersons: List<ExpenseSplitWithPerson>,
     val timestamp: Instant,
     val description: String,
-)
+) {
+
+    val totalAmount: BigDecimal = subjecExpenseSplitWithPersons.sumOf { it.amount }
+}

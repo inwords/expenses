@@ -17,12 +17,12 @@ import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
 import com.inwords.expenses.feature.events.data.db.dao.PersonsDao
 import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.ui.add_persons.AddPersonsScreenDestination
+import com.inwords.expenses.feature.events.ui.add_persons.addAddPersonsScreen
 import com.inwords.expenses.feature.events.ui.create.CreateEventScreenDestination
 import com.inwords.expenses.feature.events.ui.create.addCreateEventScreen
 import com.inwords.expenses.feature.events.ui.join.JoinEventScreenDestination
 import com.inwords.expenses.feature.events.ui.join.addJoinEventScreen
-import com.inwords.expenses.feature.events.ui.list.AddPersonsScreenDestination
-import com.inwords.expenses.feature.events.ui.list.addAddPersonsScreen
 import com.inwords.expenses.feature.expenses.api.ExpensesComponent
 import com.inwords.expenses.feature.expenses.data.db.dao.ExpensesDao
 import com.inwords.expenses.feature.expenses.ui.add.addExpenseScreen
@@ -115,13 +115,13 @@ internal fun MainNavHost(
             navigationController = navigationController,
             eventsInteractor = eventsComponent.eventsInteractor,
             expensesInteractor = expensesComponent.expensesInteractor,
-            homeScreenDestination = HomeScreenDestination,
+            settingsRepository = settingsComponent.settingsRepository,
         )
         expensesScreen(
             navigationController = navigationController,
             eventsInteractor = eventsComponent.eventsInteractor,
             expensesInteractor = expensesComponent.expensesInteractor,
-            homeScreenDestination = HomeScreenDestination,
+            settingsRepository = settingsComponent.settingsRepository,
         )
     }
 }
