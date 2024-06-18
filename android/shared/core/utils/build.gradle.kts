@@ -13,4 +13,6 @@ android {
 dependencies {
     // coroutines
     implementation(shared.coroutines.android)
+
+    implementation(shared.kotlinx.collections.immutable.jvm)
 }

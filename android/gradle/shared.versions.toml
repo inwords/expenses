@@ -2,7 +2,7 @@
 kotlin = "2.0.0"
 ksp = "2.0.0-1.0.21"
 
-room = "2.7.0-alpha03"
+room = "2.7.0-alpha04"
 datastore = "1.1.1"
 
 ktor = "2.3.0"
@@ -12,18 +12,17 @@ cronet = "119.6045.31"
 coroutines = "1.8.1"
 
 kotlinxSerialization = "1.7.0-RC"
-kotlinxDatetime = "0.6.0-RC.2"
 protobuf-plugin = "0.9.4"
 protobuf-library = "4.26.1"
 
 coil = "2.3.0"
 
-lifecycle = "2.8.1"
+lifecycle = "2.8.2"
 core = "1.13.1"
 annotation = "1.8.0"
 
-composeBom = "2024.05.00"
-navigationCompose = "2.8.0-beta02"
+composeBom = "2024.06.00"
+navigationCompose = "2.8.0-beta03"
 activityCompose = "1.9.0"
 
 constraintLayoutCompose = "1.0.1"
@@ -49,7 +48,8 @@ coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutin
 coroutinesPlayServices = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines" }
 
 kotlinxSerializationJson = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
-kotlinxDatetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlinxDatetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version = "0.6.0-RC.2" }
+kotlinx-collections-immutable-jvm = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable-jvm", version = "0.3.7" }
 protobuf-kotlin-lite = { group = "com.google.protobuf", name = "protobuf-kotlin-lite", version.ref = "protobuf-library" }
 protobuf-protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "protobuf-library" }
 

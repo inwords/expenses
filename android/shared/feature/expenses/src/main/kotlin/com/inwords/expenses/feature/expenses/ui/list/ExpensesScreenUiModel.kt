@@ -1,24 +1,28 @@
 package com.inwords.expenses.feature.expenses.ui.list
 
-import androidx.compose.runtime.Immutable
-import com.inwords.expenses.feature.events.domain.model.Person
-import com.inwords.expenses.feature.expenses.domain.model.Expense
-import java.math.BigDecimal
+import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
+import kotlinx.collections.immutable.ImmutableList
 
-@Immutable
 internal data class ExpensesScreenUiModel(
-    val creditors: List<DebtorShortUiModel>,
-    val expenses: List<ExpenseUiModel>,
+    val currentPersonName: String,
+    val creditors: ImmutableList<DebtorShortUiModel>,
+    val expenses: ImmutableList<ExpenseUiModel>,
 ) {
 
-    @Immutable
     data class DebtorShortUiModel(
-        val person: Person,
-        val amount: BigDecimal,
+        val personId: Long,
+        val personName: String,
+        val amount: String,
     )
 
-    @Immutable
     data class ExpenseUiModel(
-        val expense: Expense,
+        val expenseId: Long,
+        val currencyName: String,
+        val expenseType: ExpenseType,
+        val personName: String,
+        val totalAmount: String,
+        val timestamp: String,
+        val description: String,
     )
+
 }

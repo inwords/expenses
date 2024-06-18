@@ -2,8 +2,9 @@ package com.inwords.expenses.feature.expenses.ui.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,17 +18,25 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
@@ -36,8 +45,9 @@ import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.domain.model.Expense
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseSplitWithPerson
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
+import com.inwords.expenses.feature.expenses.ui.converter.toUiModel
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.ExpenseUiModel
-import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.datetime.Clock
 
 @Composable
@@ -46,163 +56,205 @@ internal fun ExpensesScreen(
     onAddExpenseClick: () -> Unit,
     state: SimpleScreenState<ExpensesScreenUiModel>,
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
-        when (state) {
-            is SimpleScreenState.Success -> ExpensesScreenSuccess(
-                modifier = modifier,
-                state = state.data,
-            )
+    when (state) {
+        is SimpleScreenState.Success -> ExpensesScreenSuccess(
+            modifier = modifier,
+            onAddExpenseClick = onAddExpenseClick,
+            state = state.data,
+        )
 
-            is SimpleScreenState.Loading -> {
-                Text(text = "Loading")
-            }
-
-            is SimpleScreenState.Error -> {
-                Text(text = "Error")
-            }
-
-            SimpleScreenState.Empty -> {
-                Text(text = "No expenses")
-            }
+        is SimpleScreenState.Loading -> {
+            Text(text = "Loading")
         }
 
-        ExtendedFloatingActionButton(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp),
-            onClick = onAddExpenseClick
+        is SimpleScreenState.Error -> {
+            Text(text = "Error")
+        }
+
+        SimpleScreenState.Empty -> {
+            Text(text = "No expenses")
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+internal fun ExpensesScreenSuccess(
+    modifier: Modifier = Modifier,
+    onAddExpenseClick: () -> Unit,
+    state: ExpensesScreenUiModel
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar( // TODO
+                title = {
+                    val text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic)) {
+                            append("Expenses")
+                        }
+                        append("  ")
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
+                            append(state.currentPersonName)
+                        }
+                    }
+                    Text(text = text)
+                }
+            )
+        },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = onAddExpenseClick
+            ) {
+                Icon(Icons.Outlined.Add, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "Операция")
+            }
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
-            Icon(Icons.Outlined.Add, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Операция")
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Долги",
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                TextButton(
+                    onClick = { /*TODO*/ } // TODO
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(end = 8.dp),
+                        text = "детализация",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
+                }
+            }
+
+            FlowRow(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                state.creditors.forEach { creditor ->
+                    ReturnCreditorDebtButton(creditor, { /*TODO*/ }) // TODO
+                }
+            }
+
+            Text(
+                modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp),
+                text = "Операции",
+                style = MaterialTheme.typography.headlineMedium
+            )
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                contentPadding = PaddingValues(bottom = 80.dp),
+            ) {
+                items(
+                    count = state.expenses.size,
+                    key = { index ->
+                        state.expenses[state.expenses.lastIndex - index].expenseId
+                    }
+                ) { index ->
+                    val expense = state.expenses[state.expenses.lastIndex - index]
+                    ExpenseItem(expense)
+                }
+            }
         }
     }
 }
 
 @Composable
-internal fun ExpensesScreenSuccess(
+private fun ReturnCreditorDebtButton(
+    creditor: ExpensesScreenUiModel.DebtorShortUiModel,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    state: ExpensesScreenUiModel
 ) {
-    Column(
-        modifier = modifier.fillMaxSize()
+    OutlinedButton(
+        modifier = modifier,
+        onClick = onClick
+    ) {
+        Text(
+            text = "${creditor.amount} EUR,  ${creditor.personName}",
+            modifier = Modifier.padding(end = 8.dp),
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
+    }
+}
+
+@Composable
+private fun ExpenseItem(
+    expense: ExpenseUiModel,
+    modifier: Modifier = Modifier,
+) {
+    val shape = RoundedCornerShape(8.dp)
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .shadow(elevation = 4.dp, shape = shape)
+            .background(color = MaterialTheme.colorScheme.background, shape = shape),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxHeight()
+                .weight(1f, fill = false)
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            val amountColor = when (expense.expenseType) {
+                ExpenseType.Spending -> MaterialTheme.colorScheme.onBackground
+                ExpenseType.Replenishment -> MaterialTheme.colorScheme.primary
+            }
             Text(
-                modifier = Modifier.padding(start = 8.dp),
-                text = "Долги",
-                style = MaterialTheme.typography.headlineMedium
+                text = expense.totalAmount,
+                style = MaterialTheme.typography.headlineSmall,
+                maxLines = 1,
+                color = amountColor
             )
-            TextButton(
-                onClick = { /*TODO*/ } // TODO
-            ) {
-                Text(
-                    text = "детализация",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
-            }
-        }
-
-        state.creditors.forEach { creditor ->
-            OutlinedButton(
+            Spacer(modifier = Modifier.width(8.dp))
+            Column(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp),
-                onClick = { /*TODO*/ } // TODO
+                    .fillMaxHeight()
+                    .padding(vertical = 8.dp),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "${creditor.amount.toRoundedString()},  ${creditor.person.name}",
-                    style = MaterialTheme.typography.bodyLarge
+                    text = expense.currencyName,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
+                Text(
+                    text = expense.description,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
-
-        Text(
-            modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
-            text = "Операции",
-            style = MaterialTheme.typography.headlineMedium
-        )
-        LazyColumn(
+        Column(
             modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .fillMaxWidth(),
-            contentPadding = PaddingValues(bottom = 80.dp),
+                .fillMaxHeight()
+                .padding(top = 8.dp, end = 8.dp, bottom = 8.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.End,
         ) {
-            items(count = state.expenses.size,
-                key = {
-                    state.expenses[state.expenses.lastIndex - it].expense.expenseId
-                }
-            ) { index ->
-                val shape = RoundedCornerShape(8.dp)
-                val expense = state.expenses[state.expenses.lastIndex - index].expense
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                        .shadow(elevation = 4.dp, shape = shape)
-                        .background(color = MaterialTheme.colorScheme.background, shape = shape),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(1f, fill = false)
-                            .padding(horizontal = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        val amountColor = when (expense.expenseType) {
-                            ExpenseType.Spending -> MaterialTheme.colorScheme.onBackground
-                            ExpenseType.Replenishment -> MaterialTheme.colorScheme.primary
-                        }
-                        val amountSign = when (expense.expenseType) {
-                            ExpenseType.Spending -> ""
-                            ExpenseType.Replenishment -> "+"
-                        }
-                        Text(
-                            text = "$amountSign${expense.totalAmount.toRoundedString()}",
-                            style = MaterialTheme.typography.displaySmall,
-                            maxLines = 1,
-                            color = amountColor
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Column(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .padding(vertical = 8.dp),
-                            verticalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = expense.currency.name,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Text(
-                                text = expense.description,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
-                    Column(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .padding(top = 8.dp, end = 8.dp, bottom = 8.dp),
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        horizontalAlignment = Alignment.End,
-                    ) {
-                        Text(text = expense.person.name, maxLines = 1)
-                        Text(text = expense.timestamp.toString().take(10), maxLines = 1)
-                    }
-                }
-            }
+            Text(text = expense.personName, maxLines = 1)
+            Text(text = expense.timestamp, maxLines = 1)
         }
     }
 }
@@ -226,67 +278,66 @@ internal fun mockExpensesScreenUiModel(): ExpensesScreenUiModel {
         name = "Максим"
     )
     return ExpensesScreenUiModel(
-        creditors = listOf(
+        currentPersonName = "Василий",
+        creditors = persistentListOf(
             ExpensesScreenUiModel.DebtorShortUiModel(
-                person = person1,
-                amount = 100.toBigDecimal()
+                personId = person1.id,
+                personName = person1.name,
+                amount = "100"
             ),
             ExpensesScreenUiModel.DebtorShortUiModel(
-                person = person2,
-                amount = 150.toBigDecimal()
+                personId = person2.id,
+                personName = person2.name,
+                amount = "150"
             )
         ),
-        expenses = listOf(
-            ExpenseUiModel(
-                expense = Expense(
-                    expenseId = 1,
-                    currency = Currency(
-                        id = 1,
-                        code = "RUB",
-                        name = "Russian Ruble",
+        expenses = persistentListOf(
+            Expense(
+                expenseId = 1,
+                currency = Currency(
+                    id = 1,
+                    code = "RUB",
+                    name = "Russian Ruble",
+                ),
+                expenseType = ExpenseType.Spending,
+                person = person1,
+                subjecExpenseSplitWithPersons = listOf(
+                    ExpenseSplitWithPerson(
+                        expenseSplitId = 1,
+                        expenseId = 1,
+                        person = person1,
+                        amount = 100.toBigDecimal()
                     ),
-                    expenseType = ExpenseType.Spending,
-                    person = person1,
-                    subjecExpenseSplitWithPersons = listOf(
-                        ExpenseSplitWithPerson(
-                            expenseSplitId = 1,
-                            expenseId = 1,
-                            person = person1,
-                            amount = 100.toBigDecimal()
-                        ),
-                        ExpenseSplitWithPerson(
-                            expenseSplitId = 2,
-                            expenseId = 1,
-                            person = person2,
-                            amount = 150.toBigDecimal()
-                        )
-                    ),
-                    timestamp = Clock.System.now(),
-                    description = "Lunch",
-                )
-            ),
-            ExpenseUiModel(
-                expense = Expense(
-                    expenseId = 2,
-                    currency = Currency(
-                        id = 2,
-                        code = "USD",
-                        name = "US Dollar",
-                    ),
-                    expenseType = ExpenseType.Replenishment,
-                    person = person2,
-                    subjecExpenseSplitWithPersons = listOf(
-                        ExpenseSplitWithPerson(
-                            expenseSplitId = 4,
-                            expenseId = 2,
-                            person = person2,
-                            amount = 132423423.toBigDecimal()
-                        )
-                    ),
-                    timestamp = Clock.System.now(),
-                    description = "Dinner and some text",
-                )
-            )
+                    ExpenseSplitWithPerson(
+                        expenseSplitId = 2,
+                        expenseId = 1,
+                        person = person2,
+                        amount = 150.333.toBigDecimal()
+                    )
+                ),
+                timestamp = Clock.System.now(),
+                description = "Lunch",
+            ).toUiModel(),
+            Expense(
+                expenseId = 2,
+                currency = Currency(
+                    id = 2,
+                    code = "USD",
+                    name = "US Dollar",
+                ),
+                expenseType = ExpenseType.Replenishment,
+                person = person2,
+                subjecExpenseSplitWithPersons = listOf(
+                    ExpenseSplitWithPerson(
+                        expenseSplitId = 4,
+                        expenseId = 2,
+                        person = person2,
+                        amount = 132423423.toBigDecimal()
+                    )
+                ),
+                timestamp = Clock.System.now(),
+                description = "Dinner and some text",
+            ).toUiModel()
         )
     )
 }

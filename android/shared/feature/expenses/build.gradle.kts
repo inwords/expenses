@@ -14,6 +14,10 @@ android {
     buildFeatures {
         compose = true
     }
+
+    composeCompiler {
+        enableStrongSkippingMode = true
+    }
 }
 
 dependencies {
@@ -28,6 +32,7 @@ dependencies {
 
     implementation(shared.kotlinxSerializationJson)
     implementation(shared.kotlinxDatetime)
+    implementation(shared.kotlinx.collections.immutable.jvm)
 
     implementation(shared.lifecycleRuntimeCompose)
     implementation(shared.lifecycleViewModelCompose)
@@ -41,5 +46,5 @@ dependencies {
     androidTestImplementation(composeBom)
     implementation(shared.composeUi)
     implementation(shared.composeMaterial3)
-    debugImplementation(shared.compose.ui.tooling)
+    implementation(shared.compose.ui.tooling)
 }

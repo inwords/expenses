@@ -34,12 +34,15 @@ fun NavGraphBuilder.addExpenseScreen(
             }
         })
         AddExpenseScreen(
-            onAmountChanged = viewModel::onAmountChanged,
             onCurrencyClicked = viewModel::onCurrencyClicked,
             onExpenseTypeClicked = viewModel::onExpenseTypeClicked,
             onPersonClicked = viewModel::onPersonClicked,
             onSubjectPersonClicked = viewModel::onSubjectPersonClicked,
+            onEqualSplitChange = viewModel::onEqualSplitChange,
+            onWholeAmountChanged = viewModel::onWholeAmountChanged,
+            onSplitAmountChanged = viewModel::onSplitAmountChanged,
             onConfirmClicked = viewModel::onConfirmClicked,
+            onCloseClicked = viewModel::onCloseClicked,
             state = viewModel.state.collectAsStateWithLifecycle().value,
         )
     }
