@@ -6,8 +6,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.inwords.expenses.core.navigation.DefaultNavigationController
 import com.inwords.expenses.core.navigation.Destination
+import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.settings.api.SettingsRepository
@@ -17,7 +17,7 @@ import kotlinx.serialization.Serializable
 object ExpensesScreenDestination : Destination
 
 fun NavGraphBuilder.expensesScreen(
-    navigationController: DefaultNavigationController,
+    navigationController: NavigationController,
     eventsInteractor: EventsInteractor,
     expensesInteractor: ExpensesInteractor,
     settingsRepository: SettingsRepository,
@@ -35,6 +35,7 @@ fun NavGraphBuilder.expensesScreen(
         })
         ExpensesScreen(
             onAddExpenseClick = viewModel::onAddExpenseClick,
+            onReplenishmentClick = viewModel::onReplenishmentClick,
             state = viewModel.state.collectAsStateWithLifecycle().value
         )
     }

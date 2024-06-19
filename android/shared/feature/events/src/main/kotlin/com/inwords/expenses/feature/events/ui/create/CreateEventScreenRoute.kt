@@ -6,8 +6,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.inwords.expenses.core.navigation.DefaultNavigationController
 import com.inwords.expenses.core.navigation.Destination
+import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import kotlinx.serialization.Serializable
 
@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
 object CreateEventScreenDestination : Destination
 
 fun NavGraphBuilder.addCreateEventScreen(
-    navigationController: DefaultNavigationController,
+    navigationController: NavigationController,
     eventsInteractor: EventsInteractor,
     addParticipantsDestination: Destination,
     homeScreenDestination: Destination,

@@ -54,12 +54,14 @@ import kotlinx.datetime.Clock
 internal fun ExpensesScreen(
     modifier: Modifier = Modifier,
     onAddExpenseClick: () -> Unit,
+    onReplenishmentClick: (ExpensesScreenUiModel.DebtorShortUiModel) -> Unit,
     state: SimpleScreenState<ExpensesScreenUiModel>,
 ) {
     when (state) {
         is SimpleScreenState.Success -> ExpensesScreenSuccess(
             modifier = modifier,
             onAddExpenseClick = onAddExpenseClick,
+            onReplenishmentClick = onReplenishmentClick,
             state = state.data,
         )
 
@@ -82,12 +84,13 @@ internal fun ExpensesScreen(
 internal fun ExpensesScreenSuccess(
     modifier: Modifier = Modifier,
     onAddExpenseClick: () -> Unit,
+    onReplenishmentClick: (ExpensesScreenUiModel.DebtorShortUiModel) -> Unit,
     state: ExpensesScreenUiModel
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TopAppBar( // TODO
+            TopAppBar(
                 title = {
                     val text = buildAnnotatedString {
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic)) {
@@ -147,7 +150,7 @@ internal fun ExpensesScreenSuccess(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 state.creditors.forEach { creditor ->
-                    ReturnCreditorDebtButton(creditor, { /*TODO*/ }) // TODO
+                    ReturnCreditorDebtButton(creditor, { onReplenishmentClick.invoke(creditor) })
                 }
             }
 
@@ -187,7 +190,7 @@ private fun ReturnCreditorDebtButton(
         onClick = onClick
     ) {
         Text(
-            text = "${creditor.amount} EUR,  ${creditor.personName}",
+            text = "${creditor.amount} ${creditor.currencyName},  ${creditor.personName}",
             modifier = Modifier.padding(end = 8.dp),
             style = MaterialTheme.typography.bodyLarge
         )
@@ -264,6 +267,7 @@ private fun ExpenseItem(
 private fun ExpensesScreenPreview() {
     ExpensesScreen(
         onAddExpenseClick = {},
+        onReplenishmentClick = {},
         state = SimpleScreenState.Success(mockExpensesScreenUiModel())
     )
 }
@@ -278,16 +282,21 @@ internal fun mockExpensesScreenUiModel(): ExpensesScreenUiModel {
         name = "Максим"
     )
     return ExpensesScreenUiModel(
-        currentPersonName = "Василий",
+        currentPersonId = person1.id,
+        currentPersonName = person1.name,
         creditors = persistentListOf(
             ExpensesScreenUiModel.DebtorShortUiModel(
                 personId = person1.id,
                 personName = person1.name,
+                currencyCode = "EUR",
+                currencyName = "Euro",
                 amount = "100"
             ),
             ExpensesScreenUiModel.DebtorShortUiModel(
                 personId = person2.id,
                 personName = person2.name,
+                currencyCode = "EUR",
+                currencyName = "Euro",
                 amount = "150"
             )
         ),

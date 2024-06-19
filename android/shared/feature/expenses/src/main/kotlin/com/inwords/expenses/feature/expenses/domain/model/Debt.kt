@@ -1,5 +1,6 @@
 package com.inwords.expenses.feature.expenses.domain.model
 
+import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Person
 import java.math.BigDecimal
 
@@ -13,6 +14,7 @@ internal data class Debt(
 internal data class AccumulatedDebt(
     val creditor: Person,
     val debtor: Person,
+    val currency: Currency,
     val amount: BigDecimal,
     val debts: List<Debt>,
 )
@@ -24,4 +26,6 @@ internal data class BarterAccumulatedDebt(
     val barterAmount: BigDecimal = debtorToCreditorDebt.amount
         .minus(creditorToDebtorDebt?.amount ?: BigDecimal.ZERO)
         .coerceAtLeast(BigDecimal.ZERO)
+
+    val currency: Currency = debtorToCreditorDebt.currency
 }

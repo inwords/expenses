@@ -16,7 +16,6 @@ import com.inwords.expenses.feature.expenses.ui.converter.toUiModel
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.DebtorShortUiModel
 import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
 import com.inwords.expenses.feature.settings.api.SettingsRepository
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -45,26 +44,25 @@ internal class ExpensesViewModel(
         ) { expensesDetails, currentPersonId ->
             val debtCalculator = DebtCalculator(expensesDetails)
 
-            val currentPerson = expensesDetails.expenses.map { it.person }.firstOrNull { it.id == currentPersonId }
-            val debtors = if (currentPerson == null) {
-                persistentListOf()
-            } else {
-                debtCalculator.getBarterAccumulatedDebtForPerson(currentPerson).entries
-                    .asSequence()
-                    .filter { (_, barterAccumulatedDebt) -> barterAccumulatedDebt.barterAmount > BigDecimal.ZERO }
-                    .map { (person, barterAccumulatedDebt) ->
-                        DebtorShortUiModel(
-                            personId = person.id,
-                            personName = person.name,
-                            amount = barterAccumulatedDebt.barterAmount.toRoundedString()
-                        )
-                    }
-                    .sortedBy { it.amount }
-                    .toPersistentList()
-            }
+            val currentPerson = expensesDetails.expenses.map { it.person }.first { it.id == currentPersonId }
+            val debtors = debtCalculator.getBarterAccumulatedDebtForPerson(currentPerson).entries
+                .asSequence()
+                .filter { (_, barterAccumulatedDebt) -> barterAccumulatedDebt.barterAmount > BigDecimal.ZERO }
+                .map { (person, barterAccumulatedDebt) ->
+                    DebtorShortUiModel(
+                        personId = person.id,
+                        personName = person.name,
+                        currencyCode = barterAccumulatedDebt.currency.code,
+                        currencyName = barterAccumulatedDebt.currency.name,
+                        amount = barterAccumulatedDebt.barterAmount.toRoundedString()
+                    )
+                }
+                .sortedBy { it.amount }
+                .toPersistentList()
 
             ExpensesScreenUiModel(
-                currentPersonName = currentPerson?.name ?: "",
+                currentPersonId = currentPerson.id,
+                currentPersonName = currentPerson.name,
                 creditors = debtors,
                 expenses = expensesDetails.expenses.map { expense ->
                     expense.toUiModel()
@@ -77,7 +75,22 @@ internal class ExpensesViewModel(
     }
 
     fun onAddExpenseClick() {
-        navigationController.navigateTo(AddExpenseScreenDestination)
+        navigationController.navigateTo(AddExpenseScreenDestination())
+    }
+
+    fun onReplenishmentClick(creditor: DebtorShortUiModel) {
+        val state = (_state.value as? SimpleScreenState.Success)?.data ?: return
+
+        navigationController.navigateTo(
+            AddExpenseScreenDestination(
+                replenishment = AddExpenseScreenDestination.Replenishment(
+                    fromPersonId = state.currentPersonId,
+                    toPersonId = creditor.personId,
+                    currencyCode = creditor.currencyCode,
+                    amount = creditor.amount
+                )
+            )
+        )
     }
 
 }

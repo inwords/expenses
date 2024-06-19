@@ -2,8 +2,8 @@ package com.inwords.expenses.feature.events.ui.join
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.inwords.expenses.core.navigation.DefaultNavigationController
 import com.inwords.expenses.core.navigation.Destination
+import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.feature.events.domain.EventsInteractor
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 internal class JoinEventViewModel(
-    private val navigationController: DefaultNavigationController,
+    private val navigationController: NavigationController,
     private val eventsInteractor: EventsInteractor,
     private val expensesScreenDestination: Destination,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {

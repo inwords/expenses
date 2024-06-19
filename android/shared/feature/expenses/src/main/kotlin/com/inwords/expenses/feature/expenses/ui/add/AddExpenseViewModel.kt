@@ -18,6 +18,7 @@ import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.expenses.domain.model.Expense
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseSplitWithPerson
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
+import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenDestination.Replenishment
 import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.CurrencyInfoUiModel
 import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.ExpenseSplitWithPersonUiModel
 import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.PersonInfoUiModel
@@ -46,6 +47,7 @@ internal class AddExpenseViewModel(
     private val eventsInteractor: EventsInteractor,
     private val expensesInteractor: ExpensesInteractor,
     settingsRepository: SettingsRepository,
+    private val replenishment: Replenishment?,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
     private data class AddExpenseScreenModel(
@@ -92,46 +94,7 @@ internal class AddExpenseViewModel(
                 is SimpleScreenState.Success -> SimpleScreenState.Success(state.data.toUiModel())
             }
         }
-        .stateIn(viewModelScope + UI, started = SharingStarted.WhileSubscribed(), initialValue = SimpleScreenState.Empty)
-
-    private fun AddExpenseScreenModel.toUiModel(): AddExpenseScreenUiModel {
-        return AddExpenseScreenUiModel(
-            currencies = this.currencies.map { currencyInfoModel ->
-                CurrencyInfoUiModel(
-                    currencyName = currencyInfoModel.currency.name,
-                    currencyCode = currencyInfoModel.currency.code,
-                    selected = currencyInfoModel.selected
-                )
-            }.asImmutableListAdapter(),
-            expenseType = this.expenseType,
-            persons = this.persons.map { personInfoModel ->
-                PersonInfoUiModel(
-                    personId = personInfoModel.person.id,
-                    personName = personInfoModel.person.name,
-                    selected = personInfoModel.selected
-                )
-            }.asImmutableListAdapter(),
-            subjectPersons = this.subjectPersons.map { personInfoModel ->
-                PersonInfoUiModel(
-                    personId = personInfoModel.person.id,
-                    personName = personInfoModel.person.name,
-                    selected = personInfoModel.selected
-                )
-            }.asImmutableListAdapter(),
-            equalSplit = this.equalSplit,
-            wholeAmount = this.wholeAmount.amountRaw,
-            split = this.split.map { expenseSplitWithPersonModel ->
-                ExpenseSplitWithPersonUiModel(
-                    person = PersonInfoUiModel(
-                        personId = expenseSplitWithPersonModel.person.person.id,
-                        personName = expenseSplitWithPersonModel.person.person.name,
-                        selected = expenseSplitWithPersonModel.person.selected
-                    ),
-                    amount = expenseSplitWithPersonModel.amount.amountRaw,
-                )
-            }.asImmutableListAdapter()
-        )
-    }
+        .stateIn(viewModelScope + UI, started = SharingStarted.Eagerly, initialValue = SimpleScreenState.Empty)
 
     init {
         combine(
@@ -142,30 +105,59 @@ internal class AddExpenseViewModel(
                 },
             settingsRepository.getCurrentPersonId()
         ) { eventDetails, currentPersonId ->
+            val subjectPersons = eventDetails.persons.map { person ->
+                PersonInfoModel(
+                    person = person,
+                    selected = if (replenishment == null) {
+                        true
+                    } else {
+                        person.id == replenishment.toPersonId
+                    }
+                )
+            }
+
             AddExpenseScreenModel(
                 event = eventDetails.event,
                 currencies = eventDetails.currencies.map { currency ->
                     AddExpenseScreenModel.CurrencyInfoModel(
                         currency = currency,
-                        selected = currency.id == eventDetails.primaryCurrency.id
+                        selected = if (replenishment == null) {
+                            currency.id == eventDetails.primaryCurrency.id
+                        } else {
+                            currency.code == replenishment.currencyCode
+                        }
                     )
                 },
-                expenseType = ExpenseType.Spending,
+                expenseType = replenishment?.let { ExpenseType.Replenishment } ?: ExpenseType.Spending,
                 persons = eventDetails.persons.map { person ->
                     PersonInfoModel(
                         person = person,
-                        selected = person.id == currentPersonId
+                        selected = if (replenishment == null) {
+                            person.id == currentPersonId
+                        } else {
+                            person.id == replenishment.fromPersonId
+                        }
                     )
                 },
-                subjectPersons = eventDetails.persons.map { person ->
-                    PersonInfoModel(person = person, selected = true)
-                },
-                equalSplit = true,
+                subjectPersons = subjectPersons,
+                equalSplit = replenishment == null,
                 wholeAmount = AmountModel(
                     amount = null,
                     amountRaw = ""
                 ),
-                split = emptyList()
+                split = if (replenishment == null) {
+                    emptyList()
+                } else {
+                    listOf(
+                        ExpenseSplitWithPersonModel(
+                            person = subjectPersons.first { it.selected },
+                            amount = AmountModel(
+                                amount = replenishment.amount.toBigDecimalOrNull(),
+                                amountRaw = replenishment.amount
+                            )
+                        )
+                    )
+                }
             )
         }
             .collectIn(viewModelScope) { screenUiModel ->
@@ -373,6 +365,45 @@ internal class AddExpenseViewModel(
 
     fun onCloseClicked() {
         navigationController.popBackStack()
+    }
+
+    private fun AddExpenseScreenModel.toUiModel(): AddExpenseScreenUiModel {
+        return AddExpenseScreenUiModel(
+            currencies = this.currencies.map { currencyInfoModel ->
+                CurrencyInfoUiModel(
+                    currencyName = currencyInfoModel.currency.name,
+                    currencyCode = currencyInfoModel.currency.code,
+                    selected = currencyInfoModel.selected
+                )
+            }.asImmutableListAdapter(),
+            expenseType = this.expenseType,
+            persons = this.persons.map { personInfoModel ->
+                PersonInfoUiModel(
+                    personId = personInfoModel.person.id,
+                    personName = personInfoModel.person.name,
+                    selected = personInfoModel.selected
+                )
+            }.asImmutableListAdapter(),
+            subjectPersons = this.subjectPersons.map { personInfoModel ->
+                PersonInfoUiModel(
+                    personId = personInfoModel.person.id,
+                    personName = personInfoModel.person.name,
+                    selected = personInfoModel.selected
+                )
+            }.asImmutableListAdapter(),
+            equalSplit = this.equalSplit,
+            wholeAmount = this.wholeAmount.amountRaw,
+            split = this.split.map { expenseSplitWithPersonModel ->
+                ExpenseSplitWithPersonUiModel(
+                    person = PersonInfoUiModel(
+                        personId = expenseSplitWithPersonModel.person.person.id,
+                        personName = expenseSplitWithPersonModel.person.person.name,
+                        selected = expenseSplitWithPersonModel.person.selected
+                    ),
+                    amount = expenseSplitWithPersonModel.amount.amountRaw,
+                )
+            }.asImmutableListAdapter()
+        )
     }
 
 }

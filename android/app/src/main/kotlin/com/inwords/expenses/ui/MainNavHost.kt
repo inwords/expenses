@@ -8,8 +8,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.room.RoomDatabase
-import com.inwords.expenses.core.navigation.DefaultNavigationController
 import com.inwords.expenses.core.navigation.Destination
+import com.inwords.expenses.core.navigation.rememberNavigationController
 import com.inwords.expenses.feature.databases.data.appContext
 import com.inwords.expenses.feature.databases.data.dbComponent
 import com.inwords.expenses.feature.events.api.EventsComponent
@@ -33,16 +33,15 @@ import com.inwords.expenses.feature.settings.api.SettingsRepository
 import com.inwords.expenses.ui.home.HomeScreenDestination
 import com.inwords.expenses.ui.home.homeScreen
 
-
 @Composable
 internal fun MainNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     startDestination: Destination = HomeScreenDestination
 ) {
-    val navigationController = remember { DefaultNavigationController(navController) }
+    val navigationController = rememberNavigationController(navController)
 
-    val settingsComponent = remember {
+    val settingsComponent = remember { // TODO static DI
         SettingsComponent(
             deps = object : SettingsComponent.Deps {
                 override val context: Context

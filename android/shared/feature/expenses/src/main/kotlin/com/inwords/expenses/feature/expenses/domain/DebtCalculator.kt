@@ -8,7 +8,8 @@ import com.inwords.expenses.feature.expenses.domain.model.Debt
 import com.inwords.expenses.feature.expenses.domain.model.ExpensesDetails
 
 internal class DebtCalculator(
-    private val expensesDetails: ExpensesDetails
+    private val expensesDetails: ExpensesDetails,
+    private val currencyExchanger: CurrencyExchanger = CurrencyExchanger(),
 ) {
 
     /**
@@ -64,12 +65,20 @@ internal class DebtCalculator(
             }
         }
 
+        val primaryCurrency = expensesDetails.event.primaryCurrency
         val debtorToCreditorToAccumulatedDebts = debtorToCreditorDebts.mapValues { (debtor, creditorToDebts) ->
             creditorToDebts.mapValues { (creditor, debts) ->
-                val amount = debts.sumOf { it.amount }
+                val amount = debts.sumOf {
+                    if (it.expense.currency.id == primaryCurrency.id) {
+                        it.amount
+                    } else {
+                        currencyExchanger.exchange(it.amount, it.expense.currency.code, primaryCurrency.code)
+                    }
+                }
                 AccumulatedDebt(
                     creditor = creditor,
                     debtor = debtor,
+                    currency = primaryCurrency,
                     amount = amount,
                     debts = debts,
                 )
