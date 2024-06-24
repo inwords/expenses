@@ -52,17 +52,19 @@ import kotlinx.datetime.Clock
 
 @Composable
 internal fun ExpensesScreen(
-    modifier: Modifier = Modifier,
-    onAddExpenseClick: () -> Unit,
-    onReplenishmentClick: (ExpensesScreenUiModel.DebtorShortUiModel) -> Unit,
     state: SimpleScreenState<ExpensesScreenUiModel>,
+    onAddExpenseClick: () -> Unit,
+    onDebtsDetailsClick: () -> Unit,
+    onReplenishmentClick: (ExpensesScreenUiModel.DebtorShortUiModel) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     when (state) {
         is SimpleScreenState.Success -> ExpensesScreenSuccess(
-            modifier = modifier,
-            onAddExpenseClick = onAddExpenseClick,
-            onReplenishmentClick = onReplenishmentClick,
             state = state.data,
+            onAddExpenseClick = onAddExpenseClick,
+            onDebtsDetailsClick = onDebtsDetailsClick,
+            onReplenishmentClick = onReplenishmentClick,
+            modifier = modifier,
         )
 
         is SimpleScreenState.Loading -> {
@@ -82,10 +84,11 @@ internal fun ExpensesScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 internal fun ExpensesScreenSuccess(
-    modifier: Modifier = Modifier,
+    state: ExpensesScreenUiModel,
     onAddExpenseClick: () -> Unit,
+    onDebtsDetailsClick: () -> Unit,
     onReplenishmentClick: (ExpensesScreenUiModel.DebtorShortUiModel) -> Unit,
-    state: ExpensesScreenUiModel
+    modifier: Modifier = Modifier
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -132,7 +135,7 @@ internal fun ExpensesScreenSuccess(
                     style = MaterialTheme.typography.headlineMedium
                 )
                 TextButton(
-                    onClick = { /*TODO*/ } // TODO
+                    onClick = onDebtsDetailsClick
                 ) {
                     Text(
                         modifier = Modifier
@@ -267,6 +270,7 @@ private fun ExpenseItem(
 private fun ExpensesScreenPreview() {
     ExpensesScreen(
         onAddExpenseClick = {},
+        onDebtsDetailsClick = {},
         onReplenishmentClick = {},
         state = SimpleScreenState.Success(mockExpensesScreenUiModel())
     )

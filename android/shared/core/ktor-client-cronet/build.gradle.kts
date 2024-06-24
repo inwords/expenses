@@ -13,6 +13,5 @@ android {
 dependencies {
     implementation(shared.ktorClientCore)
 
-    implementation(shared.cronet)
-
+    implementation(shared.cronetApi)
 }

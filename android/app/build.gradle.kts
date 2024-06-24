@@ -71,6 +71,7 @@ dependencies {
     // network
     implementation(platform(shared.okHttpBom))
     implementation(shared.okHttp)
+    implementation(shared.cronet)
 
     // coroutines
     implementation(shared.coroutines.android)

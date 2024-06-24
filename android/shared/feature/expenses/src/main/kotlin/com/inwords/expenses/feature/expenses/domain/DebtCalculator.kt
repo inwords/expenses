@@ -1,14 +1,17 @@
 package com.inwords.expenses.feature.expenses.domain
 
 import androidx.annotation.WorkerThread
+import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.domain.model.AccumulatedDebt
 import com.inwords.expenses.feature.expenses.domain.model.BarterAccumulatedDebt
 import com.inwords.expenses.feature.expenses.domain.model.Debt
-import com.inwords.expenses.feature.expenses.domain.model.ExpensesDetails
+import com.inwords.expenses.feature.expenses.domain.model.Expense
+import java.math.BigDecimal
 
 internal class DebtCalculator(
-    private val expensesDetails: ExpensesDetails,
+    private val expenses: List<Expense>,
+    private val primaryCurrency: Currency,
     private val currencyExchanger: CurrencyExchanger = CurrencyExchanger(),
 ) {
 
@@ -27,14 +30,15 @@ internal class DebtCalculator(
      */
     @get:WorkerThread
     val barterAccumulatedDebts: Map<Person, Map<Person, BarterAccumulatedDebt>> by lazy {
-        accumulatedDebts.mapValues { (debtor, creditorToAccumulatedDebts) ->
-            creditorToAccumulatedDebts.mapValues { (creditor, accumulatedDebt) ->
+        val threshold = BigDecimal(0.01)
+        accumulatedDebts.mapValuesTo(HashMap()) { (debtor, creditorToAccumulatedDebts) ->
+            creditorToAccumulatedDebts.mapValuesTo(HashMap()) { (creditor, accumulatedDebt) ->
                 BarterAccumulatedDebt(
                     debtorToCreditorDebt = accumulatedDebt,
                     creditorToDebtorDebt = accumulatedDebts[creditor]?.get(debtor),
                 )
-            }
-        }
+            }.filterValues { it.barterAmount > threshold }
+        }.filterValues { it.isNotEmpty() }
     }
 
     fun getBarterAccumulatedDebtForPerson(person: Person): Map<Person, BarterAccumulatedDebt> {
@@ -48,7 +52,7 @@ internal class DebtCalculator(
     private fun calculateAccumulatedDebts(): Map<Person, Map<Person, AccumulatedDebt>> {
         val debtorToCreditorDebts = hashMapOf<Person, MutableMap<Person, MutableList<Debt>>>()
 
-        expensesDetails.expenses.forEach { expense ->
+        expenses.forEach { expense ->
             expense.subjecExpenseSplitWithPersons.forEach { subjectExpenseSplit ->
                 if (subjectExpenseSplit.person != expense.person) {
                     val subjectDebtorToCreditorDebts = debtorToCreditorDebts.getOrPut(subjectExpenseSplit.person) { mutableMapOf() }
@@ -65,9 +69,8 @@ internal class DebtCalculator(
             }
         }
 
-        val primaryCurrency = expensesDetails.event.primaryCurrency
-        val debtorToCreditorToAccumulatedDebts = debtorToCreditorDebts.mapValues { (debtor, creditorToDebts) ->
-            creditorToDebts.mapValues { (creditor, debts) ->
+        val debtorToCreditorToAccumulatedDebts = debtorToCreditorDebts.mapValuesTo(HashMap()) { (debtor, creditorToDebts) ->
+            creditorToDebts.mapValuesTo(HashMap()) { (creditor, debts) ->
                 val amount = debts.sumOf {
                     if (it.expense.currency.id == primaryCurrency.id) {
                         it.amount

@@ -16,7 +16,6 @@ import com.inwords.expenses.feature.events.api.EventsComponent
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
 import com.inwords.expenses.feature.events.data.db.dao.PersonsDao
-import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.ui.add_persons.AddPersonsScreenDestination
 import com.inwords.expenses.feature.events.ui.add_persons.addAddPersonsScreen
 import com.inwords.expenses.feature.events.ui.create.CreateEventScreenDestination
@@ -26,6 +25,7 @@ import com.inwords.expenses.feature.events.ui.join.addJoinEventScreen
 import com.inwords.expenses.feature.expenses.api.ExpensesComponent
 import com.inwords.expenses.feature.expenses.data.db.dao.ExpensesDao
 import com.inwords.expenses.feature.expenses.ui.add.addExpenseScreen
+import com.inwords.expenses.feature.expenses.ui.debts_list.debtsListScreen
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenDestination
 import com.inwords.expenses.feature.expenses.ui.list.expensesScreen
 import com.inwords.expenses.feature.settings.api.SettingsComponent
@@ -72,11 +72,8 @@ internal fun MainNavHost(
     val expensesComponent = remember {
         ExpensesComponent(
             deps = object : ExpensesComponent.Deps {
-                override val eventsInteractor: EventsInteractor
-                    get() = eventsComponent.eventsInteractor
                 override val expensesDao: ExpensesDao
                     get() = dbComponent.expensesDao
-
             }
         )
     }
@@ -121,6 +118,11 @@ internal fun MainNavHost(
             eventsInteractor = eventsComponent.eventsInteractor,
             expensesInteractor = expensesComponent.expensesInteractor,
             settingsRepository = settingsComponent.settingsRepository,
+        )
+        debtsListScreen(
+            navigationController = navigationController,
+            eventsInteractor = eventsComponent.eventsInteractor,
+            expensesInteractor = expensesComponent.expensesInteractor,
         )
     }
 }

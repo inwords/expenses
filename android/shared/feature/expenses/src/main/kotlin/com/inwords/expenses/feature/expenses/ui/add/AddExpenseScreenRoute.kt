@@ -93,6 +93,7 @@ fun NavGraphBuilder.addExpenseScreen(
             }
         })
         AddExpenseScreen(
+            state = viewModel.state.collectAsStateWithLifecycle().value,
             onCurrencyClicked = viewModel::onCurrencyClicked,
             onExpenseTypeClicked = viewModel::onExpenseTypeClicked,
             onPersonClicked = viewModel::onPersonClicked,
@@ -102,7 +103,6 @@ fun NavGraphBuilder.addExpenseScreen(
             onSplitAmountChanged = viewModel::onSplitAmountChanged,
             onConfirmClicked = viewModel::onConfirmClicked,
             onCloseClicked = viewModel::onCloseClicked,
-            state = viewModel.state.collectAsStateWithLifecycle().value,
         )
     }
 }

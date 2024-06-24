@@ -1,4 +1,4 @@
-package com.inwords.expenses.feature.expenses.ui.list
+package com.inwords.expenses.feature.expenses.ui.debts_list
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -10,34 +10,30 @@ import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
-import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.serialization.Serializable
 
 @Serializable
-object ExpensesScreenDestination : Destination
+object DebtsListScreenDestination : Destination
 
-fun NavGraphBuilder.expensesScreen(
+fun NavGraphBuilder.debtsListScreen(
     navigationController: NavigationController,
     eventsInteractor: EventsInteractor,
     expensesInteractor: ExpensesInteractor,
-    settingsRepository: SettingsRepository,
 ) {
-    composable<ExpensesScreenDestination> {
-        val viewModel = viewModel<ExpensesViewModel>(it, factory = viewModelFactory {
+    composable<DebtsListScreenDestination> {
+        val viewModel = viewModel<DebtsListViewModel>(it, factory = viewModelFactory {
             initializer {
-                ExpensesViewModel(
+                DebtsListViewModel(
                     navigationController = navigationController,
                     eventsInteractor = eventsInteractor,
                     expensesInteractor = expensesInteractor,
-                    settingsRepository = settingsRepository,
                 )
             }
         })
-        ExpensesScreen(
+        DebtsListScreen(
             state = viewModel.state.collectAsStateWithLifecycle().value,
-            onAddExpenseClick = viewModel::onAddExpenseClick,
-            onDebtsDetailsClick = viewModel::onDebtsDetailsClick,
-            onReplenishmentClick = viewModel::onReplenishmentClick
+            onReplenishmentClick = viewModel::onReplenishmentClick,
+            onCloseClick = viewModel::onCloseClick
         )
     }
 }

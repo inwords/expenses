@@ -1,6 +1,5 @@
 package com.inwords.expenses.core.ktor_client_cronet
 
-import android.util.Log
 import io.ktor.client.engine.HttpClientEngineBase
 import io.ktor.client.engine.HttpClientEngineCapability
 import io.ktor.client.engine.callContext
@@ -95,7 +94,7 @@ class CronetEngine(
                 byteBuffer.flip()
                 receiveChannel.write(byteBuffer)
 
-                // Reuse previous ByteBuffer to read continuous response
+                // Continue reading
                 byteBuffer.clear()
                 request.read(byteBuffer)
             }
@@ -135,7 +134,7 @@ class CronetEngine(
             }
 
             data.body.contentType?.let {
-                addHeader(HttpHeaders.ContentType, it.contentType)
+                addHeader(HttpHeaders.ContentType, "${it.contentType}/${it.contentSubtype}")
             }
         }.build()
 
@@ -152,7 +151,6 @@ private fun UrlResponseInfo.toHttpResponseData(
     callContext: CoroutineContext,
     responseBody: ByteArray? = null,
 ): HttpResponseData {
-    Log.e("ktor", negotiatedProtocol.toString())
     return HttpResponseData(
         statusCode = HttpStatusCode.fromValue(httpStatusCode),
         requestTime = requestTime,

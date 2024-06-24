@@ -27,12 +27,12 @@ class EventsInteractor internal constructor(
         data object EventNotFound : JoinEventResult
     }
 
-    val currentEvent: StateFlow<Event?> = settingsRepository.getCurrentEventId()
+    val currentEvent: StateFlow<EventDetails?> = settingsRepository.getCurrentEventId()
         .flatMapLatestNoBuffer { currentEventId ->
             if (currentEventId == null) {
                 flowOf(null)
             } else {
-                eventsRepository.getEvent(currentEventId)
+                eventsRepository.getEventWithDetails(currentEventId)
             }
         }
         .stateIn(scope, started = SharingStarted.WhileSubscribed(), initialValue = null)

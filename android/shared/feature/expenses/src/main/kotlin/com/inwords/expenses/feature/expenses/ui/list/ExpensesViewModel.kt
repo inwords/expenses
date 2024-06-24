@@ -9,10 +9,10 @@ import com.inwords.expenses.core.utils.asImmutableListAdapter
 import com.inwords.expenses.core.utils.collectIn
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
 import com.inwords.expenses.feature.events.domain.EventsInteractor
-import com.inwords.expenses.feature.expenses.domain.DebtCalculator
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenDestination
 import com.inwords.expenses.feature.expenses.ui.converter.toUiModel
+import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListScreenDestination
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.DebtorShortUiModel
 import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
 import com.inwords.expenses.feature.settings.api.SettingsRepository
@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
-import java.math.BigDecimal
 
 internal class ExpensesViewModel(
     private val navigationController: NavigationController,
@@ -42,12 +41,9 @@ internal class ExpensesViewModel(
                 .flatMapLatestNoBuffer { expensesInteractor.getExpensesDetails(it) },
             settingsRepository.getCurrentPersonId()
         ) { expensesDetails, currentPersonId ->
-            val debtCalculator = DebtCalculator(expensesDetails)
 
-            val currentPerson = expensesDetails.expenses.map { it.person }.first { it.id == currentPersonId }
-            val debtors = debtCalculator.getBarterAccumulatedDebtForPerson(currentPerson).entries
-                .asSequence()
-                .filter { (_, barterAccumulatedDebt) -> barterAccumulatedDebt.barterAmount > BigDecimal.ZERO }
+            val currentPerson = expensesDetails.event.persons.first { it.id == currentPersonId }
+            val debtors = expensesDetails.debtCalculator.getBarterAccumulatedDebtForPerson(currentPerson)
                 .map { (person, barterAccumulatedDebt) ->
                     DebtorShortUiModel(
                         personId = person.id,
@@ -76,6 +72,10 @@ internal class ExpensesViewModel(
 
     fun onAddExpenseClick() {
         navigationController.navigateTo(AddExpenseScreenDestination())
+    }
+
+    fun onDebtsDetailsClick() {
+        navigationController.navigateTo(DebtsListScreenDestination)
     }
 
     fun onReplenishmentClick(creditor: DebtorShortUiModel) {

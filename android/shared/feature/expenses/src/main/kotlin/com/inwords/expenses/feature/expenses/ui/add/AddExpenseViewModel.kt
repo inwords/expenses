@@ -9,7 +9,6 @@ import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.core.utils.asImmutableListAdapter
 import com.inwords.expenses.core.utils.collectIn
-import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
@@ -44,7 +43,7 @@ import java.math.RoundingMode
 
 internal class AddExpenseViewModel(
     private val navigationController: NavigationController,
-    private val eventsInteractor: EventsInteractor,
+    eventsInteractor: EventsInteractor,
     private val expensesInteractor: ExpensesInteractor,
     settingsRepository: SettingsRepository,
     private val replenishment: Replenishment?,
@@ -99,10 +98,7 @@ internal class AddExpenseViewModel(
     init {
         combine(
             eventsInteractor.currentEvent
-                .filterNotNull() // TODO mvp
-                .flatMapLatestNoBuffer { event ->
-                    eventsInteractor.getEventDetails(event)
-                },
+                .filterNotNull(), // TODO mvp
             settingsRepository.getCurrentPersonId()
         ) { eventDetails, currentPersonId ->
             val subjectPersons = eventDetails.persons.map { person ->
@@ -317,12 +313,13 @@ internal class AddExpenseViewModel(
         val state = (_state.value as? SimpleScreenState.Success)?.data ?: return
 
         val subjectExpenseSplitWithPersons = if (state.equalSplit) {
+            val selectedSubjectPersons = state.subjectPersons.filter { it.selected }
             val amount = state.wholeAmount.amount?.divide(
-                /* divisor = */ state.subjectPersons.count { it.selected }.coerceAtLeast(1).toBigDecimal(),
+                /* divisor = */ selectedSubjectPersons.size.coerceAtLeast(1).toBigDecimal(),
                 /* scale = */ 3,
                 /* roundingMode = */ RoundingMode.HALF_EVEN
             ) ?: return
-            state.subjectPersons.map { personInfoModel ->
+            selectedSubjectPersons.map { personInfoModel ->
                 ExpenseSplitWithPerson(
                     expenseSplitId = 0,
                     expenseId = 0,

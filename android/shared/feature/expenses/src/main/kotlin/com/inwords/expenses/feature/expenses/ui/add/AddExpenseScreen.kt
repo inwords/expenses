@@ -46,7 +46,7 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 internal fun AddExpenseScreen(
-    modifier: Modifier = Modifier,
+    state: SimpleScreenState<AddExpenseScreenUiModel>,
     onCurrencyClicked: (CurrencyInfoUiModel) -> Unit,
     onExpenseTypeClicked: (ExpenseType) -> Unit,
     onPersonClicked: (PersonInfoUiModel) -> Unit,
@@ -56,11 +56,11 @@ internal fun AddExpenseScreen(
     onSplitAmountChanged: (ExpenseSplitWithPersonUiModel, String) -> Unit,
     onConfirmClicked: () -> Unit,
     onCloseClicked: () -> Unit,
-    state: SimpleScreenState<AddExpenseScreenUiModel>,
+    modifier: Modifier = Modifier,
 ) {
     when (state) {
         is SimpleScreenState.Success -> AddExpenseScreenSuccess(
-            modifier = modifier,
+            state = state.data,
             onCurrencyClicked = onCurrencyClicked,
             onExpenseTypeClicked = onExpenseTypeClicked,
             onPersonClicked = onPersonClicked,
@@ -70,7 +70,7 @@ internal fun AddExpenseScreen(
             onSplitAmountChanged = onSplitAmountChanged,
             onConfirmClicked = onConfirmClicked,
             onCloseClicked = onCloseClicked,
-            state = state.data
+            modifier = modifier
         )
 
         is SimpleScreenState.Loading -> {
@@ -90,7 +90,7 @@ internal fun AddExpenseScreen(
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun AddExpenseScreenSuccess(
-    modifier: Modifier = Modifier,
+    state: AddExpenseScreenUiModel,
     onCurrencyClicked: (CurrencyInfoUiModel) -> Unit,
     onExpenseTypeClicked: (ExpenseType) -> Unit,
     onPersonClicked: (PersonInfoUiModel) -> Unit,
@@ -100,7 +100,7 @@ private fun AddExpenseScreenSuccess(
     onSplitAmountChanged: (ExpenseSplitWithPersonUiModel, String) -> Unit,
     onConfirmClicked: () -> Unit,
     onCloseClicked: () -> Unit,
-    state: AddExpenseScreenUiModel,
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
         topBar = {
