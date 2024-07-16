@@ -25,6 +25,6 @@ gradlePlugin {
 
 dependencies {
 
-    implementation(buildSrc.kotlinGradlePlugin)
+    implementation(buildSrc.kotlin.gradle.plugin)
     implementation(buildSrc.agp)
 }

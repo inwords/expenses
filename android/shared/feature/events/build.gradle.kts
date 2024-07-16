@@ -1,6 +1,6 @@
 plugins {
     id("shared-library-plugin")
-    id(shared.plugins.kotlin.serialization.get().pluginId)
+    alias(shared.plugins.kotlin.serialization)
     alias(shared.plugins.compose.compiler)
 }
 
@@ -29,20 +29,20 @@ dependencies {
 
     implementation(shared.coroutines.android)
 
-    implementation(shared.kotlinxSerializationJson)
-    implementation(shared.kotlinxDatetime)
+    implementation(shared.kotlinx.serialization.json)
+    implementation(shared.kotlinx.datetime)
 
-    implementation(shared.lifecycleRuntimeCompose)
-    implementation(shared.lifecycleViewModelCompose)
+    implementation(shared.lifecycle.runtime.compose)
+    implementation(shared.lifecycle.viewmodel.compose)
 
-    implementation(shared.roomRuntime)
+    implementation(shared.room.runtime)
 
-    implementation(shared.navigationCompose)
+    implementation(shared.navigation.compose)
 
-    val composeBom = platform(shared.composeBom)
+    val composeBom = platform(shared.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
-    implementation(shared.composeUi)
-    implementation(shared.composeMaterial3)
+    implementation(shared.compose.ui)
+    implementation(shared.compose.material3)
     implementation(shared.compose.ui.tooling)
 }

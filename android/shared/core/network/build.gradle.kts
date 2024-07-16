@@ -14,11 +14,11 @@ dependencies {
     implementation(project(":shared:core:utils"))
     implementation(project(":shared:core:ktor-client-cronet"))
 
-    implementation(shared.ktorClientOkHttp)
-    implementation(shared.ktorClientContentNegotiation)
-    implementation(shared.ktorSerializationKotlinxJson)
-    implementation(shared.ktorClientLoggingJvm)
+    implementation(shared.ktor.client.okhttp)
+    implementation(shared.ktor.client.content.negotiation)
+    implementation(shared.ktor.serialization.kotlinx.json)
+    implementation(shared.ktor.client.logging.jvm)
 
-    implementation(shared.cronetApi)
+    implementation(shared.cronet.api)
 
 }

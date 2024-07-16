@@ -1,12 +1,12 @@
 [versions]
-androidGradlePlugin = "8.4.1"
+android-gradle-plugin = "8.5.1"
 kotlin = "2.0.0"
 
 [libraries]
-agp = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
-kotlinGradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+agp = { group = "com.android.tools.build", name = "gradle", version.ref = "android-gradle-plugin" }
+kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+android-application = { id = "com.android.application" }
+android-library = { id = "com.android.library" }
+kotlin-android = { id = "org.jetbrains.kotlin.android" }

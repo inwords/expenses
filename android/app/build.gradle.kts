@@ -1,6 +1,6 @@
 plugins {
-    id(buildSrc.plugins.android.application.get().pluginId)
-    id(buildSrc.plugins.kotlin.android.get().pluginId)
+    alias(buildSrc.plugins.android.application)
+    alias(buildSrc.plugins.kotlin.android)
     alias(shared.plugins.compose.compiler)
     alias(shared.plugins.kotlin.serialization)
 }
@@ -69,49 +69,49 @@ dependencies {
     implementation(project(":kmmsharedmodule"))
 
     // network
-    implementation(platform(shared.okHttpBom))
-    implementation(shared.okHttp)
+    implementation(platform(shared.okhttp.bom))
+    implementation(shared.okhttp)
     implementation(shared.cronet)
 
     // coroutines
     implementation(shared.coroutines.android)
 
     // serialization
-    implementation(shared.kotlinxSerializationJson)
+    implementation(shared.kotlinx.serialization.json)
 
     //datetime
-    implementation(shared.kotlinxDatetime)
+    implementation(shared.kotlinx.datetime)
 
     // db
-    implementation(shared.roomRuntime)
+    implementation(shared.room.runtime)
 
     // compose
-    val composeBom = platform(shared.composeBom)
+    val composeBom = platform(shared.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
 
-    implementation(shared.composeUi)
+    implementation(shared.compose.ui)
     implementation(shared.compose.ui.tooling)
-    implementation(shared.composeMaterial3)
+    implementation(shared.compose.material3)
 
     // other UI-related staff
-    implementation(shared.coilBase)
-    implementation(shared.coilComposeBase)
+    implementation(shared.coil.base)
+    implementation(shared.coil.compose.base)
 
-    implementation(shared.navigationCompose)
+    implementation(shared.navigation.compose)
 
     // lifecycle
-    implementation(shared.lifecycleRuntimeKtx)
-    implementation(shared.lifecycleRuntimeCompose)
-    implementation(shared.lifecycleViewModelCompose)
+    implementation(shared.lifecycle.runtime.ktx)
+    implementation(shared.lifecycle.runtime.compose)
+    implementation(shared.lifecycle.viewmodel.compose)
 
     // misc androidx stuff
-    implementation(shared.coreKtx)
-    implementation(shared.activityCompose)
+    implementation(shared.core.ktx)
+    implementation(shared.activity.compose)
 
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     implementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")

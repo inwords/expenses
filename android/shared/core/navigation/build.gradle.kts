@@ -20,6 +20,6 @@ android {
 }
 
 dependencies {
-    implementation(shared.navigationCompose)
-    implementation(shared.lifecycleViewModelCompose)
+    implementation(shared.navigation.compose)
+    implementation(shared.lifecycle.viewmodel.compose)
 }

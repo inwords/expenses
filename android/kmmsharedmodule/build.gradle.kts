@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("multiplatform")
-    id(buildSrc.plugins.android.library.get().pluginId)
+    alias(buildSrc.plugins.android.library)
 }
 afterEvaluate {
     tasks.withType<JavaCompile>().configureEach {

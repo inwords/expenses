@@ -12,5 +12,5 @@ android {
 
 dependencies {
     implementation(shared.coroutines.core)
-    implementation(shared.kotlinxDatetime)
+    implementation(shared.kotlinx.datetime)
 }

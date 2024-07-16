@@ -1,6 +1,6 @@
 plugins {
     id("shared-library-plugin")
-    id(shared.plugins.ksp.get().pluginId)
+    alias(shared.plugins.ksp)
 }
 
 android {
@@ -22,19 +22,19 @@ dependencies {
     implementation(project(":shared:feature:events"))
 
     // db
-    implementation(shared.roomRuntime)
-    ksp(shared.roomCompiler)
+    implementation(shared.room.runtime)
+    ksp(shared.room.compiler)
 
     implementation(shared.annotation)
 
     implementation(shared.coroutines.android)
 
-    implementation(shared.kotlinxDatetime)
+    implementation(shared.kotlinx.datetime)
 
     // compose
-    val composeBom = platform(shared.composeBom)
+    val composeBom = platform(shared.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
 
-    implementation(shared.composeRuntime) // TODO doesn't work without this - seems to be a Room KSP bug
+    implementation(shared.compose.runtime) // TODO doesn't work without this - seems to be a Room KSP bug
 }

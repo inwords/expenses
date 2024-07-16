@@ -11,9 +11,9 @@ android {
 }
 
 dependencies {
-    implementation(shared.kotlinxDatetime)
+    implementation(shared.kotlinx.datetime)
 
-    implementation(shared.roomRuntime)
+    implementation(shared.room.runtime)
 
     implementation(shared.annotation)
 }
