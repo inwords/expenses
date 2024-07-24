@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
-
 plugins {
     alias(buildSrc.plugins.android.application)
     alias(buildSrc.plugins.kotlin.android)
@@ -47,10 +45,6 @@ android {
         compose = true
     }
 
-    composeCompiler {
-        featureFlags.add(ComposeFeatureFlag.StrongSkipping)
-    }
-
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -70,19 +64,11 @@ dependencies {
     implementation(project(":shared:integration:databases"))
     implementation(project(":kmmsharedmodule"))
 
-    // network
-    implementation(platform(shared.okhttp.bom))
-    implementation(shared.okhttp)
-    implementation(shared.cronet)
-
     // coroutines
     implementation(shared.coroutines.android)
 
-    // serialization
-    implementation(shared.kotlinx.serialization.json)
-
-    //datetime
-    implementation(shared.kotlinx.datetime)
+    // network
+    implementation(shared.cronet.embedded)
 
     // db
     implementation(shared.room.runtime)

@@ -40,7 +40,7 @@ ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serializatio
 ktor-client-logging-jvm = { group = "io.ktor", name = "ktor-client-logging-jvm", version.ref = "ktor" }
 okhttp-bom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref = "okhttp-bom" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp" }
-cronet = { group = "org.chromium.net", name = "cronet-embedded", version.ref = "cronet" }
+cronet-embedded = { group = "org.chromium.net", name = "cronet-embedded", version.ref = "cronet" }
 cronet-api = { group = "org.chromium.net", name = "cronet-api", version.ref = "cronet" }
 
 coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
