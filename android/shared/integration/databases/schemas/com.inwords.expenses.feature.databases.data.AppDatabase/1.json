@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "40e572faa822a73216ea8d8ff946a612",
+    "identityHash": "4480518b9499b617418dc705b9220fe2",
     "entities": [
       {
         "tableName": "event",
@@ -226,6 +226,15 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_expense_split_person_id` ON `${TABLE_NAME}` (`person_id`)"
+          },
+          {
+            "name": "index_expense_split_expense_id",
+            "unique": false,
+            "columnNames": [
+              "expense_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_expense_split_expense_id` ON `${TABLE_NAME}` (`expense_id`)"
           }
         ],
         "foreignKeys": [
@@ -448,7 +457,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '40e572faa822a73216ea8d8ff946a612')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4480518b9499b617418dc705b9220fe2')"
     ]
   }
 }

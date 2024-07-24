@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.utils.IO
-import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -14,7 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 internal class AddPersonsViewModel(
     private val navigationController: NavigationController,
@@ -57,9 +55,10 @@ internal class AddPersonsViewModel(
             eventsInteractor.draftOtherPersons(state.persons)
             eventsInteractor.createEvent()
 
-            withContext(UI) {
-                navigationController.navigateTo(expensesScreenDestination)
-            }
+            navigationController.popBackStack(
+                toDestination = expensesScreenDestination,
+                inclusive = false
+            )
         }
     }
 }

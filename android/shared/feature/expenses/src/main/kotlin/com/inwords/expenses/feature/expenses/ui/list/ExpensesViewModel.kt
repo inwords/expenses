@@ -9,6 +9,8 @@ import com.inwords.expenses.core.utils.asImmutableListAdapter
 import com.inwords.expenses.core.utils.collectIn
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
 import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.ui.create.CreateEventScreenDestination
+import com.inwords.expenses.feature.events.ui.join.JoinEventScreenDestination
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenDestination
 import com.inwords.expenses.feature.expenses.ui.converter.toUiModel
@@ -22,7 +24,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flowOf
 
 internal class ExpensesViewModel(
     private val navigationController: NavigationController,
@@ -37,10 +39,16 @@ internal class ExpensesViewModel(
     init {
         combine(
             eventsInteractor.currentEvent
-                .filterNotNull()
-                .flatMapLatestNoBuffer { expensesInteractor.getExpensesDetails(it) },
+                .flatMapLatestNoBuffer { currentEvent ->
+                    if (currentEvent == null) {
+                        flowOf(null)
+                    } else {
+                        expensesInteractor.getExpensesDetails(currentEvent)
+                    }
+                },
             settingsRepository.getCurrentPersonId()
         ) { expensesDetails, currentPersonId ->
+            expensesDetails ?: return@combine SimpleScreenState.Empty
 
             val currentPerson = expensesDetails.event.persons.first { it.id == currentPersonId }
             val debtors = expensesDetails.debtCalculator.getBarterAccumulatedDebtForPerson(currentPerson)
@@ -56,17 +64,19 @@ internal class ExpensesViewModel(
                 .sortedBy { it.amount }
                 .toPersistentList()
 
-            ExpensesScreenUiModel(
-                currentPersonId = currentPerson.id,
-                currentPersonName = currentPerson.name,
-                creditors = debtors,
-                expenses = expensesDetails.expenses.map { expense ->
-                    expense.toUiModel()
-                }.asImmutableListAdapter()
+            SimpleScreenState.Success(
+                ExpensesScreenUiModel(
+                    currentPersonId = currentPerson.id,
+                    currentPersonName = currentPerson.name,
+                    creditors = debtors,
+                    expenses = expensesDetails.expenses.map { expense ->
+                        expense.toUiModel()
+                    }.asImmutableListAdapter()
+                )
             )
         }
             .collectIn(viewModelScope) {
-                _state.value = SimpleScreenState.Success(it)
+                _state.value = it
             }
     }
 
@@ -91,6 +101,14 @@ internal class ExpensesViewModel(
                 )
             )
         )
+    }
+
+    fun onCreateEventClick() {
+        navigationController.navigateTo(CreateEventScreenDestination)
+    }
+
+    fun onJoinEventClick() {
+        navigationController.navigateTo(JoinEventScreenDestination)
     }
 
 }

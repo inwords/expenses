@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -56,6 +58,8 @@ internal fun ExpensesScreen(
     onAddExpenseClick: () -> Unit,
     onDebtsDetailsClick: () -> Unit,
     onReplenishmentClick: (ExpensesScreenUiModel.DebtorShortUiModel) -> Unit,
+    onCreateEventClick: () -> Unit,
+    onJoinEventClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (state) {
@@ -75,15 +79,17 @@ internal fun ExpensesScreen(
             Text(text = "Error")
         }
 
-        SimpleScreenState.Empty -> {
-            Text(text = "No expenses")
-        }
+        SimpleScreenState.Empty -> ExpensesScreenEmpty(
+            onCreateEventClick = onCreateEventClick,
+            onJoinEventClick = onJoinEventClick,
+            modifier = modifier,
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-internal fun ExpensesScreenSuccess(
+private fun ExpensesScreenSuccess(
     state: ExpensesScreenUiModel,
     onAddExpenseClick: () -> Unit,
     onDebtsDetailsClick: () -> Unit,
@@ -182,6 +188,57 @@ internal fun ExpensesScreenSuccess(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ExpensesScreenEmpty(
+    onCreateEventClick: () -> Unit,
+    onJoinEventClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = {
+                    val text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic)) {
+                            append("Expenses")
+                        }
+                    }
+                    Text(text = text)
+                }
+            )
+        },
+    ) { paddingValues ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .padding(horizontal = 16.dp),
+                onClick = onCreateEventClick
+            ) {
+                Text(text = "Create event")
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedButton(
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .padding(horizontal = 16.dp),
+                onClick = onJoinEventClick
+            ) {
+                Text(text = "Join event")
+            }
+            Spacer(modifier = Modifier.fillMaxHeight(0.1f))
+        }
+    }
+}
+
 @Composable
 private fun ReturnCreditorDebtButton(
     creditor: ExpensesScreenUiModel.DebtorShortUiModel,
@@ -267,12 +324,27 @@ private fun ExpenseItem(
 
 @Composable
 @Preview(showBackground = true)
-private fun ExpensesScreenPreview() {
+private fun ExpensesScreenPreviewSuccess() {
     ExpensesScreen(
         onAddExpenseClick = {},
         onDebtsDetailsClick = {},
         onReplenishmentClick = {},
+        onJoinEventClick = {},
+        onCreateEventClick = {},
         state = SimpleScreenState.Success(mockExpensesScreenUiModel())
+    )
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun ExpensesScreenPreviewEmpty() {
+    ExpensesScreen(
+        onAddExpenseClick = {},
+        onDebtsDetailsClick = {},
+        onReplenishmentClick = {},
+        onJoinEventClick = {},
+        onCreateEventClick = {},
+        state = SimpleScreenState.Empty
     )
 }
 

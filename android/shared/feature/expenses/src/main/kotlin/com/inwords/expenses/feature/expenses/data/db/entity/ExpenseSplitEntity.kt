@@ -28,6 +28,7 @@ import java.math.BigInteger
     ],
     indices = [
         Index(value = [ExpenseSplitEntity.ColumnNames.PERSON_ID]),
+        Index(value = [ExpenseSplitEntity.ColumnNames.EXPENSE_ID]),
     ]
 )
 @TypeConverters(BigIntegerConverter::class)

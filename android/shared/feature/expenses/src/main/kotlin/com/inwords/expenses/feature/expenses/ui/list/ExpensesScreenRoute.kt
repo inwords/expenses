@@ -37,7 +37,9 @@ fun NavGraphBuilder.expensesScreen(
             state = viewModel.state.collectAsStateWithLifecycle().value,
             onAddExpenseClick = viewModel::onAddExpenseClick,
             onDebtsDetailsClick = viewModel::onDebtsDetailsClick,
-            onReplenishmentClick = viewModel::onReplenishmentClick
+            onReplenishmentClick = viewModel::onReplenishmentClick,
+            onCreateEventClick = viewModel::onCreateEventClick,
+            onJoinEventClick = viewModel::onJoinEventClick,
         )
     }
 }

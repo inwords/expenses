@@ -36,7 +36,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -354,9 +353,7 @@ internal class AddExpenseViewModel(
         viewModelScope.launch {
             expensesInteractor.addExpense(state.event, expense)
 
-            withContext(UI) {
-                navigationController.popBackStack()
-            }
+            navigationController.popBackStack()
         }
     }
 

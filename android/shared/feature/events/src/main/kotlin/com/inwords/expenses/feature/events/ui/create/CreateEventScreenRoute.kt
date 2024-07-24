@@ -17,8 +17,7 @@ object CreateEventScreenDestination : Destination
 fun NavGraphBuilder.addCreateEventScreen(
     navigationController: NavigationController,
     eventsInteractor: EventsInteractor,
-    addParticipantsDestination: Destination,
-    homeScreenDestination: Destination,
+    expensesScreenDestination: Destination,
 ) {
     composable<CreateEventScreenDestination> {
         val viewModel = viewModel<CreateEventViewModel>(it, factory = viewModelFactory {
@@ -26,8 +25,7 @@ fun NavGraphBuilder.addCreateEventScreen(
                 CreateEventViewModel(
                     navigationController = navigationController,
                     eventsInteractor = eventsInteractor,
-                    addParticipantsDestination = addParticipantsDestination,
-                    homeScreenDestination = homeScreenDestination,
+                    expensesScreenDestination = expensesScreenDestination,
                 )
             }
         })

@@ -16,11 +16,8 @@ import com.inwords.expenses.feature.events.api.EventsComponent
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
 import com.inwords.expenses.feature.events.data.db.dao.PersonsDao
-import com.inwords.expenses.feature.events.ui.add_persons.AddPersonsScreenDestination
 import com.inwords.expenses.feature.events.ui.add_persons.addAddPersonsScreen
-import com.inwords.expenses.feature.events.ui.create.CreateEventScreenDestination
 import com.inwords.expenses.feature.events.ui.create.addCreateEventScreen
-import com.inwords.expenses.feature.events.ui.join.JoinEventScreenDestination
 import com.inwords.expenses.feature.events.ui.join.addJoinEventScreen
 import com.inwords.expenses.feature.expenses.api.ExpensesComponent
 import com.inwords.expenses.feature.expenses.data.db.dao.ExpensesDao
@@ -30,14 +27,12 @@ import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenDestination
 import com.inwords.expenses.feature.expenses.ui.list.expensesScreen
 import com.inwords.expenses.feature.settings.api.SettingsComponent
 import com.inwords.expenses.feature.settings.api.SettingsRepository
-import com.inwords.expenses.ui.home.HomeScreenDestination
-import com.inwords.expenses.ui.home.homeScreen
 
 @Composable
 internal fun MainNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: Destination = HomeScreenDestination
+    startDestination: Destination = ExpensesScreenDestination
 ) {
     val navigationController = rememberNavigationController(navController)
 
@@ -83,13 +78,6 @@ internal fun MainNavHost(
         navController = navController,
         startDestination = startDestination
     ) {
-        homeScreen(
-            // FIXME remove tmp screen
-            onNavigateToExpenses = { navController.navigate(ExpensesScreenDestination) },
-            onNavigateToCreateEvent = { navController.navigate(CreateEventScreenDestination) },
-            onNavigateToJoinEvent = { navController.navigate(JoinEventScreenDestination) },
-        )
-
         addJoinEventScreen(
             navigationController = navigationController,
             eventsInteractor = eventsComponent.eventsInteractor,
@@ -98,8 +86,7 @@ internal fun MainNavHost(
         addCreateEventScreen(
             navigationController = navigationController,
             eventsInteractor = eventsComponent.eventsInteractor,
-            addParticipantsDestination = AddPersonsScreenDestination,
-            homeScreenDestination = HomeScreenDestination,
+            expensesScreenDestination = ExpensesScreenDestination,
         )
         addAddPersonsScreen(
             navigationController = navigationController,

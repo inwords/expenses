@@ -1,15 +1,12 @@
 package com.inwords.expenses.core.navigation
 
-import androidx.annotation.MainThread
-
 interface NavigationController {
 
-    @MainThread
-    fun navigateTo(screen: Destination)
+    fun navigateTo(destination: Destination)
 
-    @MainThread
-    fun navigateTo(screen: Destination, popUpTo: Destination)
+    fun navigateTo(destination: Destination, popUpTo: Destination)
 
-    @MainThread
     fun popBackStack()
+
+    fun popBackStack(toDestination: Destination, inclusive: Boolean)
 }

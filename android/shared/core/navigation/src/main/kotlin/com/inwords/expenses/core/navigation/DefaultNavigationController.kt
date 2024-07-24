@@ -15,14 +15,14 @@ internal class DefaultNavigationController : NavigationController {
     private val _navCommands = Channel<NavCommand>(capacity = 10)
     val navCommands: ReceiveChannel<NavCommand> = _navCommands
 
-    override fun navigateTo(screen: Destination) {
-        _navCommands.trySend(NavCommand { it.navigate(screen) })
+    override fun navigateTo(destination: Destination) {
+        _navCommands.trySend(NavCommand { it.navigate(destination) })
     }
 
-    override fun navigateTo(screen: Destination, popUpTo: Destination) {
+    override fun navigateTo(destination: Destination, popUpTo: Destination) {
         _navCommands.trySend(
             NavCommand {
-                it.navigate(screen) {
+                it.navigate(destination) {
                     popUpTo(popUpTo)
                 }
             }
@@ -32,4 +32,13 @@ internal class DefaultNavigationController : NavigationController {
     override fun popBackStack() {
         _navCommands.trySend(NavCommand { it.popBackStack() })
     }
+
+    override fun popBackStack(toDestination: Destination, inclusive: Boolean) {
+        _navCommands.trySend(
+            NavCommand {
+                it.popBackStack(toDestination, inclusive)
+            }
+        )
+    }
+
 }

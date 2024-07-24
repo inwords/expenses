@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
+
 plugins {
     id("shared-library-plugin")
     alias(shared.plugins.kotlin.serialization)
@@ -16,7 +18,7 @@ android {
     }
 
     composeCompiler {
-        enableStrongSkippingMode = true
+        featureFlags.add(ComposeFeatureFlag.StrongSkipping)
     }
 }
 

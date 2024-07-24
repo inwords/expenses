@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.utils.IO
-import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.ui.add_persons.AddPersonsScreenDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -14,13 +14,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 internal class CreateEventViewModel(
     private val navigationController: NavigationController,
     private val eventsInteractor: EventsInteractor,
-    private val addParticipantsDestination: Destination,
-    private val homeScreenDestination: Destination,
+    private val expensesScreenDestination: Destination,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
     private var confirmJob: Job? = null
@@ -42,12 +40,10 @@ internal class CreateEventViewModel(
             eventsInteractor.draftEventName(
                 eventName = state.eventName
             )
-            withContext(UI) {
-                navigationController.navigateTo(
-                    screen = addParticipantsDestination,
-                    popUpTo = homeScreenDestination
-                )
-            }
+            navigationController.navigateTo(
+                destination = AddPersonsScreenDestination,
+                popUpTo = expensesScreenDestination
+            )
         }
     }
 }
