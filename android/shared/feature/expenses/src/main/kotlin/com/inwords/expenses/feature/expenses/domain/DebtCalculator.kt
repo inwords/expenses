@@ -1,13 +1,14 @@
 package com.inwords.expenses.feature.expenses.domain
 
 import androidx.annotation.WorkerThread
+import com.inwords.expenses.core.utils.sumOf
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.domain.model.AccumulatedDebt
 import com.inwords.expenses.feature.expenses.domain.model.BarterAccumulatedDebt
 import com.inwords.expenses.feature.expenses.domain.model.Debt
 import com.inwords.expenses.feature.expenses.domain.model.Expense
-import java.math.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 
 internal class DebtCalculator(
     private val expenses: List<Expense>,
@@ -30,7 +31,7 @@ internal class DebtCalculator(
      */
     @get:WorkerThread
     val barterAccumulatedDebts: Map<Person, Map<Person, BarterAccumulatedDebt>> by lazy {
-        val threshold = BigDecimal(0.01)
+        val threshold = BigDecimal.fromDouble(0.01)
         accumulatedDebts.mapValuesTo(HashMap()) { (debtor, creditorToAccumulatedDebts) ->
             creditorToAccumulatedDebts.mapValuesTo(HashMap()) { (creditor, accumulatedDebt) ->
                 BarterAccumulatedDebt(
@@ -71,6 +72,7 @@ internal class DebtCalculator(
 
         val debtorToCreditorToAccumulatedDebts = debtorToCreditorDebts.mapValuesTo(HashMap()) { (debtor, creditorToDebts) ->
             creditorToDebts.mapValuesTo(HashMap()) { (creditor, debts) ->
+                BigDecimal
                 val amount = debts.sumOf {
                     if (it.expense.currency.id == primaryCurrency.id) {
                         it.amount

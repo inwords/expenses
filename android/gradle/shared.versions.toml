@@ -73,6 +73,8 @@ navigation-compose = { group = "androidx.navigation", name = "navigation-compose
 
 constraintlayout-compose = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "constraintlayout-compose" }
 
+ionspin-kotlin-bignum = { group = "com.ionspin.kotlin", name = "bignum", version = "0.3.10" }
+
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

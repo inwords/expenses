@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.inwords.expenses.core.storage.utils.type_converter.BigIntegerConverter
 import com.inwords.expenses.feature.events.data.db.entity.PersonEntity
-import java.math.BigInteger
+import com.ionspin.kotlin.bignum.integer.BigInteger
 
 @Entity(
     tableName = ExpenseSplitEntity.TABLE_NAME,
@@ -47,7 +47,7 @@ data class ExpenseSplitEntity(
     val amountUnscaled: BigInteger,
 
     @ColumnInfo(ColumnNames.SCALE)
-    val amountScale: Int,
+    val amountScale: Long,
 ) {
 
     companion object {

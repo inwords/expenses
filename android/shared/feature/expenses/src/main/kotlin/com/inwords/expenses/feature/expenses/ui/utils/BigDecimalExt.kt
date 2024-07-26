@@ -1,13 +1,13 @@
 package com.inwords.expenses.feature.expenses.ui.utils
 
-import java.math.BigDecimal
-import java.math.RoundingMode
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 
-internal fun BigDecimal.toRoundedString(scale: Int = 2): String {
-    val scaled = this.setScale(scale, RoundingMode.HALF_EVEN)
-    return if ((scaled % BigDecimal.ONE).unscaledValue() == BigDecimal.ZERO.unscaledValue()) {
+internal fun BigDecimal.toRoundedString(scale: Long = 2): String {
+    val scaled = this.scale(scale)
+    // lib is working very strange
+    return if ((scaled * BigDecimal.TEN % 10).significand == BigDecimal.ZERO.significand) {
         scaled.toBigInteger().toString()
     } else {
-        scaled.toPlainString()
+        scaled.toStringExpanded()
     }
 }

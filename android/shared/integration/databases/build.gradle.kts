@@ -37,4 +37,6 @@ dependencies {
     androidTestImplementation(composeBom)
 
     implementation(shared.compose.runtime) // TODO doesn't work without this - seems to be a Room KSP bug
+
+    implementation(shared.ionspin.kotlin.bignum)
 }

@@ -8,7 +8,7 @@ import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseSplitWithPers
 import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseWithDetailsQuery
 import com.inwords.expenses.feature.expenses.domain.model.Expense
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseSplitWithPerson
-import java.math.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 
 internal fun ExpenseWithDetailsQuery.toDomain(): Expense {
     return Expense(
@@ -42,6 +42,9 @@ internal fun ExpenseSplitWithPersonQuery.toDomain(): ExpenseSplitWithPerson {
         expenseSplitId = this.expenseSplitEntity.expenseSplitId,
         expenseId = this.expenseSplitEntity.expenseId,
         person = this.person.toDomain(),
-        amount = BigDecimal(this.expenseSplitEntity.amountUnscaled, this.expenseSplitEntity.amountScale),
+        amount = BigDecimal.fromBigIntegerWithExponent(
+            bigInteger = this.expenseSplitEntity.amountUnscaled,
+            exponent = this.expenseSplitEntity.amountScale
+        ),
     )
 }

@@ -9,6 +9,8 @@ import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.core.utils.asImmutableListAdapter
 import com.inwords.expenses.core.utils.collectIn
+import com.inwords.expenses.core.utils.divide
+import com.inwords.expenses.core.utils.toBigDecimalOrNull
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
@@ -24,7 +26,10 @@ import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.Pers
 import com.inwords.expenses.feature.expenses.ui.add.AddExpenseViewModel.AddExpenseScreenModel.AmountModel
 import com.inwords.expenses.feature.expenses.ui.add.AddExpenseViewModel.AddExpenseScreenModel.ExpenseSplitWithPersonModel
 import com.inwords.expenses.feature.expenses.ui.add.AddExpenseViewModel.AddExpenseScreenModel.PersonInfoModel
+import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
 import com.inwords.expenses.feature.settings.api.SettingsRepository
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,8 +42,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.datetime.Clock
-import java.math.BigDecimal
-import java.math.RoundingMode
 
 internal class AddExpenseViewModel(
     private val navigationController: NavigationController,
@@ -251,14 +254,13 @@ internal class AddExpenseViewModel(
 
             val newSplit = split.ifEmpty {
                 val amount = wholeAmount?.amount?.divide(
-                    /* divisor = */ selectedSubjectPersons.size.coerceAtLeast(1).toBigDecimal(),
-                    /* scale = */ 2,
-                    /* roundingMode = */ RoundingMode.HALF_EVEN
+                    other = selectedSubjectPersons.size.coerceAtLeast(1).toBigDecimal(),
+                    scale = 2,
                 )
                 selectedSubjectPersons.map { personInfoModel ->
                     ExpenseSplitWithPersonModel(
                         person = personInfoModel,
-                        amount = AmountModel(amount, amount?.toString().orEmpty())
+                        amount = AmountModel(amount, amount?.toRoundedString(2).orEmpty())
                     )
                 }
             }
@@ -314,9 +316,8 @@ internal class AddExpenseViewModel(
         val subjectExpenseSplitWithPersons = if (state.equalSplit) {
             val selectedSubjectPersons = state.subjectPersons.filter { it.selected }
             val amount = state.wholeAmount.amount?.divide(
-                /* divisor = */ selectedSubjectPersons.size.coerceAtLeast(1).toBigDecimal(),
-                /* scale = */ 3,
-                /* roundingMode = */ RoundingMode.HALF_EVEN
+                other = selectedSubjectPersons.size.coerceAtLeast(1).toBigDecimal(),
+                scale = 3,
             ) ?: return
             selectedSubjectPersons.map { personInfoModel ->
                 ExpenseSplitWithPerson(

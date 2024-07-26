@@ -2,7 +2,7 @@ package com.inwords.expenses.feature.expenses.domain.model
 
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Person
-import java.math.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 
 internal data class Debt(
     val creditor: Person,

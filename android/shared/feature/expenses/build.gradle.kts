@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
-
 plugins {
     id("shared-library-plugin")
     alias(shared.plugins.kotlin.serialization)
@@ -45,4 +43,6 @@ dependencies {
     implementation(shared.compose.ui)
     implementation(shared.compose.material3)
     implementation(shared.compose.ui.tooling)
+
+    implementation(shared.ionspin.kotlin.bignum)
 }

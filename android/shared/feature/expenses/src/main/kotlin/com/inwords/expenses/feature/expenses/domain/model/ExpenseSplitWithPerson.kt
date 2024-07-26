@@ -1,7 +1,7 @@
 package com.inwords.expenses.feature.expenses.domain.model
 
 import com.inwords.expenses.feature.events.domain.model.Person
-import java.math.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 
 data class ExpenseSplitWithPerson(
     val expenseSplitId: Long,

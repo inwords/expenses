@@ -22,7 +22,7 @@ internal fun ExpenseSplitWithPerson.toEntity(): ExpenseSplitEntity {
         expenseSplitId = this.expenseSplitId,
         expenseId = this.expenseId,
         personId = this.person.id,
-        amountUnscaled = this.amount.unscaledValue(),
-        amountScale = this.amount.scale(),
+        amountUnscaled = this.amount.significand,
+        amountScale = this.amount.exponent,
     )
 }

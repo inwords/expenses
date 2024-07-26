@@ -19,7 +19,10 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(shared.coroutines.core)
+
                 implementation(shared.kotlinx.collections.immutable)
+
+                implementation(shared.ionspin.kotlin.bignum)
             }
         }
     }
