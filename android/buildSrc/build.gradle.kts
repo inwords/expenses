@@ -20,6 +20,10 @@ gradlePlugin {
             id = "shared-library-plugin"
             implementationClass = "com.inwords.expenses.plugins.SharedLibraryPlugin"
         }
+        register("shared-kmm-library-plugin") {
+            id = "shared-kmm-library-plugin"
+            implementationClass = "com.inwords.expenses.plugins.SharedKmmLibraryPlugin"
+        }
     }
 }
 

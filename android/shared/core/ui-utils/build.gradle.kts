@@ -1,5 +1,7 @@
+import com.inwords.expenses.plugins.SharedKmmLibraryPlugin.Companion.applyKmmDefaults
+
 plugins {
-    id("shared-library-plugin")
+    id("shared-kmm-library-plugin")
 }
 
 android {
@@ -10,7 +12,15 @@ android {
     }
 }
 
-dependencies {
-    implementation(shared.coroutines.core)
-    implementation(shared.kotlinx.datetime)
+kotlin {
+    applyKmmDefaults("shared-core-ui-utils")
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation(shared.coroutines.core)
+                implementation(shared.kotlinx.datetime)
+            }
+        }
+    }
 }

@@ -1,9 +1,11 @@
 package com.inwords.expenses.plugins
 
 import com.android.build.gradle.LibraryExtension
+import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getByType
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 
 class SharedLibraryPlugin : Plugin<Project> {
@@ -25,8 +27,13 @@ class SharedLibraryPlugin : Plugin<Project> {
             testOptions {
                 targetSdk = 34
             }
+
+            compileOptions {
+                sourceCompatibility = JavaVersion.VERSION_1_8
+                targetCompatibility = JavaVersion.VERSION_1_8
+            }
         }
 
-        kotlin.jvmToolchain(17)
+        kotlin.compilerOptions.jvmTarget.set(JvmTarget.JVM_1_8)
     }
 }

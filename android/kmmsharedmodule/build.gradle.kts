@@ -1,34 +1,15 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import com.inwords.expenses.plugins.SharedKmmLibraryPlugin.Companion.applyKmmDefaults
 
 plugins {
-    kotlin("multiplatform")
-    alias(buildSrc.plugins.android.library)
+    id("shared-kmm-library-plugin")
 }
-afterEvaluate {
-    tasks.withType<JavaCompile>().configureEach {
-        sourceCompatibility = JavaVersion.VERSION_11.toString()
-        targetCompatibility = JavaVersion.VERSION_11.toString()
-    }
-}
-kotlin {
-    androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
-    }
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach {
-        it.binaries.framework {
-            baseName = "kmmsharedmodule"
-        }
-    }
 
-    jvmToolchain(11)
+android {
+    namespace = "com.inwords.expenses.kmmsharedmodule"
+}
+
+kotlin {
+    applyKmmDefaults("kmmsharedmodule")
 
     sourceSets {
         commonMain {
@@ -41,17 +22,5 @@ kotlin {
                 implementation(shared.coroutines.android)
             }
         }
-
-        iosArm64()
-        iosX64()
-        iosSimulatorArm64()
-    }
-}
-
-android {
-    namespace = "com.inwords.expenses.kmmsharedmodule"
-    compileSdk = 34
-    defaultConfig {
-        minSdk = 26
     }
 }
