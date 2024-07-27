@@ -1,5 +1,7 @@
+import com.inwords.expenses.plugins.SharedKmmLibraryPlugin.Companion.applyKmmDefaults
+
 plugins {
-    id("shared-library-plugin")
+    id("shared-kmm-library-plugin")
     alias(shared.plugins.compose.compiler)
 }
 
@@ -15,7 +17,15 @@ android {
     }
 }
 
-dependencies {
-    implementation(shared.navigation.compose)
-    implementation(shared.lifecycle.viewmodel.compose)
+kotlin {
+    applyKmmDefaults("shared-core-navigation")
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation(shared.lifecycle.viewmodel.compose.experimantal)
+                implementation(shared.navigation.compose.experimental)
+            }
+        }
+    }
 }
