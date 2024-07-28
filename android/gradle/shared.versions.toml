@@ -5,8 +5,8 @@ ksp = "2.0.20-Beta2-1.0.23"
 room = "2.7.0-alpha05"
 datastore = "1.1.1"
 
-ktor = "2.3.0"
 okhttp-bom = "4.10.0"
+ktor = "3.0.0-beta-2"
 cronet = "119.6045.31"
 
 coroutines = "1.8.1"

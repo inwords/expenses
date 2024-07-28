@@ -50,7 +50,6 @@ internal actual class HttpClientFactory(private val context: Context) {
             engine {
                 this.pipelining = true
                 this.followRedirects = false
-                this.threadsCount = 24
             }
         }
     }
