@@ -2,6 +2,7 @@ import com.inwords.expenses.plugins.SharedKmmLibraryPlugin.Companion.applyKmmDef
 
 plugins {
     id("shared-kmm-library-plugin")
+    alias(shared.plugins.atomicfu)
 }
 
 android {
@@ -21,6 +22,9 @@ kotlin {
                 implementation(shared.kotlinx.datetime)
 
                 implementation(shared.room.runtime)
+
+                implementation(shared.datastore.core.okio)
+                implementation("org.jetbrains.kotlinx:atomicfu:0.25.0") // TODO remove when atomicfu plugin is fixed
 
                 implementation(shared.ionspin.kotlin.bignum)
             }

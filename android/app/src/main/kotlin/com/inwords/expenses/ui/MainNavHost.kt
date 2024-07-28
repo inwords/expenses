@@ -25,7 +25,7 @@ import com.inwords.expenses.feature.expenses.ui.add.addExpenseScreen
 import com.inwords.expenses.feature.expenses.ui.debts_list.debtsListScreen
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenDestination
 import com.inwords.expenses.feature.expenses.ui.list.expensesScreen
-import com.inwords.expenses.feature.settings.api.SettingsComponent
+import com.inwords.expenses.feature.settings.api.SettingsComponentFactory
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 
 @Composable
@@ -37,12 +37,12 @@ internal fun MainNavHost(
     val navigationController = rememberNavigationController(navController)
 
     val settingsComponent = remember { // TODO static DI
-        SettingsComponent(
-            deps = object : SettingsComponent.Deps {
+        SettingsComponentFactory(
+            deps = object : SettingsComponentFactory.Deps {
                 override val context: Context
                     get() = appContext
             }
-        )
+        ).create()
     }
 
     val eventsComponent = remember {

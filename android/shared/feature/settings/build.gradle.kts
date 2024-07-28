@@ -1,6 +1,9 @@
+import com.inwords.expenses.plugins.SharedKmmLibraryPlugin.Companion.applyKmmDefaults
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
 plugins {
-    id("shared-library-plugin")
-    alias(shared.plugins.protobuf)
+    id("shared-kmm-library-plugin")
+    alias(shared.plugins.wire)
 }
 
 android {
@@ -11,28 +14,35 @@ android {
     }
 }
 
-protobuf {
-    protoc {
-        artifact = shared.protobuf.protoc.get().toString()
-    }
-    generateProtoTasks {
-        all().configureEach {
-            builtins {
-                create("java") {
-                    option("lite")
-                }
-                create("kotlin") {
-                    option("lite")
-                }
+kotlin {
+    applyKmmDefaults("shared-settings")
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation(project(":shared:core:utils"))
+                implementation(project(":shared:core:storage-utils"))
+
+                implementation(shared.datastore.core.okio)
+            }
+        }
+        androidMain {
+            dependencies {
+                implementation(shared.datastore.android)
             }
         }
     }
+
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    compilerOptions {
+        // Common compiler options applied to all Kotlin source sets
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
 }
 
-dependencies {
-    implementation(project(":shared:core:utils"))
-
-    implementation(shared.protobuf.kotlin.lite)
-
-    implementation(shared.datastore.android)
+wire {
+    kotlin {}
+    sourcePath {
+        srcDir(listOf("src/commonMain/proto"))
+    }
 }

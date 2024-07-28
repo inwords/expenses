@@ -3,6 +3,7 @@ import com.inwords.expenses.plugins.SharedKmmLibraryPlugin.Companion.applyKmmDef
 plugins {
     id("shared-kmm-library-plugin")
     alias(shared.plugins.compose.compiler)
+    alias(shared.plugins.compose.multiplatform.compiler)
 }
 
 android {
@@ -23,8 +24,8 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(shared.lifecycle.viewmodel.compose.experimantal)
-                implementation(shared.navigation.compose.experimental)
+                implementation(shared.lifecycle.viewmodel.compose.multiplatform)
+                implementation(shared.navigation.compose.multiplatform)
             }
         }
     }
