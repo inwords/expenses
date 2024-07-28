@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.inwords.expenses.databases"
+    namespace = "com.inwords.expenses.integration.databases"
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")

@@ -1,12 +1,12 @@
-package com.inwords.expenses.feature.databases.api
+package com.inwords.expenses.integration.databases.api
 
 import android.content.Context
 import androidx.room.RoomDatabase
-import com.inwords.expenses.feature.databases.data.createAppDatabase
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
 import com.inwords.expenses.feature.events.data.db.dao.PersonsDao
 import com.inwords.expenses.feature.expenses.data.db.dao.ExpensesDao
+import com.inwords.expenses.integration.databases.data.createAppDatabase
 
 class DatabasesComponent(private val deps: Deps) {
 

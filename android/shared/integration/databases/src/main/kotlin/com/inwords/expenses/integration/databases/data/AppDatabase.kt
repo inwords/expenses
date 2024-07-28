@@ -1,4 +1,4 @@
-package com.inwords.expenses.feature.databases.data
+package com.inwords.expenses.integration.databases.data
 
 import android.content.Context
 import androidx.room.Database

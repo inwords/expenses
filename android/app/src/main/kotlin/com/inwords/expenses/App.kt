@@ -1,7 +1,7 @@
 package com.inwords.expenses
 
 import android.app.Application
-import com.inwords.expenses.feature.databases.data.appContext
+import com.inwords.expenses.integration.databases.data.appContext
 
 class App : Application() {
 
