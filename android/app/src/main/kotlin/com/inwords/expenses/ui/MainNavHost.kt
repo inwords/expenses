@@ -8,10 +8,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.room.RoomDatabase
+import com.inwords.expenses.appContext
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.rememberNavigationController
-import com.inwords.expenses.integration.databases.data.appContext
-import com.inwords.expenses.integration.databases.data.dbComponent
+import com.inwords.expenses.dbComponent
 import com.inwords.expenses.feature.events.api.EventsComponent
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
