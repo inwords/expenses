@@ -2,7 +2,7 @@ package com.inwords.expenses
 
 import android.app.Application
 import android.content.Context
-import com.inwords.expenses.integration.databases.api.DatabasesComponent
+import com.inwords.expenses.integration.databases.api.DatabasesComponentFactory
 
 class App : Application() {
 
@@ -19,6 +19,8 @@ class App : Application() {
 // FIXME costyl
 lateinit var appContext: Context
 
-val dbComponent = DatabasesComponent(object : DatabasesComponent.Deps {
-    override val context get() = appContext
-})
+val dbComponent by lazy {
+    DatabasesComponentFactory(object : DatabasesComponentFactory.Deps {
+        override val context get() = appContext
+    }).create()
+}

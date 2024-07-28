@@ -1,6 +1,10 @@
+import com.inwords.expenses.plugins.SharedKmmLibraryPlugin.Companion.applyKmmDefaults
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
 plugins {
-    id("shared-library-plugin")
+    id("shared-kmm-library-plugin")
     alias(shared.plugins.ksp)
+    alias(shared.plugins.room)
 }
 
 android {
@@ -8,35 +12,54 @@ android {
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
+    }
+}
 
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
+kotlin {
+    applyKmmDefaults("shared-events")
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation(project(":shared:core:utils"))
+                implementation(project(":shared:core:storage-utils"))
+                implementation(project(":shared:feature:expenses"))
+                implementation(project(":shared:feature:events"))
+
+                // db
+                implementation(shared.room.runtime)
+                implementation(shared.sqlite.bundled)
+
+                implementation(shared.annotation)
+
+                implementation(shared.coroutines.core)
+
+                implementation(shared.kotlinx.datetime)
+
+                implementation(shared.ionspin.kotlin.bignum)
+            }
         }
+        androidMain {
+            dependencies {
+                // FIXME: remove
+                val composeBom = project.dependencies.platform(shared.compose.bom)
+                implementation(composeBom)
+                implementation(shared.compose.runtime)
+            }
+        }
+    }
+
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    compilerOptions {
+        // Common compiler options applied to all Kotlin source sets
+        freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 }
 
 dependencies {
-    implementation(project(":shared:core:utils"))
-    implementation(project(":shared:core:storage-utils"))
-    implementation(project(":shared:feature:expenses"))
-    implementation(project(":shared:feature:events"))
-
-    // db
-    implementation(shared.room.runtime)
     ksp(shared.room.compiler)
+}
 
-    implementation(shared.annotation)
-
-    implementation(shared.coroutines.android)
-
-    implementation(shared.kotlinx.datetime)
-
-    // compose
-    val composeBom = platform(shared.compose.bom)
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
-
-    implementation(shared.compose.runtime) // TODO doesn't work without this - seems to be a Room KSP bug
-
-    implementation(shared.ionspin.kotlin.bignum)
+room {
+    schemaDirectory("$projectDir/schemas")
 }

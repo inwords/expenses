@@ -21,5 +21,3 @@ internal class PersonsRepositoryImpl(
     }
 
 }
-
-

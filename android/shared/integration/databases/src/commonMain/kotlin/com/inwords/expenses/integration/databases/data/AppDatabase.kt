@@ -1,9 +1,8 @@
 package com.inwords.expenses.integration.databases.data
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
@@ -39,12 +38,13 @@ internal abstract class AppDatabase : RoomDatabase() {
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal fun createAppDatabase(context: Context): AppDatabase {
-    val queryCoroutineContext = IO.limitedParallelism(4)
-
-    return Room.databaseBuilder(context, "app_db") { AppDatabase::class.instantiateImpl() }
-        .setQueryCoroutineContext(queryCoroutineContext)
+internal fun createAppDatabase(
+    builder: RoomDatabase.Builder<AppDatabase>
+): AppDatabase {
+    return builder
+        .setQueryCoroutineContext(IO.limitedParallelism(4))
         .setJournalMode(RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
         .fallbackToDestructiveMigration(dropAllTables = true) // FIXME remove before prod
+        .setDriver(BundledSQLiteDriver())
         .build()
 }
