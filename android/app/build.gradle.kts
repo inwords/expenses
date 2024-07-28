@@ -62,7 +62,6 @@ dependencies {
     implementation(project(":shared:feature:expenses"))
     implementation(project(":shared:feature:events"))
     implementation(project(":shared:integration:databases"))
-    implementation(project(":kmmsharedmodule"))
 
     // coroutines
     implementation(shared.coroutines.android)

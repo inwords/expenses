@@ -40,7 +40,6 @@ dependencyResolutionManagement {
 rootProject.name = "Expenses"
 
 include(":app")
-include(":kmmsharedmodule")
 
 include(":shared")
 include(":shared:core")
