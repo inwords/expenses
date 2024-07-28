@@ -25,6 +25,8 @@ dependencyResolutionManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        // TODO remove this once it's available in mavencentral
+        maven { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev/") }
     }
     versionCatalogs {
         create("shared") {
