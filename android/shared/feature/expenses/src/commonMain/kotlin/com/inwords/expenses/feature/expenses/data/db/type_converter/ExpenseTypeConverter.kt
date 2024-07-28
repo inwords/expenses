@@ -1,10 +1,8 @@
 package com.inwords.expenses.feature.expenses.data.db.type_converter
 
-import androidx.annotation.Keep
 import androidx.room.TypeConverter
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
 
-@Keep
 object ExpenseTypeConverter {
     @TypeConverter
     fun toExpenseType(expenseType: String): ExpenseType {

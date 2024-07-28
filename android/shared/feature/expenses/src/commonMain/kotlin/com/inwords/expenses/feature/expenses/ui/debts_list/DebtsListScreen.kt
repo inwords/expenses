@@ -21,13 +21,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListScreenUiModel.DebtorShortUiModel
 import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListScreenUiModel.PersonUiModel
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentMapOf
 
 @Composable
 internal fun DebtsListScreen(
@@ -131,47 +128,4 @@ private fun ReturnCreditorDebtButton(
         )
         Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
     }
-}
-
-
-@Composable
-@Preview(showBackground = true)
-private fun DebtsListScreenPreview() {
-    DebtsListScreen(
-        state = SimpleScreenState.Success(mockDebtsListScreenUiModel()),
-        onReplenishmentClick = { _, _ -> },
-        onCloseClick = { }
-    )
-}
-
-internal fun mockDebtsListScreenUiModel(): DebtsListScreenUiModel {
-    val person1 = PersonUiModel(
-        personId = 1,
-        personName = "Василий"
-    )
-    val person2 = PersonUiModel(
-        personId = 2,
-        personName = "Максим"
-    )
-    return DebtsListScreenUiModel(
-        eventName = "Event",
-        creditors = persistentMapOf(
-            person1 to persistentListOf(
-                DebtorShortUiModel(
-                    person = person2,
-                    currencyCode = "EUR",
-                    currencyName = "Euro",
-                    amount = "100"
-                )
-            ),
-            person2 to persistentListOf(
-                DebtorShortUiModel(
-                    person = person1,
-                    currencyCode = "RUB",
-                    currencyName = "Russian Ruble",
-                    amount = "1000"
-                )
-            )
-        )
-    )
 }

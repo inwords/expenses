@@ -1,7 +1,8 @@
 package com.inwords.expenses.feature.events.data
 
 import androidx.room.RoomDatabase
-import androidx.room.withTransaction
+import androidx.room.exclusiveTransaction
+import androidx.room.useWriterConnection
 import com.inwords.expenses.feature.events.data.db.converter.toDomain
 import com.inwords.expenses.feature.events.data.db.converter.toEntity
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
@@ -55,43 +56,45 @@ internal class EventsRepositoryImpl(
         personsToInsert: List<Person>,
         currenciesToInsert: List<Currency>,
         primaryCurrencyIndex: Int,
-    ): EventDetails = db.withTransaction {
-        coroutineScope {
-            val personsDeferred = async { personsRepository.insert(personsToInsert) }
-            val currenciesDeferred = async { currenciesRepository.insert(currenciesToInsert) }
+    ): EventDetails = db.useWriterConnection {
+        it.exclusiveTransaction {
+            coroutineScope {
+                val personsDeferred = async { personsRepository.insert(personsToInsert) }
+                val currenciesDeferred = async { currenciesRepository.insert(currenciesToInsert) }
 
-            val persons = personsDeferred.await()
-            val currencies = currenciesDeferred.await()
+                val persons = personsDeferred.await()
+                val currencies = currenciesDeferred.await()
 
-            val eventDetails = EventDetails(
-                event = eventToInsert,
-                persons = persons,
-                currencies = currencies,
-                primaryCurrency = currencies[primaryCurrencyIndex],
-            )
+                val eventDetails = EventDetails(
+                    event = eventToInsert,
+                    persons = persons,
+                    currencies = currencies,
+                    primaryCurrency = currencies[primaryCurrencyIndex],
+                )
 
-            val eventId = eventsDao.insert(eventDetails.toEntity()).takeIf { it != -1L }
-            val resultEventDetails = if (eventId == null) {
-                eventDetails
-            } else {
-                eventDetails.copy(event = eventDetails.event.copy(id = eventId))
-            }
-
-            launch {
-                val personCrossRefs = eventDetails.persons.map { person ->
-                    EventPersonCrossRef(eventId = resultEventDetails.event.id, personId = person.id)
+                val eventId = eventsDao.insert(eventDetails.toEntity()).takeIf { it != -1L }
+                val resultEventDetails = if (eventId == null) {
+                    eventDetails
+                } else {
+                    eventDetails.copy(event = eventDetails.event.copy(id = eventId))
                 }
-                eventsDao.insertPersonCrossRef(personCrossRefs)
-            }
 
-            launch {
-                val currencyCrossRefs = eventDetails.currencies.map { currency ->
-                    EventCurrencyCrossRef(eventId = resultEventDetails.event.id, currencyId = currency.id)
+                launch {
+                    val personCrossRefs = eventDetails.persons.map { person ->
+                        EventPersonCrossRef(eventId = resultEventDetails.event.id, personId = person.id)
+                    }
+                    eventsDao.insertPersonCrossRef(personCrossRefs)
                 }
-                eventsDao.insertCurrencyCrossRef(currencyCrossRefs)
-            }
 
-            resultEventDetails
+                launch {
+                    val currencyCrossRefs = eventDetails.currencies.map { currency ->
+                        EventCurrencyCrossRef(eventId = resultEventDetails.event.id, currencyId = currency.id)
+                    }
+                    eventsDao.insertCurrencyCrossRef(currencyCrossRefs)
+                }
+
+                resultEventDetails
+            }
         }
     }
 

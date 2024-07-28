@@ -1,6 +1,5 @@
 package com.inwords.expenses.feature.expenses.domain
 
-import androidx.annotation.WorkerThread
 import com.inwords.expenses.core.utils.sumOf
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Person
@@ -20,7 +19,6 @@ internal class DebtCalculator(
      * Who owes to whom and how much.
      * Does not include the debts in the opposite direction.
      */
-    @get:WorkerThread
     val accumulatedDebts: Map<Person, Map<Person, AccumulatedDebt>> by lazy {
         calculateAccumulatedDebts()
     }
@@ -29,7 +27,6 @@ internal class DebtCalculator(
      * Who owes to whom and how much.
      * Includes the debts in the opposite direction.
      */
-    @get:WorkerThread
     val barterAccumulatedDebts: Map<Person, Map<Person, BarterAccumulatedDebt>> by lazy {
         val threshold = BigDecimal.fromDouble(0.01)
         accumulatedDebts.mapValuesTo(HashMap()) { (debtor, creditorToAccumulatedDebts) ->

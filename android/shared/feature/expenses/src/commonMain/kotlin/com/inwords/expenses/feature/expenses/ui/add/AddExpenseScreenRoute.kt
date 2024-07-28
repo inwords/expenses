@@ -1,6 +1,6 @@
 package com.inwords.expenses.feature.expenses.ui.add
 
-import android.os.Bundle
+import androidx.core.bundle.Bundle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer

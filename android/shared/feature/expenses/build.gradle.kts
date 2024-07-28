@@ -1,7 +1,10 @@
+import com.inwords.expenses.plugins.SharedKmmLibraryPlugin.Companion.applyKmmDefaults
+
 plugins {
-    id("shared-library-plugin")
+    id("shared-kmm-library-plugin")
     alias(shared.plugins.kotlin.serialization)
     alias(shared.plugins.compose.compiler)
+    alias(shared.plugins.compose.multiplatform.compiler)
 }
 
 android {
@@ -16,33 +19,51 @@ android {
     }
 }
 
-dependencies {
-    implementation(project(":shared:core:utils"))
-    implementation(project(":shared:core:storage-utils"))
-    implementation(project(":shared:core:ui-utils"))
-    implementation(project(":shared:core:navigation"))
-    implementation(project(":shared:feature:events"))
-    implementation(project(":shared:feature:settings"))
+kotlin {
+    applyKmmDefaults("shared-expenses")
 
-    implementation(shared.coroutines.android)
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation(project(":shared:core:utils"))
+                implementation(project(":shared:core:storage-utils"))
+                implementation(project(":shared:core:ui-utils"))
+                implementation(project(":shared:core:navigation"))
+                implementation(project(":shared:feature:events"))
+                implementation(project(":shared:feature:settings"))
 
-    implementation(shared.kotlinx.serialization.json)
-    implementation(shared.kotlinx.datetime)
-    implementation(shared.kotlinx.collections.immutable.jvm)
+                implementation(shared.annotation)
 
-    implementation(shared.lifecycle.runtime.compose)
-    implementation(shared.lifecycle.viewmodel.compose)
+                implementation(shared.coroutines.core)
 
-    implementation(shared.room.runtime)
+                implementation(shared.kotlinx.serialization.json)
+                implementation(shared.kotlinx.datetime)
+                implementation(shared.kotlinx.collections.immutable)
 
-    implementation(shared.navigation.compose)
+                implementation(shared.lifecycle.runtime.compose.multiplatform)
+                implementation(shared.lifecycle.viewmodel.compose.multiplatform)
 
-    val composeBom = platform(shared.compose.bom)
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
-    implementation(shared.compose.ui)
-    implementation(shared.compose.material3)
-    implementation(shared.compose.ui.tooling)
+                implementation(shared.room.runtime)
 
-    implementation(shared.ionspin.kotlin.bignum)
+                implementation(compose.ui)
+                implementation(compose.material3)
+
+                implementation(shared.navigation.compose.multiplatform)
+
+                implementation(shared.ionspin.kotlin.bignum)
+            }
+        }
+        androidMain {
+            dependencies {
+                implementation(shared.lifecycle.viewmodel.compose)
+                implementation(shared.navigation.compose)
+
+                val composeBom = project.dependencies.platform(shared.compose.bom)
+                implementation(composeBom)
+                implementation(shared.compose.ui)
+                implementation(shared.compose.material3)
+                implementation(shared.compose.ui.tooling)
+            }
+        }
+    }
 }
