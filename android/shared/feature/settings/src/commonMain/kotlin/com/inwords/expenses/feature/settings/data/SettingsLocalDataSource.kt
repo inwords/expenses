@@ -35,7 +35,7 @@ internal class SettingsLocalDataSource(settingsDataStoreLazy: Lazy<DataStore<Set
     }
 }
 
-internal const val settingsDsFileName = "settings.pb"
+internal const val settingsDsFileName = "expenses_settings.pb"
 
 internal val settingsDataStore = DataStoreSingleton(SettingsSerializer())
 
