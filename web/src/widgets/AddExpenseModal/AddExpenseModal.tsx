@@ -1,5 +1,5 @@
 import {Dialog, DialogContent, DialogTitle} from '@mui/material';
-import {AddExpenseForm} from '@/widgets/AddExpenseForm/AddExpenseForm';
+import {AddExpenseForm} from '@/features/CreateExpense/ui/AddExpenseForm';
 
 interface Props {
   isOpen: boolean;

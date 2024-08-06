@@ -1,10 +1,8 @@
 import {CreateEvent} from '@/entities/event/types/types';
 
 export const createEvent = async (event: CreateEvent) => {
-  console.log("-> event", event);
-
   try {
-    const response = await fetch('http://localhost:3001/event', {
+    const response = await fetch('/event', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -20,7 +18,7 @@ export const createEvent = async (event: CreateEvent) => {
 export const getEventInfo = async (eventId: string, queryParams: Record<string, string>) => {
   try {
     const query = new URLSearchParams(queryParams).toString();
-    const fetchUrl = `http://localhost:3001/event/${eventId}?${query}`;
+    const fetchUrl = `/event/${eventId}?${query}`;
 
     const response = await fetch(fetchUrl, {
       method: 'GET',

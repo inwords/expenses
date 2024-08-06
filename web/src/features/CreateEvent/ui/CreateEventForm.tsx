@@ -6,11 +6,21 @@ import {EventNameInput} from '@/features/CreateEvent/ui/EventNameInput';
 import {EventUsers} from '@/features/CreateEvent/ui/EventUsers';
 import {SelectCurrency} from '@/features/AddExpense/ui/SelectCurrency';
 import {createEvent} from '@/entities/event/services/api';
-import {EventPinCodeInput} from "@/entities/event/ui/EventPinCodeInput";
+import {EventPinCodeInput} from '@/entities/event/ui/EventPinCodeInput';
+import {useNavigate} from 'react-router';
+import {ROUTES} from '@/shared/routing/constants';
 
 export const CreateEventForm = () => {
+  const navigate = useNavigate();
+
   return (
-    <FormContainer onSuccess={(data) => createEvent(data)}>
+    <FormContainer
+      onSuccess={async (data) => {
+        const resp = await createEvent(data);
+
+        navigate(ROUTES.Event(resp.id));
+      }}
+    >
       <Stack spacing={2} maxWidth={600}>
         <EventNameInput />
 
