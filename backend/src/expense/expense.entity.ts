@@ -1,4 +1,4 @@
-import {Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {Currency} from '../currency/currency.entity';
 import {SplitInfo} from './types';
 import {Event} from '../event/event.entity';
@@ -35,7 +35,7 @@ export class Expense {
   @JoinColumn({name: 'event_id'})
   event: Event;
 
-  @ManyToOne(() => Currency)
+  @ManyToMany(() => Currency)
   @JoinColumn({name: 'user_who_paid_id'})
   user: User;
 }

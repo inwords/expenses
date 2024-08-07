@@ -2,7 +2,7 @@ import {Avatar, IconButton} from '@mui/material';
 
 interface Props {
   letter: string;
-  onClick: VoidFunction;
+  onClick?: VoidFunction;
   isSelected: boolean;
 }
 

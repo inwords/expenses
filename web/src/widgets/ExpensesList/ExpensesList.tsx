@@ -1,28 +1,26 @@
 import {Box, Button, Card, CardActions, CardContent, Stack, Typography} from '@mui/material';
+import {observer} from 'mobx-react-lite';
+import {expenseStore} from '@/entities/expense/stores/expense-store';
 
-const EXPENSES = [
-  {name: 'Пиво', date: new Date().toISOString(), amount: 200, currency: 'RUB', id: '1'},
-  {name: 'Чипсеки', date: new Date().toISOString(), amount: 100, currency: 'RUB', id: '2'},
-];
-export const ExpensesList = () => {
+export const ExpensesList = observer(() => {
   return (
     <Box display="flex" justifyContent={'center'} padding={'0 10px'}>
       <Stack minWidth={300} maxWidth={540} spacing={2} width="100%">
-        {EXPENSES.map((e) => {
+        {expenseStore.expensesToView.map((e) => {
           return (
             <Card key={e.id}>
               <CardContent>
                 <Typography variant="h5">
                   <Stack direction="row" justifyContent={'space-between'}>
-                    {e.name}
+                    {e.description}
 
                     <div>
-                      {e.amount} {e.currency}
+                      {e.amount} {e.currencyId}
                     </div>
                   </Stack>
                 </Typography>
 
-                <Typography variant="body2">{e.date}</Typography>
+                <Typography variant="body2">{e.createdAt}</Typography>
               </CardContent>
 
               <CardActions>
@@ -34,4 +32,4 @@ export const ExpensesList = () => {
       </Stack>
     </Box>
   );
-};
+});
