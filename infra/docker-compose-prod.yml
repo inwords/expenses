@@ -1,0 +1,56 @@
+services:
+  db:
+    image: postgres:16-alpine3.20
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  nest-backend:
+    image: ruggedbl/commonex-nest-backend
+    restart: always
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER_NAME: postgres # TODO use secrets
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DATABASE: postgres
+    depends_on:
+      - db
+
+  next-web:
+    image: ruggedbl/commonex-next-web
+    restart: always
+
+  nginx:
+    image: nginx:1.27.0-alpine3.19
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/commonex/ssl/certificate_chain.pem:/etc/nginx/ssl/certificate_chain.pem:ro
+      - /etc/commonex/ssl/certificate.key:/etc/nginx/ssl/certificate.key:ro
+      - /etc/commonex/ssl/certbot/live/dev-api.commonex.ru:/etc/nginx/ssl/live/dev-api.commonex.ru:ro
+      - /etc/commonex/ssl/certbot/archive/dev-api.commonex.ru:/etc/nginx/ssl/archive/dev-api.commonex.ru:ro
+      - /etc/commonex/www/certbot/:/var/www/certbot/:ro
+    depends_on:
+      - nest-backend
+      - next-web
+
+  certbot:
+    image: certbot/certbot:v2.11.0
+    volumes:
+      - /etc/commonex/ssl/certbot/:/etc/letsencrypt/:rw
+      - /etc/commonex/www/certbot/:/var/www/certbot/:rw
+
+volumes:
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
