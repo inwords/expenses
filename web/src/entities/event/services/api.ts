@@ -2,7 +2,7 @@ import {CreateEvent} from '@/entities/event/types/types';
 
 export const createEvent = async (event: CreateEvent) => {
   try {
-    const response = await fetch('/event', {
+    const response = await fetch('/api/event', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ export const createEvent = async (event: CreateEvent) => {
 export const getEventInfo = async (eventId: string, queryParams: Record<string, string>) => {
   try {
     const query = new URLSearchParams(queryParams).toString();
-    const fetchUrl = `/event/${eventId}?${query}`;
+    const fetchUrl = `/api/event/${eventId}?${query}`;
 
     const response = await fetch(fetchUrl, {
       method: 'GET',

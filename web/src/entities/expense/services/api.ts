@@ -2,7 +2,7 @@ import {CreateExpense} from '@/entities/expense/types/types';
 
 export const getEventExpenses = async (eventId: string) => {
   try {
-    const fetchUrl = `/expense/${eventId}/expenses`;
+    const fetchUrl = `/api/expense/${eventId}/expenses`;
 
     const response = await fetch(fetchUrl, {
       method: 'GET',
@@ -20,7 +20,7 @@ export const getEventExpenses = async (eventId: string) => {
 
 export const createExpense = async (expense: CreateExpense) => {
   try {
-    const response = await fetch('/expense', {
+    const response = await fetch('/api/expense', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

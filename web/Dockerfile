@@ -13,6 +13,7 @@ RUN npm ci
 # Copy the source code
 COPY . ./
 
+ENV NODE_ENV=production
 # Build the Next.js app with static export
 RUN npm run build
 
