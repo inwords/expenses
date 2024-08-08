@@ -67,6 +67,7 @@ dependencies {
     implementation(shared.coroutines.android)
 
     // network
+    implementation(shared.ktor.client.core)
     implementation(shared.cronet.embedded)
 
     // db

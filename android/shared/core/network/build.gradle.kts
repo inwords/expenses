@@ -22,8 +22,8 @@ kotlin {
                 implementation(project(":shared:core:utils"))
 
                 implementation(shared.ktor.client.content.negotiation)
-                implementation(shared.ktor.serialization.kotlinx.json)
                 implementation(shared.ktor.client.logging)
+                implementation(shared.ktor.serialization.kotlinx.json)
             }
         }
         androidMain {

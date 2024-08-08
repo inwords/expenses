@@ -41,6 +41,8 @@ kotlin {
 
                 implementation(shared.room.runtime)
 
+                implementation(shared.ktor.client.core)
+
                 implementation(compose.ui)
                 implementation(compose.material3)
 

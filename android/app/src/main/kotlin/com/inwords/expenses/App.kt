@@ -10,8 +10,7 @@ class App : Application() {
         super.onCreate()
 
         appContext = this
-
-        prefillDb() // TODO
+        NetworkTest.sendTest(this)
     }
 
 }

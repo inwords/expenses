@@ -17,6 +17,7 @@ import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.InternalAPI
 import io.ktor.utils.io.toByteArray
 import io.ktor.utils.io.writer
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
@@ -113,10 +114,14 @@ class CronetEngine(
 
                 override fun onFailed(
                     request: UrlRequest,
-                    info: UrlResponseInfo,
+                    info: UrlResponseInfo?,
                     error: CronetException
                 ) {
                     continuation.resumeWithException(error)
+                }
+
+                override fun onCanceled(request: UrlRequest, info: UrlResponseInfo?) {
+                    continuation.resumeWithException(CancellationException("Request was cancelled"))
                 }
             }
 

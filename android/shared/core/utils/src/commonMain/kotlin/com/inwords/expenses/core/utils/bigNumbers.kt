@@ -7,6 +7,8 @@ import com.ionspin.kotlin.bignum.decimal.RoundingMode
 fun String.toBigDecimalOrNull(): BigDecimal? {
     return try {
         BigDecimal.parseString(this)
+    } catch (e: NumberFormatException) {
+        null
     } catch (e: ArithmeticException) {
         null
     }
