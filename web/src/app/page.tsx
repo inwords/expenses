@@ -2,11 +2,11 @@
 
 import {Route, Routes} from 'react-router';
 import {BrowserRouter} from 'react-router-dom';
-import {MainPage} from '@/pages/MainPage';
-import {SecondPage} from '@/pages/SecondPage';
+import {MainPage} from '@/1-pages/MainPage';
+import {SecondPage} from '@/1-pages/SecondPage';
 import {NoSsr} from '@mui/material';
 import {ROUTES} from '@/shared/routing/constants';
-import {EventPage} from '@/pages/EventPage';
+import {EventPage} from '@/1-pages/EventPage';
 
 export default function Home() {
   return (
