@@ -27,11 +27,7 @@ object NetworkTest {
 
             val a = Test(client)
             a.getEvent()
-            repeat(3000) {
-                launch {
-                    a.createEvent("test", 1, listOf(Person(0L, "Vasilii"), Person(0L, "Artem")), "1234")
-                }
-            }
+            a.createEvent("test", 1, listOf(Person(0L, "Vasilii"), Person(0L, "Artem")), "1234")
         }
     }
 
