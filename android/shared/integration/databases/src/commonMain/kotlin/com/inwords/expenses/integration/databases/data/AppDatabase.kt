@@ -1,5 +1,6 @@
 package com.inwords.expenses.integration.databases.data
 
+import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
@@ -29,7 +30,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
     ],
     version = 1
 )
-internal abstract class AppDatabase : RoomDatabase() {
+@ConstructedBy(AppDatabaseConstructor::class)
+abstract class AppDatabase : RoomDatabase() { // TODO make internal when Room is fixed
 
     abstract fun eventsDao(): EventsDao
     abstract fun expensesDao(): ExpensesDao
