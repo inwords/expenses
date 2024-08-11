@@ -35,7 +35,7 @@ export class Expense {
   @JoinColumn({name: 'event_id'})
   event: Event;
 
-  @ManyToMany(() => Currency)
+  @ManyToMany(() => User)
   @JoinColumn({name: 'user_who_paid_id'})
   user: User;
 }

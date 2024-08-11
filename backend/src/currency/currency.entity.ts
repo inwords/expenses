@@ -1,16 +1,18 @@
 import {Entity, PrimaryGeneratedColumn, Column} from 'typeorm';
 
-enum CurrencyType {
+enum CurrencyCode {
   EUR = 'EUR',
   USD = 'USD',
   RUB = 'RUB',
+  JPY = 'JPY',
+  TRY = 'TRY',
 }
 
 @Entity({name: 'currency'})
 export class Currency {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
-  @Column({type: 'enum', enum: CurrencyType})
-  type: CurrencyType;
+  @Column({type: 'enum', enum: CurrencyCode})
+  code: CurrencyCode;
 }
