@@ -43,7 +43,7 @@ export const AddExpenseForm = observer(({onSuccess}: Props) => {
             eventId: Number(id),
             splitInformation: isSplitEqually
               ? userStore.users.map((u) => {
-                  return {userId: String(u.id), amount: Math.round(Number(d.amount) / userStore.users.length)};
+                  return {userId: String(u.id), amount: Math.ceil(Number(d.amount) / userStore.users.length)};
                 })
               : d.splitInformation.map((i) => {
                   return {...i, amount: Number(i.amount)};
