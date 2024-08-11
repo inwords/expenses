@@ -14,14 +14,13 @@ export class EventService {
   ) {}
 
   public async saveEvent(event: CrateEventBodyDto) {
-    const eventRepository = this.entityManager.getRepository(Event);
-
-    return await this.entityManager.transaction(async () => {
-      const eventWithoutUsers = await eventRepository.save(event);
+    return await this.entityManager.transaction(async (entityManager) => {
+      const eventWithoutUsers = await entityManager.getRepository(Event).save(event);
       const users = await this.userService.saveUsers(
         event.users.map((u) => {
           return {...u, eventId: eventWithoutUsers.id};
         }),
+        entityManager
       );
 
       return {...eventWithoutUsers, users};
