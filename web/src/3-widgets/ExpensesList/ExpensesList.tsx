@@ -3,10 +3,22 @@ import {observer} from 'mobx-react-lite';
 import {expenseStore} from '@/5-entities/expense/stores/expense-store';
 
 export const ExpensesList = observer(() => {
+  const getExpences = () => {
+    if (expenseStore.currentTab === 0) {
+      return expenseStore.expensesToView;
+    }
+
+    if (expenseStore.currentTab === 1) {
+      return expenseStore.currentUserExpenses;
+    }
+
+    return [];
+  };
+
   return (
     <Box display="flex" justifyContent={'center'} padding={'0 10px'}>
       <Stack minWidth={300} maxWidth={540} spacing={2} width="100%">
-        {expenseStore.expensesToView.map((e) => {
+        {getExpences().map((e) => {
           return (
             <Card key={e.id}>
               <CardContent>

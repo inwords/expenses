@@ -3,7 +3,6 @@ import {Button, Stack} from '@mui/material';
 import {ExpenseDescriptionInput} from '@/4-features/AddExpense/ui/ExpenseNameInput';
 import {ExpenseAmountInput} from '@/4-features/AddExpense/ui/ExpenseAmountInput';
 import {SelectExpenseOwner} from '@/4-features/AddExpense/ui/SelectExpenseOwner';
-import {SelectCurrency} from '@/4-features/AddExpense/ui/SelectCurrency';
 import React from 'react';
 import {SplitOptions} from '@/4-features/AddExpense/ui/SplitOption';
 import {useParams} from 'react-router';
@@ -13,6 +12,7 @@ import {userStore} from '@/5-entities/user/stores/user-store';
 import {SelectUser} from '@/5-entities/user/ui/SelectUser';
 import {CreateExpense} from '@/5-entities/expense/types/types';
 import {expenseStore} from '@/5-entities/expense/stores/expense-store';
+import {SelectCurrency} from "@/5-entities/currency/ui/SelectCurrency";
 
 interface Props {
   onSuccess?: (isModalOpen: boolean) => void;

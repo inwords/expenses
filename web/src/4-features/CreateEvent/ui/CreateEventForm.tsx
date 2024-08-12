@@ -4,11 +4,11 @@ import {Button, Stack} from '@mui/material';
 import React from 'react';
 import {EventNameInput} from '@/4-features/CreateEvent/ui/EventNameInput';
 import {EventUsers} from '@/4-features/CreateEvent/ui/EventUsers';
-import {SelectCurrency} from '@/4-features/AddExpense/ui/SelectCurrency';
-import {createEvent} from '@/5-entities/event/services/api';
 import {EventPinCodeInput} from '@/5-entities/event/ui/EventPinCodeInput';
 import {useNavigate} from 'react-router';
 import {ROUTES} from '@/6-shared/routing/constants';
+import {SelectCurrency} from "@/5-entities/currency/ui/SelectCurrency";
+import {eventService} from "@/5-entities/event/services/event-service";
 
 export const CreateEventForm = () => {
   const navigate = useNavigate();
@@ -16,9 +16,9 @@ export const CreateEventForm = () => {
   return (
     <FormContainer
       onSuccess={async (data) => {
-        const resp = await createEvent(data);
+        const eventId = await eventService.createEvent(data);
 
-        navigate(ROUTES.Event(resp.id));
+        navigate(ROUTES.Event(eventId));
       }}
     >
       <Stack spacing={2} maxWidth={600}>
