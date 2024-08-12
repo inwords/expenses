@@ -1,17 +1,14 @@
-import {Expense} from '@/5-entities/expense/types/types';
-import {action, computed, makeObservable, observable} from 'mobx';
+import {Expense, Tabs} from '@/5-entities/expense/types/types';
+import {makeAutoObservable} from 'mobx';
+import {userStore} from '@/5-entities/user/stores/user-store';
 
 export class ExpenseStore {
   expenses: Array<Expense> = [];
   splitOption: '1' | '2' = '1';
+  currentTab: Tabs = 0;
 
   constructor() {
-    makeObservable(this, {
-      expenses: observable,
-      splitOption: observable,
-      expensesToView: computed,
-      setExpenses: action,
-    });
+    makeAutoObservable(this);
   }
 
   get expensesToView() {
@@ -20,12 +17,22 @@ export class ExpenseStore {
     });
   }
 
+  get currentUserExpenses() {
+    return this.expensesToView.filter((e) => {
+      return e.splitInformation.some((i) => Number(i.userId) === userStore.currentUser?.id);
+    });
+  }
+
   setExpenses(expenses: Array<Expense>) {
     this.expenses = expenses;
   }
 
-  setSplitOption( splitOption: '1' | '2') {
+  setSplitOption(splitOption: '1' | '2') {
     this.splitOption = splitOption;
+  }
+
+  setCurrentTab(currentTab: Tabs) {
+    this.currentTab = currentTab;
   }
 }
 

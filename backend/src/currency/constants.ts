@@ -1,4 +1,4 @@
 export const CURRENCY_ROUTES = {
   root: '/currency',
-  getAllCurrencies: `/`,
+  getAllCurrencies: `/all`,
 };

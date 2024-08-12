@@ -21,3 +21,5 @@ export interface Expense {
     splitInformation: Array<SplitInfo>;
     createdAt: string;
 }
+
+export type Tabs = 0 | 1 | 2 | 3;
