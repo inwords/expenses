@@ -1,10 +1,11 @@
 package com.inwords.expenses.feature.expenses.api
 
+import com.inwords.expenses.core.utils.Component
 import com.inwords.expenses.feature.expenses.data.ExpensesRepositoryImpl
 import com.inwords.expenses.feature.expenses.data.db.dao.ExpensesDao
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 
-class ExpensesComponent(private val deps: Deps) {
+class ExpensesComponent(private val deps: Deps): Component {
 
     interface Deps {
 

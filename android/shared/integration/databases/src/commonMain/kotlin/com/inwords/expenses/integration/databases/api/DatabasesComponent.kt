@@ -1,6 +1,7 @@
 package com.inwords.expenses.integration.databases.api
 
 import androidx.room.RoomDatabase
+import com.inwords.expenses.core.utils.Component
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
 import com.inwords.expenses.feature.events.data.db.dao.PersonsDao
@@ -10,7 +11,7 @@ import com.inwords.expenses.integration.databases.data.createAppDatabase
 
 class DatabasesComponent internal constructor(
     private val roomDatabaseBuilderFactory: RoomDatabaseBuilderFactory
-) {
+) : Component {
 
     private val roomDb by lazy {
         createAppDatabase(roomDatabaseBuilderFactory.getDatabaseBuilder())

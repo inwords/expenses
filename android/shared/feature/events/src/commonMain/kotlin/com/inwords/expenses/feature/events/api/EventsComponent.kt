@@ -4,13 +4,14 @@ import androidx.room.RoomDatabase
 import com.inwords.expenses.feature.events.data.CurrenciesRepositoryImpl
 import com.inwords.expenses.feature.events.data.EventsRepositoryImpl
 import com.inwords.expenses.feature.events.data.PersonsRepositoryImpl
+import com.inwords.expenses.core.utils.Component
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
 import com.inwords.expenses.feature.events.data.db.dao.PersonsDao
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 
-class EventsComponent(private val deps: Deps) {
+class EventsComponent(private val deps: Deps) : Component {
 
     interface Deps {
 
