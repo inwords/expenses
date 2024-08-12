@@ -2,6 +2,7 @@ package com.inwords.expenses.core.network
 
 import com.inwords.expenses.core.utils.Component
 import io.ktor.client.HttpClient
+import io.ktor.http.URLProtocol
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.concurrent.Volatile
@@ -24,4 +25,7 @@ class NetworkComponent internal constructor(
             }
         }
     }
+
+    val hostConfig: HostConfig = HostConfig(URLProtocol.HTTPS, "dev-api.commonex.ru/api")
+
 }

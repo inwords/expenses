@@ -16,6 +16,8 @@ internal fun <T : HttpClientEngineConfig> createKtor(
     return HttpClient(httpClientEngine) {
         block.invoke(this)
 
+        expectSuccess = true
+
         followRedirects = false
 
         install(ContentNegotiation) {
