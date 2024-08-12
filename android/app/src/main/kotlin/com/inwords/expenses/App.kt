@@ -3,6 +3,8 @@ package com.inwords.expenses
 import android.app.Application
 import android.content.Context
 import com.inwords.expenses.integration.databases.api.DatabasesComponentFactory
+import com.inwords.expenses.core.locator.ComponentsMap
+import com.inwords.expenses.core.locator.getComponent
 
 class App : Application() {
 
@@ -11,15 +13,8 @@ class App : Application() {
 
         appContext = this
         NetworkTest.sendTest(this)
+        registerComponents(this)
+
     }
 
-}
-
-// FIXME costyl
-lateinit var appContext: Context
-
-val dbComponent by lazy {
-    DatabasesComponentFactory(object : DatabasesComponentFactory.Deps {
-        override val context get() = appContext
-    }).create()
 }

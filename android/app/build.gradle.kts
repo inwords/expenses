@@ -56,6 +56,7 @@ dependencies {
     implementation(project(":shared:core:utils"))
     implementation(project(":shared:core:storage-utils"))
     implementation(project(":shared:core:ui-utils"))
+    implementation(project(":shared:core:locator"))
     implementation(project(":shared:core:network"))
     implementation(project(":shared:core:navigation"))
     implementation(project(":shared:feature:settings"))

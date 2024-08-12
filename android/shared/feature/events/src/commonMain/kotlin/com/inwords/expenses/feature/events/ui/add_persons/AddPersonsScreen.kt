@@ -48,7 +48,7 @@ internal fun AddPersonsScreen(
                 .align(Alignment.Center),
         ) {
             val focusRequester = remember { FocusRequester() }
-            var requestFocus = remember { mutableStateOf(false) }
+            val requestFocus = remember { mutableStateOf(false) }
             Text(
                 modifier = Modifier.padding(bottom = 4.dp),
                 text = "Меня зовут",
