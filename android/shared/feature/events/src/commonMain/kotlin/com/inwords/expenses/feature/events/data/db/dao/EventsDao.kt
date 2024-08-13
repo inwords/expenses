@@ -23,6 +23,9 @@ interface EventsDao {
     @Insert
     suspend fun insertCurrencyCrossRef(eventWithCurrencyCrossRefs: List<EventCurrencyCrossRef>)
 
+    @Query("UPDATE ${EventEntity.TABLE_NAME} SET ${EventEntity.ColumnNames.SERVER_ID} = :newServerId WHERE ${EventEntity.ColumnNames.ID} = :eventId")
+    suspend fun update(eventId: Long, newServerId: Long): Int
+
     @Query("SELECT * FROM ${EventEntity.TABLE_NAME}")
     fun queryAll(): Flow<List<EventEntity>>
 

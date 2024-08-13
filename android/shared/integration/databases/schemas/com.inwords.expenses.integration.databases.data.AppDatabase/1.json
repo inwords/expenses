@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "4480518b9499b617418dc705b9220fe2",
+    "identityHash": "372d67162fd969a574b965208d0dc039",
     "entities": [
       {
         "tableName": "event",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `primary_currency_id` INTEGER NOT NULL, FOREIGN KEY(`primary_currency_id`) REFERENCES `currency`(`currency_id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `event_server_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `pin_code` TEXT NOT NULL, `primary_currency_id` INTEGER NOT NULL, FOREIGN KEY(`primary_currency_id`) REFERENCES `currency`(`currency_id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
         "fields": [
           {
             "fieldPath": "eventId",
@@ -15,8 +15,20 @@
             "notNull": true
           },
           {
+            "fieldPath": "eventServerId",
+            "columnName": "event_server_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "name",
             "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pinCode",
+            "columnName": "pin_code",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -264,11 +276,17 @@
       },
       {
         "tableName": "currency",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`currency_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `code` TEXT NOT NULL, `name` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`currency_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `currency_server_id` INTEGER NOT NULL, `code` TEXT NOT NULL, `name` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "currencyId",
             "columnName": "currency_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currencyServerId",
+            "columnName": "currency_server_id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -294,11 +312,17 @@
       },
       {
         "tableName": "person",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`person_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`person_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `person_server_id` INTEGER NOT NULL, `name` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "personId",
             "columnName": "person_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "personServerId",
+            "columnName": "person_server_id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -457,7 +481,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4480518b9499b617418dc705b9220fe2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '372d67162fd969a574b965208d0dc039')"
     ]
   }
 }

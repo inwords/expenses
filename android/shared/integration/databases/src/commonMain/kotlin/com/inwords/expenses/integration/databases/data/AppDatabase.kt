@@ -48,5 +48,6 @@ internal fun createAppDatabase(
         .setJournalMode(RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
         .fallbackToDestructiveMigration(dropAllTables = true) // FIXME remove before prod
         .setDriver(BundledSQLiteDriver())
+        .addCallback(RoomOnCreateCallback())
         .build()
 }

@@ -1,13 +1,13 @@
-package com.inwords.expenses.feature.events.data
+package com.inwords.expenses.feature.events.data.db.store
 
 import com.inwords.expenses.feature.events.data.db.converter.toEntity
 import com.inwords.expenses.feature.events.data.db.dao.PersonsDao
-import com.inwords.expenses.feature.events.domain.PersonsRepository
 import com.inwords.expenses.feature.events.domain.model.Person
+import com.inwords.expenses.feature.events.domain.store.local.PersonsLocalStore
 
-internal class PersonsRepositoryImpl(
+internal class PersonsLocalStoreImpl(
     personsDaoLazy: Lazy<PersonsDao>
-) : PersonsRepository {
+) : PersonsLocalStore {
 
     private val personsDao by personsDaoLazy
 

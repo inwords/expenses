@@ -25,8 +25,14 @@ data class EventEntity(
     @ColumnInfo(ColumnNames.ID)
     val eventId: Long = 0L,
 
+    @ColumnInfo(ColumnNames.SERVER_ID)
+    val eventServerId: Long,
+
     @ColumnInfo(ColumnNames.NAME)
     val name: String,
+
+    @ColumnInfo(ColumnNames.PIN_CODE)
+    val pinCode: String,
 
     @ColumnInfo(ColumnNames.PRIMARY_CURRENCY)
     val primaryCurrencyId: Long,
@@ -39,7 +45,9 @@ data class EventEntity(
     object ColumnNames {
 
         const val ID = "event_id"
+        const val SERVER_ID = "event_server_id"
         const val NAME = "name"
+        const val PIN_CODE = "pin_code"
         const val PRIMARY_CURRENCY = "primary_currency_id"
     }
 }

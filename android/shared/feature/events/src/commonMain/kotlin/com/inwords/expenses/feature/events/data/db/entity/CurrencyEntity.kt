@@ -10,6 +10,9 @@ data class CurrencyEntity(
     @ColumnInfo(ColumnNames.ID)
     val currencyId: Long = 0L,
 
+    @ColumnInfo(ColumnNames.SERVER_ID)
+    val currencyServerId: Long,
+
     @ColumnInfo(ColumnNames.CODE)
     val code: String,
 
@@ -24,6 +27,7 @@ data class CurrencyEntity(
     object ColumnNames {
 
         const val ID = "currency_id"
+        const val SERVER_ID = "currency_server_id"
         const val CODE = "code"
         const val NAME = "name"
     }

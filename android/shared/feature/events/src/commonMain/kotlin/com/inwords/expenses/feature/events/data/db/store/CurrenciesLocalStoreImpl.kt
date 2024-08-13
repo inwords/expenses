@@ -1,16 +1,16 @@
-package com.inwords.expenses.feature.events.data
+package com.inwords.expenses.feature.events.data.db.store
 
 import com.inwords.expenses.feature.events.data.db.converter.toDomain
 import com.inwords.expenses.feature.events.data.db.converter.toEntity
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
-import com.inwords.expenses.feature.events.domain.CurrenciesRepository
 import com.inwords.expenses.feature.events.domain.model.Currency
+import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-internal class CurrenciesRepositoryImpl(
+internal class CurrenciesLocalStoreImpl(
     currenciesDaoLazy: Lazy<CurrenciesDao>
-) : CurrenciesRepository {
+) : CurrenciesLocalStore {
 
     private val currenciesDao by currenciesDaoLazy
 

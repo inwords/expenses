@@ -10,6 +10,9 @@ data class PersonEntity(
     @ColumnInfo(ColumnNames.ID)
     val personId: Long = 0L,
 
+    @ColumnInfo(ColumnNames.SERVER_ID)
+    val personServerId: Long,
+
     @ColumnInfo(ColumnNames.NAME)
     val name: String,
 ) {
@@ -21,6 +24,7 @@ data class PersonEntity(
     object ColumnNames {
 
         const val ID = "person_id"
+        const val SERVER_ID = "person_server_id"
         const val NAME = "name"
     }
 }

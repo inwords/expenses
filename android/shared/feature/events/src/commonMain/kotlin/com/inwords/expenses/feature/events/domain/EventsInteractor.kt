@@ -1,11 +1,14 @@
 package com.inwords.expenses.feature.events.domain
 
+import com.inwords.expenses.core.locator.ComponentsMap
+import com.inwords.expenses.core.locator.getComponent
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
-import com.inwords.expenses.feature.events.domain.model.Currency
+import com.inwords.expenses.feature.events.api.EventsComponent
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
 import com.inwords.expenses.feature.events.domain.model.Person
+import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -14,9 +17,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
+import kotlin.random.Random
 
 class EventsInteractor internal constructor(
-    private val eventsRepository: EventsRepository,
+    private val eventsLocalStore: EventsLocalStore,
     private val settingsRepository: SettingsRepository,
     scope: CoroutineScope = CoroutineScope(SupervisorJob() + IO)
 ) {
@@ -32,13 +36,13 @@ class EventsInteractor internal constructor(
             if (currentEventId == null) {
                 flowOf(null)
             } else {
-                eventsRepository.getEventWithDetails(currentEventId)
+                eventsLocalStore.getEventWithDetails(currentEventId)
             }
         }
         .stateIn(scope, started = SharingStarted.WhileSubscribed(), initialValue = null)
 
     fun getEventDetails(event: Event): Flow<EventDetails> {
-        return eventsRepository.getEventWithDetails(event.id)
+        return eventsLocalStore.getEventWithDetails(event.id)
     }
 
     internal suspend fun joinEvent(eventId: Long, accessCode: String): JoinEventResult {
@@ -47,7 +51,7 @@ class EventsInteractor internal constructor(
         } else if (accessCode != "1234") {
             JoinEventResult.InvalidAccessCode
         } else {
-            val newCurrentEvent = Event(1L, "Fruska")
+            val newCurrentEvent = Event(1L, 11L, "Fruska", "1234")
             settingsRepository.setCurrentEventId(newCurrentEvent.id)
             settingsRepository.setCurrentPersonId(1L) // TODO
             JoinEventResult.NewCurrentEvent(newCurrentEvent)
@@ -72,22 +76,25 @@ class EventsInteractor internal constructor(
 
     internal suspend fun createEvent(): EventDetails {
         val personsToInsert = (listOf(draftOwner) + draftOtherPersons).map { personName ->
-            Person(0L, personName)
+            Person(0L, 0L, personName)
         }
-        // FIXME stub
-        val currenciesToInsert = listOf(
-            Currency(1L, "USD", "US Dollar"),
-            Currency(2L, "EUR", "Euro"),
-            Currency(3L, "RUB", "Russian Ruble"),
-        )
-        val eventToInsert = Event(0L, draftEventName)
 
-        val eventDetails = eventsRepository.deepInsert(
-            eventToInsert = eventToInsert,
-            currenciesToInsert = currenciesToInsert,
-            personsToInsert = personsToInsert,
-            primaryCurrencyIndex = 1,
+        val eventToInsert = Event(
+            id = 0L,
+            serverId = 0L,
+            name = draftEventName,
+            // FIXME secure
+            pinCode = Random.Default.nextLong(1000, 9999).toString()
         )
+
+        val eventDetails = eventsLocalStore.deepInsert(
+            eventToInsert = eventToInsert,
+            personsToInsert = personsToInsert,
+            primaryCurrencyIndex = 0,
+        )
+
+        // FIXME not here
+        ComponentsMap.getComponent<EventsComponent>().eventSyncTask.syncEvent(eventDetails.event.id)
 
         settingsRepository.setCurrentEventId(eventDetails.event.id)
         settingsRepository.setCurrentPersonId(eventDetails.persons.first().id)

@@ -30,18 +30,22 @@ private fun ExpensesScreenSuccessPreview() {
 internal fun mockAddExpenseScreenUiModel(): AddExpenseScreenUiModel {
     val person1 = Person(
         id = 1,
+        serverId = 11,
         name = "Василий"
     )
     val person2 = Person(
         id = 2,
+        serverId = 12,
         name = "Максим"
     )
     val person3 = Person(
         id = 3,
+        serverId = 13,
         name = "Анжела"
     )
     val person4 = Person(
         id = 4,
+        serverId = 14,
         name = "Саша"
     )
     return AddExpenseScreenUiModel(

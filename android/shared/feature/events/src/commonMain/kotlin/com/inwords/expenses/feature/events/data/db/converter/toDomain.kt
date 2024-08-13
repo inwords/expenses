@@ -12,7 +12,9 @@ import com.inwords.expenses.feature.events.domain.model.Person
 internal fun EventEntity.toDomain(): Event {
     return Event(
         id = eventId,
+        serverId = eventServerId,
         name = name,
+        pinCode = pinCode,
     )
 }
 
@@ -27,12 +29,14 @@ internal fun EventWithDetailsQuery.toDomain(): EventDetails {
 
 internal fun PersonEntity.toDomain() = Person(
     id = personId,
+    serverId = personServerId,
     name = name,
 )
 
 internal fun CurrencyEntity.toDomain(): Currency {
     return Currency(
         id = currencyId,
+        serverId = currencyServerId,
         code = code,
         name = name,
     )

@@ -42,10 +42,12 @@ private fun ExpensesScreenPreviewEmpty() {
 internal fun mockExpensesScreenUiModel(): ExpensesScreenUiModel {
     val person1 = Person(
         id = 1,
+        serverId = 11,
         name = "Василий"
     )
     val person2 = Person(
         id = 2,
+        serverId = 12,
         name = "Максим"
     )
     return ExpensesScreenUiModel(
@@ -72,6 +74,7 @@ internal fun mockExpensesScreenUiModel(): ExpensesScreenUiModel {
                 expenseId = 1,
                 currency = Currency(
                     id = 1,
+                    serverId = 11,
                     code = "RUB",
                     name = "Russian Ruble",
                 ),
@@ -98,6 +101,7 @@ internal fun mockExpensesScreenUiModel(): ExpensesScreenUiModel {
                 expenseId = 2,
                 currency = Currency(
                     id = 2,
+                    serverId = 11,
                     code = "USD",
                     name = "US Dollar",
                 ),

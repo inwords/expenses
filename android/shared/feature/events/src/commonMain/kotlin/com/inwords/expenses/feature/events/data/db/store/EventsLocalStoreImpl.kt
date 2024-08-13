@@ -1,4 +1,4 @@
-package com.inwords.expenses.feature.events.data
+package com.inwords.expenses.feature.events.data.db.store
 
 import androidx.room.RoomDatabase
 import com.inwords.expenses.feature.events.data.db.converter.toDomain
@@ -6,30 +6,30 @@ import com.inwords.expenses.feature.events.data.db.converter.toEntity
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
 import com.inwords.expenses.feature.events.data.db.entity.EventCurrencyCrossRef
 import com.inwords.expenses.feature.events.data.db.entity.EventPersonCrossRef
-import com.inwords.expenses.feature.events.domain.CurrenciesRepository
-import com.inwords.expenses.feature.events.domain.EventsRepository
-import com.inwords.expenses.feature.events.domain.PersonsRepository
-import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
 import com.inwords.expenses.feature.events.domain.model.Person
+import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
+import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
+import com.inwords.expenses.feature.events.domain.store.local.PersonsLocalStore
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-internal class EventsRepositoryImpl(
+internal class EventsLocalStoreImpl(
     dbLazy: Lazy<RoomDatabase>,
     eventsDaoLazy: Lazy<EventsDao>,
-    personsRepositoryLazy: Lazy<PersonsRepository>,
-    currenciesRepositoryLazy: Lazy<CurrenciesRepository>,
-) : EventsRepository {
+    personsLocalStoreLazy: Lazy<PersonsLocalStore>,
+    currenciesLocalStoreLazy: Lazy<CurrenciesLocalStore>,
+) : EventsLocalStore {
 
     private val db by dbLazy
     private val eventsDao by eventsDaoLazy
-    private val personsRepository by personsRepositoryLazy
-    private val currenciesRepository by currenciesRepositoryLazy
+    private val personsRepository by personsLocalStoreLazy
+    private val currenciesRepository by currenciesLocalStoreLazy
 
     override fun getEvents(): Flow<List<Event>> {
         return eventsDao.queryAll().map { entities ->
@@ -49,15 +49,18 @@ internal class EventsRepositoryImpl(
         }
     }
 
+    override suspend fun update(eventId: Long, newServerId: Long): Boolean {
+        return eventsDao.update(eventId, newServerId) == 1
+    }
+
     override suspend fun deepInsert(
         eventToInsert: Event,
         personsToInsert: List<Person>,
-        currenciesToInsert: List<Currency>,
         primaryCurrencyIndex: Int,
     ): EventDetails = coroutineScope {
         // FIXME: transaction not used (Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x0 in tid 23969 (DefaultDispatch), pid 23897 (nwords.expenses))
         val personsDeferred = async { personsRepository.insert(personsToInsert) }
-        val currenciesDeferred = async { currenciesRepository.insert(currenciesToInsert) }
+        val currenciesDeferred = async { currenciesRepository.getCurrencies().first() }
 
         val persons = personsDeferred.await()
         val currencies = currenciesDeferred.await()
