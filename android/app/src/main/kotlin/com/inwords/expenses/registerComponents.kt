@@ -7,7 +7,7 @@ import com.inwords.expenses.core.locator.registerComponent
 import com.inwords.expenses.core.network.HostConfig
 import com.inwords.expenses.core.network.NetworkComponentFactory
 import com.inwords.expenses.core.utils.SuspendLazy
-import com.inwords.expenses.feature.events.api.EventsComponent
+import com.inwords.expenses.feature.events.api.EventsComponentFactory
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
 import com.inwords.expenses.feature.events.data.db.dao.PersonsDao
@@ -39,8 +39,11 @@ internal fun registerComponents(appContext: Context) {
     }
 
     val eventsComponent = lazy {
-        EventsComponent(
-            deps = object : EventsComponent.Deps {
+        EventsComponentFactory(
+            deps = object : EventsComponentFactory.Deps {
+                override val context: Context
+                    get() = appContext
+
                 override val eventsDao: EventsDao
                     get() = dbComponent.value.eventsDao
                 override val personsDao: PersonsDao
@@ -59,7 +62,7 @@ internal fun registerComponents(appContext: Context) {
                 override val settingsRepository: SettingsRepository
                     get() = settingsComponent.value.settingsRepository
             }
-        )
+        ).create()
     }
 
     val expensesComponent = lazy {

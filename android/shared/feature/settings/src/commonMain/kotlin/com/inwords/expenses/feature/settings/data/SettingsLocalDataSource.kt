@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.okio.OkioSerializer
 import com.inwords.expenses.core.storage.utils.type_converter.DataStoreSingleton
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import okio.BufferedSink
 import okio.BufferedSource
@@ -21,7 +22,9 @@ internal class SettingsLocalDataSource(settingsDataStoreLazy: Lazy<DataStore<Set
     }
 
     fun getCurrentEventId(): Flow<Long?> {
-        return settingsDataStore.data.map { settings -> settings.current_event_id.takeIf { it != -1L } }
+        return settingsDataStore.data
+            .map { settings -> settings.current_event_id.takeIf { it != -1L } }
+            .distinctUntilChanged()
     }
 
     suspend fun setCurrentPersonId(userId: Long) {
@@ -31,7 +34,9 @@ internal class SettingsLocalDataSource(settingsDataStoreLazy: Lazy<DataStore<Set
     }
 
     fun getCurrentPersonId(): Flow<Long?> {
-        return settingsDataStore.data.map { settings -> settings.current_person_id.takeIf { it != -1L } }
+        return settingsDataStore.data
+            .map { settings -> settings.current_person_id.takeIf { it != -1L } }
+            .distinctUntilChanged()
     }
 }
 

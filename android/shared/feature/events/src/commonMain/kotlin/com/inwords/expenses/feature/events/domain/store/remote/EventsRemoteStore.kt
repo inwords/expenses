@@ -2,19 +2,32 @@ package com.inwords.expenses.feature.events.domain.store.remote
 
 import com.inwords.expenses.core.utils.Result
 import com.inwords.expenses.feature.events.domain.model.Currency
+import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
 import com.inwords.expenses.feature.events.domain.model.Person
 
 internal interface EventsRemoteStore {
 
-    suspend fun getEvent(eventId: Long, pinCode: String): Result<EventDetails>
+    sealed interface GetEventResult {
+        data class Event(val event: EventDetails) : GetEventResult
+        data object InvalidAccessCode : GetEventResult
+        data object EventNotFound : GetEventResult
+        data object OtherError : GetEventResult
+    }
+
+    suspend fun getEvent(eventServerId: Long, pinCode: String): GetEventResult
 
     suspend fun createEvent(
-        name: String,
-        pinCode: String,
+        event: Event,
         currencies: List<Currency>,
         primaryCurrencyId: Long,
-        users: List<Person>,
+        localPersons: List<Person>,
     ): Result<EventDetails>
+
+    suspend fun addPersonsToEvent(
+        eventServerId: Long,
+        pinCode: String,
+        localPersons: List<Person>
+    ): Result<List<Person>>
 
 }

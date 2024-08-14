@@ -1,18 +1,15 @@
 package com.inwords.expenses.feature.events.domain
 
-import com.inwords.expenses.core.locator.ComponentsMap
-import com.inwords.expenses.core.locator.getComponent
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
-import com.inwords.expenses.feature.events.api.EventsComponent
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
+import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -21,6 +18,8 @@ import kotlin.random.Random
 
 class EventsInteractor internal constructor(
     private val eventsLocalStore: EventsLocalStore,
+    private val eventsRemoteStore: EventsRemoteStore,
+    private val currenciesPullTask: CurrenciesPullTask,
     private val settingsRepository: SettingsRepository,
     scope: CoroutineScope = CoroutineScope(SupervisorJob() + IO)
 ) {
@@ -29,7 +28,10 @@ class EventsInteractor internal constructor(
         data class NewCurrentEvent(val event: Event) : JoinEventResult
         data object InvalidAccessCode : JoinEventResult
         data object EventNotFound : JoinEventResult
+        data object OtherError : JoinEventResult
     }
+
+    private val draft = Draft()
 
     val currentEvent: StateFlow<EventDetails?> = settingsRepository.getCurrentEventId()
         .flatMapLatestNoBuffer { currentEventId ->
@@ -41,48 +43,60 @@ class EventsInteractor internal constructor(
         }
         .stateIn(scope, started = SharingStarted.WhileSubscribed(), initialValue = null)
 
-    fun getEventDetails(event: Event): Flow<EventDetails> {
-        return eventsLocalStore.getEventWithDetails(event.id)
-    }
+    internal suspend fun joinEvent(eventServerId: Long, accessCode: String): JoinEventResult {
+        val localEvent = eventsLocalStore.getEventWithDetailsByServerId(eventServerId)
+        if (localEvent != null) {
+            settingsRepository.setCurrentEventId(localEvent.event.id)
+            settingsRepository.setCurrentPersonId(localEvent.persons.first().id) // FIXME select person on UI
+            return JoinEventResult.NewCurrentEvent(localEvent.event)
+        }
 
-    internal suspend fun joinEvent(eventId: Long, accessCode: String): JoinEventResult {
-        return if (eventId != 1L) {
-            JoinEventResult.EventNotFound
-        } else if (accessCode != "1234") {
-            JoinEventResult.InvalidAccessCode
-        } else {
-            val newCurrentEvent = Event(1L, 11L, "Fruska", "1234")
-            settingsRepository.setCurrentEventId(newCurrentEvent.id)
-            settingsRepository.setCurrentPersonId(1L) // TODO
-            JoinEventResult.NewCurrentEvent(newCurrentEvent)
+        return when (val eventResult = eventsRemoteStore.getEvent(eventServerId, accessCode)) {
+            is EventsRemoteStore.GetEventResult.Event -> {
+                val remoteEvent = eventResult.event
+
+                val updatedCurrencies = currenciesPullTask.updateLocalCurrencies(remoteEvent.currencies)
+
+                val eventDetails = eventsLocalStore.deepInsert(
+                    eventToInsert = remoteEvent.event,
+                    personsToInsert = remoteEvent.persons,
+                    primaryCurrencyId = updatedCurrencies.first { it.serverId == remoteEvent.primaryCurrency.serverId }.id,
+                    prefetchedLocalCurrencies = updatedCurrencies,
+                )
+
+                settingsRepository.setCurrentEventId(eventDetails.event.id)
+                settingsRepository.setCurrentPersonId(eventDetails.persons.first().id) // FIXME select person on UI
+
+                JoinEventResult.NewCurrentEvent(eventDetails.event)
+            }
+
+            EventsRemoteStore.GetEventResult.EventNotFound -> JoinEventResult.EventNotFound
+            EventsRemoteStore.GetEventResult.InvalidAccessCode -> JoinEventResult.InvalidAccessCode
+            EventsRemoteStore.GetEventResult.OtherError -> JoinEventResult.OtherError
         }
     }
 
-    private var draftEventName = ""
-    private var draftOwner = ""
-    private var draftOtherPersons = emptyList<String>()
-
-    internal suspend fun draftEventName(eventName: String) {
-        draftEventName = eventName.trim() // FIXME save to storage
+    internal fun draftEventName(eventName: String) {
+        draft.draftEventName = eventName.trim()
     }
 
-    internal suspend fun draftOwner(owner: String) {
-        draftOwner = owner.trim()
+    internal fun draftOwner(owner: String) {
+        draft.draftOwner = owner.trim()
     }
 
-    internal suspend fun draftOtherPersons(persons: List<String>) {
-        draftOtherPersons = persons.map { it.trim() }.filter { it.isNotEmpty() }
+    internal fun draftOtherPersons(persons: List<String>) {
+        draft.draftOtherPersons = persons.map { it.trim() }.filter { it.isNotEmpty() }
     }
 
     internal suspend fun createEvent(): EventDetails {
-        val personsToInsert = (listOf(draftOwner) + draftOtherPersons).map { personName ->
+        val personsToInsert = (listOf(draft.draftOwner) + draft.draftOtherPersons).map { personName ->
             Person(0L, 0L, personName)
         }
 
         val eventToInsert = Event(
             id = 0L,
             serverId = 0L,
-            name = draftEventName,
+            name = draft.draftEventName,
             // FIXME secure
             pinCode = Random.Default.nextLong(1000, 9999).toString()
         )
@@ -90,16 +104,28 @@ class EventsInteractor internal constructor(
         val eventDetails = eventsLocalStore.deepInsert(
             eventToInsert = eventToInsert,
             personsToInsert = personsToInsert,
-            primaryCurrencyIndex = 0,
+            primaryCurrencyId = 1,
         )
-
-        // FIXME not here
-        ComponentsMap.getComponent<EventsComponent>().eventSyncTask.syncEvent(eventDetails.event.id)
 
         settingsRepository.setCurrentEventId(eventDetails.event.id)
         settingsRepository.setCurrentPersonId(eventDetails.persons.first().id)
 
+        draft.clear()
+
         return eventDetails
+    }
+
+    private class Draft(
+        var draftEventName: String = "",
+        var draftOwner: String = "",
+        var draftOtherPersons: List<String> = emptyList()
+    ) {
+
+        fun clear() {
+            draftEventName = ""
+            draftOwner = ""
+            draftOtherPersons = emptyList()
+        }
     }
 
 }

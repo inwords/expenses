@@ -6,6 +6,7 @@ import com.inwords.expenses.feature.events.data.db.converter.toEntity
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
 import com.inwords.expenses.feature.events.data.db.entity.EventCurrencyCrossRef
 import com.inwords.expenses.feature.events.data.db.entity.EventPersonCrossRef
+import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
 import com.inwords.expenses.feature.events.domain.model.Person
@@ -15,6 +16,7 @@ import com.inwords.expenses.feature.events.domain.store.local.PersonsLocalStore
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -34,19 +36,17 @@ internal class EventsLocalStoreImpl(
     override fun getEvents(): Flow<List<Event>> {
         return eventsDao.queryAll().map { entities ->
             entities.map { entity -> entity.toDomain() }
-        }
+        }.distinctUntilChanged()
     }
 
-    override fun getEvent(eventId: Long): Flow<Event> {
-        return eventsDao.queryById(eventId).map { entity ->
-            entity.toDomain()
-        }
-    }
-
-    override fun getEventWithDetails(eventId: Long): Flow<EventDetails> {
+    override fun getEventWithDetails(eventId: Long): Flow<EventDetails?> {
         return eventsDao.queryEventWithDetailsById(eventId).map { entity ->
-            entity.toDomain()
-        }
+            entity?.toDomain()
+        }.distinctUntilChanged()
+    }
+
+    override suspend fun getEventWithDetailsByServerId(eventServerId: Long): EventDetails? {
+        return eventsDao.queryEventWithDetailsByServerId(eventServerId)?.toDomain()
     }
 
     override suspend fun update(eventId: Long, newServerId: Long): Boolean {
@@ -56,20 +56,19 @@ internal class EventsLocalStoreImpl(
     override suspend fun deepInsert(
         eventToInsert: Event,
         personsToInsert: List<Person>,
-        primaryCurrencyIndex: Int,
+        primaryCurrencyId: Long,
+        prefetchedLocalCurrencies: List<Currency>?
     ): EventDetails = coroutineScope {
         // FIXME: transaction not used (Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x0 in tid 23969 (DefaultDispatch), pid 23897 (nwords.expenses))
         val personsDeferred = async { personsRepository.insert(personsToInsert) }
-        val currenciesDeferred = async { currenciesRepository.getCurrencies().first() }
-
+        val currencies = prefetchedLocalCurrencies ?: currenciesRepository.getCurrencies().first()
         val persons = personsDeferred.await()
-        val currencies = currenciesDeferred.await()
 
         val eventDetails = EventDetails(
             event = eventToInsert,
             persons = persons,
             currencies = currencies,
-            primaryCurrency = currencies[primaryCurrencyIndex],
+            primaryCurrency = currencies.first { it.id == primaryCurrencyId },
         )
 
         val eventId = eventsDao.insert(eventDetails.toEntity()).takeIf { it != -1L }

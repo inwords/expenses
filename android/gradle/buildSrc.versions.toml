@@ -1,6 +1,6 @@
 [versions]
 android-gradle-plugin = "8.5.2"
-kotlin = "2.0.20-RC"
+kotlin = "2.0.20-RC2"
 
 [libraries]
 agp = { group = "com.android.tools.build", name = "gradle", version.ref = "android-gradle-plugin" }

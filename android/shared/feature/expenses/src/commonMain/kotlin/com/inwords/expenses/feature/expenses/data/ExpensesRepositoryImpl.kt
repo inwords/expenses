@@ -8,6 +8,7 @@ import com.inwords.expenses.feature.expenses.data.db.dao.ExpensesDao
 import com.inwords.expenses.feature.expenses.domain.ExpensesRepository
 import com.inwords.expenses.feature.expenses.domain.model.Expense
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 internal class ExpensesRepositoryImpl(
@@ -19,7 +20,7 @@ internal class ExpensesRepositoryImpl(
     override fun getExpenses(event: EventDetails): Flow<List<Expense>> {
         return expensesDao.queryByEventId(event.event.id).map { entities ->
             entities.map { entity -> entity.toDomain() }
-        }
+        }.distinctUntilChanged()
     }
 
     override suspend fun insert(event: Event, expense: Expense) {

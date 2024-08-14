@@ -9,7 +9,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
-class EventSyncTask internal constructor(
+class EventPushTask internal constructor(
     private val eventsLocalStore: EventsLocalStore,
     private val eventsRemoteStore: EventsRemoteStore,
     private val personsLocalStore: PersonsLocalStore,
@@ -19,17 +19,16 @@ class EventSyncTask internal constructor(
      * Prerequisites:
      * 1. Currencies are synced
      */
-    suspend fun syncEvent(eventId: Long): Boolean = withContext(IO) {
-        val localEventDetails = eventsLocalStore.getEventWithDetails(eventId).first()
+    suspend fun pushEvent(eventId: Long): Boolean = withContext(IO) {
+        val localEventDetails = eventsLocalStore.getEventWithDetails(eventId).first() ?: return@withContext false
 
         if (localEventDetails.event.serverId != 0L) return@withContext true
 
         val remoteEventDetailsResult = eventsRemoteStore.createEvent(
-            name = localEventDetails.event.name,
-            pinCode = localEventDetails.event.pinCode,
+            event = localEventDetails.event,
             currencies = localEventDetails.currencies,
             primaryCurrencyId = localEventDetails.primaryCurrency.serverId,
-            users = localEventDetails.persons
+            localPersons = localEventDetails.persons
         )
         val networkEventDetails = when (remoteEventDetailsResult) {
             is Result.Success -> remoteEventDetailsResult.data

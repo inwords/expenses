@@ -1,0 +1,29 @@
+package com.inwords.expenses.feature.events.api
+
+import androidx.room.RoomDatabase
+import com.inwords.expenses.core.network.HostConfig
+import com.inwords.expenses.core.utils.SuspendLazy
+import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
+import com.inwords.expenses.feature.events.data.db.dao.EventsDao
+import com.inwords.expenses.feature.events.data.db.dao.PersonsDao
+import com.inwords.expenses.feature.settings.api.SettingsRepository
+import io.ktor.client.HttpClient
+
+expect class EventsComponentFactory {
+
+    interface Deps {
+
+        val eventsDao: EventsDao
+        val personsDao: PersonsDao
+        val currenciesDao: CurrenciesDao
+
+        val db: RoomDatabase
+
+        val client: SuspendLazy<HttpClient>
+        val hostConfig: HostConfig
+
+        val settingsRepository: SettingsRepository
+    }
+
+    fun create(): EventsComponent
+}

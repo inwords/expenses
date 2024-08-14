@@ -16,7 +16,6 @@ import com.inwords.expenses.feature.events.data.db.entity.PersonEntity
 import com.inwords.expenses.feature.expenses.data.db.dao.ExpensesDao
 import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseEntity
 import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseSplitEntity
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @Database(
     entities = [
@@ -39,7 +38,6 @@ abstract class AppDatabase : RoomDatabase() { // TODO make internal when Room is
     abstract fun personsDao(): PersonsDao
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 internal fun createAppDatabase(
     builder: RoomDatabase.Builder<AppDatabase>
 ): AppDatabase {

@@ -1,4 +1,5 @@
 import com.inwords.expenses.plugins.SharedKmmLibraryPlugin.Companion.applyKmmDefaults
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
     id("shared-kmm-library-plugin")
@@ -53,6 +54,9 @@ kotlin {
         }
         androidMain {
             dependencies {
+                implementation(shared.work.runtime.ktx)
+                implementation(shared.coroutines.guava)
+
                 implementation(shared.lifecycle.viewmodel.compose)
                 implementation(shared.navigation.compose)
 
@@ -63,5 +67,11 @@ kotlin {
                 implementation(shared.compose.ui.tooling)
             }
         }
+    }
+
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    compilerOptions {
+        // Common compiler options applied to all Kotlin source sets
+        freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 }

@@ -43,7 +43,7 @@ internal class JoinEventViewModel(
         confirmJob = viewModelScope.launch {
             val state = _state.value
             val result = eventsInteractor.joinEvent(
-                eventId = state.eventId.toLong(),
+                eventServerId = state.eventId.toLong(),
                 accessCode = state.eventAccessCode
             )
             when (result) {
@@ -51,6 +51,7 @@ internal class JoinEventViewModel(
 
                 JoinEventResult.InvalidAccessCode -> Unit
                 JoinEventResult.EventNotFound -> Unit // TODO mvp
+                JoinEventResult.OtherError -> Unit
             }
         }
     }
