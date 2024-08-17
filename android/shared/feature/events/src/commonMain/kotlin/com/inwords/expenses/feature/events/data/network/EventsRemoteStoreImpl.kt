@@ -16,7 +16,6 @@ import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
 import com.inwords.expenses.feature.events.domain.model.Person
-import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore.GetEventResult
 import io.ktor.client.HttpClient
@@ -27,26 +26,26 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import kotlinx.coroutines.flow.first
 
 internal class EventsRemoteStoreImpl(
     private val client: SuspendLazy<HttpClient>,
     private val hostConfig: HostConfig,
-    private val currenciesLocalStore: CurrenciesLocalStore,
 ) : EventsRemoteStore {
 
-    override suspend fun getEvent(eventServerId: Long, pinCode: String): GetEventResult {
-        val currencies = currenciesLocalStore.getCurrencies().first()
-
+    override suspend fun getEvent(
+        event: Event,
+        currencies: List<Currency>,
+        localPersons: List<Person>?,
+    ): GetEventResult {
         val result = client.requestWithExceptionHandling {
             get {
                 url(hostConfig) {
-                    pathSegments = listOf("event", eventServerId.toString())
-                    parameters.append("pinCode", pinCode)
+                    pathSegments = listOf("event", event.serverId.toString())
+                    parameters.append("pinCode", event.pinCode)
                 }
             }.body<EventDto>().toEventDetails(
-                localEventId = 0L,
-                localPersons = emptyList(),
+                localEventId = event.id,
+                localPersons = localPersons,
                 currencies = currencies
             )
         }
@@ -109,7 +108,7 @@ internal class EventsRemoteStoreImpl(
             event = Event(id = localEventId, serverId = id, name = name, pinCode = pinCode),
             currencies = currencies,
             persons = users.mapIndexed { i, dto ->
-                dto.toPerson(localPersonId = localPersons?.get(i)?.id)
+                dto.toPerson(localPersonId = localPersons?.getOrNull(i)?.takeIf { it.name == dto.name }?.id)
             },
             primaryCurrency = currencies.first { it.id == currencyId },
         )

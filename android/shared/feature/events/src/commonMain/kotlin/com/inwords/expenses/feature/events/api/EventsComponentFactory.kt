@@ -1,7 +1,7 @@
 package com.inwords.expenses.feature.events.api
 
-import androidx.room.RoomDatabase
 import com.inwords.expenses.core.network.HostConfig
+import com.inwords.expenses.core.storage.utils.TransactionHelper
 import com.inwords.expenses.core.utils.SuspendLazy
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
@@ -17,7 +17,7 @@ expect class EventsComponentFactory {
         val personsDao: PersonsDao
         val currenciesDao: CurrenciesDao
 
-        val db: RoomDatabase
+        val transactionHelper: TransactionHelper
 
         val client: SuspendLazy<HttpClient>
         val hostConfig: HostConfig

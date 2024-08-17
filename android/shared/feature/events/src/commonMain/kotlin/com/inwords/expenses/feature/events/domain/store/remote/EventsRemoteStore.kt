@@ -15,7 +15,11 @@ internal interface EventsRemoteStore {
         data object OtherError : GetEventResult
     }
 
-    suspend fun getEvent(eventServerId: Long, pinCode: String): GetEventResult
+    suspend fun getEvent(
+        event: Event,
+        currencies: List<Currency>,
+        localPersons: List<Person>?,
+    ): GetEventResult
 
     suspend fun createEvent(
         event: Event,

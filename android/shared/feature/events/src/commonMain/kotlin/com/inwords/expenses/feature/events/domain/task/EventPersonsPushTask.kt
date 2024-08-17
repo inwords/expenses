@@ -1,25 +1,26 @@
-package com.inwords.expenses.feature.events.domain
+package com.inwords.expenses.feature.events.domain.task
 
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.Result
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
-import com.inwords.expenses.feature.events.domain.store.local.PersonsLocalStore
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 
-class EventPersonsPushTask internal constructor(
-    private val eventsLocalStore: EventsLocalStore,
-    private val eventsRemoteStore: EventsRemoteStore,
-    private val personsLocalStore: PersonsLocalStore,
+internal class EventPersonsPushTask(
+    eventsLocalStoreLazy: Lazy<EventsLocalStore>,
+    eventsRemoteStoreLazy: Lazy<EventsRemoteStore>,
 ) {
+
+    private val eventsLocalStore by eventsLocalStoreLazy
+    private val eventsRemoteStore by eventsRemoteStoreLazy
 
     /**
      * Prerequisites:
      * 1. Event is synced
      */
-    internal suspend fun pushEventPersons(eventId: Long): Boolean = withContext(IO) {
+    suspend fun pushEventPersons(eventId: Long): Boolean = withContext(IO) {
         val localEvent = eventsLocalStore.getEventWithDetails(eventId).first() ?: return@withContext false
 
         val personsToAdd = localEvent.persons.filter { it.serverId == 0L }
@@ -37,7 +38,7 @@ class EventPersonsPushTask internal constructor(
             is Result.Error -> return@withContext false
         }
 
-        personsLocalStore.insert(networkPersons)
+        eventsLocalStore.insertPersonsWithCrossRefs(eventId, networkPersons, inTransaction = true)
 
         true
     }

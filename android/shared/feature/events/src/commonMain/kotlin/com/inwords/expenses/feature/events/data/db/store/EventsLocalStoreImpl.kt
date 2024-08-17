@@ -1,6 +1,6 @@
 package com.inwords.expenses.feature.events.data.db.store
 
-import androidx.room.RoomDatabase
+import com.inwords.expenses.core.storage.utils.TransactionHelper
 import com.inwords.expenses.feature.events.data.db.converter.toDomain
 import com.inwords.expenses.feature.events.data.db.converter.toEntity
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
@@ -13,24 +13,21 @@ import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.PersonsLocalStore
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 internal class EventsLocalStoreImpl(
-    dbLazy: Lazy<RoomDatabase>,
+    transactionHelperLazy: Lazy<TransactionHelper>,
     eventsDaoLazy: Lazy<EventsDao>,
     personsLocalStoreLazy: Lazy<PersonsLocalStore>,
     currenciesLocalStoreLazy: Lazy<CurrenciesLocalStore>,
 ) : EventsLocalStore {
 
-    private val db by dbLazy
+    private val transactionHelper by transactionHelperLazy
     private val eventsDao by eventsDaoLazy
-    private val personsRepository by personsLocalStoreLazy
+    private val personsLocalStore by personsLocalStoreLazy
     private val currenciesRepository by currenciesLocalStoreLazy
 
     override fun getEvents(): Flow<List<Event>> {
@@ -45,8 +42,16 @@ internal class EventsLocalStoreImpl(
         }.distinctUntilChanged()
     }
 
+    override suspend fun getEvent(eventId: Long): Event? {
+        return eventsDao.queryEventById(eventId)?.toDomain()
+    }
+
     override suspend fun getEventWithDetailsByServerId(eventServerId: Long): EventDetails? {
         return eventsDao.queryEventWithDetailsByServerId(eventServerId)?.toDomain()
+    }
+
+    override suspend fun getEventPersons(eventId: Long): List<Person> {
+        return eventsDao.queryEventPersonsById(eventId).map { it.toDomain() }
     }
 
     override suspend fun update(eventId: Long, newServerId: Long): Boolean {
@@ -57,12 +62,40 @@ internal class EventsLocalStoreImpl(
         eventToInsert: Event,
         personsToInsert: List<Person>,
         primaryCurrencyId: Long,
-        prefetchedLocalCurrencies: List<Currency>?
-    ): EventDetails = coroutineScope {
-        // FIXME: transaction not used (Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x0 in tid 23969 (DefaultDispatch), pid 23897 (nwords.expenses))
-        val personsDeferred = async { personsRepository.insert(personsToInsert) }
+        prefetchedLocalCurrencies: List<Currency>?,
+        inTransaction: Boolean
+    ): EventDetails {
+        return if (inTransaction) {
+            transactionHelper.immediateWriteTransaction {
+                deepInsertInternal(eventToInsert, personsToInsert, primaryCurrencyId, prefetchedLocalCurrencies)
+            }
+        } else {
+            deepInsertInternal(eventToInsert, personsToInsert, primaryCurrencyId, prefetchedLocalCurrencies)
+        }
+    }
+
+    override suspend fun insertPersonsWithCrossRefs(
+        eventId: Long,
+        persons: List<Person>,
+        inTransaction: Boolean,
+    ): List<Person> {
+        return if (inTransaction) {
+            transactionHelper.immediateWriteTransaction {
+                insertPersonsWithCrossRefsInternal(eventId, persons)
+            }
+        } else {
+            insertPersonsWithCrossRefsInternal(eventId, persons)
+        }
+    }
+
+    private suspend fun deepInsertInternal(
+        eventToInsert: Event,
+        personsToInsert: List<Person>,
+        primaryCurrencyId: Long,
+        prefetchedLocalCurrencies: List<Currency>?,
+    ): EventDetails {
+        val persons = personsLocalStore.insertWithoutCrossRefs(personsToInsert)
         val currencies = prefetchedLocalCurrencies ?: currenciesRepository.getCurrencies().first()
-        val persons = personsDeferred.await()
 
         val eventDetails = EventDetails(
             event = eventToInsert,
@@ -78,22 +111,30 @@ internal class EventsLocalStoreImpl(
             eventDetails.copy(event = eventDetails.event.copy(id = eventId))
         }
 
-        launch {
-            val personCrossRefs = eventDetails.persons.map { person ->
-                EventPersonCrossRef(eventId = resultEventDetails.event.id, personId = person.id)
-            }
-            eventsDao.insertPersonCrossRef(personCrossRefs)
+        val personCrossRefs = eventDetails.persons.map { person ->
+            EventPersonCrossRef(eventId = resultEventDetails.event.id, personId = person.id)
         }
+        eventsDao.insertPersonCrossRef(personCrossRefs)
 
-        launch {
-            val currencyCrossRefs = eventDetails.currencies.map { currency ->
-                EventCurrencyCrossRef(eventId = resultEventDetails.event.id, currencyId = currency.id)
-            }
-            eventsDao.insertCurrencyCrossRef(currencyCrossRefs)
+        val currencyCrossRefs = eventDetails.currencies.map { currency ->
+            EventCurrencyCrossRef(eventId = resultEventDetails.event.id, currencyId = currency.id)
         }
+        eventsDao.insertCurrencyCrossRef(currencyCrossRefs)
 
-        resultEventDetails
+        return resultEventDetails
     }
+
+    private suspend fun insertPersonsWithCrossRefsInternal(
+        eventId: Long,
+        persons: List<Person>,
+    ): List<Person> {
+        val insertedPersons = personsLocalStore.insertWithoutCrossRefs(persons)
+        val personCrossRefs = insertedPersons.map { person ->
+            EventPersonCrossRef(eventId = eventId, personId = person.id)
+        }
+        eventsDao.insertPersonCrossRef(personCrossRefs)
+
+        return insertedPersons
+    }
+
 }
-
-

@@ -24,9 +24,10 @@ internal actual class EventsSyncManager {
     actual fun pushAllEventInfo(eventId: Long) {
         scope.launch {
             mutex.withLock {
-                eventsComponent.currenciesPullTask.pullCurrencies() &&
-                    eventsComponent.eventPushTask.pushEvent(eventId) &&
-                    eventsComponent.eventPersonsPushTask.pushEventPersons(eventId)
+                eventsComponent.currenciesPullTask.value.pullCurrencies() &&
+                    eventsComponent.eventPushTask.value.pushEvent(eventId) &&
+                    (eventsComponent.eventPersonsPushTask.value.pushEventPersons(eventId) ||
+                        eventsComponent.eventPullCurrenciesAndPersonsTask.value.pullEventCurrenciesAndPersons(eventId) == true)
             }
         }
     }

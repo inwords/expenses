@@ -11,7 +11,11 @@ internal interface EventsLocalStore {
     fun getEvents(): Flow<List<Event>>
     fun getEventWithDetails(eventId: Long): Flow<EventDetails?>
 
+    suspend fun getEvent(eventId: Long): Event?
+
     suspend fun getEventWithDetailsByServerId(eventServerId: Long): EventDetails?
+
+    suspend fun getEventPersons(eventId: Long): List<Person>
 
     suspend fun update(eventId: Long, newServerId: Long): Boolean
 
@@ -19,6 +23,14 @@ internal interface EventsLocalStore {
         eventToInsert: Event,
         personsToInsert: List<Person>,
         primaryCurrencyId: Long,
-        prefetchedLocalCurrencies: List<Currency>? = null
+        prefetchedLocalCurrencies: List<Currency>? = null,
+        inTransaction: Boolean
     ): EventDetails
+
+    suspend fun insertPersonsWithCrossRefs(
+        eventId: Long,
+        persons: List<Person>,
+        inTransaction: Boolean,
+    ): List<Person>
+
 }

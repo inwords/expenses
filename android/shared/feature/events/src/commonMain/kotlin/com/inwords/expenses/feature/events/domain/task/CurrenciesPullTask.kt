@@ -1,5 +1,6 @@
-package com.inwords.expenses.feature.events.domain
+package com.inwords.expenses.feature.events.domain.task
 
+import com.inwords.expenses.core.storage.utils.TransactionHelper
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.Result
 import com.inwords.expenses.feature.events.domain.model.Currency
@@ -8,10 +9,15 @@ import com.inwords.expenses.feature.events.domain.store.remote.CurrenciesRemoteS
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
-class CurrenciesPullTask internal constructor(
-    private val currenciesLocalStore: CurrenciesLocalStore,
-    private val currenciesRemoteStore: CurrenciesRemoteStore,
+internal class CurrenciesPullTask(
+    transactionHelperLazy: Lazy<TransactionHelper>,
+    currenciesLocalStoreLazy: Lazy<CurrenciesLocalStore>,
+    currenciesRemoteStoreLazy: Lazy<CurrenciesRemoteStore>,
 ) {
+
+    private val transactionHelper by transactionHelperLazy
+    private val currenciesLocalStore by currenciesLocalStoreLazy
+    private val currenciesRemoteStore by currenciesRemoteStoreLazy
 
     suspend fun pullCurrencies(): Boolean = withContext(IO) {
         val networkCurrencies = when (val networkResult = currenciesRemoteStore.getCurrencies()) {
@@ -19,12 +25,27 @@ class CurrenciesPullTask internal constructor(
             is Result.Error -> return@withContext false
         }
 
-        updateLocalCurrencies(networkCurrencies)
+        updateLocalCurrencies(networkCurrencies, inTransaction = true)
 
         true
     }
 
-    internal suspend fun updateLocalCurrencies(networkCurrencies: List<Currency>): List<Currency> = withContext(IO) {
+    suspend fun updateLocalCurrencies(
+        networkCurrencies: List<Currency>,
+        inTransaction: Boolean,
+    ): List<Currency> = withContext(IO) {
+        if (inTransaction) {
+            transactionHelper.immediateWriteTransaction {
+                updateLocalCurrenciesInternal(networkCurrencies)
+            }
+        } else {
+            updateLocalCurrenciesInternal(networkCurrencies)
+        }
+    }
+
+    private suspend fun updateLocalCurrenciesInternal(
+        networkCurrencies: List<Currency>
+    ): List<Currency> {
         val localCurrencies = currenciesLocalStore.getCurrencies().first()
         val localCurrenciesMap = localCurrencies.associateBy { it.code }
 
@@ -44,7 +65,7 @@ class CurrenciesPullTask internal constructor(
             }
         }
 
-        if (hasUpdates) {
+        return if (hasUpdates) {
             currenciesLocalStore.insert(updatedCurrencies)
         } else {
             localCurrencies

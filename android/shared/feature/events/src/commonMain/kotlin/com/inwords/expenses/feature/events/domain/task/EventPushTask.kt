@@ -1,19 +1,25 @@
-package com.inwords.expenses.feature.events.domain
+package com.inwords.expenses.feature.events.domain.task
 
+import com.inwords.expenses.core.storage.utils.TransactionHelper
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.Result
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.PersonsLocalStore
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
-class EventPushTask internal constructor(
-    private val eventsLocalStore: EventsLocalStore,
-    private val eventsRemoteStore: EventsRemoteStore,
-    private val personsLocalStore: PersonsLocalStore,
+internal class EventPushTask(
+    transactionHelperLazy: Lazy<TransactionHelper>,
+    eventsLocalStoreLazy: Lazy<EventsLocalStore>,
+    eventsRemoteStoreLazy: Lazy<EventsRemoteStore>,
+    personsLocalStoreLazy: Lazy<PersonsLocalStore>,
 ) {
+
+    private val transactionHelper by transactionHelperLazy
+    private val eventsLocalStore by eventsLocalStoreLazy
+    private val eventsRemoteStore by eventsRemoteStoreLazy
+    private val personsLocalStore by personsLocalStoreLazy
 
     /**
      * Prerequisites:
@@ -45,9 +51,8 @@ class EventPushTask internal constructor(
             persons = updatedPersons
         )
 
-        // FIXME transaction
-        withContext(NonCancellable) {
-            personsLocalStore.insert(updatedPersons)
+        transactionHelper.immediateWriteTransaction {
+            personsLocalStore.insertWithoutCrossRefs(updatedPersons)
 
             eventsLocalStore.update(eventId, updatedEvent.event.serverId)
         }

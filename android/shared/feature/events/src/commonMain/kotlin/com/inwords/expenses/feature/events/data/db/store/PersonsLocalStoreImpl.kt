@@ -11,7 +11,7 @@ internal class PersonsLocalStoreImpl(
 
     private val personsDao by personsDaoLazy
 
-    override suspend fun insert(persons: List<Person>): List<Person> {
+    override suspend fun insertWithoutCrossRefs(persons: List<Person>): List<Person> {
         val personEntities = persons.map { it.toEntity() }
         val ids = personsDao.insert(personEntities)
 

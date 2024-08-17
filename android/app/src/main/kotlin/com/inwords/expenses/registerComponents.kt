@@ -1,11 +1,11 @@
 package com.inwords.expenses
 
 import android.content.Context
-import androidx.room.RoomDatabase
 import com.inwords.expenses.core.locator.ComponentsMap
 import com.inwords.expenses.core.locator.registerComponent
 import com.inwords.expenses.core.network.HostConfig
 import com.inwords.expenses.core.network.NetworkComponentFactory
+import com.inwords.expenses.core.storage.utils.TransactionHelper
 import com.inwords.expenses.core.utils.SuspendLazy
 import com.inwords.expenses.feature.events.api.EventsComponentFactory
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
@@ -51,8 +51,8 @@ internal fun registerComponents(appContext: Context) {
                 override val currenciesDao: CurrenciesDao
                     get() = dbComponent.value.currenciesDao
 
-                override val db: RoomDatabase
-                    get() = dbComponent.value.db
+                override val transactionHelper: TransactionHelper
+                    get() = dbComponent.value.transactionHelper
 
                 override val client: SuspendLazy<HttpClient>
                     get() = SuspendLazy { networkComponent.value.getHttpClient() }

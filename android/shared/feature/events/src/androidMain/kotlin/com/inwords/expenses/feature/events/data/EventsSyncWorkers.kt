@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
@@ -25,7 +26,7 @@ internal class CurrenciesPullWorker(
     private val eventsComponent by ComponentsMap.inject<EventsComponent>()
 
     override suspend fun doWork(): Result {
-        eventsComponent.currenciesPullTask.pullCurrencies()
+        eventsComponent.currenciesPullTask.value.pullCurrencies()
 
         return Result.success()
     }
@@ -49,13 +50,9 @@ internal class EventPushWorker(
     private val eventsComponent by ComponentsMap.inject<EventsComponent>()
 
     override suspend fun doWork(): Result {
-        val eventId = inputData.getLong(KEY_EVENT_ID, -1L)
-        if (eventId == -1L) {
-            // TODO log wtf
-            return Result.failure()
-        }
+        val eventId = inputData.getEventId() ?: return Result.failure()
 
-        val success = eventsComponent.eventPushTask.pushEvent(eventId)
+        val success = eventsComponent.eventPushTask.value.pushEvent(eventId)
 
         return if (success) {
             Result.success()
@@ -69,9 +66,7 @@ internal class EventPushWorker(
         fun buildEventPushRequest(eventId: Long): OneTimeWorkRequest {
             return OneTimeWorkRequestBuilder<EventPushWorker>()
                 .setCommonParameters()
-                .setInputData(
-                    workDataOf(KEY_EVENT_ID to eventId)
-                )
+                .setInputDataEventId(eventId)
                 .addTag(getTagForEvent(eventId))
                 .build()
         }
@@ -86,13 +81,9 @@ internal class EventPersonsPushWorker(
     private val eventsComponent by ComponentsMap.inject<EventsComponent>()
 
     override suspend fun doWork(): Result {
-        val eventId = inputData.getLong(KEY_EVENT_ID, -1L)
-        if (eventId == -1L) {
-            // TODO log wtf
-            return Result.failure()
-        }
+        val eventId = inputData.getEventId() ?: return Result.failure()
 
-        val success = eventsComponent.eventPersonsPushTask.pushEventPersons(eventId)
+        val success = eventsComponent.eventPersonsPushTask.value.pushEventPersons(eventId)
 
         return if (success) {
             Result.success()
@@ -106,9 +97,38 @@ internal class EventPersonsPushWorker(
         fun buildEventPersonsPushRequest(eventId: Long): OneTimeWorkRequest {
             return OneTimeWorkRequestBuilder<EventPersonsPushWorker>()
                 .setCommonParameters()
-                .setInputData(
-                    workDataOf(KEY_EVENT_ID to eventId)
-                )
+                .setInputDataEventId(eventId)
+                .addTag(getTagForEvent(eventId))
+                .build()
+        }
+    }
+}
+
+internal class EventPullCurrenciesAndPersonsWorker(
+    appContext: Context,
+    workerParams: WorkerParameters
+) : CoroutineWorker(appContext, workerParams) {
+
+    private val eventsComponent by ComponentsMap.inject<EventsComponent>()
+
+    override suspend fun doWork(): Result {
+        val eventId = inputData.getEventId() ?: return Result.failure()
+
+        val success = eventsComponent.eventPullCurrenciesAndPersonsTask.value.pullEventCurrenciesAndPersons(eventId)
+
+        return when (success) {
+            true -> Result.success()
+            false -> Result.retry()
+            null -> Result.failure()
+        }
+    }
+
+    companion object {
+
+        fun buildEventPullCurrenciesAndPersonsRequest(eventId: Long): OneTimeWorkRequest {
+            return OneTimeWorkRequestBuilder<EventPullCurrenciesAndPersonsWorker>()
+                .setCommonParameters()
+                .setInputDataEventId(eventId)
                 .addTag(getTagForEvent(eventId))
                 .build()
         }
@@ -122,6 +142,21 @@ internal fun getTagForEvent(eventId: Long): String {
 private const val EVENTS_SYNC_WORKER_GROUP = "events_sync"
 
 private const val KEY_EVENT_ID = "EVENT_ID"
+
+private fun Data.getEventId(): Long? {
+    val eventId = getLong(KEY_EVENT_ID, -1L)
+    if (eventId == -1L) {
+        // TODO log wtf
+        return null
+    }
+    return eventId
+}
+
+private fun <B : WorkRequest.Builder<B, *>, W : WorkRequest> WorkRequest.Builder<B, W>.setInputDataEventId(eventId: Long): B {
+    return setInputData(
+        workDataOf(KEY_EVENT_ID to eventId)
+    )
+}
 
 private fun <B : WorkRequest.Builder<B, *>, W : WorkRequest> WorkRequest.Builder<B, W>.setCommonParameters(): B {
     return setConstraints(Constraints(requiredNetworkType = NetworkType.CONNECTED))

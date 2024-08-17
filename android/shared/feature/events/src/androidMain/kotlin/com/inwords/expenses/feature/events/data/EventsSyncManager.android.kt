@@ -5,7 +5,7 @@ import androidx.work.WorkManager
 import com.inwords.expenses.core.utils.IO
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.guava.await
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.sync.Mutex
@@ -25,16 +25,21 @@ internal actual class EventsSyncManager(
             mutex.withLock {
                 val workManager = WorkManager.getInstance(context)
 
-                val workInfos = workManager.getWorkInfosByTag(getTagForEvent(eventId)).await()
+                val workInfos = workManager.getWorkInfosByTagFlow(getTagForEvent(eventId)).first()
 
-                if (workInfos.isNotEmpty()) {
+                if (workInfos.any { !it.state.isFinished }) {
                     return@launch
                 }
 
                 WorkManager.getInstance(context)
                     .beginWith(CurrenciesPullWorker.buildCurrenciesPullRequest(eventId))
                     .then(EventPushWorker.buildEventPushRequest(eventId))
-                    .then(EventPersonsPushWorker.buildEventPersonsPushRequest(eventId))
+                    .then(
+                        listOf(
+                            EventPersonsPushWorker.buildEventPersonsPushRequest(eventId),
+                            EventPullCurrenciesAndPersonsWorker.buildEventPullCurrenciesAndPersonsRequest(eventId)
+                        )
+                    )
                     .enqueue()
             }
         }

@@ -50,7 +50,8 @@ internal class ExpensesViewModel(
         ) { expensesDetails, currentPersonId ->
             expensesDetails ?: return@combine SimpleScreenState.Empty
 
-            val currentPerson = expensesDetails.event.persons.first { it.id == currentPersonId }
+            val currentPerson = expensesDetails.event.persons.firstOrNull { it.id == currentPersonId } ?: return@combine SimpleScreenState.Empty
+
             val debtors = expensesDetails.debtCalculator.getBarterAccumulatedDebtForPerson(currentPerson)
                 .map { (person, barterAccumulatedDebt) ->
                     DebtorShortUiModel(

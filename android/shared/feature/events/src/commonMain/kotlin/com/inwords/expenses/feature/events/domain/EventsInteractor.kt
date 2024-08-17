@@ -6,7 +6,6 @@ import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
-import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -17,15 +16,18 @@ import kotlinx.coroutines.flow.stateIn
 import kotlin.random.Random
 
 class EventsInteractor internal constructor(
-    private val eventsLocalStore: EventsLocalStore,
-    private val eventsRemoteStore: EventsRemoteStore,
-    private val currenciesPullTask: CurrenciesPullTask,
-    private val settingsRepository: SettingsRepository,
+    eventsLocalStoreLazy: Lazy<EventsLocalStore>,
+    settingsRepositoryLazy: Lazy<SettingsRepository>,
+    joinRemoteEventUseCaseLazy: Lazy<JoinRemoteEventUseCase>,
     scope: CoroutineScope = CoroutineScope(SupervisorJob() + IO)
 ) {
 
+    private val eventsLocalStore by eventsLocalStoreLazy
+    private val settingsRepository by settingsRepositoryLazy
+    private val joinRemoteEventUseCase by joinRemoteEventUseCaseLazy
+
     internal sealed interface JoinEventResult {
-        data class NewCurrentEvent(val event: Event) : JoinEventResult
+        data class NewCurrentEvent(val event: EventDetails) : JoinEventResult
         data object InvalidAccessCode : JoinEventResult
         data object EventNotFound : JoinEventResult
         data object OtherError : JoinEventResult
@@ -48,32 +50,28 @@ class EventsInteractor internal constructor(
         if (localEvent != null) {
             settingsRepository.setCurrentEventId(localEvent.event.id)
             settingsRepository.setCurrentPersonId(localEvent.persons.first().id) // FIXME select person on UI
-            return JoinEventResult.NewCurrentEvent(localEvent.event)
+            return JoinEventResult.NewCurrentEvent(localEvent)
         }
 
-        return when (val eventResult = eventsRemoteStore.getEvent(eventServerId, accessCode)) {
-            is EventsRemoteStore.GetEventResult.Event -> {
-                val remoteEvent = eventResult.event
+        // TODO extract separate model for event parameters
+        val joinEventResult = joinRemoteEventUseCase.joinRemoteEvent(
+            event = Event(0L, eventServerId, "", accessCode),
+            localCurrencies = null,
+            localPersons = null,
+        )
 
-                val updatedCurrencies = currenciesPullTask.updateLocalCurrencies(remoteEvent.currencies)
-
-                val eventDetails = eventsLocalStore.deepInsert(
-                    eventToInsert = remoteEvent.event,
-                    personsToInsert = remoteEvent.persons,
-                    primaryCurrencyId = updatedCurrencies.first { it.serverId == remoteEvent.primaryCurrency.serverId }.id,
-                    prefetchedLocalCurrencies = updatedCurrencies,
-                )
-
-                settingsRepository.setCurrentEventId(eventDetails.event.id)
-                settingsRepository.setCurrentPersonId(eventDetails.persons.first().id) // FIXME select person on UI
-
-                JoinEventResult.NewCurrentEvent(eventDetails.event)
+        when (joinEventResult) {
+            is JoinEventResult.NewCurrentEvent -> {
+                settingsRepository.setCurrentEventId(joinEventResult.event.event.id)
+                settingsRepository.setCurrentPersonId(joinEventResult.event.persons.first().id) // FIXME select person on UI
             }
 
-            EventsRemoteStore.GetEventResult.EventNotFound -> JoinEventResult.EventNotFound
-            EventsRemoteStore.GetEventResult.InvalidAccessCode -> JoinEventResult.InvalidAccessCode
-            EventsRemoteStore.GetEventResult.OtherError -> JoinEventResult.OtherError
+            JoinEventResult.EventNotFound,
+            JoinEventResult.InvalidAccessCode,
+            JoinEventResult.OtherError -> Unit
         }
+
+        return joinEventResult
     }
 
     internal fun draftEventName(eventName: String) {
@@ -105,6 +103,7 @@ class EventsInteractor internal constructor(
             eventToInsert = eventToInsert,
             personsToInsert = personsToInsert,
             primaryCurrencyId = 1,
+            inTransaction = true
         )
 
         settingsRepository.setCurrentEventId(eventDetails.event.id)
