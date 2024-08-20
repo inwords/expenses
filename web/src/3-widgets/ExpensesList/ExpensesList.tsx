@@ -5,11 +5,11 @@ import {expenseStore} from '@/5-entities/expense/stores/expense-store';
 export const ExpensesList = observer(() => {
   const getExpences = () => {
     if (expenseStore.currentTab === 0) {
-      return expenseStore.expensesToView;
+      return expenseStore.currentUserExpenses;
     }
 
     if (expenseStore.currentTab === 1) {
-      return expenseStore.currentUserExpenses;
+      return expenseStore.expensesToView;
     }
 
     return [];

@@ -3,4 +3,5 @@ export const EVENT_ROUTES = {
   event: `/`,
   getEventInfo: `/:eventId`,
   addUsersToEvent: `/:eventId/users`,
+  deleteUser: '/',
 };

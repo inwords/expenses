@@ -1,15 +1,16 @@
-import {makeAutoObservable} from "mobx";
+import {makeAutoObservable} from 'mobx';
+import {Event} from "@/5-entities/event/types/types";
 
 export class EventStore {
-    currentEventName?: string = undefined;
+  currentEvent?: Event = undefined;
 
-    constructor() {
-        makeAutoObservable(this);
-    }
+  constructor() {
+    makeAutoObservable(this);
+  }
 
-    setCurrentEventName(eventName: string) {
-        this.currentEventName = eventName;
-    }
+  setCurrentEvent(event: Event) {
+    this.currentEvent = event;
+  }
 }
 
 export const eventStore = new EventStore();
