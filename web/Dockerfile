@@ -1,11 +1,13 @@
 # Base image
-FROM node:22-alpine3.19 as build-stage
+FROM node:20-alpine3.19 as build-stage
 
 # Set working directory
 WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY package.json package-lock.json ./
+
+COPY --chown=node:node . .
 
 # Install dependencies
 RUN npm ci

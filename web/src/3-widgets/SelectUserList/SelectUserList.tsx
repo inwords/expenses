@@ -1,34 +1,31 @@
 import {UserAvatar} from '@/4-features/SelectUser/ui/UserAvatar';
-import {Stack} from '@mui/material';
+import {Box, Stack} from '@mui/material';
 import {observer} from 'mobx-react-lite';
 import {userStore} from '@/5-entities/user/stores/user-store';
 
 export const SelectUserList = observer(() => {
+  if (userStore.currentUser) {
+    return null;
+  }
+
   return (
-    <Stack justifyContent={userStore.currentUser && 'end'} direction="row">
-      {userStore.users.map((u) => {
-        if (!userStore.currentUser) {
-          return (
-            <UserAvatar
-              key={u.id}
-              letter={u.name[0]}
-              isSelected={false}
-              onClick={() => userStore.setCurrentUser(u)}
-            />
-          );
-        } else {
-          return (
-            u.id === userStore.currentUser.id && (
+    <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Stack direction={'column'} alignItems={'center'} spacing={2}>
+        <h1>Выберите участника</h1>
+
+        <Stack justifyContent={userStore.currentUser && 'end'} direction="row">
+          {userStore.users.map((u) => {
+            return (
               <UserAvatar
                 key={u.id}
                 letter={u.name[0]}
-                isSelected={userStore.currentUser.id === u.id}
+                isSelected={false}
                 onClick={() => userStore.setCurrentUser(u)}
               />
-            )
-          );
-        }
-      })}
-    </Stack>
+            );
+          })}
+        </Stack>
+      </Stack>
+    </Box>
   );
 });

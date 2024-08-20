@@ -1,7 +1,7 @@
-import {Body, Controller, Get, HttpCode, Param, Post, Query} from '@nestjs/common';
+import {Body, Controller, Delete, Get, HttpCode, Param, Post, Query} from '@nestjs/common';
 import {EVENT_ROUTES} from './constants';
 import {EventService} from './event.service';
-import {AddUsersToEventDto, CrateEventBodyDto, EventIdDto, GetEventInfoQueryDto} from './dto/event';
+import {AddUsersToEventDto, CrateEventBodyDto, DeleteUserQuery, EventIdDto, GetEventInfoQueryDto} from './dto/event';
 
 @Controller(EVENT_ROUTES.root)
 export class EventController {
@@ -20,6 +20,12 @@ export class EventController {
   @Post(EVENT_ROUTES.addUsersToEvent)
   @HttpCode(201)
   async addUserToEvent(@Param() {eventId}: EventIdDto, @Body() body: AddUsersToEventDto) {
-    return this.eventService.addUsersToEvent(eventId, body.users);
+    return this.eventService.addUsersToEvent(eventId, body.users, body.pinCode);
+  }
+
+  @Delete(EVENT_ROUTES.deleteUser)
+  @HttpCode(200)
+  async deleteUser(@Query() query: DeleteUserQuery) {
+    return this.eventService.deleteUserFromEvent(query.pinCode, query.userId, query.eventId);
   }
 }

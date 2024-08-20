@@ -10,4 +10,8 @@ export class UserService {
   public async saveUsers(users: Array<{name: string; eventId: number}>, entityManager?: EntityManager) {
     return (entityManager || this.entityManager).getRepository(User).save(users);
   }
+
+  public async deleteUser(id: number, entityManager?: EntityManager) {
+    return (entityManager || this.entityManager).getRepository(User).delete({id});
+  }
 }

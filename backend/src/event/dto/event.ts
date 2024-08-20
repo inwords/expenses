@@ -41,4 +41,24 @@ export class AddUsersToEventDto {
   @ValidateNested()
   @Type(() => UserDto)
   users!: Array<Omit<User, 'id' | 'eventId'>>;
+
+  @ApiProperty({type: String})
+  @IsString()
+  @MaxLength(4)
+  pinCode!: string;
+}
+
+export class DeleteUserQuery {
+  @ApiProperty()
+  @IsString()
+  @MaxLength(4)
+  pinCode!: string;
+
+  @ApiProperty()
+  @IsString()
+  userId!: string;
+
+  @ApiProperty()
+  @IsString()
+  eventId!: string;
 }

@@ -22,4 +22,4 @@ export interface Expense {
     createdAt: string;
 }
 
-export type Tabs = 0 | 1 | 2 | 3;
+export type Tabs = 0 | 1 | 2 | 3 | 4;

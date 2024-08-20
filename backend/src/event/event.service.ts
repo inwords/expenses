@@ -20,7 +20,7 @@ export class EventService {
         event.users.map((u) => {
           return {...u, eventId: eventWithoutUsers.id};
         }),
-        entityManager
+        entityManager,
       );
 
       return {...eventWithoutUsers, users};
@@ -45,11 +45,35 @@ export class EventService {
     }
   }
 
-  public async addUsersToEvent(eventId: number, users: Array<Omit<User, 'id' | 'eventId'>>) {
+  public async addUsersToEvent(eventId: number, users: Array<Omit<User, 'id' | 'eventId'>>, pinCode: string) {
+    const event = await this.entityManager.getRepository(Event).findOne({
+      where: {
+        id: eventId,
+      },
+    });
+
+    if (event.pinCode !== pinCode) {
+      throw new Error('');
+    }
+
     return this.userService.saveUsers(
       users.map((u) => {
         return {...u, eventId};
       }),
     );
+  }
+
+  public async deleteUserFromEvent(pinCode: string, userId: string, eventId: string) {
+    const event = await this.entityManager.getRepository(Event).findOne({
+      where: {
+        id: Number(eventId),
+      },
+    });
+
+    if (event.pinCode !== pinCode) {
+      throw new Error('');
+    }
+
+    await this.userService.deleteUser(Number(userId));
   }
 }
