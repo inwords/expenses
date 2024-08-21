@@ -14,6 +14,8 @@ export const EventTabs = observer(() => {
           onChange={(_, v) => {
             expenseService.setCurrentTab(v);
           }}
+          variant="scrollable"
+          scrollButtons="auto"
         >
           <Tab label="Мои траты" value={0} />
 
