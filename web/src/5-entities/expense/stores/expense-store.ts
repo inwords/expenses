@@ -1,11 +1,14 @@
-import {Expense, Tabs} from '@/5-entities/expense/types/types';
+import {CreateExpenseRefundForm, Expense, ExpenseRefund, Tabs} from '@/5-entities/expense/types/types';
 import {makeAutoObservable} from 'mobx';
 import {userStore} from '@/5-entities/user/stores/user-store';
 
 export class ExpenseStore {
   expenses: Array<Expense> = [];
+  expenseRefunds: Array<ExpenseRefund> = [];
   splitOption: '1' | '2' = '1';
   currentTab: Tabs = 0;
+  isExpenseRefundModalOpen: boolean = false;
+  currentExpenseRefund: Partial<CreateExpenseRefundForm> = {};
 
   constructor() {
     makeAutoObservable(this);
@@ -23,8 +26,24 @@ export class ExpenseStore {
     });
   }
 
+  get expenseRefundsToView() {
+    return this.expenseRefunds.map((expense) => {
+      return {...expense, amount: expense.splitInformation.reduce((prev, info) => prev + info.amount, 0)};
+    });
+  }
+
+  get currentUserExpenseRefunds() {
+    return this.expenseRefundsToView.filter((e) => {
+      return e.splitInformation.some((i) => i.userId === userStore.currentUser?.id);
+    });
+  }
+
   setExpenses(expenses: Array<Expense>) {
     this.expenses = expenses;
+  }
+
+  setExpenseRefunds(expenseRefunds: Array<ExpenseRefund>) {
+    this.expenseRefunds = expenseRefunds;
   }
 
   setSplitOption(splitOption: '1' | '2') {
@@ -33,6 +52,14 @@ export class ExpenseStore {
 
   setCurrentTab(currentTab: Tabs) {
     this.currentTab = currentTab;
+  }
+
+  setIsExpenseRefundModalOpen(isExpenseRefundModalOpen: boolean) {
+    this.isExpenseRefundModalOpen = isExpenseRefundModalOpen;
+  }
+
+  setCurrentExpenseRefund(expenseRefund: Partial<CreateExpenseRefundForm>) {
+    this.currentExpenseRefund = expenseRefund;
   }
 }
 

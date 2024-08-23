@@ -1,5 +1,6 @@
 import {Dialog, DialogContent, DialogTitle} from '@mui/material';
 import {AddExpenseForm} from '@/4-features/CreateExpense/ui/AddExpenseForm';
+import {expenseService} from '@/5-entities/expense/services/expense-service';
 
 interface Props {
   isOpen: boolean;
@@ -12,7 +13,12 @@ export const AddExpenseModal = ({isOpen, setIsOpen}: Props) => {
       <DialogTitle id="alert-dialog-title">Добавление траты</DialogTitle>
 
       <DialogContent>
-        <AddExpenseForm onSuccess={(isOpen) => setIsOpen(isOpen)} />
+        <AddExpenseForm
+          onSuccess={async (isOpen, d, id) => {
+            setIsOpen(isOpen);
+            await expenseService.createExpense(d, id);
+          }}
+        />
       </DialogContent>
     </Dialog>
   );

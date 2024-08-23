@@ -3,3 +3,8 @@ export const EXPENSE_ROUTES = {
   getAllEventExpenses: `/:eventId/expenses`,
   createExpense: `/`,
 };
+
+export enum ExpenseType {
+  Expense = 'expense',
+  Refund = 'refund',
+}
