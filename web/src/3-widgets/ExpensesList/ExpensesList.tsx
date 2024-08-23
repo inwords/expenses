@@ -1,6 +1,8 @@
 import {Box, Button, Card, CardActions, CardContent, Stack, Typography} from '@mui/material';
 import {observer} from 'mobx-react-lite';
 import {expenseStore} from '@/5-entities/expense/stores/expense-store';
+import {userStore} from '@/5-entities/user/stores/user-store';
+import {CURRENCIES_ID_TO_CURRENCY_CODE} from '@/5-entities/currency/constants';
 
 export const ExpensesList = observer(() => {
   const getExpences = () => {
@@ -27,7 +29,7 @@ export const ExpensesList = observer(() => {
                     {e.description}
 
                     <div>
-                      {e.amount} {e.currencyId}
+                      {e.amount} {CURRENCIES_ID_TO_CURRENCY_CODE[String(e.currencyId)]}
                     </div>
                   </Stack>
                 </Typography>
@@ -36,7 +38,28 @@ export const ExpensesList = observer(() => {
               </CardContent>
 
               <CardActions>
-                <Button variant="contained">Вернуть</Button>
+                {userStore.currentUser?.id !== e.userWhoPaidId && (
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      expenseStore.setCurrentExpenseRefund({
+                        description: `Возврат за ${e.description}`,
+                        amount: e.splitInformation.reduce((prev, curr) => {
+                          if (curr.userId === userStore.currentUser?.id) {
+                            prev += +curr.amount;
+                          }
+
+                          return prev;
+                        }, 0),
+                        userWhoPaidId: userStore.currentUser?.id,
+                        currencyId: e.currencyId,
+                      });
+                      expenseStore.setIsExpenseRefundModalOpen(true);
+                    }}
+                  >
+                    Вернуть
+                  </Button>
+                )}
               </CardActions>
             </Card>
           );

@@ -6,16 +6,15 @@ import {SelectExpenseOwner} from '@/4-features/AddExpense/ui/SelectExpenseOwner'
 import React from 'react';
 import {SplitOptions} from '@/4-features/AddExpense/ui/SplitOption';
 import {useParams} from 'react-router';
-import {expenseService} from '@/5-entities/expense/services/expense-service';
 import {observer} from 'mobx-react-lite';
 import {userStore} from '@/5-entities/user/stores/user-store';
 import {SelectUser} from '@/5-entities/user/ui/SelectUser';
-import {CreateExpense} from '@/5-entities/expense/types/types';
+import {CreateExpenseForm} from '@/5-entities/expense/types/types';
 import {expenseStore} from '@/5-entities/expense/stores/expense-store';
-import {SelectCurrency} from "@/5-entities/currency/ui/SelectCurrency";
+import {SelectCurrency} from '@/5-entities/currency/ui/SelectCurrency';
 
 interface Props {
-  onSuccess?: (isModalOpen: boolean) => void;
+  onSuccess?: (isModalOpen: boolean, data: CreateExpenseForm, id: string) => void;
 }
 
 export const AddExpenseForm = observer(({onSuccess}: Props) => {
@@ -25,10 +24,7 @@ export const AddExpenseForm = observer(({onSuccess}: Props) => {
     name: 'users', // unique name for your Field Array
   });
   const {id} = useParams();
-  const initialValues = {userWhoPaidId: userStore.currentUser?.id, splitOption: '1'} as CreateExpense & {
-    amount: number;
-    splitOption: string;
-  };
+  const initialValues = {userWhoPaidId: userStore.currentUser?.id, splitOption: '1'} as CreateExpenseForm;
 
   const isSplitEqually = expenseStore.splitOption === '1';
 
@@ -36,21 +32,7 @@ export const AddExpenseForm = observer(({onSuccess}: Props) => {
     <FormContainer
       onSuccess={async (d) => {
         if (id) {
-          const {amount, splitOption, ...rest} = d;
-
-          await expenseService.createExpense({
-            ...rest,
-            eventId: Number(id),
-            splitInformation: isSplitEqually
-              ? userStore.users.map((u) => {
-                  return {userId: String(u.id), amount: Math.ceil(Number(d.amount) / userStore.users.length)};
-                })
-              : d.splitInformation.map((i) => {
-                  return {...i, amount: Number(i.amount)};
-                }),
-          });
-
-          onSuccess?.(false);
+          onSuccess?.(false, d, id);
         }
       }}
       defaultValues={initialValues}

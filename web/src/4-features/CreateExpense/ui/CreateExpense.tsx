@@ -6,7 +6,7 @@ interface Props {
 
 export const CreateExpense = ({setIsOpen}: Props) => {
   return (
-    <Stack justifyContent={'end'} direction={'row'} marginTop={'20px'}>
+    <Stack style={{position: 'fixed', bottom: '20px', right: '20px'}} justifyContent={'end'} direction={'row'} marginTop={'20px'}>
       <Fab color="primary" onClick={() => setIsOpen(true)}>
         <span className="material-icons-outlined">+</span>
       </Fab>

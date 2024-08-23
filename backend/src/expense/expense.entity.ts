@@ -3,6 +3,7 @@ import {Currency} from '../currency/currency.entity';
 import {SplitInfo} from './types';
 import {Event} from '../event/event.entity';
 import {User} from '../user/user.entity';
+import {ExpenseType} from './constants';
 
 @Entity('expense')
 export class Expense {
@@ -20,6 +21,9 @@ export class Expense {
 
   @Column()
   eventId: number;
+
+  @Column({type: 'enum', enum: ExpenseType})
+  expenseType: ExpenseType;
 
   @Column({type: 'jsonb'})
   splitInformation: string | Array<SplitInfo>;
