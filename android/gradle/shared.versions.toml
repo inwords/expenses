@@ -1,8 +1,8 @@
 [versions]
-kotlin = "2.0.20-RC2"
-ksp = "2.0.20-RC2-1.0.24"
+kotlin = "2.0.20"
+ksp = "2.0.20-1.0.24"
 
-room = "2.7.0-alpha06"
+room = "2.7.0-alpha07"
 datastore = "1.1.1"
 
 ktor = "3.0.0-beta-2"
@@ -16,13 +16,13 @@ coil = "2.7.0"
 
 lifecycle = "2.8.4"
 
-compose-bom = "2024.06.00"
+compose-bom = "2024.08.00"
 compose-multiplatform = "1.7.0-alpha02"
 
 [libraries]
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version = "2.5.0-alpha06" }
+sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version = "2.5.0-alpha07" }
 datastore-core-okio = { group = "androidx.datastore", name = "datastore-core-okio", version.ref = "datastore" }
 datastore-android = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
 
@@ -63,7 +63,7 @@ compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.9.1" }
-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version = "2.8.0-beta07" }
+navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version = "2.8.0-rc01" }
 navigation-compose-multiplatform = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version = "2.8.0-alpha08" }
 
 ionspin-kotlin-bignum = { group = "com.ionspin.kotlin", name = "bignum", version = "0.3.10" }
