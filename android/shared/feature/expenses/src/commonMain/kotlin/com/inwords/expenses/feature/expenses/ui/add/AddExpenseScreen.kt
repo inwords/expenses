@@ -51,6 +51,7 @@ internal fun AddExpenseScreen(
     onEqualSplitChange: (Boolean) -> Unit,
     onWholeAmountChanged: (String) -> Unit,
     onSplitAmountChanged: (ExpenseSplitWithPersonUiModel, String) -> Unit,
+    onDescriptionChanged: (String) -> Unit,
     onConfirmClicked: () -> Unit,
     onCloseClicked: () -> Unit,
     modifier: Modifier = Modifier,
@@ -65,6 +66,7 @@ internal fun AddExpenseScreen(
             onEqualSplitChange = onEqualSplitChange,
             onWholeAmountChanged = onWholeAmountChanged,
             onSplitAmountChanged = onSplitAmountChanged,
+            onDescriptionChanged = onDescriptionChanged,
             onConfirmClicked = onConfirmClicked,
             onCloseClicked = onCloseClicked,
             modifier = modifier
@@ -95,6 +97,7 @@ private fun AddExpenseScreenSuccess(
     onEqualSplitChange: (Boolean) -> Unit,
     onWholeAmountChanged: (String) -> Unit,
     onSplitAmountChanged: (ExpenseSplitWithPersonUiModel, String) -> Unit,
+    onDescriptionChanged: (String) -> Unit,
     onConfirmClicked: () -> Unit,
     onCloseClicked: () -> Unit,
     modifier: Modifier = Modifier,
@@ -120,9 +123,28 @@ private fun AddExpenseScreenSuccess(
                 .fillMaxSize()
                 .padding(paddingValues),
         ) {
+            val keyboardController = LocalSoftwareKeyboardController.current
+
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                textStyle = MaterialTheme.typography.headlineSmall,
+                value = state.description,
+                label = { Text(text = "Описание") },
+                onValueChange = onDescriptionChanged,
+                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+                keyboardOptions = KeyboardOptions(
+                    autoCorrectEnabled = true,
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done,
+                ),
+                singleLine = true
+            )
+
             Text(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp),
+                    .padding(start = 16.dp, top = 16.dp, end = 12.dp),
                 text = "Оплатил",
                 style = MaterialTheme.typography.headlineMedium
             )
@@ -223,8 +245,6 @@ private fun AddExpenseScreenSuccess(
             }
 
             if (state.equalSplit) {
-                val keyboardController = LocalSoftwareKeyboardController.current
-
                 SplitEqualPartsInput(
                     amount = state.wholeAmount,
                     modifier = Modifier

@@ -4,6 +4,7 @@ import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
 import kotlinx.collections.immutable.ImmutableList
 
 internal data class AddExpenseScreenUiModel(
+    val description: String,
     val currencies: ImmutableList<CurrencyInfoUiModel>,
     val expenseType: ExpenseType,
     val persons: ImmutableList<PersonInfoUiModel>,

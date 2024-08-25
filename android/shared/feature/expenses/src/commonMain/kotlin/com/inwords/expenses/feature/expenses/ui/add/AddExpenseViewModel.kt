@@ -53,6 +53,7 @@ internal class AddExpenseViewModel(
 
     private data class AddExpenseScreenModel(
         val event: Event,
+        val description: String,
         val currencies: List<CurrencyInfoModel>,
         val expenseType: ExpenseType,
         val persons: List<PersonInfoModel>,
@@ -116,6 +117,12 @@ internal class AddExpenseViewModel(
 
             AddExpenseScreenModel(
                 event = eventDetails.event,
+                description = if (replenishment == null) {
+                    ""
+                } else {
+                    val currentPerson = eventDetails.persons.first { it.id == currentPersonId }
+                    "Возврат от ${currentPerson.name}"
+                },
                 currencies = eventDetails.currencies.map { currency ->
                     AddExpenseScreenModel.CurrencyInfoModel(
                         currency = currency,
@@ -310,6 +317,12 @@ internal class AddExpenseViewModel(
         )
     }
 
+    fun onDescriptionChanged(description: String) {
+        _state.updateIfSuccess { state ->
+            state.copy(description = description)
+        }
+    }
+
     fun onConfirmClicked() {
         val state = (_state.value as? SimpleScreenState.Success)?.data ?: return
 
@@ -348,7 +361,7 @@ internal class AddExpenseViewModel(
             person = selectedPerson,
             subjecExpenseSplitWithPersons = subjectExpenseSplitWithPersons,
             timestamp = Clock.System.now(),
-            description = "Буррито",
+            description = state.description.ifEmpty { "Без описания" },
         )
 
         viewModelScope.launch {
@@ -364,6 +377,7 @@ internal class AddExpenseViewModel(
 
     private fun AddExpenseScreenModel.toUiModel(): AddExpenseScreenUiModel {
         return AddExpenseScreenUiModel(
+            description = this.description,
             currencies = this.currencies.map { currencyInfoModel ->
                 CurrencyInfoUiModel(
                     currencyName = currencyInfoModel.currency.name,

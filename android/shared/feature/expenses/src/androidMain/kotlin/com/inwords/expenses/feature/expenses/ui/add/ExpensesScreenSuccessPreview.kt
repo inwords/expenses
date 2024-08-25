@@ -19,6 +19,7 @@ private fun ExpensesScreenSuccessPreview() {
         onPersonClicked = {},
         onSubjectPersonClicked = {},
         onEqualSplitChange = {},
+        onDescriptionChanged = {},
         onWholeAmountChanged = {},
         onSplitAmountChanged = { _, _ -> },
         onConfirmClicked = {},
@@ -49,6 +50,7 @@ internal fun mockAddExpenseScreenUiModel(): AddExpenseScreenUiModel {
         name = "Саша"
     )
     return AddExpenseScreenUiModel(
+        description = "Чипсы и кола",
         currencies = persistentListOf(
             CurrencyInfoUiModel(
                 currencyCode = "USD",

@@ -101,6 +101,7 @@ fun NavGraphBuilder.addExpenseScreen(
             onEqualSplitChange = viewModel::onEqualSplitChange,
             onWholeAmountChanged = viewModel::onWholeAmountChanged,
             onSplitAmountChanged = viewModel::onSplitAmountChanged,
+            onDescriptionChanged = viewModel::onDescriptionChanged,
             onConfirmClicked = viewModel::onConfirmClicked,
             onCloseClicked = viewModel::onCloseClicked,
         )
