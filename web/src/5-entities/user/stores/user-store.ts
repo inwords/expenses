@@ -17,8 +17,16 @@ export class UserStore {
 
   get usersToSelect() {
     return this.users.map((u) => {
-      return {id: u.id, label: u.name}
-    })
+      return {id: u.id, label: u.name};
+    });
+  }
+
+  get usersDictIdToName() {
+    return this.users.reduce<Record<string, string>>((prev, curr) => {
+      prev[curr.id] = curr.name;
+
+      return prev;
+    }, {});
   }
 
   setUsers(users: Array<User>) {

@@ -2,6 +2,7 @@ import {Box, Card, CardActions, CardContent, Stack, Typography} from '@mui/mater
 import {observer} from 'mobx-react-lite';
 import {expenseStore} from '@/5-entities/expense/stores/expense-store';
 import {CURRENCIES_ID_TO_CURRENCY_CODE} from '@/5-entities/currency/constants';
+import {eventStore} from '@/5-entities/event/stores/event-store';
 
 export const ExpenseRefundsList = observer(() => {
   const getExpenceRefunds = () => {
@@ -24,7 +25,7 @@ export const ExpenseRefundsList = observer(() => {
                     {e.description}
 
                     <div>
-                      {e.amount} {CURRENCIES_ID_TO_CURRENCY_CODE[String(e.currencyId)]}
+                      {e.amount} {CURRENCIES_ID_TO_CURRENCY_CODE[String(eventStore.currentEvent?.currencyId)]}
                     </div>
                   </Stack>
                 </Typography>
@@ -32,9 +33,7 @@ export const ExpenseRefundsList = observer(() => {
                 <Typography variant="body2">{e.createdAt}</Typography>
               </CardContent>
 
-              <CardActions>
-
-              </CardActions>
+              <CardActions></CardActions>
             </Card>
           );
         })}

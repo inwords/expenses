@@ -9,6 +9,7 @@ import {SnakeNamingStrategy} from 'typeorm-naming-strategies';
 import {EventModule} from './event/event.module';
 import {CurrencyModule} from './currency/currency.module';
 import {ExpenseModule} from './expense/expense.module';
+import {CurrencyRateModule} from "./currency-rate/currency-rate.module";
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import {ExpenseModule} from './expense/expense.module';
         namingStrategy: new SnakeNamingStrategy(),
       }),
       inject: [ConfigService],
-      imports: [ConfigModule, EventModule, CurrencyModule, ExpenseModule],
+      imports: [ConfigModule, EventModule, CurrencyModule, ExpenseModule, CurrencyRateModule],
     }),
   ],
   controllers: [AppController],
