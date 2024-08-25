@@ -8,10 +8,11 @@ import kotlinx.coroutines.flow.Flow
 
 internal interface EventsLocalStore {
 
-    fun getEvents(): Flow<List<Event>>
-    fun getEventWithDetails(eventId: Long): Flow<EventDetails?>
+    fun getEventsFlow(): Flow<List<Event>>
+    fun getEventWithDetailsFlow(eventId: Long): Flow<EventDetails?>
 
     suspend fun getEvent(eventId: Long): Event?
+    suspend fun getEventWithDetails(eventId: Long): EventDetails?
 
     suspend fun getEventWithDetailsByServerId(eventServerId: Long): EventDetails?
 

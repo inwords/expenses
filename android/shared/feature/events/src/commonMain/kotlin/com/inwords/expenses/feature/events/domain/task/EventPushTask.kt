@@ -6,7 +6,6 @@ import com.inwords.expenses.core.utils.Result
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.PersonsLocalStore
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 internal class EventPushTask(
@@ -26,7 +25,7 @@ internal class EventPushTask(
      * 1. Currencies are synced
      */
     suspend fun pushEvent(eventId: Long): Boolean = withContext(IO) {
-        val localEventDetails = eventsLocalStore.getEventWithDetails(eventId).first() ?: return@withContext false
+        val localEventDetails = eventsLocalStore.getEventWithDetails(eventId) ?: return@withContext false
 
         if (localEventDetails.event.serverId != 0L) return@withContext true
 

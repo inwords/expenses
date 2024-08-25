@@ -8,4 +8,4 @@ internal expect class RoomDatabaseBuilderFactory {
     fun getDatabaseBuilder(): RoomDatabase.Builder<AppDatabase>
 }
 
-expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> // TODO make internal when Room is fixed
+internal expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase>

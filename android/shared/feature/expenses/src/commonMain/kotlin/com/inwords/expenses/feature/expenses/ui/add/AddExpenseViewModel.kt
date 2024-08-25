@@ -361,7 +361,7 @@ internal class AddExpenseViewModel(
             person = selectedPerson,
             subjecExpenseSplitWithPersons = subjectExpenseSplitWithPersons,
             timestamp = Clock.System.now(),
-            description = state.description.ifEmpty { "Без описания" },
+            description = state.description.trim().ifEmpty { "Без описания" },
         )
 
         viewModelScope.launch {

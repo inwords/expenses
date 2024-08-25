@@ -40,7 +40,7 @@ class EventsInteractor internal constructor(
             if (currentEventId == null) {
                 flowOf(null)
             } else {
-                eventsLocalStore.getEventWithDetails(currentEventId)
+                eventsLocalStore.getEventWithDetailsFlow(currentEventId)
             }
         }
         .stateIn(scope, started = SharingStarted.WhileSubscribed(), initialValue = null)

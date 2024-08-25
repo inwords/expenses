@@ -4,7 +4,6 @@ import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.Result
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 
@@ -21,7 +20,7 @@ internal class EventPersonsPushTask(
      * 1. Event is synced
      */
     suspend fun pushEventPersons(eventId: Long): Boolean = withContext(IO) {
-        val localEvent = eventsLocalStore.getEventWithDetails(eventId).first() ?: return@withContext false
+        val localEvent = eventsLocalStore.getEventWithDetails(eventId) ?: return@withContext false
 
         val personsToAdd = localEvent.persons.filter { it.serverId == 0L }
 

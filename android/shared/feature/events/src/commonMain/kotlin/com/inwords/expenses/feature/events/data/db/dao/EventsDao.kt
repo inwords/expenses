@@ -27,11 +27,15 @@ interface EventsDao {
     suspend fun update(eventId: Long, newServerId: Long): Int
 
     @Query("SELECT * FROM ${EventEntity.TABLE_NAME}")
-    fun queryAll(): Flow<List<EventEntity>>
+    fun queryAllEventsFlow(): Flow<List<EventEntity>>
 
     @Transaction
     @Query("SELECT * FROM ${EventEntity.TABLE_NAME} WHERE ${EventEntity.ColumnNames.ID} = :eventId")
-    fun queryEventWithDetailsById(eventId: Long): Flow<EventWithDetailsQuery?>
+    fun queryEventWithDetailsByIdFlow(eventId: Long): Flow<EventWithDetailsQuery?>
+
+    @Transaction
+    @Query("SELECT * FROM ${EventEntity.TABLE_NAME} WHERE ${EventEntity.ColumnNames.ID} = :eventId LIMIT 1")
+    suspend fun queryEventWithDetailsById(eventId: Long): EventWithDetailsQuery?
 
     @Query("SELECT * FROM ${EventEntity.TABLE_NAME} WHERE ${EventEntity.ColumnNames.ID} = :eventId")
     suspend fun queryEventById(eventId: Long): EventEntity?

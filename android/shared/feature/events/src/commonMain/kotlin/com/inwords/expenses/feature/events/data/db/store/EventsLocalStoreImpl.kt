@@ -30,20 +30,23 @@ internal class EventsLocalStoreImpl(
     private val personsLocalStore by personsLocalStoreLazy
     private val currenciesRepository by currenciesLocalStoreLazy
 
-    override fun getEvents(): Flow<List<Event>> {
-        return eventsDao.queryAll().map { entities ->
+    override fun getEventsFlow(): Flow<List<Event>> {
+        return eventsDao.queryAllEventsFlow().map { entities ->
             entities.map { entity -> entity.toDomain() }
         }.distinctUntilChanged()
     }
 
-    override fun getEventWithDetails(eventId: Long): Flow<EventDetails?> {
-        return eventsDao.queryEventWithDetailsById(eventId).map { entity ->
+    override fun getEventWithDetailsFlow(eventId: Long): Flow<EventDetails?> {
+        return eventsDao.queryEventWithDetailsByIdFlow(eventId).map { entity ->
             entity?.toDomain()
         }.distinctUntilChanged()
     }
 
     override suspend fun getEvent(eventId: Long): Event? {
         return eventsDao.queryEventById(eventId)?.toDomain()
+    }
+    override suspend fun getEventWithDetails(eventId: Long): EventDetails? {
+        return eventsDao.queryEventWithDetailsById(eventId)?.toDomain()
     }
 
     override suspend fun getEventWithDetailsByServerId(eventServerId: Long): EventDetails? {

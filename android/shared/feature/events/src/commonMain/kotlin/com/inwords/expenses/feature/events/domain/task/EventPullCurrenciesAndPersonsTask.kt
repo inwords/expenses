@@ -5,7 +5,6 @@ import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 
@@ -28,7 +27,7 @@ internal class EventPullCurrenciesAndPersonsTask(
      * @return true if event was found and updated, false is error is recoverable, null if error is not recoverable
      */
     suspend fun pullEventCurrenciesAndPersons(eventId: Long): Boolean? = withContext(IO) {
-        val localEvent = eventsLocalStore.getEventWithDetails(eventId).first()?.takeIf { it.event.serverId != 0L } ?: return@withContext null
+        val localEvent = eventsLocalStore.getEventWithDetails(eventId)?.takeIf { it.event.serverId != 0L } ?: return@withContext null
 
         val remoteResult = eventsRemoteStore.getEvent(
             event = localEvent.event,
