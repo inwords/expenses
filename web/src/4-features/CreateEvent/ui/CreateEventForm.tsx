@@ -7,8 +7,8 @@ import {EventUsers} from '@/4-features/CreateEvent/ui/EventUsers';
 import {EventPinCodeInput} from '@/5-entities/event/ui/EventPinCodeInput';
 import {useNavigate} from 'react-router';
 import {ROUTES} from '@/6-shared/routing/constants';
-import {SelectCurrency} from "@/5-entities/currency/ui/SelectCurrency";
-import {eventService} from "@/5-entities/event/services/event-service";
+import {SelectCurrency} from '@/5-entities/currency/ui/SelectCurrency';
+import {eventService} from '@/5-entities/event/services/event-service';
 
 export const CreateEventForm = () => {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export const CreateEventForm = () => {
       onSuccess={async (data) => {
         const eventId = await eventService.createEvent(data);
 
-        navigate(ROUTES.Event(eventId));
+        navigate(ROUTES.Event(eventId), {state: 'navigateFromMainForm'});
       }}
     >
       <Stack spacing={2} maxWidth={600}>

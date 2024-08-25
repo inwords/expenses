@@ -3,9 +3,10 @@ import {observer} from 'mobx-react-lite';
 import {expenseStore} from '@/5-entities/expense/stores/expense-store';
 import {userStore} from '@/5-entities/user/stores/user-store';
 import {CURRENCIES_ID_TO_CURRENCY_CODE} from '@/5-entities/currency/constants';
+import {eventStore} from '@/5-entities/event/stores/event-store';
 
 export const ExpensesList = observer(() => {
-  const getExpences = () => {
+  const getExpenses = () => {
     if (expenseStore.currentTab === 0) {
       return expenseStore.currentUserExpenses;
     }
@@ -20,7 +21,7 @@ export const ExpensesList = observer(() => {
   return (
     <Box display="flex" justifyContent={'center'} padding={'0 10px'}>
       <Stack minWidth={300} maxWidth={540} spacing={2} width="100%">
-        {getExpences().map((e) => {
+        {getExpenses().map((e) => {
           return (
             <Card key={e.id}>
               <CardContent>
@@ -29,7 +30,7 @@ export const ExpensesList = observer(() => {
                     {e.description}
 
                     <div>
-                      {e.amount} {CURRENCIES_ID_TO_CURRENCY_CODE[String(e.currencyId)]}
+                      {e.amount} {CURRENCIES_ID_TO_CURRENCY_CODE[String(eventStore.currentEvent?.currencyId)]}
                     </div>
                   </Stack>
                 </Typography>
@@ -52,7 +53,8 @@ export const ExpensesList = observer(() => {
                           return prev;
                         }, 0),
                         userWhoPaidId: userStore.currentUser?.id,
-                        currencyId: e.currencyId,
+                        currencyId: eventStore.currentEvent?.currencyId,
+                        userWhoReceiveId: e.userWhoPaidId,
                       });
                       expenseStore.setIsExpenseRefundModalOpen(true);
                     }}

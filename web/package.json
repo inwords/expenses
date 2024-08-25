@@ -20,7 +20,8 @@
     "react-hook-form-mui": "^7.0.0",
     "react-router-dom": "6.3.0",
     "mobx": "6.9.0",
-    "mobx-react-lite": "3.4.3"
+    "mobx-react-lite": "3.4.3",
+    "copy-to-clipboard": "3.3.3"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "4.2.0",

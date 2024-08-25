@@ -16,7 +16,7 @@ export const FindEventForm = () => {
         onSuccess={async (d) => {
           await eventService.getEventInfo(d.eventId, {pinCode: d.pinCode});
 
-          navigate(ROUTES.Event(d.eventId));
+          navigate(ROUTES.Event(d.eventId), {state: 'navigateFromMainForm'});
         }}
       >
         <Stack direction="column" spacing={2} minWidth={300}>

@@ -38,6 +38,41 @@ export class ExpenseStore {
     });
   }
 
+  get currentUserDebts() {
+    const debts = this.expenses.reduce<Record<string, number>>((prev, curr) => {
+      if (curr.userWhoPaidId !== userStore.currentUser?.id) {
+
+        const userName = userStore.usersDictIdToName[curr.userWhoPaidId];
+
+        prev[userName] =
+          (prev[userName] || 0) +
+          curr.splitInformation.reduce((pre, cur) => {
+            if (cur.userId === userStore.currentUser?.id) {
+              pre += cur.amount;
+            }
+
+            return pre;
+          }, 0);
+      }
+
+      return prev;
+    }, {});
+
+    this.expenseRefunds.forEach((r) => {
+      if (userStore.currentUser?.id === r.userWhoPaidId) {
+        r.splitInformation.forEach((i) => {
+          const userName = userStore.usersDictIdToName[i.userId];
+
+          if (debts[userName]) {
+            debts[userName] -= i.amount;
+          }
+        });
+      }
+    });
+
+    return debts;
+  }
+
   setExpenses(expenses: Array<Expense>) {
     this.expenses = expenses;
   }

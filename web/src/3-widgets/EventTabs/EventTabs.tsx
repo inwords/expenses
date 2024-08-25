@@ -44,6 +44,13 @@ export const EventTabs = observer(() => {
         </>
       )}
 
+      {expenseStore.currentTab === 2 &&
+        Object.entries(expenseStore.currentUserDebts).map(([name, debt]) => (
+          <div key={name}>
+            {name}: {debt}
+          </div>
+        ))}
+
       {expenseStore.currentTab === 3 && <ExpenseRefundsList />}
 
       {expenseStore.currentTab === 4 ? <EventUsers /> : <ExpensesList />}

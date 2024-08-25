@@ -1,6 +1,6 @@
 import {Entity, PrimaryGeneratedColumn, Column} from 'typeorm';
 
-enum CurrencyCode {
+export enum CurrencyCode {
   EUR = 'EUR',
   USD = 'USD',
   RUB = 'RUB',

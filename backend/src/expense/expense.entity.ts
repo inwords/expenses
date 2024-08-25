@@ -26,7 +26,7 @@ export class Expense {
   expenseType: ExpenseType;
 
   @Column({type: 'jsonb'})
-  splitInformation: string | Array<SplitInfo>;
+  splitInformation: Array<SplitInfo>;
 
   @CreateDateColumn({type: 'timestamptz'})
   createdAt!: Date;
