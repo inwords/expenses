@@ -2,14 +2,12 @@ package com.inwords.expenses.feature.events.api
 
 import com.inwords.expenses.core.storage.utils.TransactionHelper
 import com.inwords.expenses.core.utils.Component
-import com.inwords.expenses.feature.events.data.EventsSyncManagerFactory
 import com.inwords.expenses.feature.events.data.db.store.CurrenciesLocalStoreImpl
 import com.inwords.expenses.feature.events.data.db.store.EventsLocalStoreImpl
 import com.inwords.expenses.feature.events.data.db.store.PersonsLocalStoreImpl
-import com.inwords.expenses.feature.events.data.network.CurrenciesRemoteStoreImpl
-import com.inwords.expenses.feature.events.data.network.EventsRemoteStoreImpl
+import com.inwords.expenses.feature.events.data.network.store.CurrenciesRemoteStoreImpl
+import com.inwords.expenses.feature.events.data.network.store.EventsRemoteStoreImpl
 import com.inwords.expenses.feature.events.domain.EventsInteractor
-import com.inwords.expenses.feature.events.domain.EventsSyncObserver
 import com.inwords.expenses.feature.events.domain.JoinRemoteEventUseCase
 import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
@@ -22,7 +20,6 @@ import com.inwords.expenses.feature.events.domain.task.EventPullCurrenciesAndPer
 import com.inwords.expenses.feature.events.domain.task.EventPushTask
 
 class EventsComponent internal constructor(
-    private val eventsSyncManagerFactory: EventsSyncManagerFactory,
     private val deps: EventsComponentFactory.Deps
 ) : Component {
 
@@ -43,7 +40,7 @@ class EventsComponent internal constructor(
         PersonsLocalStoreImpl(lazy { deps.personsDao })
     }
 
-    private val eventsLocalStore: Lazy<EventsLocalStore> = lazy {
+    val eventsLocalStore: Lazy<EventsLocalStore> = lazy {
         EventsLocalStoreImpl(
             transactionHelperLazy = transactionHelper,
             eventsDaoLazy = lazy { deps.eventsDao },
@@ -59,7 +56,7 @@ class EventsComponent internal constructor(
         )
     }
 
-    internal val currenciesPullTask: Lazy<CurrenciesPullTask> = lazy {
+    val currenciesPullTask: Lazy<CurrenciesPullTask> = lazy {
         CurrenciesPullTask(
             transactionHelperLazy = transactionHelper,
             currenciesLocalStoreLazy = currenciesLocalStore,
@@ -67,7 +64,7 @@ class EventsComponent internal constructor(
         )
     }
 
-    internal val eventPushTask: Lazy<EventPushTask> = lazy {
+    val eventPushTask: Lazy<EventPushTask> = lazy {
         EventPushTask(
             transactionHelperLazy = transactionHelper,
             eventsLocalStoreLazy = eventsLocalStore,
@@ -76,14 +73,14 @@ class EventsComponent internal constructor(
         )
     }
 
-    internal val eventPersonsPushTask: Lazy<EventPersonsPushTask> = lazy {
+    val eventPersonsPushTask: Lazy<EventPersonsPushTask> = lazy {
         EventPersonsPushTask(
             eventsLocalStoreLazy = eventsLocalStore,
             eventsRemoteStoreLazy = eventsRemoteStore,
         )
     }
 
-    internal val eventPullCurrenciesAndPersonsTask: Lazy<EventPullCurrenciesAndPersonsTask> = lazy {
+    val eventPullCurrenciesAndPersonsTask: Lazy<EventPullCurrenciesAndPersonsTask> = lazy {
         EventPullCurrenciesAndPersonsTask(
             transactionHelperLazy = transactionHelper,
             eventsLocalStoreLazy = eventsLocalStore,
@@ -107,13 +104,6 @@ class EventsComponent internal constructor(
             eventsLocalStoreLazy = eventsLocalStore,
             settingsRepositoryLazy = lazy { deps.settingsRepository },
             joinRemoteEventUseCaseLazy = joinRemoteEventUseCase
-        )
-    }
-
-    val eventsSyncObserver: EventsSyncObserver by lazy {
-        EventsSyncObserver(
-            eventsInteractor = lazy { eventsInteractor },
-            eventsSyncManagerFactory = eventsSyncManagerFactory
         )
     }
 

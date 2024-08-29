@@ -1,11 +1,11 @@
-package com.inwords.expenses.feature.events.data.network
+package com.inwords.expenses.feature.events.data.network.store
 
 import com.inwords.expenses.core.network.HostConfig
 import com.inwords.expenses.core.network.NetworkResult
 import com.inwords.expenses.core.network.requestWithExceptionHandling
-import com.inwords.expenses.core.network.toBasicResult
+import com.inwords.expenses.core.network.toIoResult
 import com.inwords.expenses.core.network.url
-import com.inwords.expenses.core.utils.Result
+import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.core.utils.SuspendLazy
 import com.inwords.expenses.feature.events.data.network.dto.AddUsersDto
 import com.inwords.expenses.feature.events.data.network.dto.CreateEventRequest
@@ -67,7 +67,7 @@ internal class EventsRemoteStoreImpl(
         currencies: List<Currency>,
         primaryCurrencyId: Long,
         localPersons: List<Person>,
-    ): Result<EventDetails> {
+    ): IoResult<EventDetails> {
         return client.requestWithExceptionHandling {
             post {
                 url(hostConfig) { pathSegments = listOf("event") }
@@ -81,7 +81,7 @@ internal class EventsRemoteStoreImpl(
                     )
                 )
             }.body<EventDto>().toEventDetails(event.id, localPersons, currencies)
-        }.toBasicResult()
+        }.toIoResult()
     }
 
     // FIXME check pinCode on backend
@@ -89,7 +89,7 @@ internal class EventsRemoteStoreImpl(
         eventServerId: Long,
         pinCode: String,
         localPersons: List<Person>
-    ): Result<List<Person>> {
+    ): IoResult<List<Person>> {
         return client.requestWithExceptionHandling {
             post {
                 url(hostConfig) { pathSegments = listOf("event", eventServerId.toString(), "users") }
@@ -100,7 +100,7 @@ internal class EventsRemoteStoreImpl(
             }.body<List<UserDto>>().mapIndexed { i, dto ->
                 dto.toPerson(localPersonId = localPersons[i].id)
             }
-        }.toBasicResult()
+        }.toIoResult()
     }
 
     private fun EventDto.toEventDetails(localEventId: Long, localPersons: List<Person>?, currencies: List<Currency>): EventDetails {

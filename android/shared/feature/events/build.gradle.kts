@@ -31,7 +31,6 @@ kotlin {
                 implementation(project(":shared:core:ui-utils"))
                 implementation(project(":shared:core:navigation"))
                 implementation(project(":shared:core:network"))
-                implementation(project(":shared:core:locator"))
                 implementation(project(":shared:feature:settings"))
 
                 implementation(shared.coroutines.core)
@@ -54,9 +53,6 @@ kotlin {
         }
         androidMain {
             dependencies {
-                implementation(shared.work.runtime.ktx)
-                implementation(shared.coroutines.guava)
-
                 implementation(shared.lifecycle.viewmodel.compose)
                 implementation(shared.navigation.compose)
 

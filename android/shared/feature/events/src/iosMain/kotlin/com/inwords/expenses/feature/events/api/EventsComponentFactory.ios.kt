@@ -3,7 +3,6 @@ package com.inwords.expenses.feature.events.api
 import com.inwords.expenses.core.network.HostConfig
 import com.inwords.expenses.core.storage.utils.TransactionHelper
 import com.inwords.expenses.core.utils.SuspendLazy
-import com.inwords.expenses.feature.events.data.EventsSyncManagerFactory
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
 import com.inwords.expenses.feature.events.data.db.dao.PersonsDao
@@ -26,8 +25,7 @@ actual class EventsComponentFactory(private val deps: Deps) {
     }
 
     actual fun create(): EventsComponent {
-        val syncManagerFactory = EventsSyncManagerFactory()
-        return EventsComponent(eventsSyncManagerFactory = syncManagerFactory, deps = deps)
+        return EventsComponent(deps = deps)
     }
 
 }

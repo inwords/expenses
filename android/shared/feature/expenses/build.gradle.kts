@@ -29,6 +29,7 @@ kotlin {
                 implementation(project(":shared:core:storage-utils"))
                 implementation(project(":shared:core:ui-utils"))
                 implementation(project(":shared:core:navigation"))
+                implementation(project(":shared:core:network"))
                 implementation(project(":shared:feature:events"))
                 implementation(project(":shared:feature:settings"))
 
@@ -44,6 +45,8 @@ kotlin {
                 implementation(shared.lifecycle.viewmodel.compose.multiplatform)
 
                 implementation(shared.room.runtime)
+
+                implementation(shared.ktor.client.core)
 
                 implementation(compose.ui)
                 implementation(compose.material3)

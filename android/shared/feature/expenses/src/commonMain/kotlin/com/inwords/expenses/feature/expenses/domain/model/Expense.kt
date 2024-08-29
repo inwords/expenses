@@ -8,6 +8,7 @@ import kotlinx.datetime.Instant
 
 data class Expense(
     val expenseId: Long,
+    val serverId: Long,
     val currency: Currency,
     val expenseType: ExpenseType,
     val person: Person,

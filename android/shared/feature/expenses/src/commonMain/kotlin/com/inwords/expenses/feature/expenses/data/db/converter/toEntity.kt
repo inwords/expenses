@@ -9,6 +9,7 @@ import com.inwords.expenses.feature.expenses.domain.model.ExpenseSplitWithPerson
 internal fun Expense.toEntity(event: Event): ExpenseEntity {
     return ExpenseEntity(
         eventId = event.id,
+        serverId = this.serverId,
         currencyId = this.currency.id,
         expenseType = this.expenseType,
         personId = this.person.id,

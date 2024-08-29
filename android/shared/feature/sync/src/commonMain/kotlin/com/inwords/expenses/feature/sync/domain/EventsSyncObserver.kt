@@ -1,8 +1,9 @@
-package com.inwords.expenses.feature.events.domain
+package com.inwords.expenses.feature.sync.domain
 
 import com.inwords.expenses.core.utils.collectIn
-import com.inwords.expenses.feature.events.data.EventsSyncManagerFactory
+import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.domain.model.Person
+import com.inwords.expenses.feature.sync.data.EventsSyncManagerFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull

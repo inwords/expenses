@@ -2,13 +2,14 @@ package com.inwords.expenses.feature.events.domain.task
 
 import com.inwords.expenses.core.storage.utils.TransactionHelper
 import com.inwords.expenses.core.utils.IO
+import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
 import kotlinx.coroutines.withContext
 
 
-internal class EventPullCurrenciesAndPersonsTask(
+class EventPullCurrenciesAndPersonsTask internal constructor(
     transactionHelperLazy: Lazy<TransactionHelper>,
     eventsLocalStoreLazy: Lazy<EventsLocalStore>,
     eventsRemoteStoreLazy: Lazy<EventsRemoteStore>,
@@ -23,11 +24,11 @@ internal class EventPullCurrenciesAndPersonsTask(
     /**
      * Prerequisites:
      * 1. Event has serverId
-     *
-     * @return true if event was found and updated, false is error is recoverable, null if error is not recoverable
      */
-    suspend fun pullEventCurrenciesAndPersons(eventId: Long): Boolean? = withContext(IO) {
-        val localEvent = eventsLocalStore.getEventWithDetails(eventId)?.takeIf { it.event.serverId != 0L } ?: return@withContext null
+    suspend fun pullEventCurrenciesAndPersons(eventId: Long): IoResult<*> = withContext(IO) {
+        val localEvent = eventsLocalStore.getEventWithDetails(eventId)
+            ?.takeIf { it.event.serverId != 0L }
+            ?: return@withContext IoResult.Error.Failure
 
         val remoteResult = eventsRemoteStore.getEvent(
             event = localEvent.event,
@@ -39,24 +40,24 @@ internal class EventPullCurrenciesAndPersonsTask(
             is EventsRemoteStore.GetEventResult.Event -> remoteResult.event
 
             EventsRemoteStore.GetEventResult.EventNotFound,
-            EventsRemoteStore.GetEventResult.InvalidAccessCode -> return@withContext null
+            EventsRemoteStore.GetEventResult.InvalidAccessCode -> return@withContext IoResult.Error.Failure
 
-            EventsRemoteStore.GetEventResult.OtherError -> return@withContext false
+            EventsRemoteStore.GetEventResult.OtherError -> return@withContext IoResult.Error.Retry
         }
 
         transactionHelper.immediateWriteTransaction {
             currenciesPullTask.updateLocalCurrencies(remoteEventDetails.currencies, inTransaction = false)
-            updateLocalEventPersonsInternal(
+            updateLocalEventPersons(
                 eventId = localEvent.event.id,
                 localPersons = localEvent.persons,
                 remotePersons = remoteEventDetails.persons
             )
         }
 
-        true
+        IoResult.Success(Unit)
     }
 
-    private suspend fun updateLocalEventPersonsInternal(
+    private suspend fun updateLocalEventPersons(
         eventId: Long,
         localPersons: List<Person>,
         remotePersons: List<Person>

@@ -45,6 +45,7 @@ internal class EventsLocalStoreImpl(
     override suspend fun getEvent(eventId: Long): Event? {
         return eventsDao.queryEventById(eventId)?.toDomain()
     }
+
     override suspend fun getEventWithDetails(eventId: Long): EventDetails? {
         return eventsDao.queryEventWithDetailsById(eventId)?.toDomain()
     }
@@ -58,7 +59,7 @@ internal class EventsLocalStoreImpl(
     }
 
     override suspend fun update(eventId: Long, newServerId: Long): Boolean {
-        return eventsDao.update(eventId, newServerId) == 1
+        return eventsDao.update(eventId, newServerId) >= 1
     }
 
     override suspend fun deepInsert(

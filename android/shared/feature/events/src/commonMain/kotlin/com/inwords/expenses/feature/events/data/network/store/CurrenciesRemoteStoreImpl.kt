@@ -1,10 +1,10 @@
-package com.inwords.expenses.feature.events.data.network
+package com.inwords.expenses.feature.events.data.network.store
 
 import com.inwords.expenses.core.network.HostConfig
 import com.inwords.expenses.core.network.requestWithExceptionHandling
-import com.inwords.expenses.core.network.toBasicResult
+import com.inwords.expenses.core.network.toIoResult
 import com.inwords.expenses.core.network.url
-import com.inwords.expenses.core.utils.Result
+import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.core.utils.SuspendLazy
 import com.inwords.expenses.feature.events.data.network.dto.CurrencyDto
 import com.inwords.expenses.feature.events.domain.model.Currency
@@ -18,14 +18,14 @@ internal class CurrenciesRemoteStoreImpl(
     private val hostConfig: HostConfig,
 ) : CurrenciesRemoteStore {
 
-    override suspend fun getCurrencies(): Result<List<Currency>> {
+    override suspend fun getCurrencies(): IoResult<List<Currency>> {
         return client.requestWithExceptionHandling {
             get {
                 url(hostConfig) {
                     pathSegments = listOf("currency", "all")
                 }
             }.body<List<CurrencyDto>>().map { it.toCurrency() }
-        }.toBasicResult()
+        }.toIoResult()
     }
 
     private fun CurrencyDto.toCurrency(): Currency {

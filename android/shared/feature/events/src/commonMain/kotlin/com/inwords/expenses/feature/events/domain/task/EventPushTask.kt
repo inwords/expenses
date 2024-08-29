@@ -2,13 +2,13 @@ package com.inwords.expenses.feature.events.domain.task
 
 import com.inwords.expenses.core.storage.utils.TransactionHelper
 import com.inwords.expenses.core.utils.IO
-import com.inwords.expenses.core.utils.Result
+import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.PersonsLocalStore
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
 import kotlinx.coroutines.withContext
 
-internal class EventPushTask(
+class EventPushTask internal constructor(
     transactionHelperLazy: Lazy<TransactionHelper>,
     eventsLocalStoreLazy: Lazy<EventsLocalStore>,
     eventsRemoteStoreLazy: Lazy<EventsRemoteStore>,
@@ -24,10 +24,10 @@ internal class EventPushTask(
      * Prerequisites:
      * 1. Currencies are synced
      */
-    suspend fun pushEvent(eventId: Long): Boolean = withContext(IO) {
-        val localEventDetails = eventsLocalStore.getEventWithDetails(eventId) ?: return@withContext false
+    suspend fun pushEvent(eventId: Long): IoResult<*> = withContext(IO) {
+        val localEventDetails = eventsLocalStore.getEventWithDetails(eventId) ?: return@withContext IoResult.Error.Failure
 
-        if (localEventDetails.event.serverId != 0L) return@withContext true
+        if (localEventDetails.event.serverId != 0L) return@withContext IoResult.Success(Unit)
 
         val remoteEventDetailsResult = eventsRemoteStore.createEvent(
             event = localEventDetails.event,
@@ -36,8 +36,8 @@ internal class EventPushTask(
             localPersons = localEventDetails.persons
         )
         val networkEventDetails = when (remoteEventDetailsResult) {
-            is Result.Success -> remoteEventDetailsResult.data
-            is Result.Error -> return@withContext false
+            is IoResult.Success -> remoteEventDetailsResult.data
+            is IoResult.Error -> return@withContext remoteEventDetailsResult
         }
 
         val localPersons = localEventDetails.persons
@@ -56,6 +56,6 @@ internal class EventPushTask(
             eventsLocalStore.update(eventId, updatedEvent.event.serverId)
         }
 
-        true
+        IoResult.Success(Unit)
     }
 }

@@ -1,4 +1,4 @@
-package com.inwords.expenses.feature.events.data
+package com.inwords.expenses.feature.sync.data
 
 import android.content.Context
 import androidx.work.WorkManager
@@ -39,6 +39,12 @@ internal actual class EventsSyncManager(
                         listOf(
                             EventPersonsPushWorker.buildEventPersonsPushRequest(eventId),
                             EventPullCurrenciesAndPersonsWorker.buildEventPullCurrenciesAndPersonsRequest(eventId)
+                        )
+                    )
+                    .then(
+                        listOf(
+                            EventExpensesPushWorker.buildEventExpensesPushRequest(eventId),
+                            EventExpensesPullWorker.buildEventExpensesPullRequest(eventId)
                         )
                     )
                     .enqueue()

@@ -55,6 +55,7 @@ include("shared:feature")
 include("shared:feature:settings")
 include("shared:feature:events")
 include("shared:feature:expenses")
+include("shared:feature:sync")
 
 include("shared:integration")
 include("shared:integration:databases")

@@ -1,4 +1,4 @@
-package com.inwords.expenses.feature.events.data
+package com.inwords.expenses.feature.sync.data
 
 internal expect class EventsSyncManager {
 

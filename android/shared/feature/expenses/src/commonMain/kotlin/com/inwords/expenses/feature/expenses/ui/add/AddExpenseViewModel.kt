@@ -356,6 +356,7 @@ internal class AddExpenseViewModel(
 
         val expense = Expense(
             expenseId = 0,
+            serverId = 0,
             currency = selectedCurrency,
             expenseType = state.expenseType,
             person = selectedPerson,

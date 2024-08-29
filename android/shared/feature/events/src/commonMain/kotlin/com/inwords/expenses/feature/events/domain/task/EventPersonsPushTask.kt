@@ -1,13 +1,13 @@
 package com.inwords.expenses.feature.events.domain.task
 
 import com.inwords.expenses.core.utils.IO
-import com.inwords.expenses.core.utils.Result
+import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
 import kotlinx.coroutines.withContext
 
 
-internal class EventPersonsPushTask(
+class EventPersonsPushTask internal constructor(
     eventsLocalStoreLazy: Lazy<EventsLocalStore>,
     eventsRemoteStoreLazy: Lazy<EventsRemoteStore>,
 ) {
@@ -19,12 +19,12 @@ internal class EventPersonsPushTask(
      * Prerequisites:
      * 1. Event is synced
      */
-    suspend fun pushEventPersons(eventId: Long): Boolean = withContext(IO) {
-        val localEvent = eventsLocalStore.getEventWithDetails(eventId) ?: return@withContext false
+    suspend fun pushEventPersons(eventId: Long): IoResult<*> = withContext(IO) {
+        val localEvent = eventsLocalStore.getEventWithDetails(eventId) ?: return@withContext IoResult.Error.Failure
 
         val personsToAdd = localEvent.persons.filter { it.serverId == 0L }
 
-        if (personsToAdd.isEmpty()) return@withContext true
+        if (personsToAdd.isEmpty()) return@withContext IoResult.Success(Unit)
 
         val networkResult = eventsRemoteStore.addPersonsToEvent(
             eventServerId = localEvent.event.serverId,
@@ -33,12 +33,12 @@ internal class EventPersonsPushTask(
         )
 
         val networkPersons = when (networkResult) {
-            is Result.Success -> networkResult.data
-            is Result.Error -> return@withContext false
+            is IoResult.Success -> networkResult.data
+            is IoResult.Error -> return@withContext networkResult
         }
 
         eventsLocalStore.insertPersonsWithCrossRefs(eventId, networkPersons, inTransaction = true)
 
-        true
+        IoResult.Success(Unit)
     }
 }

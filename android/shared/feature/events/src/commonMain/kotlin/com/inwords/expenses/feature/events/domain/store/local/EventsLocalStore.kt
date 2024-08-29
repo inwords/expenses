@@ -6,7 +6,7 @@ import com.inwords.expenses.feature.events.domain.model.EventDetails
 import com.inwords.expenses.feature.events.domain.model.Person
 import kotlinx.coroutines.flow.Flow
 
-internal interface EventsLocalStore {
+interface EventsLocalStore {
 
     fun getEventsFlow(): Flow<List<Event>>
     fun getEventWithDetailsFlow(eventId: Long): Flow<EventDetails?>

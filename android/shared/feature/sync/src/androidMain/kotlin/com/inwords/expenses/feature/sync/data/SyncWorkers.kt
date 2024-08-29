@@ -1,10 +1,11 @@
-package com.inwords.expenses.feature.events.data
+package com.inwords.expenses.feature.sync.data
 
 import android.content.Context
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.Data
+import androidx.work.ListenableWorker
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
@@ -15,7 +16,9 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.inwords.expenses.core.locator.ComponentsMap
 import com.inwords.expenses.core.locator.inject
+import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.feature.events.api.EventsComponent
+import com.inwords.expenses.feature.expenses.api.ExpensesComponent
 import java.util.concurrent.TimeUnit
 
 internal class CurrenciesPullWorker(
@@ -26,9 +29,11 @@ internal class CurrenciesPullWorker(
     private val eventsComponent by ComponentsMap.inject<EventsComponent>()
 
     override suspend fun doWork(): Result {
-        eventsComponent.currenciesPullTask.value.pullCurrencies()
+        if (shouldFailure()) return Result.failure()
 
-        return Result.success()
+        val ioResult = eventsComponent.currenciesPullTask.value.pullCurrencies()
+
+        return ioResult.toResult()
     }
 
     companion object {
@@ -52,13 +57,11 @@ internal class EventPushWorker(
     override suspend fun doWork(): Result {
         val eventId = inputData.getEventId() ?: return Result.failure()
 
-        val success = eventsComponent.eventPushTask.value.pushEvent(eventId)
+        if (shouldFailure()) return Result.failure()
 
-        return if (success) {
-            Result.success()
-        } else {
-            Result.retry()
-        }
+        val ioResult = eventsComponent.eventPushTask.value.pushEvent(eventId)
+
+        return ioResult.toResult()
     }
 
     companion object {
@@ -83,13 +86,11 @@ internal class EventPersonsPushWorker(
     override suspend fun doWork(): Result {
         val eventId = inputData.getEventId() ?: return Result.failure()
 
-        val success = eventsComponent.eventPersonsPushTask.value.pushEventPersons(eventId)
+        if (shouldFailure()) return Result.failure()
 
-        return if (success) {
-            Result.success()
-        } else {
-            Result.retry()
-        }
+        val ioResult = eventsComponent.eventPersonsPushTask.value.pushEventPersons(eventId)
+
+        return ioResult.toResult()
     }
 
     companion object {
@@ -114,19 +115,75 @@ internal class EventPullCurrenciesAndPersonsWorker(
     override suspend fun doWork(): Result {
         val eventId = inputData.getEventId() ?: return Result.failure()
 
-        val success = eventsComponent.eventPullCurrenciesAndPersonsTask.value.pullEventCurrenciesAndPersons(eventId)
+        if (shouldFailure()) return Result.failure()
 
-        return when (success) {
-            true -> Result.success()
-            false -> Result.retry()
-            null -> Result.failure()
-        }
+        val ioResult = eventsComponent.eventPullCurrenciesAndPersonsTask.value.pullEventCurrenciesAndPersons(eventId)
+
+        return ioResult.toResult()
     }
 
     companion object {
 
         fun buildEventPullCurrenciesAndPersonsRequest(eventId: Long): OneTimeWorkRequest {
             return OneTimeWorkRequestBuilder<EventPullCurrenciesAndPersonsWorker>()
+                .setCommonParameters()
+                .setInputDataEventId(eventId)
+                .addTag(getTagForEvent(eventId))
+                .build()
+        }
+    }
+}
+
+internal class EventExpensesPushWorker(
+    appContext: Context,
+    workerParams: WorkerParameters
+) : CoroutineWorker(appContext, workerParams) {
+
+    private val expensesComponent by ComponentsMap.inject<ExpensesComponent>()
+
+    override suspend fun doWork(): Result {
+        val eventId = inputData.getEventId() ?: return Result.failure()
+
+        if (shouldFailure()) return Result.failure()
+
+        val ioResult = expensesComponent.eventExpensesPushTask.value.pushEventExpenses(eventId)
+
+        return ioResult.toResult()
+    }
+
+    companion object {
+
+        fun buildEventExpensesPushRequest(eventId: Long): OneTimeWorkRequest {
+            return OneTimeWorkRequestBuilder<EventExpensesPushWorker>()
+                .setCommonParameters()
+                .setInputDataEventId(eventId)
+                .addTag(getTagForEvent(eventId))
+                .build()
+        }
+    }
+}
+
+internal class EventExpensesPullWorker(
+    appContext: Context,
+    workerParams: WorkerParameters
+) : CoroutineWorker(appContext, workerParams) {
+
+    private val expensesComponent by ComponentsMap.inject<ExpensesComponent>()
+
+    override suspend fun doWork(): Result {
+        val eventId = inputData.getEventId() ?: return Result.failure()
+
+        if (shouldFailure()) return Result.failure()
+
+        val ioResult = expensesComponent.eventExpensesPullTask.value.pullEventExpenses(eventId)
+
+        return ioResult.toResult()
+    }
+
+    companion object {
+
+        fun buildEventExpensesPullRequest(eventId: Long): OneTimeWorkRequest {
+            return OneTimeWorkRequestBuilder<EventExpensesPullWorker>()
                 .setCommonParameters()
                 .setInputDataEventId(eventId)
                 .addTag(getTagForEvent(eventId))
@@ -150,6 +207,18 @@ private fun Data.getEventId(): Long? {
         return null
     }
     return eventId
+}
+
+private fun ListenableWorker.shouldFailure(): Boolean {
+    return runAttemptCount > 3
+}
+
+private fun IoResult<*>.toResult(): ListenableWorker.Result {
+    return when (this) {
+        is IoResult.Success -> ListenableWorker.Result.success()
+        is IoResult.Error.Retry -> ListenableWorker.Result.retry()
+        is IoResult.Error.Failure -> ListenableWorker.Result.failure()
+    }
 }
 
 private fun <B : WorkRequest.Builder<B, *>, W : WorkRequest> WorkRequest.Builder<B, W>.setInputDataEventId(eventId: Long): B {

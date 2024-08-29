@@ -2,14 +2,14 @@ package com.inwords.expenses.feature.events.domain.task
 
 import com.inwords.expenses.core.storage.utils.TransactionHelper
 import com.inwords.expenses.core.utils.IO
-import com.inwords.expenses.core.utils.Result
+import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
 import com.inwords.expenses.feature.events.domain.store.remote.CurrenciesRemoteStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
-internal class CurrenciesPullTask(
+class CurrenciesPullTask internal constructor(
     transactionHelperLazy: Lazy<TransactionHelper>,
     currenciesLocalStoreLazy: Lazy<CurrenciesLocalStore>,
     currenciesRemoteStoreLazy: Lazy<CurrenciesRemoteStore>,
@@ -19,15 +19,15 @@ internal class CurrenciesPullTask(
     private val currenciesLocalStore by currenciesLocalStoreLazy
     private val currenciesRemoteStore by currenciesRemoteStoreLazy
 
-    suspend fun pullCurrencies(): Boolean = withContext(IO) {
+    suspend fun pullCurrencies(): IoResult<*> = withContext(IO) {
         val networkCurrencies = when (val networkResult = currenciesRemoteStore.getCurrencies()) {
-            is Result.Success -> networkResult.data
-            is Result.Error -> return@withContext false
+            is IoResult.Success -> networkResult.data
+            is IoResult.Error -> return@withContext networkResult
         }
 
         updateLocalCurrencies(networkCurrencies, inTransaction = true)
 
-        true
+        IoResult.Success(Unit)
     }
 
     suspend fun updateLocalCurrencies(

@@ -11,10 +11,13 @@ import com.inwords.expenses.feature.events.api.EventsComponentFactory
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
 import com.inwords.expenses.feature.events.data.db.dao.PersonsDao
+import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.expenses.api.ExpensesComponent
 import com.inwords.expenses.feature.expenses.data.db.dao.ExpensesDao
 import com.inwords.expenses.feature.settings.api.SettingsComponentFactory
 import com.inwords.expenses.feature.settings.api.SettingsRepository
+import com.inwords.expenses.feature.sync.api.SyncComponentFactory
 import com.inwords.expenses.integration.databases.api.DatabasesComponentFactory
 import io.ktor.client.HttpClient
 
@@ -41,9 +44,6 @@ internal fun registerComponents(appContext: Context) {
     val eventsComponent = lazy {
         EventsComponentFactory(
             deps = object : EventsComponentFactory.Deps {
-                override val context: Context
-                    get() = appContext
-
                 override val eventsDao: EventsDao
                     get() = dbComponent.value.eventsDao
                 override val personsDao: PersonsDao
@@ -70,8 +70,28 @@ internal fun registerComponents(appContext: Context) {
             deps = object : ExpensesComponent.Deps {
                 override val expensesDao: ExpensesDao
                     get() = dbComponent.value.expensesDao
+
+                override val client: SuspendLazy<HttpClient>
+                    get() = SuspendLazy { networkComponent.value.getHttpClient() }
+                override val hostConfig: HostConfig
+                    get() = networkComponent.value.hostConfig
+
+                override val eventsLocalStore: EventsLocalStore
+                    get() = eventsComponent.value.eventsLocalStore.value
             }
         )
+    }
+
+    val syncComponent = lazy {
+        SyncComponentFactory(
+            deps = object : SyncComponentFactory.Deps {
+                override val context: Context get() = appContext
+
+                override val eventsInteractor: EventsInteractor
+                    get() = eventsComponent.value.eventsInteractor
+
+            }
+        ).create()
     }
 
     ComponentsMap.registerComponent(settingsComponent)
@@ -79,4 +99,5 @@ internal fun registerComponents(appContext: Context) {
     ComponentsMap.registerComponent(networkComponent)
     ComponentsMap.registerComponent(eventsComponent)
     ComponentsMap.registerComponent(expensesComponent)
+    ComponentsMap.registerComponent(syncComponent)
 }

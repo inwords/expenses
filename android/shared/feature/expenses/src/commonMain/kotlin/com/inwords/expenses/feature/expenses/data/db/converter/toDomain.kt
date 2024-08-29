@@ -13,6 +13,7 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 internal fun ExpenseWithDetailsQuery.toDomain(): Expense {
     return Expense(
         expenseId = this.expense.expenseId,
+        serverId = this.expense.serverId,
         currency = this.currency.toDomain(),
         expenseType = this.expense.expenseType,
         person = this.person.toDomain(),
