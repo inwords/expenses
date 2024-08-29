@@ -2,13 +2,16 @@ package com.inwords.expenses.feature.events.domain
 
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
+import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
 import com.inwords.expenses.feature.events.domain.model.Person
+import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -17,12 +20,14 @@ import kotlin.random.Random
 
 class EventsInteractor internal constructor(
     eventsLocalStoreLazy: Lazy<EventsLocalStore>,
+    currenciesLocalStoreLazy: Lazy<CurrenciesLocalStore>,
     settingsRepositoryLazy: Lazy<SettingsRepository>,
     joinRemoteEventUseCaseLazy: Lazy<JoinRemoteEventUseCase>,
     scope: CoroutineScope = CoroutineScope(SupervisorJob() + IO)
 ) {
 
     private val eventsLocalStore by eventsLocalStoreLazy
+    private val currenciesLocalStore by currenciesLocalStoreLazy
     private val settingsRepository by settingsRepositoryLazy
     private val joinRemoteEventUseCase by joinRemoteEventUseCaseLazy
 
@@ -44,6 +49,10 @@ class EventsInteractor internal constructor(
             }
         }
         .stateIn(scope, started = SharingStarted.WhileSubscribed(), initialValue = null)
+
+    fun getCurrencies(): Flow<List<Currency>> {
+        return currenciesLocalStore.getCurrencies()
+    }
 
     internal suspend fun joinEvent(eventServerId: Long, accessCode: String): JoinEventResult {
         val localEvent = eventsLocalStore.getEventWithDetailsByServerId(eventServerId)
@@ -78,6 +87,10 @@ class EventsInteractor internal constructor(
         draft.draftEventName = eventName.trim()
     }
 
+    internal fun draftEventPrimaryCurrency(currency: Currency) {
+        draft.draftPrimaryCurrencyId = currency.id
+    }
+
     internal fun draftOwner(owner: String) {
         draft.draftOwner = owner.trim()
     }
@@ -102,7 +115,7 @@ class EventsInteractor internal constructor(
         val eventDetails = eventsLocalStore.deepInsert(
             eventToInsert = eventToInsert,
             personsToInsert = personsToInsert,
-            primaryCurrencyId = 1,
+            primaryCurrencyId = draft.draftPrimaryCurrencyId,
             inTransaction = true
         )
 
@@ -116,12 +129,14 @@ class EventsInteractor internal constructor(
 
     private class Draft(
         var draftEventName: String = "",
+        var draftPrimaryCurrencyId: Long = 0,
         var draftOwner: String = "",
         var draftOtherPersons: List<String> = emptyList()
     ) {
 
         fun clear() {
             draftEventName = ""
+            draftPrimaryCurrencyId = 0
             draftOwner = ""
             draftOtherPersons = emptyList()
         }

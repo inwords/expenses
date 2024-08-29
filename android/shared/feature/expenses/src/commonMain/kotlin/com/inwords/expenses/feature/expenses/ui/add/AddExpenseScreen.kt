@@ -162,6 +162,7 @@ private fun AddExpenseScreenSuccess(
                 }
             }
 
+            // TODO duplicate UI
             Text(
                 modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp),
                 text = "Валюта",

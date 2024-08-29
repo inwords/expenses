@@ -102,6 +102,7 @@ class EventsComponent internal constructor(
     val eventsInteractor: EventsInteractor by lazy {
         EventsInteractor(
             eventsLocalStoreLazy = eventsLocalStore,
+            currenciesLocalStoreLazy = currenciesLocalStore,
             settingsRepositoryLazy = lazy { deps.settingsRepository },
             joinRemoteEventUseCaseLazy = joinRemoteEventUseCase
         )

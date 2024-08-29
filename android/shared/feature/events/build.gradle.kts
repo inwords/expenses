@@ -27,13 +27,15 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":shared:core:utils"))
-                implementation(project(":shared:core:storage-utils"))
                 implementation(project(":shared:core:ui-utils"))
+                implementation(project(":shared:core:storage-utils"))
                 implementation(project(":shared:core:navigation"))
                 implementation(project(":shared:core:network"))
                 implementation(project(":shared:feature:settings"))
 
                 implementation(shared.coroutines.core)
+
+                implementation(shared.kotlinx.collections.immutable)
 
                 implementation(shared.kotlinx.serialization.json)
                 implementation(shared.kotlinx.datetime)

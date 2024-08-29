@@ -32,6 +32,7 @@ fun NavGraphBuilder.addCreateEventScreen(
         CreateEventScreen(
             state = viewModel.state.collectAsStateWithLifecycle().value,
             onEventNameChanged = viewModel::onEventNameChanged,
+            onCurrencyClicked = viewModel::onCurrencyClicked,
             onConfirmClicked = viewModel::onConfirmClicked,
         )
     }
