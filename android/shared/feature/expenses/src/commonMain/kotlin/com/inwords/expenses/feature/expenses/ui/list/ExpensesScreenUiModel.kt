@@ -4,6 +4,8 @@ import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
 import kotlinx.collections.immutable.ImmutableList
 
 internal data class ExpensesScreenUiModel(
+    val eventId: String,
+    val pinCode: String,
     val currentPersonId : Long,
     val currentPersonName: String,
     val creditors: ImmutableList<DebtorShortUiModel>,

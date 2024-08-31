@@ -53,6 +53,8 @@ internal fun mockExpensesScreenUiModel(): ExpensesScreenUiModel {
         name = "Максим"
     )
     return ExpensesScreenUiModel(
+        eventId = "1234",
+        pinCode = "4321",
         currentPersonId = person1.id,
         currentPersonName = person1.name,
         creditors = persistentListOf(

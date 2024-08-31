@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -98,16 +102,40 @@ private fun ExpensesScreenSuccess(
         topBar = {
             TopAppBar(
                 title = {
-                    val text = buildAnnotatedString {
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic)) {
-                            append("Expenses")
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(end = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val appAndPersonName = buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic)) {
+                                append("CommonEx")
+                            }
+                            append("  ")
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
+                                append(state.currentPersonName)
+                            }
                         }
-                        append("  ")
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
-                            append(state.currentPersonName)
+                        Text(text = appAndPersonName)
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        val idAndPin = buildAnnotatedString {
+                            withStyle(
+                                style = SpanStyle(
+                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                    fontWeight = FontWeight.Light
+                                )
+                            ) {
+                                append("  ID ")
+                                append(state.eventId)
+                                append(", PIN ")
+                                append(state.pinCode)
+                            }
                         }
+                        Text(idAndPin)
                     }
-                    Text(text = text)
                 }
             )
         },
@@ -121,13 +149,18 @@ private fun ExpensesScreenSuccess(
             }
         }
     ) { paddingValues ->
-        val pullToRefreshState = rememberPullToRefreshState()
+        val topAndHorizontalPaddings = PaddingValues(
+            top = paddingValues.calculateTopPadding(),
+            start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
+            end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
+        )
 
         PullToRefreshBox(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            state = pullToRefreshState,
+                .consumeWindowInsets(topAndHorizontalPaddings)
+                .padding(topAndHorizontalPaddings),
+            state = rememberPullToRefreshState(),
             isRefreshing = state.isRefreshing,
             onRefresh = onRefresh,
         ) {
@@ -174,11 +207,14 @@ private fun ExpensesScreenSuccess(
                     text = "Операции",
                     style = MaterialTheme.typography.headlineMedium
                 )
+
+                val bottomPadding = paddingValues.calculateBottomPadding()
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .consumeWindowInsets(PaddingValues(bottom = bottomPadding))
                         .padding(horizontal = 8.dp),
-                    contentPadding = PaddingValues(bottom = 80.dp),
+                    contentPadding = PaddingValues(bottom = 88.dp + bottomPadding),
                 ) {
                     items(
                         count = state.expenses.size,
@@ -209,7 +245,7 @@ private fun ExpensesScreenEmpty(
                 title = {
                     val text = buildAnnotatedString {
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic)) {
-                            append("Expenses")
+                            append("CommonEx")
                         }
                     }
                     Text(text = text)

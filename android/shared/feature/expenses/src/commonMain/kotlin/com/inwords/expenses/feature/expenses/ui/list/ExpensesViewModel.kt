@@ -74,6 +74,8 @@ internal class ExpensesViewModel(
 
             SimpleScreenState.Success(
                 ExpensesScreenUiModel(
+                    eventId = expensesDetails.event.event.serverId.toString(),
+                    pinCode = expensesDetails.event.event.pinCode,
                     currentPersonId = currentPerson.id,
                     currentPersonName = currentPerson.name,
                     creditors = debtors,

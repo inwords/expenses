@@ -5,14 +5,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
@@ -30,6 +36,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -118,10 +125,18 @@ private fun AddExpenseScreenSuccess(
             )
         }
     ) { paddingValues ->
+        val topAndHorizontalPaddings = PaddingValues(
+            top = paddingValues.calculateTopPadding(),
+            start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
+            end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
+        )
+
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .consumeWindowInsets(topAndHorizontalPaddings)
+                .padding(topAndHorizontalPaddings)
+                .verticalScroll(rememberScrollState()),
         ) {
             val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -272,7 +287,7 @@ private fun AddExpenseScreenSuccess(
             Button(
                 modifier = Modifier
                     .align(Alignment.End)
-                    .padding(all = 16.dp),
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp + paddingValues.calculateBottomPadding()),
                 onClick = onConfirmClicked,
             ) {
                 Text(text = "Подтвердить")

@@ -40,6 +40,7 @@ interface EventsDao {
     @Query("SELECT * FROM ${EventEntity.TABLE_NAME} WHERE ${EventEntity.ColumnNames.ID} = :eventId")
     suspend fun queryEventById(eventId: Long): EventEntity?
 
+    @Transaction
     @Query("SELECT * FROM ${EventEntity.TABLE_NAME} WHERE ${EventEntity.ColumnNames.SERVER_ID} = :eventServerId")
     suspend fun queryEventWithDetailsByServerId(eventServerId: Long): EventWithDetailsQuery?
 

@@ -24,7 +24,6 @@ internal actual class EventsSyncManager(
         scope.launch {
             mutex.withLock {
                 val workManager = WorkManager.getInstance(context)
-                workManager.cancelAllWork() // FIXME: for dev app
 
                 val workInfos = workManager.getWorkInfosByTagFlow(getTagForEvent(eventId)).first()
 
