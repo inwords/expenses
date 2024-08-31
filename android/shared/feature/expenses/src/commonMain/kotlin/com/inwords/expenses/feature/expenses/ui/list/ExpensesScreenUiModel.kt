@@ -8,6 +8,7 @@ internal data class ExpensesScreenUiModel(
     val currentPersonName: String,
     val creditors: ImmutableList<DebtorShortUiModel>,
     val expenses: ImmutableList<ExpenseUiModel>,
+    val isRefreshing: Boolean,
 ) {
 
     data class DebtorShortUiModel(

@@ -15,6 +15,7 @@ import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.expenses.api.ExpensesComponent
 import com.inwords.expenses.feature.expenses.data.db.dao.ExpensesDao
+import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.settings.api.SettingsComponentFactory
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import com.inwords.expenses.feature.sync.api.SyncComponentFactory
@@ -89,6 +90,8 @@ internal fun registerComponents(appContext: Context) {
 
                 override val eventsInteractor: EventsInteractor
                     get() = eventsComponent.value.eventsInteractor
+                override val expensesInteractor: ExpensesInteractor
+                    get() = expensesComponent.value.expensesInteractor
 
             }
         ).create()

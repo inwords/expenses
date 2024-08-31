@@ -29,6 +29,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,6 +54,7 @@ internal fun ExpensesScreen(
     onReplenishmentClick: (ExpensesScreenUiModel.DebtorShortUiModel) -> Unit,
     onCreateEventClick: () -> Unit,
     onJoinEventClick: () -> Unit,
+    onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (state) {
@@ -60,6 +63,7 @@ internal fun ExpensesScreen(
             onAddExpenseClick = onAddExpenseClick,
             onDebtsDetailsClick = onDebtsDetailsClick,
             onReplenishmentClick = onReplenishmentClick,
+            onRefresh = onRefresh,
             modifier = modifier,
         )
 
@@ -86,6 +90,7 @@ private fun ExpensesScreenSuccess(
     onAddExpenseClick: () -> Unit,
     onDebtsDetailsClick: () -> Unit,
     onReplenishmentClick: (ExpensesScreenUiModel.DebtorShortUiModel) -> Unit,
+    onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -116,64 +121,74 @@ private fun ExpensesScreenSuccess(
             }
         }
     ) { paddingValues ->
-        Column(
-            modifier = modifier
+        val pullToRefreshState = rememberPullToRefreshState()
+
+        PullToRefreshBox(
+            modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
+            state = pullToRefreshState,
+            isRefreshing = state.isRefreshing,
+            onRefresh = onRefresh,
         ) {
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
             ) {
-                Text(
-                    text = "Долги",
-                    style = MaterialTheme.typography.headlineMedium
-                )
-                TextButton(
-                    onClick = onDebtsDetailsClick
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        modifier = Modifier
-                            .padding(end = 8.dp),
-                        text = "детализация",
-                        style = MaterialTheme.typography.bodyLarge
+                        text = "Долги",
+                        style = MaterialTheme.typography.headlineMedium
                     )
-                    Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
-                }
-            }
-
-            FlowRow(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                state.creditors.forEach { creditor ->
-                    ReturnCreditorDebtButton(creditor, { onReplenishmentClick.invoke(creditor) })
-                }
-            }
-
-            Text(
-                modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp),
-                text = "Операции",
-                style = MaterialTheme.typography.headlineMedium
-            )
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                contentPadding = PaddingValues(bottom = 80.dp),
-            ) {
-                items(
-                    count = state.expenses.size,
-                    key = { index ->
-                        state.expenses[state.expenses.lastIndex - index].expenseId
+                    TextButton(
+                        onClick = onDebtsDetailsClick
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(end = 8.dp),
+                            text = "детализация",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
                     }
-                ) { index ->
-                    val expense = state.expenses[state.expenses.lastIndex - index]
-                    ExpenseItem(expense)
+                }
+
+                FlowRow(
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    state.creditors.forEach { creditor ->
+                        ReturnCreditorDebtButton(creditor, { onReplenishmentClick.invoke(creditor) })
+                    }
+                }
+
+                Text(
+                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp),
+                    text = "Операции",
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    contentPadding = PaddingValues(bottom = 80.dp),
+                ) {
+                    items(
+                        count = state.expenses.size,
+                        key = { index ->
+                            state.expenses[state.expenses.lastIndex - index].expenseId
+                        }
+                    ) { index ->
+                        val expense = state.expenses[state.expenses.lastIndex - index]
+                        ExpenseItem(expense)
+                    }
                 }
             }
         }

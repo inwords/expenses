@@ -22,6 +22,7 @@ private fun ExpensesScreenPreviewSuccess() {
         onReplenishmentClick = {},
         onJoinEventClick = {},
         onCreateEventClick = {},
+        onRefresh = {},
         state = SimpleScreenState.Success(mockExpensesScreenUiModel())
     )
 }
@@ -35,6 +36,7 @@ private fun ExpensesScreenPreviewEmpty() {
         onReplenishmentClick = {},
         onJoinEventClick = {},
         onCreateEventClick = {},
+        onRefresh = {},
         state = SimpleScreenState.Empty
     )
 }
@@ -120,6 +122,7 @@ internal fun mockExpensesScreenUiModel(): ExpensesScreenUiModel {
                 timestamp = Clock.System.now(),
                 description = "Dinner and some text",
             ).toUiModel()
-        )
+        ),
+        isRefreshing = false
     )
 }

@@ -11,7 +11,8 @@ class SyncComponent internal constructor(
 
     val eventsSyncObserver: EventsSyncObserver by lazy {
         EventsSyncObserver(
-            eventsInteractor = lazy { deps.eventsInteractor },
+            eventsInteractorLazy = lazy { deps.eventsInteractor },
+            expensesInteractorLazy = lazy { deps.expensesInteractor },
             eventsSyncManagerFactory = eventsSyncManagerFactory
         )
     }

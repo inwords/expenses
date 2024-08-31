@@ -20,18 +20,25 @@ import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 
 internal class ExpensesViewModel(
     private val navigationController: NavigationController,
-    eventsInteractor: EventsInteractor,
-    expensesInteractor: ExpensesInteractor,
+    private val eventsInteractor: EventsInteractor,
+    private val expensesInteractor: ExpensesInteractor,
     settingsRepository: SettingsRepository,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
+
+    private var refreshJob: Job? = null
+
+    private val isRefreshing = MutableStateFlow(false)
 
     private val _state = MutableStateFlow<SimpleScreenState<ExpensesScreenUiModel>>(SimpleScreenState.Loading)
     val state: StateFlow<SimpleScreenState<ExpensesScreenUiModel>> = _state
@@ -72,10 +79,18 @@ internal class ExpensesViewModel(
                     creditors = debtors,
                     expenses = expensesDetails.expenses.map { expense ->
                         expense.toUiModel()
-                    }.asImmutableListAdapter()
+                    }.asImmutableListAdapter(),
+                    isRefreshing = false // TODO costyl
                 )
             )
         }
+            .combine(isRefreshing) { state, isRefreshing ->
+                if (state is SimpleScreenState.Success) {
+                    state.copy(data = state.data.copy(isRefreshing = isRefreshing))
+                } else {
+                    state
+                }
+            }
             .collectIn(viewModelScope) {
                 _state.value = it
             }
@@ -110,6 +125,18 @@ internal class ExpensesViewModel(
 
     fun onJoinEventClick() {
         navigationController.navigateTo(JoinEventScreenDestination)
+    }
+
+    fun onRefresh() {
+        val event = eventsInteractor.currentEvent.value?.event ?: return
+
+        refreshJob?.cancel()
+        refreshJob = viewModelScope.launch {
+            isRefreshing.value = true
+            expensesInteractor.onRefreshExpensesAsync(event)
+            delay(2000)
+            isRefreshing.value = false
+        }
     }
 
 }
