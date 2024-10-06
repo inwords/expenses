@@ -18,6 +18,7 @@ services:
       POSTGRES_USER_NAME: postgres # TODO use secrets
       POSTGRES_PASSWORD: postgres
       POSTGRES_DATABASE: postgres
+      OPEN_EXCHANGE_RATES_API_ID: key # пробрасывать из переменных
     depends_on:
       - db
 

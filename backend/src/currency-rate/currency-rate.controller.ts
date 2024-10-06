@@ -14,10 +14,10 @@ export class CurrencyRateController {
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async getCurrenciesChangeRates() {
     const result = await this.httpService.axiosRef.get(
-      `https://openexchangerates.org/api/latest.json?app_id=${this.configService.get('OPEN_EXCHANGE_RATES_API_ID')}&base=EUR`,
+      `https://openexchangerates.org/api/latest.json?app_id=${this.configService.get('OPEN_EXCHANGE_RATES_API_ID')}&base=USD`,
     );
 
-    const rates = JSON.parse(result.data).rates;
+    const rates = result.data.rates;
 
     if (rates) {
       await this.currencyRateService.setCurrenciesChangeRates(rates);

@@ -13,14 +13,12 @@ export class CurrencyRateService {
   }
   public async getRate(from: CurrencyCode, to: CurrencyCode) {
     const currencyRateRepository = await this.entityManager.getRepository(CurrencyRate);
-    const rates = await currencyRateRepository.findOne({
+    const rates: any = await currencyRateRepository.findOne({
       where: {
         date: getCurrentDateWithoutTime(),
       },
     });
 
-    const rate = rates.rate[to] / rates.rate[from];
-
-    return rate;
+    return rates.rate[to] / rates.rate[from];
   }
 }
