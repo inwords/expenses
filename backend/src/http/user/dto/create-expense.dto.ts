@@ -1,14 +1,8 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {IsEnum, IsNumber, IsString, ValidateNested} from 'class-validator';
 import {Type} from 'class-transformer';
-import {SplitInfo} from '../types';
-import {ExpenseType} from '../constants';
-
-export class EventIdDto {
-  @ApiProperty()
-  @IsNumber()
-  eventId!: number;
-}
+import {ExpenseType} from "../../../domain/expense/constants";
+import {SplitInfo} from "../../../domain/expense/types";
 
 class SplitInfoDto {
   @ApiProperty()
@@ -20,7 +14,7 @@ class SplitInfoDto {
   amount!: number;
 }
 
-export class ExpenseCreatedDto {
+export class CreatedExpenseDto {
   @ApiProperty()
   @IsString()
   description!: string;
@@ -32,10 +26,6 @@ export class ExpenseCreatedDto {
   @ApiProperty()
   @IsNumber()
   currencyId!: number;
-
-  @ApiProperty()
-  @IsNumber()
-  eventId!: number;
 
   @ApiProperty()
   @IsEnum(ExpenseType)

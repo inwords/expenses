@@ -2,7 +2,6 @@ import {InjectEntityManager} from '@nestjs/typeorm';
 import {EntityManager} from 'typeorm';
 import {Event} from './event.entity';
 import {Injectable} from '@nestjs/common';
-import {CrateEventBodyDto} from './dto/event';
 import {UserService} from '../user/user.service';
 import {User} from '../user/user.entity';
 
@@ -13,7 +12,7 @@ export class EventService {
     private readonly userService: UserService,
   ) {}
 
-  public async saveEvent(event: CrateEventBodyDto) {
+  public async saveEvent(event: any) {
     return await this.entityManager.transaction(async (entityManager) => {
       const eventWithoutUsers = await entityManager.getRepository(Event).save(event);
       const users = await this.userService.saveUsers(

@@ -1,21 +1,24 @@
-import {Injectable} from '@nestjs/common';
+import {Inject, Injectable} from '@nestjs/common';
 import {InjectEntityManager} from '@nestjs/typeorm';
 import {EntityManager} from 'typeorm';
 import {Expense} from './expense.entity';
 import {Event} from '../event/event.entity';
 import {Currency} from '../currency/currency.entity';
 import {CurrencyRateService} from '../currency-rate/currency-rate.service';
-import {SplitInfo} from './types';
+import {FindExpenses} from '../persistence/expense/queries/find-expenses';
+import {SplitInfo} from '../domain/expense/types';
 
 @Injectable()
 export class ExpenseService {
   constructor(
     @InjectEntityManager() private readonly entityManager: EntityManager,
     private readonly currencyRateService: CurrencyRateService,
+    @Inject(FindExpenses)
+    private readonly findExpenses: FindExpenses,
   ) {}
 
   public getAllEventExpenses(eventId: number) {
-    return this.entityManager.getRepository(Expense).find({
+    return this.findExpenses.execute({
       where: {
         eventId,
       },
@@ -59,9 +62,11 @@ export class ExpenseService {
       for (let i of expense.splitInformation) {
         splitInformation.push({
           ...i,
-          amount: Number(Number(
+          amount: Number(
+            Number(
               i.amount * (await this.currencyRateService.getRate(expenseCurrencyCode.code, eventCurrencyCode.code)),
-          ).toFixed(2)),
+            ).toFixed(2),
+          ),
         });
       }
 
