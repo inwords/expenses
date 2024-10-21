@@ -1,9 +1,9 @@
 import {Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {Currency} from '../currency/currency.entity';
-import {SplitInfo} from './types';
 import {Event} from '../event/event.entity';
 import {User} from '../user/user.entity';
-import {ExpenseType} from './constants';
+import {ExpenseType} from "../domain/expense/constants";
+import {SplitInfo} from "../domain/expense/types";
 
 @Entity('expense')
 export class Expense {

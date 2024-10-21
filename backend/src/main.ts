@@ -18,10 +18,8 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Expenses Title')
-    .setDescription('The expenses API description')
+    .setTitle('Expenses Swagger')
     .setVersion('0.0.1')
-    .addTag('expenses')
     .build();
   const document = SwaggerModule.createDocument(app, config);
 

@@ -1,6 +1,4 @@
 import {Module} from '@nestjs/common';
-import {AppController} from './app.controller';
-import {AppService} from './app.service';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {config} from './config';
 import {ConfigModule, ConfigService} from '@nestjs/config';
@@ -9,7 +7,8 @@ import {SnakeNamingStrategy} from 'typeorm-naming-strategies';
 import {EventModule} from './event/event.module';
 import {CurrencyModule} from './currency/currency.module';
 import {ExpenseModule} from './expense/expense.module';
-import {CurrencyRateModule} from "./currency-rate/currency-rate.module";
+import {CurrencyRateModule} from './currency-rate/currency-rate.module';
+import {HttpModule} from './http/http.module';
 
 @Module({
   imports: [
@@ -27,10 +26,13 @@ import {CurrencyRateModule} from "./currency-rate/currency-rate.module";
         namingStrategy: new SnakeNamingStrategy(),
       }),
       inject: [ConfigService],
-      imports: [ConfigModule, EventModule, CurrencyModule, ExpenseModule, CurrencyRateModule],
+      imports: [ConfigModule],
     }),
+    EventModule,
+    CurrencyModule,
+    ExpenseModule,
+    CurrencyRateModule,
+    HttpModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
