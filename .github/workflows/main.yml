@@ -36,16 +36,6 @@ jobs:
           push: true
           tags: ruggedbl/commonex-next-web:latest
 
-      - name: Set up SSH key
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          echo "StrictHostKeyChecking no" >> ~/.ssh/config
-
-      - name: Copy docker-compose.yml to server
-        run: |
-          scp -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} infra/docker-compose-prod.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }}:${{ secrets.APP_PATH }}
-
       - name: Deploy with Docker Compose
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} "cd ${{ secrets.APP_PATH }} && docker compose -f docker-compose-prod.yml pull && docker-compose up -d"
+          ssh -o StrictHostKeyChecking=no -i <(echo "${{ secrets.SSH_PRIVATE_KEY }}") ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} 'cd ${{ secrets.APP_PATH }} && docker compose -f docker-compose-prod.yml pull && docker-compose up -d'
