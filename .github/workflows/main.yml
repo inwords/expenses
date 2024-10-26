@@ -32,7 +32,7 @@ jobs:
       - name: Build and push frontend image
         uses: docker/build-push-action@v3
         with:
-          context: ./frontend
+          context: ./web
           push: true
           tags: ruggedbl/commonex-next-web:latest
 
