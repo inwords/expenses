@@ -19,7 +19,6 @@ jobs:
       - name: Log in to Docker Registry
         uses: docker/login-action@v2
         with:
-          registry: ruggedbl # Change to your registry
           username: ${{ secrets.DOCKER_USERNAME }} # Store your Docker Hub username in GitHub Secrets
           password: ${{ secrets.DOCKER_PASSWORD }} # Store your Docker Hub password in GitHub Secrets
 
