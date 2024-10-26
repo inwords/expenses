@@ -46,4 +46,4 @@ jobs:
 
       - name: Deploy with Docker Compose
         run: |
-          ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} 'cd ${{ secrets.APP_PATH }} && docker compose -f docker-compose-prod.yml pull && docker-compose up -d'
+          ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} 'cd ${{ secrets.APP_PATH }} && docker compose -f docker-compose-prod.yml pull && docker compose -f docker-compose-prod.yml up -d'
