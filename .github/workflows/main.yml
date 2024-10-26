@@ -29,6 +29,14 @@ jobs:
           push: true
           tags: ruggedbl/commonex-nest-backend:latest
 
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "Host *" >> ~/.ssh/config
+          echo "    StrictHostKeyChecking no" >> ~/.ssh/config
+
       - name: Build and push frontend image
         uses: docker/build-push-action@v3
         with:
@@ -38,4 +46,4 @@ jobs:
 
       - name: Deploy with Docker Compose
         run: |
-          ssh -o StrictHostKeyChecking=no -i <(echo "${{ secrets.SSH_PRIVATE_KEY }}") ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} 'cd ${{ secrets.APP_PATH }} && docker compose -f docker-compose-prod.yml pull && docker-compose up -d'
+          ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} 'cd ${{ secrets.APP_PATH }} && docker compose -f docker-compose-prod.yml pull && docker-compose up -d'
