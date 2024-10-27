@@ -3,7 +3,7 @@ import {httpClient} from '@/6-shared/api/http-client';
 
 export const getEventExpenses = async (eventId: string) => {
   try {
-    const fetchUrl = `/expense/${eventId}/expenses`;
+    const fetchUrl = `user/event/expense/${eventId}/expenses`;
 
     return await httpClient.request(fetchUrl, {
       method: 'GET',
@@ -14,10 +14,12 @@ export const getEventExpenses = async (eventId: string) => {
 };
 
 export const createExpense = async (expense: CreateExpense) => {
+  const {eventId, ...rest} = expense;
+
   try {
-    return await httpClient.request('/expense', {
+    return await httpClient.request(`/user/event/${eventId}/expense`, {
       method: 'POST',
-      body: JSON.stringify(expense),
+      body: JSON.stringify(rest),
     });
   } catch (error) {}
 };
