@@ -6,8 +6,8 @@ import {join} from 'path';
 import {SnakeNamingStrategy} from 'typeorm-naming-strategies';
 import {EventModule} from './event/event.module';
 import {CurrencyModule} from './currency/currency.module';
-import {HttpModule} from '@nestjs/axios';
 import {CronModule} from './api/cron/cron.module';
+import {HttpModule} from './api/http/http.module';
 
 @Module({
   imports: [
