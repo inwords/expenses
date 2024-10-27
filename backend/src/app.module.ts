@@ -6,9 +6,8 @@ import {join} from 'path';
 import {SnakeNamingStrategy} from 'typeorm-naming-strategies';
 import {EventModule} from './event/event.module';
 import {CurrencyModule} from './currency/currency.module';
-import {ExpenseModule} from './expense/expense.module';
-import {CurrencyRateModule} from './currency-rate/currency-rate.module';
-import {HttpModule} from './http/http.module';
+import {HttpModule} from '@nestjs/axios';
+import {CronModule} from './api/cron/cron.module';
 
 @Module({
   imports: [
@@ -30,9 +29,8 @@ import {HttpModule} from './http/http.module';
     }),
     EventModule,
     CurrencyModule,
-    ExpenseModule,
-    CurrencyRateModule,
     HttpModule,
+    CronModule,
   ],
 })
 export class AppModule {}

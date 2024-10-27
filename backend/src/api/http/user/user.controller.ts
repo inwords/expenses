@@ -1,15 +1,16 @@
 import {Body, Controller, Get, HttpCode, Param, Post, Query} from '@nestjs/common';
 import {UserRoutes} from './user.contants';
 import {ApiTags} from '@nestjs/swagger';
-import {CurrencyService} from '../../currency/currency.service';
-import {EventService} from '../../event/event.service';
+
 import {CrateEventBodyDto} from './dto/create-event.dto';
 import {GetEventInfoQueryDto} from './dto/get-event-info.dto';
 import {EventIdDto} from './dto/event-id.dto';
 import {AddUsersToEventDto} from './dto/add-users-to-event.dto';
 import {CreatedExpenseDto} from './dto/create-expense.dto';
-import {GetEventExpenses} from '../../interaction/expense/use-cases/get-event-expenses';
-import {SaveEventExpense} from '../../interaction/expense/use-cases/save-event-expense';
+import {CurrencyService} from '../../../currency/currency.service';
+import {EventService} from '../../../event/event.service';
+import {GetEventExpenses} from '../../../interaction/expense/use-cases/get-event-expenses';
+import {SaveEventExpense} from '../../../interaction/expense/use-cases/save-event-expense';
 
 @Controller(UserRoutes.root)
 @ApiTags('User')

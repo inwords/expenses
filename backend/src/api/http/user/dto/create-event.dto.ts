@@ -1,8 +1,8 @@
 import {ApiProperty} from "@nestjs/swagger";
 import {IsNumber, IsString, ValidateNested} from "class-validator";
-import {UserDto} from "../../../user/dto/user";
 import {Type} from "class-transformer";
-import {User} from "../../../user/user.entity";
+import {UserDto} from "../../../../user/dto/user";
+import {User} from "../../../../user/user.entity";
 
 export class CrateEventBodyDto {
     @ApiProperty()

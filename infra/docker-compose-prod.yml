@@ -13,12 +13,12 @@ services:
     image: ruggedbl/commonex-nest-backend
     restart: always
     environment:
-      POSTGRES_HOST: db
-      POSTGRES_PORT: 5432
-      POSTGRES_USER_NAME: postgres # TODO use secrets
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DATABASE: postgres
-      OPEN_EXCHANGE_RATES_API_ID: key # пробрасывать из переменных
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER_NAME=${POSTGRES_USER_NAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE}
+      - OPEN_EXCHANGE_RATES_API_ID=${OPEN_EXCHANGE_RATES_API_ID}
     depends_on:
       - db
 
