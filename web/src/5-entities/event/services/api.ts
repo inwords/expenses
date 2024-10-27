@@ -3,7 +3,7 @@ import {httpClient} from '@/6-shared/api/http-client';
 
 export const createEvent = async (event: CreateEvent) => {
   try {
-    return await httpClient.request('/event', {
+    return await httpClient.request('/user/event', {
       method: 'POST',
       body: JSON.stringify(event),
     });
@@ -13,7 +13,7 @@ export const createEvent = async (event: CreateEvent) => {
 export const getEventInfo = async (eventId: string, queryParams: Record<string, string>) => {
   try {
     const query = new URLSearchParams(queryParams).toString();
-    const fetchUrl = `/event/${eventId}?${query}`;
+    const fetchUrl = `/user/event/${eventId}?${query}`;
 
     return await httpClient.request(fetchUrl, {
       method: 'GET',

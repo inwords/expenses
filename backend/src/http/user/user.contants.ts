@@ -5,5 +5,5 @@ export const UserRoutes = {
   getEventInfo: `/event/:eventId`,
   addUsersToEvent: `/event/:eventId/users`,
   getAllEventExpenses: `/event/:eventId/expenses`,
-  createExpense: `/:eventId/expense`,
+  createExpense: `/event/:eventId/expense`,
 };
