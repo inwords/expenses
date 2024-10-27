@@ -3,7 +3,7 @@ import {httpClient} from '@/6-shared/api/http-client';
 
 export const getEventExpenses = async (eventId: string) => {
   try {
-    const fetchUrl = `/user/event/expense/${eventId}/expenses`;
+    const fetchUrl = `/user/event/${eventId}/expenses`;
 
     return await httpClient.request(fetchUrl, {
       method: 'GET',
