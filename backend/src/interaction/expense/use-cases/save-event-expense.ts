@@ -44,7 +44,7 @@ export class SaveEventExpense implements UseCase<Input, Output> {
 
           if (currencyRate) {
             const exchangeRate =
-              currencyRate.rate[expenseCurrencyCode.code] / currencyRate.rate[eventCurrencyCode.code];
+              currencyRate.rate[eventCurrencyCode.code] / currencyRate.rate[expenseCurrencyCode.code];
 
             let splitInformation: SplitInfo[] = [];
 
