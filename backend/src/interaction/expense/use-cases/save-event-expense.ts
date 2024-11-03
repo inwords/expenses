@@ -1,15 +1,15 @@
 import {Inject, Injectable} from '@nestjs/common';
-import {UseCase} from '../../../packages/use-case';
-import {IUpsertExpense, UpsertExpenseInput} from '../../../persistence/expense/types';
-import {Expense, SplitInfo} from '../../../domain/expense/types';
-import {UpsertExpense} from '../../../persistence/expense/queries/upsert-expense';
-import {IFindEvent} from '../../../persistence/event/types';
-import {FindEvent} from '../../../persistence/event/queries/find-event';
-import {FindCurrency} from '../../../persistence/currency/queries/find-currency';
-import {IFindCurrency} from '../../../persistence/currency/types';
-import {IFindCurrencyRate} from '../../../persistence/currency-rate/types';
-import {getCurrentDateWithoutTime} from '../../../packages/date-utils';
-import {FindCurrencyRate} from '../../../persistence/currency-rate/queries/find-currency-rate';
+import {UseCase} from '#packages/use-case';
+import {IUpsertExpense, UpsertExpenseInput} from '#persistence/expense/types';
+import {Expense, SplitInfo} from '#domain/expense/types';
+import {UpsertExpense} from '#persistence/expense/queries/upsert-expense';
+import {IFindEvent} from '#persistence/event/types';
+import {FindEvent} from '#persistence/event/queries/find-event';
+import {FindCurrency} from '#persistence/currency/queries/find-currency';
+import {IFindCurrency} from '#persistence/currency/types';
+import {IFindCurrencyRate} from '#persistence/currency-rate/types';
+import {getCurrentDateWithoutTime} from '#packages/date-utils';
+import {FindCurrencyRate} from '#persistence/currency-rate/queries/find-currency-rate';
 
 type Input = Omit<UpsertExpenseInput, 'createdAt'>;
 type Output = Expense;

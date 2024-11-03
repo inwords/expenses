@@ -1,8 +1,8 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {IsEnum, IsNumber, IsString, ValidateNested} from 'class-validator';
 import {Type} from 'class-transformer';
-import {ExpenseType} from "../../../../domain/expense/constants";
-import {SplitInfo} from "../../../../domain/expense/types";
+import {ExpenseType} from "#domain/expense/constants";
+import {SplitInfo} from "#domain/expense/types";
 
 
 class SplitInfoDto {

@@ -1,7 +1,7 @@
 import {Inject} from '@nestjs/common';
-import {FindCurrencyRate} from '../../../persistence/currency-rate/queries/find-currency-rate';
-import {IFindCurrencyRate} from '../../../persistence/currency-rate/types';
-import {UseCase} from '../../../packages/use-case';
+import {FindCurrencyRate} from '#persistence/currency-rate/queries/find-currency-rate';
+import {IFindCurrencyRate} from '#persistence/currency-rate/types';
+import {UseCase} from '#packages/use-case';
 
 type Input = {date: string};
 type Output = boolean;

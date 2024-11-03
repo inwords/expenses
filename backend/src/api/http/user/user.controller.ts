@@ -7,12 +7,12 @@ import {GetEventInfoQueryDto} from './dto/get-event-info.dto';
 import {EventIdDto} from './dto/event-id.dto';
 import {AddUsersToEventDto} from './dto/add-users-to-event.dto';
 import {CreatedExpenseDto} from './dto/create-expense.dto';
-import {GetEventExpenses} from '../../../interaction/expense/use-cases/get-event-expenses';
-import {SaveEventExpense} from '../../../interaction/expense/use-cases/save-event-expense';
-import {GetAllCurrencies} from '../../../interaction/currency/use-cases/get-all-currencies';
-import {SaveEvent} from '../../../interaction/event/use-cases/save-event';
-import {GetEventInfo} from '../../../interaction/event/use-cases/get-event-info';
-import {SaveUsersToEvent} from '../../../interaction/user/use-cases/save-users-to-event';
+import {GetEventExpenses} from '#interaction/expense/use-cases/get-event-expenses';
+import {SaveEventExpense} from '#interaction/expense/use-cases/save-event-expense';
+import {GetAllCurrencies} from '#interaction/currency/use-cases/get-all-currencies';
+import {SaveEvent} from '#interaction/event/use-cases/save-event';
+import {GetEventInfo} from '#interaction/event/use-cases/get-event-info';
+import {SaveUsersToEvent} from '#interaction/user/use-cases/save-users-to-event';
 
 @Controller(UserRoutes.root)
 @ApiTags('User')

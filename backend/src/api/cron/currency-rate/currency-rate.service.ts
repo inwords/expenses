@@ -1,9 +1,9 @@
 import {Injectable, OnModuleInit} from '@nestjs/common';
 import {HttpService} from '@nestjs/axios';
 import {ConfigService} from '@nestjs/config';
-import {SaveCurrencyRate} from '../../../interaction/currency-rate/use-cases/save-currency-rate';
-import {IsCurrencyRateExist} from '../../../interaction/currency-rate/use-cases/is-currency-rate-exist';
-import {getCurrentDateWithoutTime} from '../../../packages/date-utils';
+import {SaveCurrencyRate} from '#interaction/currency-rate/use-cases/save-currency-rate';
+import {IsCurrencyRateExist} from '#interaction/currency-rate/use-cases/is-currency-rate-exist';
+import {getCurrentDateWithoutTime} from '#packages/date-utils';
 
 @Injectable()
 export class CurrencyRateService implements OnModuleInit {

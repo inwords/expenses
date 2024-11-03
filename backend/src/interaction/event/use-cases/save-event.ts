@@ -1,13 +1,13 @@
-import {UseCase} from '../../../packages/use-case';
-import {Event} from '../../../domain/event/types';
-import {User} from '../../../domain/user/types';
+import {UseCase} from '#packages/use-case';
+import {Event} from '#domain/event/types';
+import {User} from '#domain/user/types';
 import {InjectEntityManager} from '@nestjs/typeorm';
 import {EntityManager} from 'typeorm';
 import {Inject} from '@nestjs/common';
-import {IUpsertEvent} from '../../../persistence/event/types';
-import {UpsertEvent} from '../../../persistence/event/queries/upsert-event';
-import {IUpsertUsers} from '../../../persistence/user/types';
-import {UpsertUsers} from '../../../persistence/user/queries/upsert-users';
+import {IUpsertEvent} from '#persistence/event/types';
+import {UpsertEvent} from '#persistence/event/queries/upsert-event';
+import {IUpsertUsers} from '#persistence/user/types';
+import {UpsertUsers} from '#persistence/user/queries/upsert-users';
 
 type Input = {users: Array<Omit<User, 'id' | 'eventId'>>; event: Pick<Event, 'name' | 'currencyId' | 'pinCode'>};
 type Output = Event;
