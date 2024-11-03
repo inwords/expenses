@@ -1,6 +1,6 @@
 import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
-import {Currency} from '../currency/currency.entity';
 import {JoinColumn} from 'typeorm';
+import {Currency} from "#persistence/entities/currency.entity";
 
 @Entity({name: 'event'})
 export class Event {

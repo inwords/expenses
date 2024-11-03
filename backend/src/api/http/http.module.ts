@@ -1,11 +1,19 @@
 import {Module} from '@nestjs/common';
 import {UserController} from './user/user.controller';
 import {ExpenseInteractionModule} from '../../interaction/expense/expense.interaction.module';
-import {CurrencyModule} from '../../currency/currency.module';
-import {EventModule} from '../../event/event.module';
+import {CurrencyInteractionModule} from '../../interaction/currency/currency.interaction.module';
+import {EventInteractionModule} from '../../interaction/event/event.interaction.module';
+import {UserInteractionModule} from '../../interaction/user/user.interaction.module';
+import {CurrencyPersistenceModule} from '../../persistence/currency/currency.persistence.module';
 
 @Module({
-  imports: [CurrencyModule, EventModule, ExpenseInteractionModule],
+  imports: [
+    ExpenseInteractionModule,
+    CurrencyInteractionModule,
+    EventInteractionModule,
+    UserInteractionModule,
+    CurrencyPersistenceModule,
+  ],
   controllers: [UserController],
 })
 export class HttpModule {}

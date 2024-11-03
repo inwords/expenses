@@ -1,5 +1,5 @@
 import {Column, Entity, PrimaryColumn} from 'typeorm';
-import {DateWithoutTime} from "../packages/date-utils";
+import {DateWithoutTime} from "#packages/date-utils";
 
 @Entity('currency_rate')
 export class CurrencyRate {

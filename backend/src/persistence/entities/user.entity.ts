@@ -1,5 +1,5 @@
 import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
-import {Event} from '../event/event.entity';
+import {Event} from '#persistence/entities/event.entity';
 
 @Entity('user')
 export class User {

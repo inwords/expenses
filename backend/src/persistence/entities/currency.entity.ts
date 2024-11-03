@@ -1,12 +1,5 @@
 import {Entity, PrimaryGeneratedColumn, Column} from 'typeorm';
-
-export enum CurrencyCode {
-  EUR = 'EUR',
-  USD = 'USD',
-  RUB = 'RUB',
-  JPY = 'JPY',
-  TRY = 'TRY',
-}
+import {CurrencyCode} from '#domain/currency/constants';
 
 @Entity({name: 'currency'})
 export class Currency {
