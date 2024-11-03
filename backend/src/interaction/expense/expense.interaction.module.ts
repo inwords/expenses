@@ -4,7 +4,7 @@ import {ExpensePersistenceModule} from '#persistence/expense/expense.persistence
 import {SaveEventExpense} from './use-cases/save-event-expense';
 import {EventPersistenceModule} from '#persistence/event/event.persistence.module';
 import {CurrencyPersistenceModule} from '#persistence/currency/currency.persistence.module';
-import {CurrencyRatePersistenceModule} from "#persistence/currency-rate/currency-rate.persistence.module";
+import {CurrencyRatePersistenceModule} from '#persistence/currency-rate/currency-rate.persistence.module';
 
 const useCases = [GetEventExpenses, SaveEventExpense];
 

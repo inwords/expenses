@@ -2,7 +2,9 @@ import {FindUsersInput, IFindUsers} from '../types';
 import {InjectEntityManager} from '@nestjs/typeorm';
 import {EntityManager} from 'typeorm';
 import {User} from '#persistence/entities/user.entity';
+import {Injectable} from '@nestjs/common';
 
+@Injectable()
 export class FindUsers implements IFindUsers {
   constructor(@InjectEntityManager() private readonly entityManager: EntityManager) {}
 

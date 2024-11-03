@@ -2,7 +2,9 @@ import {IUpsertUsers, UpsertUsersInput} from '../types';
 import {InjectEntityManager} from '@nestjs/typeorm';
 import {EntityManager} from 'typeorm';
 import {User} from '#persistence/entities/user.entity';
+import {Injectable} from "@nestjs/common";
 
+@Injectable()
 export class UpsertUsers implements IUpsertUsers {
   constructor(@InjectEntityManager() private readonly entityManager: EntityManager) {}
 
