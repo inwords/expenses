@@ -1,6 +1,6 @@
-import {Query} from '../../packages/query';
+import {Query} from '#packages/query';
 import {FindManyOptions} from 'typeorm/find-options/FindManyOptions';
-import {Expense as ExpenseInterface} from '../../domain/expense/types';
+import {Expense as ExpenseInterface} from '#domain/expense/types';
 
 export type FindExpensesInput = Pick<ExpenseInterface, 'eventId'>;
 export type IFindExpenses = Query<FindManyOptions<FindExpensesInput>, Array<ExpenseInterface>>;

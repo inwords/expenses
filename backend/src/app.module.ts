@@ -4,7 +4,6 @@ import {config} from './config';
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import {join} from 'path';
 import {SnakeNamingStrategy} from 'typeorm-naming-strategies';
-import {CronModule} from '#api/cron/cron.module';
 import {HttpModule} from '#api/http/http.module';
 
 @Module({
@@ -26,7 +25,6 @@ import {HttpModule} from '#api/http/http.module';
       imports: [ConfigModule],
     }),
     HttpModule,
-    CronModule,
   ],
 })
 export class AppModule {}

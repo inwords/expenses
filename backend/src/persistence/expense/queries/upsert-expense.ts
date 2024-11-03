@@ -1,5 +1,5 @@
 import {IUpsertExpense} from '../types';
-import {Expense as ExpenseInterface} from '../../../domain/expense/types';
+import {Expense as ExpenseInterface} from '#domain/expense/types';
 import {InjectEntityManager} from '@nestjs/typeorm';
 import {EntityManager} from 'typeorm';
 import {Injectable} from '@nestjs/common';
