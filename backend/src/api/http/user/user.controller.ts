@@ -7,41 +7,47 @@ import {GetEventInfoQueryDto} from './dto/get-event-info.dto';
 import {EventIdDto} from './dto/event-id.dto';
 import {AddUsersToEventDto} from './dto/add-users-to-event.dto';
 import {CreatedExpenseDto} from './dto/create-expense.dto';
-import {CurrencyService} from '../../../currency/currency.service';
-import {EventService} from '../../../event/event.service';
 import {GetEventExpenses} from '../../../interaction/expense/use-cases/get-event-expenses';
 import {SaveEventExpense} from '../../../interaction/expense/use-cases/save-event-expense';
+import {GetAllCurrencies} from '../../../interaction/currency/use-cases/get-all-currencies';
+import {SaveEvent} from '../../../interaction/event/use-cases/save-event';
+import {GetEventInfo} from '../../../interaction/event/use-cases/get-event-info';
+import {SaveUsersToEvent} from '../../../interaction/user/use-cases/save-users-to-event';
 
 @Controller(UserRoutes.root)
 @ApiTags('User')
 export class UserController {
   constructor(
-    private readonly currencyService: CurrencyService,
-    private readonly eventService: EventService,
     private readonly getEventExpensesUseCase: GetEventExpenses,
     private readonly saveEventExpenseUseCase: SaveEventExpense,
+    private readonly getAllCurrenciesUseCase: GetAllCurrencies,
+    private readonly saveEventUseCase: SaveEvent,
+    private readonly getEventInfoUseCase: GetEventInfo,
+    private readonly saveUsersToEventUseCase: SaveUsersToEvent,
   ) {}
   @Get(UserRoutes.getAllCurrencies)
   @HttpCode(200)
   async getAllCurrencies() {
-    return this.currencyService.getAllCurrencies();
+    return this.getAllCurrenciesUseCase.execute();
   }
 
   @Post(UserRoutes.createEvent)
   @HttpCode(201)
   async createEvent(@Body() body: CrateEventBodyDto) {
-    return this.eventService.saveEvent(body);
+    const {users, ...event} = body;
+
+    return this.saveEventUseCase.execute({users, event});
   }
 
   @Get(UserRoutes.getEventInfo)
   async getEventInfo(@Param() {eventId}: EventIdDto, @Query() query: GetEventInfoQueryDto) {
-    return this.eventService.getEventInfo(eventId, query.pinCode);
+    return this.getEventInfoUseCase.execute({eventId, pinCode: query.pinCode});
   }
 
   @Post(UserRoutes.addUsersToEvent)
   @HttpCode(201)
   async addUserToEvent(@Param() {eventId}: EventIdDto, @Body() body: AddUsersToEventDto) {
-    return this.eventService.addUsersToEvent(eventId, body.users, body.pinCode);
+    return this.saveUsersToEventUseCase.execute({id: eventId, ...body});
   }
 
   @Get(UserRoutes.getAllEventExpenses)

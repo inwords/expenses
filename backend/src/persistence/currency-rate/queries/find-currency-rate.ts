@@ -1,7 +1,7 @@
 import {FindCurrencyRateInput, IFindCurrencyRate} from '../types';
 import {InjectEntityManager} from '@nestjs/typeorm';
 import {EntityManager} from 'typeorm';
-import {CurrencyRate} from '../../../currency-rate/currency-rate.entity';
+import {CurrencyRate} from "#persistence/entities/currency-rate.entity";
 
 export class FindCurrencyRate implements IFindCurrencyRate {
   constructor(@InjectEntityManager() private readonly entityManager: EntityManager) {}

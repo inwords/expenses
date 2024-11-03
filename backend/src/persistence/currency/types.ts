@@ -3,3 +3,4 @@ import {Currency} from "../../domain/currency/types";
 
 export type FindCurrencyInput = {currencyId: number};
 export type IFindCurrency = Query<FindCurrencyInput, Currency>;
+export type IFIndCurrencies = Query<void, Array<Currency>>;

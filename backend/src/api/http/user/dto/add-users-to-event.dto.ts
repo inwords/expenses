@@ -1,8 +1,8 @@
 import {ApiProperty} from "@nestjs/swagger";
 import {IsString, MaxLength, ValidateNested} from "class-validator";
 import {Type} from "class-transformer";
-import {UserDto} from "../../../../user/dto/user";
-import {User} from "../../../../user/user.entity";
+import {UserDto} from "./user.dto";
+import {User} from "#domain/user/types";
 
 export class AddUsersToEventDto {
     @ApiProperty({isArray: true, type: UserDto})

@@ -9,7 +9,6 @@
     "target": "ES2021",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
     "lib": ["ESNext"],
     "incremental": true,
     "skipLibCheck": true,
@@ -17,6 +16,14 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "baseUrl": "./",                                     /* Specify the base directory to resolve non-relative module names. */
+    "paths": {
+      "#api/*": ["src/api/*"],
+      "#domain/*": ["src/domain/*"],
+      "#interaction/*": ["src/interaction/*"],
+      "#packages/*": ["src/packages/*"],
+      "#persistence/*": ["src/persistence/*"],
+    }
   }
 }

@@ -14,6 +14,8 @@ export class CurrencyRateService implements OnModuleInit {
     private readonly isCurrencyRateExistUseCase: IsCurrencyRateExist,
   ) {}
   public async onModuleInit() {
+    // TODO при первом запросе в течении дня идти в апишку обменника
+    // TODO обработать ошибку от обменника, возмоно проставлять флаг, для необходимости пересчета
     await this.checkOrGetTodayCurrencyRate();
   }
 

@@ -4,10 +4,8 @@ import {config} from './config';
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import {join} from 'path';
 import {SnakeNamingStrategy} from 'typeorm-naming-strategies';
-import {EventModule} from './event/event.module';
-import {CurrencyModule} from './currency/currency.module';
-import {CronModule} from './api/cron/cron.module';
-import {HttpModule} from './api/http/http.module';
+import {CronModule} from '#api/cron/cron.module';
+import {HttpModule} from '#api/http/http.module';
 
 @Module({
   imports: [
@@ -27,8 +25,6 @@ import {HttpModule} from './api/http/http.module';
       inject: [ConfigService],
       imports: [ConfigModule],
     }),
-    EventModule,
-    CurrencyModule,
     HttpModule,
     CronModule,
   ],

@@ -2,8 +2,8 @@ import {EntityManager} from 'typeorm';
 import {FindManyOptions} from 'typeorm/find-options/FindManyOptions';
 import {InjectEntityManager} from '@nestjs/typeorm';
 import {Injectable} from '@nestjs/common';
-import {Expense} from '../../../expense/expense.entity';
 import {FindExpensesInput} from '../types';
+import {Expense} from '#persistence/entities/expense.entity';
 
 @Injectable()
 export class FindExpenses implements FindExpenses {

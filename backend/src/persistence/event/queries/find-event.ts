@@ -1,7 +1,7 @@
 import {FindEventInput, IFindEvent} from '../types';
 import {InjectEntityManager} from '@nestjs/typeorm';
 import {EntityManager} from 'typeorm';
-import {Event} from '../../../event/event.entity';
+import {Event} from '#persistence/entities/event.entity';
 
 export class FindEvent implements IFindEvent {
   constructor(@InjectEntityManager() private readonly entityManager: EntityManager) {}
