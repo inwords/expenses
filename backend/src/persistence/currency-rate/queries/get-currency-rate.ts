@@ -11,12 +11,13 @@ export class GetCurrencyRate implements IGetCurrencyRate {
   ) {}
 
   public async execute() {
-    console.log(this.httpService)
     const result = await this.httpService.axiosRef.get(
       `https://openexchangerates.org/api/latest.json?app_id=${this.configService.get('OPEN_EXCHANGE_RATES_API_ID')}&base=USD`,
     );
+    console.log("-> result", result);
 
     const rate = result.data.rates;
+    console.log("-> rate", rate);
 
     return rate || null;
   }
