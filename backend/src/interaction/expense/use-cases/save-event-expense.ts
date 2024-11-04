@@ -46,13 +46,15 @@ export class SaveEventExpense implements UseCase<Input, Output> {
         const eventCurrencyCode = await this.findCurrency.execute({currencyId: event.currencyId});
 
         if (expenseCurrencyCode && eventCurrencyCode) {
-          let currencyRate = await this.findCurrencyRate.execute({date: getCurrentDateWithoutTime()});
+          const date = getCurrentDateWithoutTime();
+
+          let currencyRate = await this.findCurrencyRate.execute({date});
 
           if (!currencyRate) {
-            currencyRate = await this.getCurrencyRate.execute();
+            currencyRate = {date, rate: await this.getCurrencyRate.execute()};
           }
 
-          if (currencyRate) {
+          if (currencyRate.rate) {
             void this.upsertCurrencyRate.execute(currencyRate);
 
             const exchangeRate =
