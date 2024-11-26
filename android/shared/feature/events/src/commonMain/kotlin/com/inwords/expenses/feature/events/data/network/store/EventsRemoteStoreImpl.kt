@@ -40,7 +40,7 @@ internal class EventsRemoteStoreImpl(
         val result = client.requestWithExceptionHandling {
             get {
                 url(hostConfig) {
-                    pathSegments = listOf("event", event.serverId.toString())
+                    pathSegments = listOf("user", "event", event.serverId.toString())
                     parameters.append("pinCode", event.pinCode)
                 }
             }.body<EventDto>().toEventDetails(
@@ -70,7 +70,7 @@ internal class EventsRemoteStoreImpl(
     ): IoResult<EventDetails> {
         return client.requestWithExceptionHandling {
             post {
-                url(hostConfig) { pathSegments = listOf("event") }
+                url(hostConfig) { pathSegments = listOf("user", "event") }
                 contentType(ContentType.Application.Json)
                 setBody(
                     CreateEventRequest(
@@ -92,7 +92,7 @@ internal class EventsRemoteStoreImpl(
     ): IoResult<List<Person>> {
         return client.requestWithExceptionHandling {
             post {
-                url(hostConfig) { pathSegments = listOf("event", eventServerId.toString(), "users") }
+                url(hostConfig) { pathSegments = listOf("user", "event", eventServerId.toString(), "users") }
                 contentType(ContentType.Application.Json)
                 setBody(
                     AddUsersDto(users = localPersons.map { it.toCreateUserDto() })

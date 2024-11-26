@@ -192,10 +192,8 @@ private suspend fun OutgoingContent.toUploadDataProvider(): UploadDataProvider? 
             UploadDataProviders.create(outgoingContent.readFrom().toByteArray())
         }
 
-        is OutgoingContent.WriteChannelContent -> {
-            coroutineScope {
-                UploadDataProviders.create(toReadChannel(outgoingContent).toByteArray())
-            }
+        is OutgoingContent.WriteChannelContent -> coroutineScope {
+            UploadDataProviders.create(toReadChannel(outgoingContent).toByteArray())
         }
 
         is OutgoingContent.ProtocolUpgrade -> error("UnsupportedContentType $this")

@@ -1,28 +1,28 @@
 [versions]
-kotlin = "2.0.20"
-ksp = "2.0.20-1.0.24"
+kotlin = "2.0.21"
+ksp = "2.0.21-1.0.28"
 
-room = "2.7.0-alpha07"
+room = "2.7.0-alpha11"
 datastore = "1.1.1"
 
-ktor = "3.0.0-rc-1"
+ktor = "3.0.1"
 cronet = "119.6045.31"
 
-coroutines = "1.9.0-RC.2"
+coroutines = "1.9.0"
 
-kotlinx-serialization = "1.7.2"
+kotlinx-serialization = "1.7.3"
 
 coil = "2.7.0"
 
-lifecycle = "2.8.5"
+lifecycle = "2.8.7"
 
-compose-bom = "2024.09.00"
+compose-bom = "2024.11.00"
 compose-multiplatform = "1.7.0-alpha02"
 
 [libraries]
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version = "2.5.0-alpha07" }
+sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version = "2.5.0-alpha11" }
 datastore-core-okio = { group = "androidx.datastore", name = "datastore-core-okio", version.ref = "datastore" }
 datastore-android = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
 
@@ -52,17 +52,17 @@ lifecycle-runtime-compose-multiplatform = { group = "org.jetbrains.androidx.life
 lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 lifecycle-viewmodel-compose-multiplatform = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-compose", version = "2.8.0" }
 
-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version = "2.9.1" }
-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.13.1" }
-annotation = { group = "androidx.annotation", name = "annotation", version = "1.8.2" }
+work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version = "2.10.0" }
+core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.15.0" }
+annotation = { group = "androidx.annotation", name = "annotation", version = "1.9.1" }
 
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
 compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
-activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.9.2" }
-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version = "2.8.0" }
+activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.9.3" }
+navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version = "2.8.4" }
 navigation-compose-multiplatform = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version = "2.8.0-alpha08" }
 
 ionspin-kotlin-bignum = { group = "com.ionspin.kotlin", name = "bignum", version = "0.3.10" }

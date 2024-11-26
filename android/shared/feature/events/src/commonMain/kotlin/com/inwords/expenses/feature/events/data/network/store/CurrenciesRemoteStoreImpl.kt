@@ -22,7 +22,7 @@ internal class CurrenciesRemoteStoreImpl(
         return client.requestWithExceptionHandling {
             get {
                 url(hostConfig) {
-                    pathSegments = listOf("currency", "all")
+                    pathSegments = listOf("user", "currencies", "all")
                 }
             }.body<List<CurrencyDto>>().map { it.toCurrency() }
         }.toIoResult()
