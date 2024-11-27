@@ -40,7 +40,7 @@
     "@opentelemetry/instrumentation": "^0.55.0",
     "@opentelemetry/resources": "^1.28.0",
     "@opentelemetry/sdk-node": "^0.55.0",
-    "axios": "^1.7.5",
+    "axios": "^1.7.8",
     "bcrypt": "5.1.1",
     "class-transformer": "0.5.1",
     "class-validator": "0.14.1",
