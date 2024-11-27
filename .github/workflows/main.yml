@@ -56,5 +56,5 @@ jobs:
             OPEN_EXCHANGE_RATES_API_ID=${{ secrets.OPEN_EXCHANGE_RATES_API_ID }} \
             GF_SECURITY_ADMIN_USER=${{ secrets.GF_SECURITY_ADMIN_USER }} \
             GF_SECURITY_ADMIN_PASSWORD=${{ secrets.GF_SECURITY_ADMIN_PASSWORD }} \
-            docker compose -f docker-compose-prod.yml pull && docker compose -f docker-compose-prod.yml up -d
+            docker compose -f docker-compose-prod.yml up -d --pull always
           EOF
