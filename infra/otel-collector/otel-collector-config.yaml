@@ -1,0 +1,30 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+processors:
+  batch:
+
+exporters:
+  otlphttp/victoriametrics:
+    compression: gzip
+    encoding: proto
+    endpoint: http://victoriametrics:8428/opentelemetry
+    tls:
+      insecure: true
+
+extensions:
+  health_check:
+
+service:
+  extensions: [ health_check ]
+  pipelines:
+    metrics:
+      receivers: [ otlp ]
+      processors: [ batch ]
+      exporters: [ otlphttp/victoriametrics ]
+#    traces:
+#      receivers: [ otlp ]
+#      processors: [ batch ]

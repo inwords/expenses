@@ -1,6 +1,10 @@
 services:
   db:
-    image: postgres:16-alpine3.20
+    image: postgres:17-alpine3.20
+    deploy:
+      resources:
+        limits:
+          memory: 300M
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -11,6 +15,10 @@ services:
 
   nest-backend:
     image: ruggedbl/commonex-nest-backend
+    deploy:
+      resources:
+        limits:
+          memory: 300M
     restart: always
     environment:
       - POSTGRES_HOST=${POSTGRES_HOST}
@@ -24,10 +32,18 @@ services:
 
   next-web:
     image: ruggedbl/commonex-next-web
+    deploy:
+      resources:
+        limits:
+          memory: 200M
     restart: always
 
   nginx:
-    image: nginx:1.27.0-alpine3.19
+    image: nginx:1.27.3-alpine3.20
+    deploy:
+      resources:
+        limits:
+          memory: 200M
     restart: always
     ports:
       - "80:80"
@@ -43,8 +59,51 @@ services:
       - nest-backend
       - next-web
 
+  otel-collector:
+    image: otel/opentelemetry-collector:0.114.0
+    container_name: otelcollector
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+    restart: unless-stopped
+    command: [ "--config=/etc/otel-collector-config.yaml" ]
+    volumes:
+      - ./otel-collector/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:v1.106.1
+    container_name: victoriametrics
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+    command:
+      - "--storageDataPath=/victoria-metrics-data"
+    volumes:
+      - victoriametrics_data:/victoria-metrics-data
+
+  grafana:
+    image: grafana/grafana:11.3.1
+    container_name: grafana
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+    depends_on:
+      - victoriametrics
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+    volumes:
+      - grafana_data:/var/lib/grafana
+
   certbot:
     image: certbot/certbot:v2.11.0
+    deploy:
+      resources:
+        limits:
+          memory: 200M
     volumes:
       - /etc/commonex/ssl/certbot/:/etc/letsencrypt/:rw
       - /etc/commonex/www/certbot/:/var/www/certbot/:rw
@@ -55,3 +114,5 @@ volumes:
     driver_opts:
       type: tmpfs
       device: tmpfs
+  victoriametrics_data:
+  grafana_data:
