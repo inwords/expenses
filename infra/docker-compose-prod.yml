@@ -106,7 +106,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 200M
+          memory: 190M
     volumes:
       - /etc/commonex/ssl/certbot/:/etc/letsencrypt/:rw
       - /etc/commonex/www/certbot/:/var/www/certbot/:rw

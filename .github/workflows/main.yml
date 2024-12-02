@@ -5,9 +5,9 @@ on:
     branches:
       - main
     paths:
-      - './backend'
-      - './web'
-      - './infra'
+      - 'backend/**'
+      - 'web/**'
+      - 'infra/**'
 
 jobs:
   build:
