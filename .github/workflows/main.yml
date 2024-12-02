@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - './backend'
+      - './web'
+      - './infra'
 
 jobs:
   build:
@@ -43,6 +47,13 @@ jobs:
           context: ./web
           push: true
           tags: ruggedbl/commonex-next-web:latest
+
+      - name: Build and push otel-collector image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./infra/otel-collector
+          push: true
+          tags: ruggedbl/opentelemetry-collector-custom:latest
 
       - name: Deploy with Docker Compose
         run: |

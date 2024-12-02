@@ -4,6 +4,12 @@ receivers:
       grpc:
         endpoint: 0.0.0.0:4317
 
+  docker_stats:
+    endpoint: unix:///var/run/docker.sock
+    collection_interval: 5s
+    timeout: 5s
+    api_version: "1.45"
+
 processors:
   batch:
 
@@ -22,7 +28,7 @@ service:
   extensions: [ health_check ]
   pipelines:
     metrics:
-      receivers: [ otlp ]
+      receivers: [ otlp, docker_stats ]
       processors: [ batch ]
       exporters: [ otlphttp/victoriametrics ]
 #    traces:
