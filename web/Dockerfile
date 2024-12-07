@@ -1,5 +1,5 @@
 # Base image
-FROM node:20-alpine3.19 as build-stage
+FROM node:20-alpine3.20 AS build-stage
 
 # Set working directory
 WORKDIR /app
@@ -22,7 +22,7 @@ RUN npm run build
 USER nginx
 
 # Intermediate image for Nginx
-FROM nginx:1.27.0-alpine3.19
+FROM nginx:1.27.3-alpine3.20
 
 # Copy the static files from the build-stage
 COPY --from=build-stage /app/build /usr/share/nginx/html
