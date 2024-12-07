@@ -8,11 +8,74 @@ on:
       - 'backend/**'
       - 'web/**'
       - 'infra/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - 'web/**'
+      - 'infra/**'
+      - '.github/workflows/**'
 
 jobs:
-  build:
+  containers_matrix_prep:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix-json.outputs.matrix }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
+      - name: Filter changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend: 'backend/**'
+            frontend: 'web/**'
+            otel-collector: 'infra/otel-collector/**'
+
+      - name: Prepare matrix JSON
+        id: matrix-json
+        run: |
+          # 'filter.outputs.changes' contains a JSON array of changed service names, e.g. ["backend","frontend"].
+          changed_services='${{ steps.filter.outputs.changes }}'
+
+          # Define all available services in a JSON file
+          cat <<EOF > services.json
+          [
+            {
+              "name": "backend",
+              "context": "./backend",
+              "tags": "ruggedbl/commonex-nest-backend:latest"
+            },
+            {
+              "name": "frontend",
+              "context": "./web",
+              "tags": "ruggedbl/commonex-next-web:latest"
+            },
+            {
+              "name": "otel-collector",
+              "context": "./infra/otel-collector",
+              "tags": "ruggedbl/opentelemetry-collector-custom:latest"
+            }
+          ]
+          EOF
+
+          matrix=$(jq -c --argjson changed_services "$changed_services" '
+          [
+          .[] | (.name) as $n | select($changed_services | index($n) != null)
+          ]
+          ' services.json)
+          
+          echo "matrix={\"service\":$matrix}" >> $GITHUB_OUTPUT
+
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs: containers_matrix_prep
+    strategy:
+      matrix: ${{ fromJson(needs.containers_matrix_prep.outputs.matrix) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -23,16 +86,21 @@ jobs:
       - name: Log in to Docker Registry
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }} # Store your Docker Hub username in GitHub Secrets
-          password: ${{ secrets.DOCKER_PASSWORD }} # Store your Docker Hub password in GitHub Secrets
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push backend image
+      - name: Build and push ${{ matrix.service.name }} image
         uses: docker/build-push-action@v3
         with:
-          context: ./backend
+          context: ${{ matrix.service.context }}
           push: true
-          tags: ruggedbl/commonex-nest-backend:latest
+          tags: ${{ matrix.service.tags }}
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    steps:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
@@ -40,20 +108,6 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           echo "Host *" >> ~/.ssh/config
           echo "    StrictHostKeyChecking no" >> ~/.ssh/config
-
-      - name: Build and push frontend image
-        uses: docker/build-push-action@v3
-        with:
-          context: ./web
-          push: true
-          tags: ruggedbl/commonex-next-web:latest
-
-      - name: Build and push otel-collector image
-        uses: docker/build-push-action@v3
-        with:
-          context: ./infra/otel-collector
-          push: true
-          tags: ruggedbl/opentelemetry-collector-custom:latest
 
       - name: Deploy with Docker Compose
         run: |

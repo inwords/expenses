@@ -27,4 +27,3 @@ EXPOSE 4317/tcp 4318/tcp
 
 # Set the default command
 ENTRYPOINT ["/otelcol-custom"]
-
