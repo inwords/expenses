@@ -21,6 +21,10 @@ internal class CurrenciesLocalStoreImpl(
         }.distinctUntilChanged()
     }
 
+    override fun getCurrencyCodeById(currencyId: Long): String? {
+        return currenciesDao.queryCodeById(currencyId)
+    }
+
     override suspend fun insert(currencies: List<Currency>): List<Currency> {
         val currencyEntities = currencies.map { it.toEntity() }
         val ids = currenciesDao.insert(currencyEntities)

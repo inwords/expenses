@@ -85,23 +85,25 @@ internal fun mockExpensesScreenUiModel(): ExpensesScreenUiModel {
                 ),
                 expenseType = ExpenseType.Spending,
                 person = person1,
-                subjecExpenseSplitWithPersons = listOf(
+                subjectExpenseSplitWithPersons = listOf(
                     ExpenseSplitWithPerson(
                         expenseSplitId = 1,
                         expenseId = 1,
                         person = person1,
-                        amount = 100.toBigDecimal()
+                        originalAmount = 100.toBigDecimal(),
+                        exchangedAmount = 100.toBigDecimal(),
                     ),
                     ExpenseSplitWithPerson(
                         expenseSplitId = 2,
                         expenseId = 1,
                         person = person2,
-                        amount = 150.333.toBigDecimal()
+                        originalAmount = 150.333.toBigDecimal(),
+                        exchangedAmount = 100.toBigDecimal(),
                     )
                 ),
                 timestamp = Clock.System.now(),
                 description = "Lunch",
-            ).toUiModel(),
+            ).toUiModel("EUR"),
             Expense(
                 expenseId = 2,
                 serverId = 12,
@@ -113,17 +115,18 @@ internal fun mockExpensesScreenUiModel(): ExpensesScreenUiModel {
                 ),
                 expenseType = ExpenseType.Replenishment,
                 person = person2,
-                subjecExpenseSplitWithPersons = listOf(
+                subjectExpenseSplitWithPersons = listOf(
                     ExpenseSplitWithPerson(
                         expenseSplitId = 4,
                         expenseId = 2,
                         person = person2,
-                        amount = 132423423.toBigDecimal()
+                        originalAmount = 132423423.toBigDecimal(),
+                        exchangedAmount = 132423423.toBigDecimal(),
                     )
                 ),
                 timestamp = Clock.System.now(),
                 description = "Dinner and some text",
-            ).toUiModel()
+            ).toUiModel("EUR")
         ),
         isRefreshing = false
     )

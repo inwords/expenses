@@ -23,7 +23,6 @@ interface EventsLocalStore {
     suspend fun deepInsert(
         eventToInsert: Event,
         personsToInsert: List<Person>,
-        primaryCurrencyId: Long,
         prefetchedLocalCurrencies: List<Currency>? = null,
         inTransaction: Boolean
     ): EventDetails

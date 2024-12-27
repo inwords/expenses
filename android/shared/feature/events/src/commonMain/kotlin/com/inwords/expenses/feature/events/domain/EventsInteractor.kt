@@ -64,7 +64,7 @@ class EventsInteractor internal constructor(
 
         // TODO extract separate model for event parameters
         val joinEventResult = joinRemoteEventUseCase.joinRemoteEvent(
-            event = Event(0L, eventServerId, "", accessCode),
+            event = Event(0L, eventServerId, "", accessCode, 0L),
             localCurrencies = null,
             localPersons = null,
         )
@@ -109,13 +109,13 @@ class EventsInteractor internal constructor(
             serverId = 0L,
             name = draft.draftEventName,
             // FIXME secure
-            pinCode = Random.Default.nextLong(1000, 9999).toString()
+            pinCode = Random.Default.nextLong(1000, 9999).toString(),
+            primaryCurrencyId = draft.draftPrimaryCurrencyId
         )
 
         val eventDetails = eventsLocalStore.deepInsert(
             eventToInsert = eventToInsert,
             personsToInsert = personsToInsert,
-            primaryCurrencyId = draft.draftPrimaryCurrencyId,
             inTransaction = true
         )
 

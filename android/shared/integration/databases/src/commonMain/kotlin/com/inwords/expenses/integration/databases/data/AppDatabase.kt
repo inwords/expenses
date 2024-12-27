@@ -1,6 +1,5 @@
 package com.inwords.expenses.integration.databases.data
 
-import androidx.room.AutoMigration
 import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -29,12 +28,12 @@ import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseSplitEntity
         EventPersonCrossRef::class,
     ],
     autoMigrations = [
-        AutoMigration(from = 1, to = 2)
+
     ],
-    version = 2
+    version = 3
 )
 @ConstructedBy(AppDatabaseConstructor::class)
-abstract class AppDatabase : RoomDatabase() { // TODO make internal when Room is fixed
+internal abstract class AppDatabase : RoomDatabase() {
 
     abstract fun eventsDao(): EventsDao
     abstract fun expensesDao(): ExpensesDao

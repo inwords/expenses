@@ -5,8 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class CreateExpenseRequest(
-    @SerialName("eventId")
-    val eventId: Long,
 
     @SerialName("description")
     val description: String,

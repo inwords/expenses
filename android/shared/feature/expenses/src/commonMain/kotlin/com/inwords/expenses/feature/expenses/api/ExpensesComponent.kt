@@ -1,8 +1,10 @@
 package com.inwords.expenses.feature.expenses.api
 
 import com.inwords.expenses.core.network.HostConfig
+import com.inwords.expenses.core.storage.utils.TransactionHelper
 import com.inwords.expenses.core.utils.Component
 import com.inwords.expenses.core.utils.SuspendLazy
+import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.expenses.data.db.ExpensesLocalStoreImpl
 import com.inwords.expenses.feature.expenses.data.db.dao.ExpensesDao
@@ -23,7 +25,10 @@ class ExpensesComponent(private val deps: Deps) : Component {
         val client: SuspendLazy<HttpClient>
         val hostConfig: HostConfig
 
+        val transactionHelper: TransactionHelper
+
         val eventsLocalStore: EventsLocalStore
+        val currenciesLocalStore: CurrenciesLocalStore
     }
 
     private val expensesLocalStore: Lazy<ExpensesLocalStore> = lazy {
@@ -41,7 +46,8 @@ class ExpensesComponent(private val deps: Deps) : Component {
         EventExpensesPushTask(
             eventsLocalStoreLazy = lazy { deps.eventsLocalStore },
             expensesLocalStoreLazy = expensesLocalStore,
-            expensesRemoteStoreLazy = expensesRemoteStore
+            expensesRemoteStoreLazy = expensesRemoteStore,
+            transactionHelperLazy = lazy { deps.transactionHelper }
         )
     }
 
@@ -54,6 +60,6 @@ class ExpensesComponent(private val deps: Deps) : Component {
     }
 
     val expensesInteractor: ExpensesInteractor by lazy {
-        ExpensesInteractor(expensesLocalStore)
+        ExpensesInteractor(expensesLocalStore, lazy { deps.currenciesLocalStore })
     }
 }

@@ -3,20 +3,24 @@ package com.inwords.expenses.feature.expenses.data.db.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.TypeConverters
 import androidx.room.Upsert
+import com.inwords.expenses.core.storage.utils.type_converter.BigIntegerConverter
 import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseEntity
 import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseSplitEntity
 import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseWithDetailsQuery
+import com.ionspin.kotlin.bignum.integer.BigInteger
 import kotlinx.coroutines.flow.Flow
 
 @Dao
+@TypeConverters(BigIntegerConverter::class)
 interface ExpensesDao {
 
     @Transaction
-    suspend fun insert(expenseEntity: ExpenseEntity, subjectPersonSplitEntities: List<ExpenseSplitEntity>): Long {
-        val expenseId = insert(expenseEntity)
+    suspend fun upsert(expenseEntity: ExpenseEntity, subjectPersonSplitEntities: List<ExpenseSplitEntity>): Long {
+        val expenseId = upsert(expenseEntity)
 
-        insert(
+        upsert(
             subjectPersonSplitEntities.map { personSplit ->
                 personSplit.copy(expenseId = expenseId)
             }
@@ -26,15 +30,30 @@ interface ExpensesDao {
     }
 
     @Upsert
-    suspend fun insert(expenseEntity: ExpenseEntity): Long
+    suspend fun upsert(expenseEntity: ExpenseEntity): Long
 
     @Upsert
-    suspend fun insert(personSplitEntities: List<ExpenseSplitEntity>)
+    suspend fun upsert(subjectPersonSplitEntities: List<ExpenseSplitEntity>)
 
-    @Transaction
-    @Query("UPDATE ${ExpenseEntity.TABLE_NAME} SET ${ExpenseEntity.ColumnNames.SERVER_ID} = :serverId " +
-        "WHERE ${ExpenseEntity.ColumnNames.ID} = :expenseId")
-    suspend fun update(expenseId: Long, serverId: Long): Int
+    @Query(
+        "UPDATE ${ExpenseSplitEntity.TABLE_NAME} SET " +
+            "${ExpenseSplitEntity.ColumnNames.EXCHANGED_AMOUNT_UNSCALED} = " +
+            ":exchangedAmountUnscaled, " +
+            "${ExpenseSplitEntity.ColumnNames.EXCHANGED_AMOUNT_SCALE} = " +
+            ":exchangedAmountScale " +
+            "WHERE ${ExpenseSplitEntity.ColumnNames.ID} = :expenseSplitId"
+    )
+    suspend fun updateExpenseSplitExchangedAmount(
+        expenseSplitId: Long,
+        exchangedAmountUnscaled: BigInteger,
+        exchangedAmountScale: Long
+    ): Int
+
+    @Query(
+        "UPDATE ${ExpenseEntity.TABLE_NAME} SET ${ExpenseEntity.ColumnNames.SERVER_ID} = :serverId " +
+            "WHERE ${ExpenseEntity.ColumnNames.ID} = :expenseId"
+    )
+    suspend fun updateExpenseServerId(expenseId: Long, serverId: Long): Int
 
     @Transaction
     @Query("SELECT * FROM ${ExpenseEntity.TABLE_NAME} WHERE ${ExpenseEntity.ColumnNames.EVENT_ID} = :eventId")

@@ -341,7 +341,7 @@ private fun ExpenseItem(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = expense.currencyName,
+                    text = expense.currencyText,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )

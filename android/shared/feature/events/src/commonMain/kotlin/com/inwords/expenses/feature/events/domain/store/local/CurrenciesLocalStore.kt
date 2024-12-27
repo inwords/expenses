@@ -3,9 +3,11 @@ package com.inwords.expenses.feature.events.domain.store.local
 import com.inwords.expenses.feature.events.domain.model.Currency
 import kotlinx.coroutines.flow.Flow
 
-internal interface CurrenciesLocalStore {
+interface CurrenciesLocalStore {
 
     fun getCurrencies(): Flow<List<Currency>>
+
+    fun getCurrencyCodeById(currencyId: Long): String?
 
     suspend fun insert(currencies: List<Currency>): List<Currency>
 }

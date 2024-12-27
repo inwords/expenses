@@ -80,7 +80,7 @@ internal class ExpensesViewModel(
                     currentPersonName = currentPerson.name,
                     creditors = debtors,
                     expenses = expensesDetails.expenses.map { expense ->
-                        expense.toUiModel()
+                        expense.toUiModel(primaryCurrencyName = expensesDetails.event.primaryCurrency.name)
                     }.asImmutableListAdapter(),
                     isRefreshing = false // TODO costyl
                 )

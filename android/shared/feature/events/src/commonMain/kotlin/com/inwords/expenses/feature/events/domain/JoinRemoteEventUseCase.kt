@@ -46,7 +46,6 @@ internal class JoinRemoteEventUseCase(
             eventsLocalStore.deepInsert(
                 eventToInsert = remoteEvent.event,
                 personsToInsert = remoteEvent.persons,
-                primaryCurrencyId = updatedCurrencies.first { it.serverId == remoteEvent.primaryCurrency.serverId }.id,
                 prefetchedLocalCurrencies = updatedCurrencies,
                 inTransaction = false,
             )

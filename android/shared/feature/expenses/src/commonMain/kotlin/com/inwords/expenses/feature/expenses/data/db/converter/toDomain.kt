@@ -17,7 +17,7 @@ internal fun ExpenseWithDetailsQuery.toDomain(): Expense {
         currency = this.currency.toDomain(),
         expenseType = this.expense.expenseType,
         person = this.person.toDomain(),
-        subjecExpenseSplitWithPersons = this.expenseSplitWithPersons.map { it.toDomain() },
+        subjectExpenseSplitWithPersons = this.expenseSplitWithPersons.map { it.toDomain() },
         timestamp = this.expense.timestamp,
         description = this.expense.description,
     )
@@ -41,13 +41,24 @@ internal fun PersonEntity.toDomain(): Person {
 }
 
 internal fun ExpenseSplitWithPersonQuery.toDomain(): ExpenseSplitWithPerson {
+    val originalAmountUnscaled = this.expenseSplitEntity.originalAmountUnscaled
+    val originalAmountScale = this.expenseSplitEntity.originalAmountScale
+
     return ExpenseSplitWithPerson(
         expenseSplitId = this.expenseSplitEntity.expenseSplitId,
         expenseId = this.expenseSplitEntity.expenseId,
         person = this.person.toDomain(),
-        amount = BigDecimal.fromBigIntegerWithExponent(
-            bigInteger = this.expenseSplitEntity.amountUnscaled,
-            exponent = this.expenseSplitEntity.amountScale
+        originalAmount = if (originalAmountUnscaled != null && originalAmountScale != null) {
+            BigDecimal.fromBigIntegerWithExponent(
+                bigInteger = originalAmountUnscaled,
+                exponent = originalAmountScale
+            )
+        } else {
+            null
+        },
+        exchangedAmount = BigDecimal.fromBigIntegerWithExponent(
+            bigInteger = this.expenseSplitEntity.exchangedAmountUnscaled,
+            exponent = this.expenseSplitEntity.exchangedAmountScale
         ),
     )
 }

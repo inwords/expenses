@@ -43,11 +43,17 @@ data class ExpenseSplitEntity(
     @ColumnInfo(ColumnNames.PERSON_ID)
     val personId: Long,
 
-    @ColumnInfo(ColumnNames.AMOUNT_UNSCALED)
-    val amountUnscaled: BigInteger,
+    @ColumnInfo(ColumnNames.ORIGINAL_AMOUNT_UNSCALED)
+    val originalAmountUnscaled: BigInteger?,
 
-    @ColumnInfo(ColumnNames.SCALE)
-    val amountScale: Long,
+    @ColumnInfo(ColumnNames.ORIGINAL_AMOUNT_SCALE)
+    val originalAmountScale: Long?,
+
+    @ColumnInfo(name = ColumnNames.EXCHANGED_AMOUNT_UNSCALED)
+    val exchangedAmountUnscaled: BigInteger,
+
+    @ColumnInfo(name = ColumnNames.EXCHANGED_AMOUNT_SCALE)
+    val exchangedAmountScale: Long
 ) {
 
     companion object {
@@ -60,7 +66,9 @@ data class ExpenseSplitEntity(
         const val ID = "expense_split_id"
         const val EXPENSE_ID = "expense_id"
         const val PERSON_ID = "person_id"
-        const val AMOUNT_UNSCALED = "amount_unscaled"
-        const val SCALE = "scale"
+        const val ORIGINAL_AMOUNT_UNSCALED = "original_amount_unscaled"
+        const val ORIGINAL_AMOUNT_SCALE = "original_amount_scale"
+        const val EXCHANGED_AMOUNT_UNSCALED = "exchanged_amount_unscaled"
+        const val EXCHANGED_AMOUNT_SCALE = "exchanged_amount_scale"
     }
 }

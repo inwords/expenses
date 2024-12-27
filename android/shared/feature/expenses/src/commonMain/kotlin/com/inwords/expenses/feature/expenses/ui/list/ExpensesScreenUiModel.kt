@@ -23,7 +23,7 @@ internal data class ExpensesScreenUiModel(
 
     data class ExpenseUiModel(
         val expenseId: Long,
-        val currencyName: String,
+        val currencyText: String,
         val expenseType: ExpenseType,
         val personName: String,
         val totalAmount: String,
