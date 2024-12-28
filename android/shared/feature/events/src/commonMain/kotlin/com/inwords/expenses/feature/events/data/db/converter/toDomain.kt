@@ -4,6 +4,7 @@ import com.inwords.expenses.feature.events.data.db.entity.CurrencyEntity
 import com.inwords.expenses.feature.events.data.db.entity.EventEntity
 import com.inwords.expenses.feature.events.data.db.entity.EventWithDetailsQuery
 import com.inwords.expenses.feature.events.data.db.entity.PersonEntity
+import com.inwords.expenses.feature.events.data.db.entity.PrimaryCurrencyByEventIdQuery
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
@@ -15,6 +16,7 @@ internal fun EventEntity.toDomain(): Event {
         serverId = eventServerId,
         name = name,
         pinCode = pinCode,
+        primaryCurrencyId = primaryCurrencyId,
     )
 }
 
@@ -25,6 +27,10 @@ internal fun EventWithDetailsQuery.toDomain(): EventDetails {
         persons = persons.map { it.toDomain() },
         primaryCurrency = primaryCurrency.toDomain(),
     )
+}
+
+internal fun PrimaryCurrencyByEventIdQuery.toDomain(): Currency {
+    return primaryCurrency.toDomain()
 }
 
 internal fun PersonEntity.toDomain() = Person(

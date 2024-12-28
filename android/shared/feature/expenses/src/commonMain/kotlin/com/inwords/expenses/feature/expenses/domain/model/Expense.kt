@@ -12,10 +12,10 @@ data class Expense(
     val currency: Currency,
     val expenseType: ExpenseType,
     val person: Person,
-    val subjecExpenseSplitWithPersons: List<ExpenseSplitWithPerson>,
+    val subjectExpenseSplitWithPersons: List<ExpenseSplitWithPerson>,
     val timestamp: Instant,
     val description: String,
 ) {
 
-    val totalAmount: BigDecimal = subjecExpenseSplitWithPersons.sumOf { it.amount }
+    val totalAmount: BigDecimal = subjectExpenseSplitWithPersons.sumOf { it.exchangedAmount }
 }

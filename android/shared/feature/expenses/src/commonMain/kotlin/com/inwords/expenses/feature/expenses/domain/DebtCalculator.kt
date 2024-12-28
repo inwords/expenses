@@ -12,7 +12,6 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 internal class DebtCalculator(
     private val expenses: List<Expense>,
     private val primaryCurrency: Currency,
-    private val currencyExchanger: CurrencyExchanger = CurrencyExchanger(),
 ) {
 
     /**
@@ -51,14 +50,14 @@ internal class DebtCalculator(
         val debtorToCreditorDebts = hashMapOf<Person, MutableMap<Person, MutableList<Debt>>>()
 
         expenses.forEach { expense ->
-            expense.subjecExpenseSplitWithPersons.forEach { subjectExpenseSplit ->
+            expense.subjectExpenseSplitWithPersons.forEach { subjectExpenseSplit ->
                 if (subjectExpenseSplit.person != expense.person) {
                     val subjectDebtorToCreditorDebts = debtorToCreditorDebts.getOrPut(subjectExpenseSplit.person) { mutableMapOf() }
 
                     val debt = Debt(
                         creditor = expense.person,
                         debtor = subjectExpenseSplit.person,
-                        amount = subjectExpenseSplit.amount,
+                        amount = subjectExpenseSplit.exchangedAmount,
                         expense = expense,
                     )
 
@@ -69,14 +68,7 @@ internal class DebtCalculator(
 
         val debtorToCreditorToAccumulatedDebts = debtorToCreditorDebts.mapValuesTo(HashMap()) { (debtor, creditorToDebts) ->
             creditorToDebts.mapValuesTo(HashMap()) { (creditor, debts) ->
-                BigDecimal
-                val amount = debts.sumOf {
-                    if (it.expense.currency.id == primaryCurrency.id) {
-                        it.amount
-                    } else {
-                        currencyExchanger.exchange(it.amount, it.expense.currency.code, primaryCurrency.code)
-                    }
-                }
+                val amount = debts.sumOf { it.amount }
                 AccumulatedDebt(
                     creditor = creditor,
                     debtor = debtor,

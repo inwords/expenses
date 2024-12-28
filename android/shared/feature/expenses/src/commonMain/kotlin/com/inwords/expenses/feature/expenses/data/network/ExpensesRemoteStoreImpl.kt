@@ -67,17 +67,16 @@ internal class ExpensesRemoteStoreImpl(
                 contentType(ContentType.Application.Json)
                 setBody(
                     CreateExpenseRequest(
-                        eventId = event.serverId,
                         currencyId = expense.currency.serverId,
                         expenseType = when (expense.expenseType) {
                             ExpenseType.Spending -> "expense"
                             ExpenseType.Replenishment -> "refund"
                         },
                         userWhoPaidId = expense.person.serverId,
-                        splitInformation = expense.subjecExpenseSplitWithPersons.map { expenseSplitWithPerson ->
+                        splitInformation = expense.subjectExpenseSplitWithPersons.map { expenseSplitWithPerson ->
                             SplitInformationDto(
                                 userId = expenseSplitWithPerson.person.serverId,
-                                amount = expenseSplitWithPerson.amount.toStringExpanded()
+                                amount = expenseSplitWithPerson.originalAmount?.toStringExpanded() ?: return IoResult.Error.Failure // FIXME: non-fatal error
                             )
                         },
                         description = expense.description
@@ -102,7 +101,7 @@ internal class ExpensesRemoteStoreImpl(
                 else -> return null
             },
             person = persons.firstOrNull { it.serverId == userWhoPaidId } ?: return null,
-            subjecExpenseSplitWithPersons = splitInformation.map { it.toDomain(persons) ?: return null },
+            subjectExpenseSplitWithPersons = splitInformation.map { it.toDomain(persons) ?: return null },
             timestamp = createdAt,
             description = description,
         )
@@ -110,6 +109,7 @@ internal class ExpensesRemoteStoreImpl(
 
     private fun SplitInformationDto.toDomain(persons: List<Person>): ExpenseSplitWithPerson? {
         val person = persons.firstOrNull { it.serverId == userId } ?: return null
+        val exchangedAmount = BigDecimal.parseString(amount)
         return ExpenseSplitWithPerson(
             expenseSplitId = 0L,
             expenseId = 0L,
@@ -118,7 +118,8 @@ internal class ExpensesRemoteStoreImpl(
                 serverId = userId,
                 name = person.name,
             ),
-            amount = BigDecimal.parseString(amount),
+            originalAmount = null,
+            exchangedAmount = exchangedAmount,
         )
     }
 

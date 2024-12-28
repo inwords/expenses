@@ -65,16 +65,15 @@ internal class EventsLocalStoreImpl(
     override suspend fun deepInsert(
         eventToInsert: Event,
         personsToInsert: List<Person>,
-        primaryCurrencyId: Long,
         prefetchedLocalCurrencies: List<Currency>?,
         inTransaction: Boolean
     ): EventDetails {
         return if (inTransaction) {
             transactionHelper.immediateWriteTransaction {
-                deepInsertInternal(eventToInsert, personsToInsert, primaryCurrencyId, prefetchedLocalCurrencies)
+                deepInsertInternal(eventToInsert, personsToInsert, prefetchedLocalCurrencies)
             }
         } else {
-            deepInsertInternal(eventToInsert, personsToInsert, primaryCurrencyId, prefetchedLocalCurrencies)
+            deepInsertInternal(eventToInsert, personsToInsert, prefetchedLocalCurrencies)
         }
     }
 
@@ -95,7 +94,6 @@ internal class EventsLocalStoreImpl(
     private suspend fun deepInsertInternal(
         eventToInsert: Event,
         personsToInsert: List<Person>,
-        primaryCurrencyId: Long,
         prefetchedLocalCurrencies: List<Currency>?,
     ): EventDetails {
         val persons = personsLocalStore.insertWithoutCrossRefs(personsToInsert)
@@ -105,7 +103,7 @@ internal class EventsLocalStoreImpl(
             event = eventToInsert,
             persons = persons,
             currencies = currencies,
-            primaryCurrency = currencies.first { it.id == primaryCurrencyId },
+            primaryCurrency = currencies.first { it.id == eventToInsert.primaryCurrencyId },
         )
 
         val eventId = eventsDao.insert(eventDetails.toEntity()).takeIf { it != -1L }

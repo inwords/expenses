@@ -1,15 +1,13 @@
 package com.inwords.expenses.ui.image_loading
 
 import android.content.Context
-import coil.ImageLoader
-import okhttp3.OkHttpClient
+import coil3.ImageLoader
 
 class ImageLoaderFactory {
 
-    fun createImageLoader(context: Context, okHttpClient: Lazy<OkHttpClient>): ImageLoader {
+    fun createImageLoader(context: Context): ImageLoader {
         return ImageLoader.Builder(context)
-            // Create the OkHttpClient inside a lambda so it will be initialized lazily on a background thread.
-            .okHttpClient { okHttpClient.value }
+            // TODO set up ktor here
             .build()
     }
 }

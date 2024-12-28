@@ -1,5 +1,6 @@
 package com.inwords.expenses.feature.expenses.domain.tasks
 
+import com.inwords.expenses.core.storage.utils.TransactionHelper
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
@@ -12,11 +13,13 @@ class EventExpensesPushTask internal constructor(
     eventsLocalStoreLazy: Lazy<EventsLocalStore>,
     expensesLocalStoreLazy: Lazy<ExpensesLocalStore>,
     expensesRemoteStoreLazy: Lazy<ExpensesRemoteStore>,
+    transactionHelperLazy: Lazy<TransactionHelper>,
 ) {
 
     private val eventsLocalStore by eventsLocalStoreLazy
     private val expensesLocalStore by expensesLocalStoreLazy
     private val expensesRemoteStore by expensesRemoteStoreLazy
+    private val transactionHelper by transactionHelperLazy
 
     /**
      * Prerequisites:
@@ -56,8 +59,16 @@ class EventExpensesPushTask internal constructor(
         }
 
         withContext(NonCancellable) {
-            networkExpenses.forEach {
-                expensesLocalStore.updateExpenseServerId(it.expenseId, it.serverId)
+            networkExpenses.forEachIndexed { expenseIndex, networkExpense ->
+                transactionHelper.immediateWriteTransaction {
+                    expensesLocalStore.updateExpenseServerId(networkExpense.expenseId, networkExpense.serverId)
+                    networkExpense.subjectExpenseSplitWithPersons.forEachIndexed { splitIndex, networkSplit ->
+                        expensesLocalStore.updateExpenseSplitExchangedAmount(
+                            expenseSplitId = expensesToAddFiltered[expenseIndex].subjectExpenseSplitWithPersons[splitIndex].expenseSplitId,
+                            exchangedAmount = networkSplit.exchangedAmount
+                        )
+                    }
+                }
             }
         }
 

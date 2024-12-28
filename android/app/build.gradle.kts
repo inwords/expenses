@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.config.JvmTarget
-
 plugins {
     alias(buildSrc.plugins.android.application)
     alias(buildSrc.plugins.kotlin.android)
@@ -38,7 +36,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JvmTarget.JVM_1_8.toString()
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
     buildFeatures {

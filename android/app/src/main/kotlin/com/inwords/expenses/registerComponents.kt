@@ -12,6 +12,7 @@ import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
 import com.inwords.expenses.feature.events.data.db.dao.PersonsDao
 import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.expenses.api.ExpensesComponent
 import com.inwords.expenses.feature.expenses.data.db.dao.ExpensesDao
@@ -76,9 +77,13 @@ internal fun registerComponents(appContext: Context) {
                     get() = SuspendLazy { networkComponent.value.getHttpClient() }
                 override val hostConfig: HostConfig
                     get() = networkComponent.value.hostConfig
+                override val transactionHelper: TransactionHelper
+                    get() = dbComponent.value.transactionHelper
 
                 override val eventsLocalStore: EventsLocalStore
                     get() = eventsComponent.value.eventsLocalStore.value
+                override val currenciesLocalStore: CurrenciesLocalStore
+                    get() = eventsComponent.value.currenciesLocalStore.value
             }
         )
     }

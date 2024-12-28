@@ -25,7 +25,7 @@ class EventsComponent internal constructor(
 
     private val transactionHelper: Lazy<TransactionHelper> = lazy { deps.transactionHelper }
 
-    private val currenciesLocalStore: Lazy<CurrenciesLocalStore> = lazy {
+    val currenciesLocalStore: Lazy<CurrenciesLocalStore> = lazy {
         CurrenciesLocalStoreImpl(currenciesDaoLazy = lazy { deps.currenciesDao })
     }
 

@@ -21,7 +21,7 @@ kotlin {
             dependencies {
                 implementation(project(":shared:core:utils"))
 
-                implementation("org.jetbrains.kotlinx:atomicfu:0.25.0") // TODO remove when atomicfu plugin is fixed
+                implementation("org.jetbrains.kotlinx:atomicfu:0.26.1") // TODO remove when atomicfu plugin is fixed
             }
         }
     }

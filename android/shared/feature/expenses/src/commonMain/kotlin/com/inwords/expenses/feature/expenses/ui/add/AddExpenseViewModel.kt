@@ -16,9 +16,8 @@ import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
-import com.inwords.expenses.feature.expenses.domain.model.Expense
-import com.inwords.expenses.feature.expenses.domain.model.ExpenseSplitWithPerson
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
+import com.inwords.expenses.feature.expenses.domain.model.PersonWithAmount
 import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenDestination.Replenishment
 import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.CurrencyInfoUiModel
 import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.ExpenseSplitWithPersonUiModel
@@ -41,7 +40,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import kotlinx.datetime.Clock
 
 internal class AddExpenseViewModel(
     private val navigationController: NavigationController,
@@ -326,47 +324,32 @@ internal class AddExpenseViewModel(
     fun onConfirmClicked() {
         val state = (_state.value as? SimpleScreenState.Success)?.data ?: return
 
-        val subjectExpenseSplitWithPersons = if (state.equalSplit) {
-            val selectedSubjectPersons = state.subjectPersons.filter { it.selected }
-            val amount = state.wholeAmount.amount?.divide(
-                other = selectedSubjectPersons.size.coerceAtLeast(1).toBigDecimal(),
-                scale = 3,
-            ) ?: return
-            selectedSubjectPersons.map { personInfoModel ->
-                ExpenseSplitWithPerson(
-                    expenseSplitId = 0,
-                    expenseId = 0,
-                    person = personInfoModel.person,
-                    amount = amount
-                )
-            }
-        } else {
-            state.split.map { expenseSplit ->
-                ExpenseSplitWithPerson(
-                    expenseSplitId = 0,
-                    expenseId = 0,
-                    person = expenseSplit.person.person,
-                    amount = expenseSplit.amount.amount ?: return
-                )
-            }
-        }
-
-        val selectedCurrency = state.currencies.first { it.selected }.currency
-        val selectedPerson = state.persons.first { it.selected }.person
-
-        val expense = Expense(
-            expenseId = 0,
-            serverId = 0,
-            currency = selectedCurrency,
-            expenseType = state.expenseType,
-            person = selectedPerson,
-            subjecExpenseSplitWithPersons = subjectExpenseSplitWithPersons,
-            timestamp = Clock.System.now(),
-            description = state.description.trim().ifEmpty { "Без описания" },
-        )
-
         viewModelScope.launch {
-            expensesInteractor.addExpense(state.event, expense)
+            val selectedCurrency = state.currencies.first { it.selected }.currency
+            val selectedPerson = state.persons.first { it.selected }.person
+            if (state.equalSplit) {
+                expensesInteractor.addExpenseEqualSplit(
+                    event = state.event,
+                    wholeAmount = state.wholeAmount.amount ?: return@launch,
+                    expenseType = state.expenseType,
+                    description = state.description,
+                    selectedSubjectPersons = state.subjectPersons.filter { it.selected }.map { it.person },
+                    selectedCurrency = selectedCurrency,
+                    selectedPerson = selectedPerson,
+                )
+            } else {
+                val personWithAmountSplit = state.split.map {
+                    PersonWithAmount(it.person.person, it.amount.amount ?: return@launch)
+                }
+                expensesInteractor.addExpenseCustomSplit(
+                    event = state.event,
+                    expenseType = state.expenseType,
+                    description = state.description,
+                    selectedCurrency = selectedCurrency,
+                    selectedPerson = selectedPerson,
+                    personWithAmountSplit = personWithAmountSplit
+                )
+            }
 
             navigationController.popBackStack()
         }

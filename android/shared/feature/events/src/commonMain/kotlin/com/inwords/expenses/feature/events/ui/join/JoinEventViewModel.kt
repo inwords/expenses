@@ -47,7 +47,10 @@ internal class JoinEventViewModel(
                 accessCode = state.eventAccessCode
             )
             when (result) {
-                is JoinEventResult.NewCurrentEvent -> navigationController.navigateTo(expensesScreenDestination)
+                is JoinEventResult.NewCurrentEvent -> navigationController.navigateTo(
+                    destination = expensesScreenDestination,
+                    popUpTo = expensesScreenDestination
+                )
 
                 JoinEventResult.InvalidAccessCode -> Unit
                 JoinEventResult.EventNotFound -> Unit // TODO mvp
