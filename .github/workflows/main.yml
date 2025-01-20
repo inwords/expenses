@@ -123,4 +123,3 @@ jobs:
             GF_SECURITY_ADMIN_PASSWORD=${{ secrets.GF_SECURITY_ADMIN_PASSWORD }} \
             docker compose -f docker-compose-prod.yml up -d --pull always
           EOF
-
