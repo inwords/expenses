@@ -79,6 +79,7 @@ services:
       resources:
         limits:
           memory: 230M
+    restart: unless-stopped
     command:
       - "--storageDataPath=/victoria-metrics-data"
     volumes:
