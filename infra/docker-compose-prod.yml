@@ -5,7 +5,7 @@ services:
       resources:
         limits:
           memory: 300M
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -13,13 +13,30 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  nest-backend:
+  nest-backend-green:
     image: ruggedbl/commonex-nest-backend
     deploy:
       resources:
         limits:
           memory: 300M
-    restart: always
+    restart: unless-stopped
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER_NAME=${POSTGRES_USER_NAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE}
+      - OPEN_EXCHANGE_RATES_API_ID=${OPEN_EXCHANGE_RATES_API_ID}
+    depends_on:
+      - db
+
+  nest-backend-blue:
+    image: ruggedbl/commonex-nest-backend
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+    restart: unless-stopped
     environment:
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
@@ -36,7 +53,7 @@ services:
       resources:
         limits:
           memory: 200M
-    restart: always
+    restart: unless-stopped
 
   nginx:
     image: nginx:1.27.3-alpine3.20
@@ -44,7 +61,7 @@ services:
       resources:
         limits:
           memory: 150M
-    restart: always
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
@@ -56,7 +73,8 @@ services:
       - /etc/commonex/ssl/certbot/archive/dev-api.commonex.ru:/etc/nginx/ssl/archive/dev-api.commonex.ru:ro
       - /etc/commonex/www/certbot/:/var/www/certbot/:ro
     depends_on:
-      - nest-backend
+      - nest-backend-green
+      - nest-backend-blue
       - next-web
 
   otel-collector:
@@ -78,7 +96,11 @@ services:
     deploy:
       resources:
         limits:
+          memory: 600M
+          cpus: '0.80'
+        reservations:
           memory: 230M
+    memswap_limit: 2048M
     restart: unless-stopped
     command:
       - "--storageDataPath=/victoria-metrics-data"
@@ -91,7 +113,11 @@ services:
     deploy:
       resources:
         limits:
-          memory: 200M
+          memory: 350M
+          cpus: '0.80'
+        reservations:
+          memory: 250M
+    restart: unless-stopped
     depends_on:
       - victoriametrics
     environment:
@@ -114,9 +140,5 @@ services:
 
 volumes:
   postgres_data:
-    driver: local
-    driver_opts:
-      type: tmpfs
-      device: tmpfs
   victoriametrics_data:
   grafana_data:
