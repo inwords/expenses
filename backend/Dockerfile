@@ -66,3 +66,4 @@ EXPOSE 3001
 
 # Command to run the app
 CMD npm run db:migrate:docker_prod && npm run start:prod
+
