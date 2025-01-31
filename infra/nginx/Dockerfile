@@ -135,10 +135,7 @@ RUN \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log
 
-# show env
-#RUN env | sort
-
-# show the configuration
+# uncomment to show the configuration
 #RUN nginx -V
 
 EXPOSE 80 443/udp 443/tcp

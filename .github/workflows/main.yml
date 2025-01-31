@@ -64,7 +64,7 @@ jobs:
             {
               "name": "nginx",
               "context": "./infra/nginx",
-              "tags": "ruggedbl/ruggedbl/nginx-http3:latest"
+              "tags": "ruggedbl/nginx-http3:latest"
             }
           ]
           EOF
