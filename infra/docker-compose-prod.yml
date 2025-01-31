@@ -56,17 +56,18 @@ services:
     restart: unless-stopped
 
   nginx:
-    image: nginx:1.27.3-alpine3.20
+    image: ruggedbl/nginx-http3
     deploy:
       resources:
         limits:
           memory: 150M
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - "80:80/tcp"
+      - "443:443/tcp"
+      - "443:443/udp"
     volumes:
-      - ./nginx-prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/nginx-prod.conf:/etc/nginx/nginx.conf:ro
       - /etc/commonex/ssl/certificate_chain.pem:/etc/nginx/ssl/certificate_chain.pem:ro
       - /etc/commonex/ssl/certificate.key:/etc/nginx/ssl/certificate.key:ro
       - /etc/commonex/ssl/certbot/live/dev-api.commonex.ru:/etc/nginx/ssl/live/dev-api.commonex.ru:ro
