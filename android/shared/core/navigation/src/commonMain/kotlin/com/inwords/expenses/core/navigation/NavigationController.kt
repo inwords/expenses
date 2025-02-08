@@ -4,7 +4,7 @@ interface NavigationController {
 
     fun navigateTo(destination: Destination)
 
-    fun navigateTo(destination: Destination, popUpTo: Destination)
+    fun navigateTo(destination: Destination, popUpTo: Destination, launchSingleTop: Boolean = false)
 
     fun popBackStack()
 

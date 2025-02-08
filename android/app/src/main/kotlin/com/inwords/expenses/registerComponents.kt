@@ -17,6 +17,7 @@ import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.expenses.api.ExpensesComponent
 import com.inwords.expenses.feature.expenses.data.db.dao.ExpensesDao
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
+import com.inwords.expenses.feature.menu.api.MenuComponent
 import com.inwords.expenses.feature.settings.api.SettingsComponentFactory
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import com.inwords.expenses.feature.sync.api.SyncComponentFactory
@@ -67,6 +68,15 @@ internal fun registerComponents(appContext: Context) {
         ).create()
     }
 
+    val menuComponent = lazy {
+        MenuComponent(
+            deps = object : MenuComponent.Deps {
+                override val eventsInteractor: EventsInteractor
+                    get() = eventsComponent.value.eventsInteractor
+            }
+        )
+    }
+
     val expensesComponent = lazy {
         ExpensesComponent(
             deps = object : ExpensesComponent.Deps {
@@ -107,5 +117,6 @@ internal fun registerComponents(appContext: Context) {
     ComponentsMap.registerComponent(networkComponent)
     ComponentsMap.registerComponent(eventsComponent)
     ComponentsMap.registerComponent(expensesComponent)
+    ComponentsMap.registerComponent(menuComponent)
     ComponentsMap.registerComponent(syncComponent)
 }

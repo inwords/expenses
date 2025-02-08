@@ -17,6 +17,7 @@ import com.inwords.expenses.feature.expenses.ui.converter.toUiModel
 import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListScreenDestination
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.DebtorShortUiModel
 import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
+import com.inwords.expenses.feature.menu.ui.MenuDialogDestination
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
@@ -74,8 +75,7 @@ internal class ExpensesViewModel(
 
             SimpleScreenState.Success(
                 ExpensesScreenUiModel(
-                    eventId = expensesDetails.event.event.serverId.toString(),
-                    pinCode = expensesDetails.event.event.pinCode,
+                    eventName = expensesDetails.event.event.name,
                     currentPersonId = currentPerson.id,
                     currentPersonName = currentPerson.name,
                     creditors = debtors,
@@ -96,6 +96,10 @@ internal class ExpensesViewModel(
             .collectIn(viewModelScope) {
                 _state.value = it
             }
+    }
+
+    fun onMenuClick() {
+        navigationController.navigateTo(MenuDialogDestination)
     }
 
     fun onAddExpenseClick() {

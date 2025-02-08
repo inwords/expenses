@@ -15,15 +15,31 @@ import kotlinx.datetime.Clock
 
 @Preview(showBackground = true)
 @Composable
-private fun ExpensesScreenPreviewSuccess() {
+private fun ExpensesScreenPreviewSuccessWithCreditors() {
     ExpensesScreen(
+        onMenuClick = {},
         onAddExpenseClick = {},
         onDebtsDetailsClick = {},
         onReplenishmentClick = {},
         onJoinEventClick = {},
         onCreateEventClick = {},
         onRefresh = {},
-        state = SimpleScreenState.Success(mockExpensesScreenUiModel())
+        state = SimpleScreenState.Success(mockExpensesScreenUiModel(withCreditors = true))
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ExpensesScreenPreviewSuccessWithoutCreditors() {
+    ExpensesScreen(
+        onMenuClick = {},
+        onAddExpenseClick = {},
+        onDebtsDetailsClick = {},
+        onReplenishmentClick = {},
+        onJoinEventClick = {},
+        onCreateEventClick = {},
+        onRefresh = {},
+        state = SimpleScreenState.Success(mockExpensesScreenUiModel(withCreditors = false))
     )
 }
 
@@ -31,6 +47,7 @@ private fun ExpensesScreenPreviewSuccess() {
 @Preview(showBackground = true)
 private fun ExpensesScreenPreviewEmpty() {
     ExpensesScreen(
+        onMenuClick = {},
         onAddExpenseClick = {},
         onDebtsDetailsClick = {},
         onReplenishmentClick = {},
@@ -41,7 +58,7 @@ private fun ExpensesScreenPreviewEmpty() {
     )
 }
 
-internal fun mockExpensesScreenUiModel(): ExpensesScreenUiModel {
+internal fun mockExpensesScreenUiModel(withCreditors: Boolean): ExpensesScreenUiModel {
     val person1 = Person(
         id = 1,
         serverId = 11,
@@ -53,8 +70,7 @@ internal fun mockExpensesScreenUiModel(): ExpensesScreenUiModel {
         name = "Максим"
     )
     return ExpensesScreenUiModel(
-        eventId = "1234",
-        pinCode = "4321",
+        eventName = "France trip",
         currentPersonId = person1.id,
         currentPersonName = person1.name,
         creditors = persistentListOf(
@@ -72,7 +88,7 @@ internal fun mockExpensesScreenUiModel(): ExpensesScreenUiModel {
                 currencyName = "Euro",
                 amount = "150"
             )
-        ),
+        ).takeIf { withCreditors } ?: persistentListOf(),
         expenses = persistentListOf(
             Expense(
                 expenseId = 1,

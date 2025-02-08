@@ -19,11 +19,12 @@ internal class DefaultNavigationController : NavigationController {
         _navCommands.trySend(NavCommand { it.navigate(destination) })
     }
 
-    override fun navigateTo(destination: Destination, popUpTo: Destination) {
+    override fun navigateTo(destination: Destination, popUpTo: Destination, launchSingleTop: Boolean) {
         _navCommands.trySend(
             NavCommand {
                 it.navigate(destination) {
                     popUpTo(popUpTo)
+                    this.launchSingleTop = launchSingleTop
                 }
             }
         )

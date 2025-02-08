@@ -1,10 +1,10 @@
 package com.inwords.expenses.feature.expenses.ui.list
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,24 +20,24 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -53,6 +53,7 @@ import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.Expen
 @Composable
 internal fun ExpensesScreen(
     state: SimpleScreenState<ExpensesScreenUiModel>,
+    onMenuClick: () -> Unit,
     onAddExpenseClick: () -> Unit,
     onDebtsDetailsClick: () -> Unit,
     onReplenishmentClick: (ExpensesScreenUiModel.DebtorShortUiModel) -> Unit,
@@ -64,6 +65,7 @@ internal fun ExpensesScreen(
     when (state) {
         is SimpleScreenState.Success -> ExpensesScreenSuccess(
             state = state.data,
+            onMenuClick = onMenuClick,
             onAddExpenseClick = onAddExpenseClick,
             onDebtsDetailsClick = onDebtsDetailsClick,
             onReplenishmentClick = onReplenishmentClick,
@@ -91,6 +93,7 @@ internal fun ExpensesScreen(
 @Composable
 private fun ExpensesScreenSuccess(
     state: ExpensesScreenUiModel,
+    onMenuClick: () -> Unit,
     onAddExpenseClick: () -> Unit,
     onDebtsDetailsClick: () -> Unit,
     onReplenishmentClick: (ExpensesScreenUiModel.DebtorShortUiModel) -> Unit,
@@ -102,39 +105,27 @@ private fun ExpensesScreenSuccess(
         topBar = {
             TopAppBar(
                 title = {
-                    Row(
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(end = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val appAndPersonName = buildAnnotatedString {
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic)) {
-                                append("CommonEx")
-                            }
-                            append("  ")
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
-                                append(state.currentPersonName)
-                            }
-                        }
-                        Text(text = appAndPersonName)
+                        Text(
+                            modifier = Modifier.align(Alignment.Center),
+                            text = "CommonEx",
+                            fontStyle = FontStyle.Italic,
+                            fontWeight = FontWeight.Bold
+                        )
 
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        val idAndPin = buildAnnotatedString {
-                            withStyle(
-                                style = SpanStyle(
-                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                                    fontWeight = FontWeight.Light
-                                )
-                            ) {
-                                append("  ID ")
-                                append(state.eventId)
-                                append(", PIN ")
-                                append(state.pinCode)
-                            }
+                        IconButton(
+                            modifier = Modifier.align(Alignment.CenterEnd),
+                            onClick = onMenuClick,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Menu,
+                                contentDescription = null,
+                            )
                         }
-                        Text(idAndPin)
                     }
                 }
             )
@@ -168,42 +159,18 @@ private fun ExpensesScreenSuccess(
                 modifier = modifier
                     .fillMaxSize()
             ) {
-                Row(
+                EventInfoBlock(
                     modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Долги",
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                    TextButton(
-                        onClick = onDebtsDetailsClick
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .padding(end = 8.dp),
-                            text = "детализация",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
-                    }
-                }
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    eventName = state.eventName,
+                    currentPersonName = state.currentPersonName
+                )
 
-                FlowRow(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    state.creditors.forEach { creditor ->
-                        ReturnCreditorDebtButton(creditor, { onReplenishmentClick.invoke(creditor) })
-                    }
-                }
+                DebtsBlock(onDebtsDetailsClick, state, onReplenishmentClick)
 
                 Text(
-                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp),
+                    modifier = Modifier.padding(start = 16.dp, top = 24.dp, end = 16.dp, bottom = 4.dp),
                     text = "Операции",
                     style = MaterialTheme.typography.headlineMedium
                 )
@@ -283,25 +250,6 @@ private fun ExpensesScreenEmpty(
 }
 
 @Composable
-private fun ReturnCreditorDebtButton(
-    creditor: ExpensesScreenUiModel.DebtorShortUiModel,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    OutlinedButton(
-        modifier = modifier,
-        onClick = onClick
-    ) {
-        Text(
-            text = "${creditor.amount} ${creditor.currencyName},  ${creditor.personName}",
-            modifier = Modifier.padding(end = 8.dp),
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
-    }
-}
-
-@Composable
 private fun ExpenseItem(
     expense: ExpenseUiModel,
     modifier: Modifier = Modifier,
@@ -312,8 +260,7 @@ private fun ExpenseItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
-            .shadow(elevation = 4.dp, shape = shape)
-            .background(color = MaterialTheme.colorScheme.background, shape = shape),
+            .border(border = AssistChipDefaults.assistChipBorder(false), shape = shape),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(

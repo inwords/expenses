@@ -60,6 +60,7 @@ dependencies {
     implementation(project(":shared:feature:settings"))
     implementation(project(":shared:feature:expenses"))
     implementation(project(":shared:feature:events"))
+    implementation(project(":shared:feature:menu"))
     implementation(project(":shared:feature:sync"))
     implementation(project(":shared:integration:databases"))
 
@@ -96,6 +97,8 @@ dependencies {
     // misc androidx stuff
     implementation(shared.core.ktx)
     implementation(shared.activity.compose)
+
+    implementation("org.jetbrains.kotlinx:atomicfu:0.26.1") // TODO remove when atomicfu plugin is fixed
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

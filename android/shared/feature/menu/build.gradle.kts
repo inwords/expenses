@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.inwords.expenses.feature.expenses"
+    namespace = "com.inwords.expenses.feature.menu"
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
@@ -20,18 +20,15 @@ android {
 }
 
 kotlin {
-    applyKmmDefaults("shared-expenses")
+    applyKmmDefaults("shared-menu")
 
     sourceSets {
         commonMain {
             dependencies {
                 implementation(project(":shared:core:utils"))
-                implementation(project(":shared:core:storage-utils"))
                 implementation(project(":shared:core:ui-utils"))
                 implementation(project(":shared:core:navigation"))
-                implementation(project(":shared:core:network"))
                 implementation(project(":shared:feature:events"))
-                implementation(project(":shared:feature:menu"))
                 implementation(project(":shared:feature:settings"))
 
                 implementation(shared.annotation)
@@ -39,22 +36,15 @@ kotlin {
                 implementation(shared.coroutines.core)
 
                 implementation(shared.kotlinx.serialization.json)
-                implementation(shared.kotlinx.datetime)
                 implementation(shared.kotlinx.collections.immutable)
 
                 implementation(shared.lifecycle.runtime.compose.multiplatform)
                 implementation(shared.lifecycle.viewmodel.compose.multiplatform)
 
-                implementation(shared.room.runtime)
-
-                implementation(shared.ktor.client.core)
-
                 implementation(compose.ui)
                 implementation(compose.material3)
 
                 implementation(shared.navigation.compose.multiplatform)
-
-                implementation(shared.ionspin.kotlin.bignum)
             }
         }
         androidMain {

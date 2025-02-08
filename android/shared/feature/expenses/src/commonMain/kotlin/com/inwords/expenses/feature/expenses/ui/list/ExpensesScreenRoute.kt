@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 object ExpensesScreenDestination : Destination
 
-fun NavGraphBuilder.expensesScreen(
+fun NavGraphBuilder.addExpensesScreen(
     navigationController: NavigationController,
     eventsInteractor: EventsInteractor,
     expensesInteractor: ExpensesInteractor,
@@ -35,6 +35,7 @@ fun NavGraphBuilder.expensesScreen(
         })
         ExpensesScreen(
             state = viewModel.state.collectAsStateWithLifecycle().value,
+            onMenuClick = viewModel::onMenuClick,
             onAddExpenseClick = viewModel::onAddExpenseClick,
             onDebtsDetailsClick = viewModel::onDebtsDetailsClick,
             onReplenishmentClick = viewModel::onReplenishmentClick,

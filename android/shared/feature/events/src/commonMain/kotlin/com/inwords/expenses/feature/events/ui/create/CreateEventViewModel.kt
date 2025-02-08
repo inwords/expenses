@@ -92,7 +92,7 @@ internal class CreateEventViewModel(
             )
             navigationController.navigateTo(
                 destination = AddPersonsScreenDestination,
-                popUpTo = expensesScreenDestination
+                popUpTo = expensesScreenDestination,
             )
         }
     }

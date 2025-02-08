@@ -49,7 +49,8 @@ internal class JoinEventViewModel(
             when (result) {
                 is JoinEventResult.NewCurrentEvent -> navigationController.navigateTo(
                     destination = expensesScreenDestination,
-                    popUpTo = expensesScreenDestination
+                    popUpTo = expensesScreenDestination,
+                    launchSingleTop = true,
                 )
 
                 JoinEventResult.InvalidAccessCode -> Unit

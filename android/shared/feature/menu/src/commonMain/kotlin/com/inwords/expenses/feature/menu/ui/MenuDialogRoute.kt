@@ -1,39 +1,35 @@
-package com.inwords.expenses.feature.expenses.ui.debts_list
+package com.inwords.expenses.feature.menu.ui
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.feature.events.domain.EventsInteractor
-import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import kotlinx.serialization.Serializable
 
 @Serializable
-object DebtsListScreenDestination : Destination
+object MenuDialogDestination : Destination
 
-fun NavGraphBuilder.addDebtsListScreen(
+fun NavGraphBuilder.addMenuDialog(
     navigationController: NavigationController,
     eventsInteractor: EventsInteractor,
-    expensesInteractor: ExpensesInteractor,
 ) {
-    composable<DebtsListScreenDestination> {
-        val viewModel = viewModel<DebtsListViewModel>(it, factory = viewModelFactory {
+    dialog<MenuDialogDestination> {
+        val viewModel = viewModel<MenuViewModel>(it, factory = viewModelFactory {
             initializer {
-                DebtsListViewModel(
+                MenuViewModel(
                     navigationController = navigationController,
                     eventsInteractor = eventsInteractor,
-                    expensesInteractor = expensesInteractor,
                 )
             }
         })
-        DebtsListScreen(
+        MenuDialog(
             state = viewModel.state.collectAsStateWithLifecycle().value,
-            onReplenishmentClick = viewModel::onReplenishmentClick,
-            onCloseClick = viewModel::onCloseClick
+            onJoinEventClicked = viewModel::onJoinEventClicked,
         )
     }
 }

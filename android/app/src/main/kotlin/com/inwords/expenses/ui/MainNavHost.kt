@@ -16,9 +16,11 @@ import com.inwords.expenses.feature.events.ui.create.addCreateEventScreen
 import com.inwords.expenses.feature.events.ui.join.addJoinEventScreen
 import com.inwords.expenses.feature.expenses.api.ExpensesComponent
 import com.inwords.expenses.feature.expenses.ui.add.addExpenseScreen
-import com.inwords.expenses.feature.expenses.ui.debts_list.debtsListScreen
+import com.inwords.expenses.feature.expenses.ui.debts_list.addDebtsListScreen
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenDestination
-import com.inwords.expenses.feature.expenses.ui.list.expensesScreen
+import com.inwords.expenses.feature.expenses.ui.list.addExpensesScreen
+import com.inwords.expenses.feature.menu.api.MenuComponent
+import com.inwords.expenses.feature.menu.ui.addMenuDialog
 import com.inwords.expenses.feature.settings.api.SettingsComponent
 
 @Composable
@@ -32,6 +34,7 @@ internal fun MainNavHost(
     val settingsComponent = remember { ComponentsMap.getComponent<SettingsComponent>() }
     val eventsComponent = remember { ComponentsMap.getComponent<EventsComponent>() }
     val expensesComponent = remember { ComponentsMap.getComponent<ExpensesComponent>() }
+    val menuComponent = remember { ComponentsMap.getComponent<MenuComponent>() } // TODO
 
     NavHost(
         modifier = modifier,
@@ -60,16 +63,21 @@ internal fun MainNavHost(
             expensesInteractor = expensesComponent.expensesInteractor,
             settingsRepository = settingsComponent.settingsRepository,
         )
-        expensesScreen(
+        addExpensesScreen(
             navigationController = navigationController,
             eventsInteractor = eventsComponent.eventsInteractor,
             expensesInteractor = expensesComponent.expensesInteractor,
             settingsRepository = settingsComponent.settingsRepository,
         )
-        debtsListScreen(
+        addDebtsListScreen(
             navigationController = navigationController,
             eventsInteractor = eventsComponent.eventsInteractor,
             expensesInteractor = expensesComponent.expensesInteractor,
+        )
+
+        addMenuDialog(
+            navigationController = navigationController,
+            eventsInteractor = eventsComponent.eventsInteractor,
         )
     }
 }
