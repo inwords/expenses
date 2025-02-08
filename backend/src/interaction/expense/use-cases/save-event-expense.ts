@@ -80,7 +80,7 @@ export class SaveEventExpense implements UseCase<Input, Output> {
             throw new HttpException(
               {
                 status: HttpStatus.INTERNAL_SERVER_ERROR,
-                error: `No currency rate for available for ${getDateWithoutTimeWithMoscowTimezone(new Date(input.createdAt))} date`,
+                error: `No currency rate available for ${getDateWithoutTimeWithMoscowTimezone(new Date(input.createdAt))} date`,
               },
               HttpStatus.INTERNAL_SERVER_ERROR,
             );
