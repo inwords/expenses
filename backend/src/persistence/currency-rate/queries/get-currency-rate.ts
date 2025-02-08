@@ -13,10 +13,12 @@ export class GetCurrencyRate implements IGetCurrencyRate {
   ) {}
 
   public async execute(date: DateWithoutTime) {
-    const result = await retry(async () =>
-      this.httpService.axiosRef.get(
-        `https://openexchangerates.org/api/historical/${date}.json?app_id=${this.configService.get('OPEN_EXCHANGE_RATES_API_ID')}&base=USD`,
-      ),
+    const result = await retry(
+      async () =>
+        this.httpService.axiosRef.get(
+          `https://openexchangerates.org/api/historical/${date}.json?app_id=${this.configService.get('OPEN_EXCHANGE_RATES_API_ID')}&base=USD`,
+        ),
+      {retries: 3},
     );
 
     const rate = result.data.rates;
