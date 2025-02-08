@@ -5,7 +5,7 @@ export const getCurrentDateWithoutTime = (): DateWithoutTime => {
   return getDateWithoutTimeWithMoscowTimezone(now);
 };
 
-const getDateWithoutTimeWithMoscowTimezone = (date: Date): DateWithoutTime => {
+export const getDateWithoutTimeWithMoscowTimezone = (date: Date): DateWithoutTime => {
   const moscowLocale = date.toLocaleString('en-US', {timeZone: 'Europe/Moscow'});
 
   return new Date(moscowLocale).toLocaleDateString('sv-SE'); // yyyy-MM-dd

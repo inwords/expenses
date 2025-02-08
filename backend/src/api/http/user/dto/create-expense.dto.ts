@@ -1,9 +1,9 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {IsEnum, IsNumber, IsString, ValidateNested} from 'class-validator';
+import {IsDate, IsEnum, IsNumber, IsOptional, IsString, ValidateNested} from 'class-validator';
 import {Type} from 'class-transformer';
 import {ExpenseType} from "#domain/expense/constants";
 import {SplitInfo} from "#domain/expense/types";
-
+import {DateIsoString} from "#packages/types";
 
 class SplitInfoDto {
   @ApiProperty()
@@ -36,4 +36,10 @@ export class CreatedExpenseDto {
   @ValidateNested()
   @Type(() => SplitInfoDto)
   splitInformation!: Array<SplitInfo>;
+
+  @ApiProperty({required: false, description: 'ISO String'})
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  createdAt?: DateIsoString;
 }
