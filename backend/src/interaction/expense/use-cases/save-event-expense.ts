@@ -13,7 +13,7 @@ import {FindCurrencyRate} from '#persistence/currency-rate/queries/find-currency
 import {GetCurrencyRate} from '#persistence/currency-rate/queries/get-currency-rate';
 import {UpsertCurrencyRate} from '#persistence/currency-rate/queries/upsert-currency-rate';
 
-type Input = UpsertExpenseInput;
+type Input = Omit<UpsertExpenseInput, 'createdAt'> & Partial<Pick<Expense, 'createdAt'>>;
 type Output = Expense;
 
 @Injectable()
