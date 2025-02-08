@@ -1,4 +1,4 @@
-import {Inject, Injectable} from '@nestjs/common';
+import {HttpException, HttpStatus, Inject, Injectable} from '@nestjs/common';
 import {UseCase} from '#packages/use-case';
 import {IUpsertExpense, UpsertExpenseInput} from '#persistence/expense/types';
 import {Expense, SplitInfo} from '#domain/expense/types';
@@ -8,12 +8,12 @@ import {FindEvent} from '#persistence/event/queries/find-event';
 import {FindCurrency} from '#persistence/currency/queries/find-currency';
 import {IFindCurrency} from '#persistence/currency/types';
 import {IFindCurrencyRate, IGetCurrencyRate, IUpsertCurrencyRate} from '#persistence/currency-rate/types';
-import {getCurrentDateWithoutTime} from '#packages/date-utils';
+import {getCurrentDateWithoutTime, getDateWithoutTimeWithMoscowTimezone} from '#packages/date-utils';
 import {FindCurrencyRate} from '#persistence/currency-rate/queries/find-currency-rate';
 import {GetCurrencyRate} from '#persistence/currency-rate/queries/get-currency-rate';
 import {UpsertCurrencyRate} from '#persistence/currency-rate/queries/upsert-currency-rate';
 
-type Input = Omit<UpsertExpenseInput, 'createdAt'>;
+type Input = UpsertExpenseInput;
 type Output = Expense;
 
 @Injectable()
@@ -47,11 +47,16 @@ export class SaveEventExpense implements UseCase<Input, Output> {
 
         if (expenseCurrencyCode && eventCurrencyCode) {
           const date = getCurrentDateWithoutTime();
+          const getDateForExchangeRate = input.createdAt
+            ? getDateWithoutTimeWithMoscowTimezone(new Date(input.createdAt))
+            : date;
 
-          let currencyRate = await this.findCurrencyRate.execute({date});
+          let currencyRate = await this.findCurrencyRate.execute({
+            date: getDateForExchangeRate,
+          });
 
           if (!currencyRate) {
-            currencyRate = {date, rate: await this.getCurrencyRate.execute()};
+            currencyRate = {date, rate: await this.getCurrencyRate.execute(getDateForExchangeRate)};
           }
 
           if (currencyRate.rate) {
@@ -65,13 +70,20 @@ export class SaveEventExpense implements UseCase<Input, Output> {
             for (let i of input.splitInformation) {
               splitInformation.push({
                 ...i,
-                amount: Number(Number(i.amount * exchangeRate).toFixed(2)),
+                exchangedAmount: Number(Number(i.amount * exchangeRate).toFixed(2)),
               });
             }
 
             return this.upsertExpense.execute({...input, createdAt, splitInformation});
           } else {
             // https://www.youtube.com/watch?v=WR0Uh3-AVNA
+            throw new HttpException(
+              {
+                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                error: `No currency rate for available for ${getDateWithoutTimeWithMoscowTimezone(new Date(input.createdAt))} date`,
+              },
+              HttpStatus.INTERNAL_SERVER_ERROR,
+            );
           }
         }
       }
