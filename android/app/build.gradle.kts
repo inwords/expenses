@@ -98,7 +98,7 @@ dependencies {
     implementation(shared.core.ktx)
     implementation(shared.activity.compose)
 
-    implementation("org.jetbrains.kotlinx:atomicfu:0.26.1") // TODO remove when atomicfu plugin is fixed
+    implementation("org.jetbrains.kotlinx:atomicfu:0.27.0") // TODO remove when atomicfu plugin is fixed
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

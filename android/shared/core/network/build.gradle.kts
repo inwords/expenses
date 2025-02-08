@@ -1,5 +1,4 @@
 import com.inwords.expenses.plugins.SharedKmmLibraryPlugin.Companion.applyKmmDefaults
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
     id("shared-kmm-library-plugin")
@@ -39,7 +38,6 @@ kotlin {
         }
     }
 
-    @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         // Common compiler options applied to all Kotlin source sets
         freeCompilerArgs.add("-Xexpect-actual-classes")
