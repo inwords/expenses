@@ -3,7 +3,7 @@ import {Button, Stack} from '@mui/material';
 import {ExpenseDescriptionInput} from '@/4-features/AddExpense/ui/ExpenseNameInput';
 import {ExpenseAmountInput} from '@/4-features/AddExpense/ui/ExpenseAmountInput';
 import {SelectExpenseOwner} from '@/4-features/AddExpense/ui/SelectExpenseOwner';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {SplitOptions} from '@/4-features/AddExpense/ui/SplitOption';
 import {useParams} from 'react-router';
 import {observer} from 'mobx-react-lite';
@@ -27,6 +27,12 @@ export const AddExpenseForm = observer(({onSuccess}: Props) => {
   const initialValues = {userWhoPaidId: userStore.currentUser?.id, splitOption: '1'} as CreateExpenseForm;
 
   const isSplitEqually = expenseStore.splitOption === '1';
+
+  useEffect(() => {
+    if (!isSplitEqually) {
+      append({});
+    }
+  }, [expenseStore.splitOption]);
 
   return (
     <FormContainer
