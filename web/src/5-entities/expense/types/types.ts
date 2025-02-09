@@ -5,7 +5,7 @@ export interface CreateExpenseForm {
   userWhoPaidId: number;
   currencyId: number;
   eventId: number;
-  splitInformation: Array<SplitInfo>;
+  splitInformation: Array<Omit<SplitInfo, 'exchangedAmount'>>;
   amount: number;
   splitOption: string;
 }
@@ -26,6 +26,7 @@ export interface CreateExpense extends Omit<CreateExpenseForm, 'amount' | 'split
 export interface SplitInfo {
   userId: number;
   amount: number;
+  exchangedAmount: number;
 }
 
 export interface ExpenseBase {

@@ -16,7 +16,7 @@ export class ExpenseStore {
 
   get expensesToView() {
     return this.expenses.map((expense) => {
-      return {...expense, amount: expense.splitInformation.reduce((prev, info) => prev + info.amount, 0)};
+      return {...expense, amount: expense.splitInformation.reduce((prev, info) => prev + info.exchangedAmount, 0)};
     });
   }
 
@@ -28,7 +28,7 @@ export class ExpenseStore {
 
   get expenseRefundsToView() {
     return this.expenseRefunds.map((expense) => {
-      return {...expense, amount: expense.splitInformation.reduce((prev, info) => prev + info.amount, 0)};
+      return {...expense, amount: expense.splitInformation.reduce((prev, info) => prev + info.exchangedAmount, 0)};
     });
   }
 
@@ -48,7 +48,7 @@ export class ExpenseStore {
           (prev[userName] || 0) +
           curr.splitInformation.reduce((pre, cur) => {
             if (cur.userId === userStore.currentUser?.id) {
-              pre += cur.amount;
+              pre += cur.exchangedAmount;
             }
 
             return pre;
@@ -64,7 +64,7 @@ export class ExpenseStore {
           const userName = userStore.usersDictIdToName[i.userId];
 
           if (debts[userName]) {
-            debts[userName] -= i.amount;
+            debts[userName] -= i.exchangedAmount;
           }
         });
       }
