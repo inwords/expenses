@@ -15,5 +15,5 @@ export interface Expense {
 export interface SplitInfo {
   userId: string;
   amount: number;
-  exchangedAmount: number | null;
+  exchangedAmount: number;
 }

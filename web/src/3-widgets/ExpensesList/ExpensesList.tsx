@@ -47,7 +47,7 @@ export const ExpensesList = observer(() => {
                         description: `Возврат за ${e.description}`,
                         amount: e.splitInformation.reduce((prev, curr) => {
                           if (curr.userId === userStore.currentUser?.id) {
-                            prev += +curr.amount;
+                            prev += +curr.exchangedAmount;
                           }
 
                           return prev;

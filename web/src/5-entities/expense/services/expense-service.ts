@@ -44,7 +44,7 @@ export class ExpenseService {
     const resp = await createExpenseApi({
       ...rest,
       expenseType: ExpenseType.Refund,
-      splitInformation: [{userId: userWhoReceiveId, amount: amount}],
+      splitInformation: [{userId: userWhoReceiveId, amount}],
     });
 
     expenseStore.setExpenseRefunds([...expenseStore.expenseRefunds, resp]);
