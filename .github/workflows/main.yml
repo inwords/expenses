@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Backend/Web CI/CD Pipeline
 
 on:
   push:
