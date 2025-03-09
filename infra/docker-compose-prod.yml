@@ -72,6 +72,8 @@ services:
       - /etc/commonex/ssl/certificate.key:/etc/nginx/ssl/certificate.key:ro
       - /etc/commonex/ssl/certbot/live/dev-api.commonex.ru:/etc/nginx/ssl/live/dev-api.commonex.ru:ro
       - /etc/commonex/ssl/certbot/archive/dev-api.commonex.ru:/etc/nginx/ssl/archive/dev-api.commonex.ru:ro
+      - /etc/commonex/ssl/certbot/live/commonex.ru:/etc/nginx/ssl/live/commonex.ru:ro
+      - /etc/commonex/ssl/certbot/archive/commonex.ru:/etc/nginx/ssl/archive/commonex.ru:ro
       - /etc/commonex/www/certbot/:/var/www/certbot/:ro
     depends_on:
       - nest-backend-green

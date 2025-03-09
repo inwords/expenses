@@ -1,15 +1,15 @@
-# https://hg.nginx.org/nginx/file/tip/src/core/nginx.h
-ARG NGINX_VERSION=1.27.3
+# https://nginx.org/en/CHANGES
+ARG NGINX_VERSION=1.27.4
 
 # https://github.com/google/ngx_brotli
 ARG NGX_BROTLI_COMMIT=a71f9312c2deb28875acc7bacfdd5695a111aa53
 
-# https://github.com/openssl/openssl
-ARG OPENSSL_VERSION=3.4.0
+# https://github.com/openssl/openssl/releases
+ARG OPENSSL_VERSION=3.4.1
 
 # NGINX UID / GID
-ARG NGINX_USER_UID=100
-ARG NGINX_GROUP_GID=101
+ARG NGINX_USER_UID=1000
+ARG NGINX_GROUP_GID=1001
 
 # https://nginx.org/en/docs/http/ngx_http_v3_module.html
 # https://nginx.org/en/docs/configure.html
@@ -87,7 +87,7 @@ RUN \
 # https://www.f5.com/company/blog/nginx/quic-http3-support-openssl-nginx
 RUN \
     echo "Cloning OpenSSL $OPENSSL_VERSION ..." \
-    &&git clone --depth 1 --branch openssl-$OPENSSL_VERSION https://github.com/openssl/openssl.git /usr/src/openssl-$OPENSSL_VERSION
+    && git clone --depth 1 --branch openssl-$OPENSSL_VERSION https://github.com/openssl/openssl.git /usr/src/openssl-$OPENSSL_VERSION
 
 ARG CC_OPT='-O2 -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -fPIC -Wdate-time -D_FORTIFY_SOURCE=2'
 ARG LD_OPT='-Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -flto=auto -Wl,-z,relro -Wl,-z,now -fPIC'
