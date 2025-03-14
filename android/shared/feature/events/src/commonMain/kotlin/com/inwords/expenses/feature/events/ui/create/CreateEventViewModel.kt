@@ -85,7 +85,7 @@ internal class CreateEventViewModel(
         confirmJob = viewModelScope.launch {
             val state = _state.value
             eventsInteractor.draftEventName(
-                eventName = state.eventName
+                eventName = state.eventName.takeIf { it.isNotBlank() } ?: return@launch
             )
             eventsInteractor.draftEventPrimaryCurrency(
                 currency = state.currencies.first { it.selected }.currency

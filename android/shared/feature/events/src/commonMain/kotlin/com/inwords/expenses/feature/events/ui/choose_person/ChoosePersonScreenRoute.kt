@@ -1,4 +1,4 @@
-package com.inwords.expenses.feature.events.ui.join
+package com.inwords.expenses.feature.events.ui.choose_person
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -9,28 +9,32 @@ import androidx.navigation.compose.composable
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.serialization.Serializable
 
 @Serializable
-object JoinEventScreenDestination : Destination
+data object ChoosePersonScreenDestination : Destination
 
-fun NavGraphBuilder.addJoinEventScreen(
+fun NavGraphBuilder.addChoosePersonScreen(
     navigationController: NavigationController,
     eventsInteractor: EventsInteractor,
+    settingsRepository: SettingsRepository,
+    expensesScreenDestination: Destination,
 ) {
-    composable<JoinEventScreenDestination> {
-        val viewModel = viewModel<JoinEventViewModel>(it, factory = viewModelFactory {
+    composable<ChoosePersonScreenDestination> {
+        val viewModel = viewModel<ChoosePersonViewModel>(it, factory = viewModelFactory {
             initializer {
-                JoinEventViewModel(
+                ChoosePersonViewModel(
                     navigationController = navigationController,
                     eventsInteractor = eventsInteractor,
+                    settingsRepository = settingsRepository,
+                    expensesScreenDestination = expensesScreenDestination,
                 )
             }
         })
-        JoinEventScreen(
+        ChoosePersonScreen(
             state = viewModel.state.collectAsStateWithLifecycle().value,
-            onEventIdChanged = viewModel::onEventIdChanged,
-            onEventAccessCodeChanged = viewModel::onEventAccessCodeChanged,
+            onPersonSelected = viewModel::onPersonSelected,
             onConfirmClicked = viewModel::onConfirmClicked,
         )
     }

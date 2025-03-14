@@ -6,6 +6,7 @@ import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.collectIn
 import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonScreenDestination
 import com.inwords.expenses.feature.events.ui.join.JoinEventScreenDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -40,4 +41,7 @@ internal class MenuViewModel(
         navigationController.navigateTo(JoinEventScreenDestination)
     }
 
+    fun onChoosePersonClicked() {
+        navigationController.navigateTo(ChoosePersonScreenDestination)
+    }
 }

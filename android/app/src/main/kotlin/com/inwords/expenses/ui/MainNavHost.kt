@@ -12,6 +12,7 @@ import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.rememberNavigationController
 import com.inwords.expenses.feature.events.api.EventsComponent
 import com.inwords.expenses.feature.events.ui.add_persons.addAddPersonsScreen
+import com.inwords.expenses.feature.events.ui.choose_person.addChoosePersonScreen
 import com.inwords.expenses.feature.events.ui.create.addCreateEventScreen
 import com.inwords.expenses.feature.events.ui.join.addJoinEventScreen
 import com.inwords.expenses.feature.expenses.api.ExpensesComponent
@@ -44,7 +45,6 @@ internal fun MainNavHost(
         addJoinEventScreen(
             navigationController = navigationController,
             eventsInteractor = eventsComponent.eventsInteractor,
-            expensesScreenDestination = ExpensesScreenDestination,
         )
         addCreateEventScreen(
             navigationController = navigationController,
@@ -55,6 +55,12 @@ internal fun MainNavHost(
             navigationController = navigationController,
             eventsInteractor = eventsComponent.eventsInteractor,
             expensesScreenDestination = ExpensesScreenDestination
+        )
+        addChoosePersonScreen(
+            navigationController = navigationController,
+            eventsInteractor = eventsComponent.eventsInteractor,
+            settingsRepository = settingsComponent.settingsRepository,
+            expensesScreenDestination = ExpensesScreenDestination,
         )
 
         addExpenseScreen(
