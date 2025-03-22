@@ -1,0 +1,131 @@
+syntax = "proto3";
+
+package user;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+// Define the service
+service UserService {
+  rpc GetAllCurrencies (google.protobuf.Empty) returns (GetAllCurrenciesResponse);
+  rpc CreateEvent (CreateEventRequest) returns (EventResponse);
+  rpc GetEventInfo (GetEventInfoRequest) returns (EventInfoResponse);
+  rpc AddUsersToEvent (AddUsersToEventRequest) returns (AddUsersToEventResponse);
+  rpc GetAllEventExpenses (EventIdRequest) returns (ExpensesResponse);
+  rpc CreateExpense (CreateExpenseRequest) returns (ExpenseResponse);
+}
+
+// Define the messages
+
+enum CurrencyCode {
+  EUR = 1;
+  USD = 2;
+  RUB = 3;
+  JPY = 4;
+  TRY = 5;
+}
+
+message Currency {
+  int32 id = 1;
+  CurrencyCode code = 2;
+}
+
+message GetAllCurrenciesResponse {
+  repeated Currency currencies = 1;
+}
+
+message CreateEventRequest {
+  string name = 1;
+  int32 currencyId = 2;
+  repeated User users = 3;
+  string pinCode = 4;
+}
+
+message User {
+  string name = 1;
+}
+
+message UserResponse {
+  string name = 1;
+   int32 id = 2;
+   int32 eventId = 3;
+}
+
+message EventResponse {
+  int32 id = 1;
+  string name = 2;
+  int32 currencyId = 3;
+  repeated UserResponse users = 4;
+  string pinCode = 5;
+}
+
+message GetEventInfoRequest {
+  int32 eventId = 1;
+  string pinCode = 2;
+}
+
+message EventInfoResponse {
+  int32 id = 1;
+  string name = 2;
+  int32 currencyId = 3;
+  repeated UserResponse users = 4;
+  string pinCode = 5;
+}
+
+message AddUsersToEventRequest {
+  int32 eventId = 1;
+  repeated User users = 2;
+  string pinCode = 3;
+}
+
+message AddUsersToEventResponse {
+  repeated UserResponse users = 1;
+}
+
+message EventIdRequest {
+  int32 eventId = 1;
+}
+
+message Expense {
+  int32 id = 1;
+  string description = 2;
+  int32 userWhoPaidId = 3;
+  int32 currencyId = 4;
+  ExpenseType expenseType = 5;
+  repeated SplitInfo splitInformation = 6;
+  string createdAt = 7;
+}
+
+message SplitInfo {
+  int32 userId = 1;
+  int32 amount = 2;
+}
+
+enum ExpenseType {
+ expense = 0;
+ refund = 1;
+}
+
+message ExpensesResponse {
+  repeated Expense expenses = 1;
+}
+
+message CreateExpenseRequest {
+  int32 eventId = 1;
+  string description = 2;
+  int32 userWhoPaidId = 3;
+  int32 currencyId = 4;
+  ExpenseType expenseType = 5;
+  repeated SplitInfo splitInformation = 6;
+  string createdAt = 7;
+}
+
+message ExpenseResponse {
+  int32 id = 1;
+  string description = 2;
+  int32 userWhoPaidId = 3;
+  int32 currencyId = 4;
+  ExpenseType expenseType = 5;
+  repeated SplitInfo splitInformation = 6;
+  string createdAt = 7;
+}

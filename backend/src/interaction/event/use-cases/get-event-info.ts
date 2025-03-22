@@ -5,9 +5,10 @@ import {Inject} from '@nestjs/common';
 import {FindEvent} from '#persistence/event/queries/find-event';
 import {IFindUsers} from '#persistence/user/types';
 import {FindUsers} from '#persistence/user/queries/find-users';
+import {User} from '#domain/user/types';
 
 type Input = {eventId: number; pinCode: string};
-type Output = Event;
+type Output = Event & {users: Array<User>};
 
 export class GetEventInfo implements UseCase<Input, Output> {
   constructor(

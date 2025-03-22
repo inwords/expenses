@@ -5,6 +5,7 @@ import {ConfigModule, ConfigService} from '@nestjs/config';
 import {join} from 'path';
 import {SnakeNamingStrategy} from 'typeorm-naming-strategies';
 import {HttpModule} from '#api/http/http.module';
+import {GrpcModule} from '#api/grpc/grpcModule';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import {HttpModule} from '#api/http/http.module';
       imports: [ConfigModule],
     }),
     HttpModule,
+    GrpcModule,
   ],
 })
 export class AppModule {}
