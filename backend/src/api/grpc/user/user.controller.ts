@@ -25,6 +25,7 @@ export class UserController {
 
   @GrpcMethod('UserService', 'GetAllCurrencies')
   async getAllCurrencies() {
+    console.log('lek')
     return {currencies: await this.getAllCurrenciesUseCase.execute()};
   }
 
