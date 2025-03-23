@@ -33,6 +33,7 @@ ARG CONFIG="\
     --without-http_scgi_module \
     --with-http_ssl_module \
     --with-http_v2_module \
+    --with-http_grpc_module \
     --with-http_v3_module \
     --with-openssl=/usr/src/openssl-$OPENSSL_VERSION \
     --add-module=/usr/src/ngx_brotli \
