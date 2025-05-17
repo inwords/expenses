@@ -58,11 +58,9 @@ class EventsInteractor internal constructor(
         val localEvent = eventsLocalStore.getEventWithDetailsByServerId(eventServerId)
         if (localEvent != null) {
             settingsRepository.setCurrentEventId(localEvent.event.id)
-            settingsRepository.setCurrentPersonId(localEvent.persons.first().id) // FIXME select person on UI
             return JoinEventResult.NewCurrentEvent(localEvent)
         }
 
-        // TODO extract separate model for event parameters
         val joinEventResult = joinRemoteEventUseCase.joinRemoteEvent(
             event = Event(0L, eventServerId, "", accessCode, 0L),
             localCurrencies = null,
@@ -72,7 +70,6 @@ class EventsInteractor internal constructor(
         when (joinEventResult) {
             is JoinEventResult.NewCurrentEvent -> {
                 settingsRepository.setCurrentEventId(joinEventResult.event.event.id)
-                settingsRepository.setCurrentPersonId(joinEventResult.event.persons.first().id) // FIXME select person on UI
             }
 
             JoinEventResult.EventNotFound,

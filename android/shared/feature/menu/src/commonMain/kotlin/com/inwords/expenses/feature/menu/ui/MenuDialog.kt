@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 internal fun MenuDialog(
     state: MenuDialogUiModel,
     onJoinEventClicked: () -> Unit,
+    onChoosePersonClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -50,7 +51,8 @@ internal fun MenuDialog(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp)
+                .clickable(onClick = onChoosePersonClicked),
         ) {
             Icon(
                 modifier = Modifier
