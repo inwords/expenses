@@ -31,6 +31,7 @@ async function bootstrap() {
     options: {
       package: 'user', // This should match the gRPC service package name
       protoPath: join(__dirname, '../expenses.proto'), // Path to your .proto file
+      url: '0.0.0.0:5000',
     },
   });
 
