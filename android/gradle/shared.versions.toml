@@ -1,28 +1,28 @@
 [versions]
-kotlin = "2.1.10" # https://github.com/jetbrains/kotlin/releases https://kotlinlang.org/docs/releases.html#release-details
-ksp = "2.1.10-1.0.30" # https://github.com/google/ksp/releases
+kotlin = "2.1.21" # https://github.com/jetbrains/kotlin/releases https://kotlinlang.org/docs/releases.html#release-details
+ksp = "2.1.21-2.0.1" # https://github.com/google/ksp/releases
 
-room = "2.7.0-beta01" # https://developer.android.com/jetpack/androidx/releases/room
-datastore = "1.1.2" # https://developer.android.com/jetpack/androidx/releases/datastore
+room = "2.7.1" # https://developer.android.com/jetpack/androidx/releases/room
+datastore = "1.1.7" # https://developer.android.com/jetpack/androidx/releases/datastore
 
-ktor = "3.1.0" # https://github.com/ktorio/ktor/releases
+ktor = "3.1.3" # https://github.com/ktorio/ktor/releases
 cronet = "119.6045.31"
 
-coroutines = "1.10.1"
+coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines/releases
 
-kotlinx-serialization = "1.8.0" # https://github.com/Kotlin/kotlinx.serialization/releases
+kotlinx-serialization = "1.8.1" # https://github.com/Kotlin/kotlinx.serialization/releases
 
 coil = "3.1.0" # https://github.com/coil-kt/coil/releases
 
-lifecycle = "2.9.0-alpha10" # https://developer.android.com/jetpack/androidx/releases/lifecycle
+lifecycle = "2.9.0" # https://developer.android.com/jetpack/androidx/releases/lifecycle
 
-compose-bom = "2025.02.00" # https://developer.android.com/jetpack/androidx/releases/compose
-compose-multiplatform = "1.7.3" # https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
+compose-bom = "2025.05.01" # https://developer.android.com/jetpack/androidx/releases/compose
+compose-multiplatform = "1.8.1" # https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
 
 [libraries]
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version = "2.5.0-beta01" } # https://developer.android.com/jetpack/androidx/releases/sqlite
+sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version = "2.5.1" } # https://developer.android.com/jetpack/androidx/releases/sqlite
 datastore-core-okio = { group = "androidx.datastore", name = "datastore-core-okio", version.ref = "datastore" }
 datastore-android = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
 
@@ -41,19 +41,19 @@ coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-co
 
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version = "0.6.2" } # https://github.com/Kotlin/kotlinx-datetime/releases
-kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version = "0.3.8" }
+kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version = "0.4.0" } # https://github.com/Kotlin/kotlinx.collections.immutable/releases
 
 coil-base = { group = "io.coil-kt.coil3", name = "coil-core", version.ref = "coil" }
 coil-compose-base = { group = "io.coil-kt.coil3", name = "coil-compose-core", version.ref = "coil" }
 
 lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
 lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
-lifecycle-runtime-compose-multiplatform = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version = "2.8.4" }
+lifecycle-runtime-compose-multiplatform = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version = "2.9.0" }
 lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
-lifecycle-viewmodel-compose-multiplatform = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-compose", version = "2.8.4" }
+lifecycle-viewmodel-compose-multiplatform = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-compose", version = "2.9.0" }
 
-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version = "2.10.0" }
-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.15.0" }
+work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version = "2.10.1" } # https://developer.android.com/jetpack/androidx/releases/work
+core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.16.0" } # https://developer.android.com/jetpack/androidx/releases/core
 annotation = { group = "androidx.annotation", name = "annotation", version = "1.9.1" }
 
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
@@ -61,9 +61,9 @@ compose-ui = { group = "androidx.compose.ui", name = "ui" }
 compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
-activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.10.0" }
-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version = "2.8.7" } # https://developer.android.com/jetpack/androidx/releases/navigation
-navigation-compose-multiplatform = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version = "2.8.0-alpha13" } # https://mvnrepository.com/artifact/org.jetbrains.androidx.navigation/navigation-compose
+activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.10.1" }
+navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version = "2.9.0" } # https://developer.android.com/jetpack/androidx/releases/navigation
+navigation-compose-multiplatform = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version = "2.9.0-beta01" } # https://mvnrepository.com/artifact/org.jetbrains.androidx.navigation/navigation-compose
 
 ionspin-kotlin-bignum = { group = "com.ionspin.kotlin", name = "bignum", version = "0.3.10" }
 
@@ -73,6 +73,6 @@ compose-multiplatform-compiler = { id = "org.jetbrains.compose", version.ref = "
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
-wire = { id = "com.squareup.wire", version = "5.3.0" } # https://square.github.io/wire/changelog/
+wire = { id = "com.squareup.wire", version = "5.3.1" } # https://square.github.io/wire/changelog/
 atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version = "0.27.0" }
 gradle-versions-checker = { id = "com.github.ben-manes.versions", version = "0.52.0" }
