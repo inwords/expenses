@@ -12,6 +12,7 @@ import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.data.network.dto.CreateExpenseRequest
 import com.inwords.expenses.feature.expenses.data.network.dto.ExpenseDto
 import com.inwords.expenses.feature.expenses.data.network.dto.SplitInformationDto
+import com.inwords.expenses.feature.expenses.data.network.dto.SplitInformationRequest
 import com.inwords.expenses.feature.expenses.domain.model.Expense
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseSplitWithPerson
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
@@ -74,9 +75,9 @@ internal class ExpensesRemoteStoreImpl(
                         },
                         userWhoPaidId = expense.person.serverId,
                         splitInformation = expense.subjectExpenseSplitWithPersons.map { expenseSplitWithPerson ->
-                            SplitInformationDto(
+                            SplitInformationRequest(
                                 userId = expenseSplitWithPerson.person.serverId,
-                                amount = expenseSplitWithPerson.originalAmount?.toStringExpanded() ?: return IoResult.Error.Failure // FIXME: non-fatal error
+                                amount = expenseSplitWithPerson.originalAmount?.doubleValue(false) ?: return IoResult.Error.Failure, // FIXME: non-fatal error
                             )
                         },
                         description = expense.description
@@ -109,7 +110,8 @@ internal class ExpensesRemoteStoreImpl(
 
     private fun SplitInformationDto.toDomain(persons: List<Person>): ExpenseSplitWithPerson? {
         val person = persons.firstOrNull { it.serverId == userId } ?: return null
-        val exchangedAmount = BigDecimal.parseString(amount)
+        val originalAmount = BigDecimal.fromDouble(amount)
+        val exchangedAmount = BigDecimal.fromDouble(exchangedAmount ?: amount)
         return ExpenseSplitWithPerson(
             expenseSplitId = 0L,
             expenseId = 0L,
@@ -118,7 +120,7 @@ internal class ExpensesRemoteStoreImpl(
                 serverId = userId,
                 name = person.name,
             ),
-            originalAmount = null,
+            originalAmount = originalAmount,
             exchangedAmount = exchangedAmount,
         )
     }

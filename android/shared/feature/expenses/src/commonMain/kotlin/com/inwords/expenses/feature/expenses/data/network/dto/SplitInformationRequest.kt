@@ -4,12 +4,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class SplitInformationDto(
+internal data class SplitInformationRequest(
     @SerialName("amount")
     val amount: Double, // TODO pass as String
-
-    @SerialName("exchangedAmount")
-    val exchangedAmount: Double? = null, // TODO pass as String
 
     @SerialName("userId")
     val userId: Long

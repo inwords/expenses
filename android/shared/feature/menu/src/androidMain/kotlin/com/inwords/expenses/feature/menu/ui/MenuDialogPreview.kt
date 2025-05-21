@@ -12,6 +12,7 @@ private fun MenuDialogPreview() {
             eventAccessCode = "1111"
         ),
         onJoinEventClicked = {},
+        onLeaveEventClicked = {},
         onChoosePersonClicked = {},
     )
 }

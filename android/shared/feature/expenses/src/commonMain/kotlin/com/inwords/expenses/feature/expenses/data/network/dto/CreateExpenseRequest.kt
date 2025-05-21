@@ -19,5 +19,5 @@ internal data class CreateExpenseRequest(
     val expenseType: String,
 
     @SerialName("splitInformation")
-    val splitInformation: List<SplitInformationDto>
+    val splitInformation: List<SplitInformationRequest>
 )

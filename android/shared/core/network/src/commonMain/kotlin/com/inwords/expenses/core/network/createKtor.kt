@@ -8,6 +8,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 
 internal fun <T : HttpClientEngineConfig> createKtor(
     httpClientEngine: HttpClientEngineFactory<T>,
@@ -21,7 +22,9 @@ internal fun <T : HttpClientEngineConfig> createKtor(
         followRedirects = false
 
         install(ContentNegotiation) {
-            json()
+            json(
+                Json { ignoreUnknownKeys = true }
+            )
         }
 
         install(Logging) {

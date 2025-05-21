@@ -30,6 +30,7 @@ fun NavGraphBuilder.addMenuDialog(
         MenuDialog(
             state = viewModel.state.collectAsStateWithLifecycle().value,
             onJoinEventClicked = viewModel::onJoinEventClicked,
+            onLeaveEventClicked = viewModel::onLeaveEventClicked,
             onChoosePersonClicked = viewModel::onChoosePersonClicked,
         )
     }
