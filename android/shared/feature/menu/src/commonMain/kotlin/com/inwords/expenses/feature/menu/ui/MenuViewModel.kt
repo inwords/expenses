@@ -9,16 +9,20 @@ import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonScreenDestination
 import com.inwords.expenses.feature.events.ui.join.JoinEventScreenDestination
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 internal class MenuViewModel(
     private val navigationController: NavigationController,
-    eventsInteractor: EventsInteractor,
+    private val eventsInteractor: EventsInteractor,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
     private val emptyState = MenuDialogUiModel("", "")
+
+    private var leaveEventJob: Job? = null
 
     private val _state = MutableStateFlow(emptyState)
     val state: StateFlow<MenuDialogUiModel> = _state
@@ -31,7 +35,7 @@ internal class MenuViewModel(
             }
 
             _state.value = MenuDialogUiModel(
-                eventId = event.event.id.toString(),
+                eventId = event.event.serverId.toString(),
                 eventAccessCode = event.event.pinCode,
             )
         }
@@ -39,6 +43,15 @@ internal class MenuViewModel(
 
     fun onJoinEventClicked() {
         navigationController.navigateTo(JoinEventScreenDestination)
+    }
+
+    fun onLeaveEventClicked() {
+        if (leaveEventJob != null) return
+        leaveEventJob = viewModelScope.launch {
+            eventsInteractor.leaveEvent()
+            navigationController.popBackStack()
+            leaveEventJob = null
+        }
     }
 
     fun onChoosePersonClicked() {

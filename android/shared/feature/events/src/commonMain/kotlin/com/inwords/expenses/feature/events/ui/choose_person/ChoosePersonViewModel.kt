@@ -51,12 +51,15 @@ internal class ChoosePersonViewModel(
                 .distinctUntilChanged(),
             settingsRepository.getCurrentPersonId()
         ) { eventWithPersons, currentPersonId ->
+            var needToSelectFirst = !eventWithPersons.persons.any { person -> person.id == currentPersonId }
             val persons = eventWithPersons.persons.map { person ->
-                PersonUiModel(
+                val model = PersonUiModel(
                     id = person.id,
                     name = person.name,
-                    selected = person.id == currentPersonId
+                    selected = person.id == currentPersonId || needToSelectFirst
                 )
+                needToSelectFirst = false
+                model
             }
 
             _state.value = if (persons.isEmpty()) {
@@ -90,7 +93,8 @@ internal class ChoosePersonViewModel(
         confirmJob = viewModelScope.launch {
             val currentState = _state.value as? SimpleScreenState.Success ?: return@launch
 
-            val selectedPersonId = currentState.data.persons.first { it.selected }.id
+            val selectedPersonId = (currentState.data.persons.firstOrNull { it.selected }
+                ?: currentState.data.persons.first()).id
             settingsRepository.setCurrentPersonId(selectedPersonId)
             navigationController.navigateTo(
                 destination = expensesScreenDestination,

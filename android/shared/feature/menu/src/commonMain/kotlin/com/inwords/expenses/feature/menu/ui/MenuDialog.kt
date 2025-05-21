@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 internal fun MenuDialog(
     state: MenuDialogUiModel,
     onJoinEventClicked: () -> Unit,
+    onLeaveEventClicked: () -> Unit,
     onChoosePersonClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -84,6 +86,26 @@ internal fun MenuDialog(
             Text(
                 modifier = Modifier.align(Alignment.CenterVertically),
                 text = "Войти в другое событие",
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .clickable(onClick = onLeaveEventClicked)
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            Icon(
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .align(Alignment.CenterVertically),
+                imageVector = Icons.AutoMirrored.Outlined.ExitToApp,
+                contentDescription = null
+            )
+            Text(
+                modifier = Modifier.align(Alignment.CenterVertically),
+                text = "Покинуть событие",
                 style = MaterialTheme.typography.bodyLarge
             )
         }
