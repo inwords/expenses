@@ -1,6 +1,5 @@
 package com.inwords.expenses.feature.expenses.ui.add
 
-import androidx.core.bundle.Bundle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
@@ -9,6 +8,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import androidx.savedstate.SavedState
+import androidx.savedstate.read
+import androidx.savedstate.write
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.feature.events.domain.EventsInteractor
@@ -17,7 +19,6 @@ import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenDestination.
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.reflect.typeOf
 
@@ -43,8 +44,10 @@ data class AddExpenseScreenDestination(
 private class ReplenishmentNavType : NavType<Replenishment?>(
     isNullableAllowed = true
 ) {
-    override fun get(bundle: Bundle, key: String): Replenishment? {
-        return bundle.getString(key)?.let { parseValue(it) }
+    override fun get(bundle: SavedState, key: String): Replenishment? {
+        return bundle.read {
+            getStringOrNull(key)?.let { parseValue(it) }
+        }
     }
 
     override fun parseValue(value: String): Replenishment? {
@@ -55,9 +58,11 @@ private class ReplenishmentNavType : NavType<Replenishment?>(
         }
     }
 
-    override fun put(bundle: Bundle, key: String, value: Replenishment?) {
+    override fun put(bundle: SavedState, key: String, value: Replenishment?) {
         if (value != null) {
-            bundle.putString(key, serializeAsValue(value))
+            bundle.write {
+                putString(key, serializeAsValue(value))
+            }
         }
     }
 
