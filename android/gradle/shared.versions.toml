@@ -12,11 +12,11 @@ coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines/releases
 
 kotlinx-serialization = "1.8.1" # https://github.com/Kotlin/kotlinx.serialization/releases
 
-coil = "3.1.0" # https://github.com/coil-kt/coil/releases
+coil = "3.2.0" # https://github.com/coil-kt/coil/releases
 
-lifecycle = "2.9.0" # https://developer.android.com/jetpack/androidx/releases/lifecycle
+lifecycle = "2.9.1" # https://developer.android.com/jetpack/androidx/releases/lifecycle
 
-compose-bom = "2025.05.01" # https://developer.android.com/jetpack/androidx/releases/compose
+compose-bom = "2025.06.00" # https://developer.android.com/jetpack/androidx/releases/compose
 compose-multiplatform = "1.8.1" # https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
 
 [libraries]
@@ -73,6 +73,6 @@ compose-multiplatform-compiler = { id = "org.jetbrains.compose", version.ref = "
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
-wire = { id = "com.squareup.wire", version = "5.3.1" } # https://square.github.io/wire/changelog/
+wire = { id = "com.squareup.wire", version = "5.3.3" } # https://square.github.io/wire/changelog/
 atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version = "0.27.0" }
 gradle-versions-checker = { id = "com.github.ben-manes.versions", version = "0.52.0" }

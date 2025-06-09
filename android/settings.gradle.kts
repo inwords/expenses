@@ -37,6 +37,7 @@ dependencyResolutionManagement {
         }
     }
 }
+
 rootProject.name = "Expenses"
 
 include(":app")
