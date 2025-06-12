@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,24 +26,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.inwords.expenses.core.ui.design.appbar.BasicTopAppBar
+import com.inwords.expenses.core.ui.design.button.BasicFloatingActionButton
+import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonScreenUiModel.PersonUiModel
 import com.inwords.expenses.feature.events.ui.common.EventInfoBlock
+import kotlinx.collections.immutable.persistentListOf
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 internal fun ChoosePersonScreen(
@@ -54,7 +52,6 @@ internal fun ChoosePersonScreen(
     onPersonSelected: (Long) -> Unit,
     onConfirmClicked: () -> Unit,
 ) {
-
     when (state) {
         is SimpleScreenState.Loading -> {
             LoadingState(modifier = modifier)
@@ -100,91 +97,57 @@ internal fun ChoosePersonContent(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(
-                title = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(end = 16.dp),
-                    ) {
-                        Text(
-                            modifier = Modifier.align(Alignment.Center),
-                            text = "CommonEx",
-                            fontStyle = FontStyle.Italic,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            )
+            BasicTopAppBar()
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = {
-                    if (state.persons.any { it.selected }) {
-                        onConfirmClicked()
-                    }
-                },
-                containerColor = if (state.persons.any { it.selected }) {
-                    MaterialTheme.colorScheme.secondaryContainer
-                } else {
-                    MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f)
-                },
-                contentColor = if (state.persons.any { it.selected }) {
-                    MaterialTheme.colorScheme.onSecondaryContainer
-                } else {
-                    MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.6f)
-                }
-            ) {
-                Text(text = "Продолжить")
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
-            }
+            BasicFloatingActionButton(
+                text = "Продолжить",
+                icon = Icons.AutoMirrored.Outlined.ArrowForward,
+                onClick = onConfirmClicked,
+                enabled = state.persons.any { it.selected },
+            )
         }
     ) { paddingValues ->
-        val topAndHorizontalPaddings = PaddingValues(
-            top = paddingValues.calculateTopPadding(),
-            start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
-            end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-        )
-
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .consumeWindowInsets(topAndHorizontalPaddings)
-                .padding(topAndHorizontalPaddings)
+                .consumeWindowInsets(paddingValues)
+                .padding(paddingValues)
         ) {
-            EventInfoBlock(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                eventName = state.eventName,
-                currentPersonName = state.selectedPersonName
-            )
+            Column {
+                EventInfoBlock(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    eventName = state.eventName,
+                    currentPersonName = state.selectedPersonName
+                )
 
-            Text(
-                text = "Ваше имя",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 4.dp)
-            )
+                Text(
+                    text = "Ваше имя",
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 4.dp)
+                )
 
-            val bottomPadding = paddingValues.calculateBottomPadding()
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .consumeWindowInsets(PaddingValues(bottom = bottomPadding))
-                    .padding(horizontal = 16.dp),
-                contentPadding = PaddingValues(bottom = 88.dp + bottomPadding),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(
-                    count = state.persons.size,
-                    key = { index -> state.persons[index].id }
-                ) { index ->
-                    val person = state.persons[index]
-                    PersonSelectionItem(
-                        person = person,
-                        onPersonSelected = onPersonSelected,
-                    )
+                val bottomPadding = paddingValues.calculateBottomPadding()
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .consumeWindowInsets(PaddingValues(bottom = bottomPadding))
+                        .padding(horizontal = 16.dp),
+                    contentPadding = PaddingValues(bottom = 88.dp + bottomPadding),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(
+                        count = state.persons.size,
+                        key = { index -> state.persons[index].id }
+                    ) { index ->
+                        val person = state.persons[index]
+                        PersonSelectionItem(
+                            person = person,
+                            onPersonSelected = onPersonSelected,
+                        )
+                    }
                 }
             }
         }
@@ -261,6 +224,29 @@ private fun PersonSelectionItem(
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight(animatedFontWeight),
             color = animatedNameTextColor
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ChoosePersonScreenPreview() {
+    ExpensesTheme {
+        ChoosePersonScreen(
+            state = SimpleScreenState.Success(
+                ChoosePersonScreenUiModel(
+                    eventId = 1,
+                    eventName = "Weekend Trip",
+                    selectedPersonName = "John Doe",
+                    persons = persistentListOf(
+                        PersonUiModel(id = 1, name = "John Doe", selected = true),
+                        PersonUiModel(id = 2, name = "Jane Smith", selected = false),
+                        PersonUiModel(id = 3, name = "Peter Jones", selected = false),
+                    )
+                )
+            ),
+            onPersonSelected = {},
+            onConfirmClicked = {}
         )
     }
 }

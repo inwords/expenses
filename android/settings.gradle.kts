@@ -44,6 +44,7 @@ include(":app")
 
 include(":shared")
 include(":shared:core")
+include(":shared:core:ui-design")
 include(":shared:core:navigation")
 include(":shared:core:network")
 include(":shared:core:locator")
@@ -61,3 +62,4 @@ include("shared:feature:sync")
 
 include("shared:integration")
 include("shared:integration:databases")
+include("shared:integration:base")

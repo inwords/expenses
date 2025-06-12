@@ -24,7 +24,6 @@ import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -38,17 +37,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.inwords.expenses.core.ui.design.appbar.BasicTopAppBar
+import com.inwords.expenses.core.ui.design.button.BasicFloatingActionButton
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
+import com.inwords.expenses.feature.events.domain.model.Currency
+import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.events.ui.common.EventInfoBlock
+import com.inwords.expenses.feature.expenses.domain.model.Expense
+import com.inwords.expenses.feature.expenses.domain.model.ExpenseSplitWithPerson
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
+import com.inwords.expenses.feature.expenses.ui.converter.toUiModel
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.ExpenseUiModel
+import com.ionspin.kotlin.bignum.decimal.toBigDecimal
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.datetime.Clock
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 internal fun ExpensesScreen(
@@ -131,13 +139,11 @@ private fun ExpensesScreenSuccess(
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = onAddExpenseClick
-            ) {
-                Icon(Icons.Outlined.Add, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Операция")
-            }
+            BasicFloatingActionButton(
+                text = "Операция",
+                icon = Icons.Outlined.Add,
+                onClick = onAddExpenseClick,
+            )
         }
     ) { paddingValues ->
         val topAndHorizontalPaddings = PaddingValues(
@@ -208,43 +214,42 @@ private fun ExpensesScreenEmpty(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(
-                title = {
-                    val text = buildAnnotatedString {
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic)) {
-                            append("CommonEx")
-                        }
-                    }
-                    Text(text = text)
-                }
-            )
+            BasicTopAppBar()
         },
     ) { paddingValues ->
         Column(
             modifier = modifier
                 .fillMaxSize()
+                .consumeWindowInsets(paddingValues)
                 .padding(paddingValues),
-            verticalArrangement = Arrangement.Bottom,
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = "Вы можете создать новое событие или присоединиться к существующему",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .padding(bottom = 32.dp, start = 16.dp, end = 16.dp),
+            )
             Button(
                 modifier = Modifier
-                    .fillMaxWidth(0.5f)
+                    .fillMaxWidth(0.7f)
                     .padding(horizontal = 16.dp),
                 onClick = onCreateEventClick
             ) {
-                Text(text = "Create event")
+                Text(text = "Новое событие")
             }
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedButton(
                 modifier = Modifier
-                    .fillMaxWidth(0.5f)
+                    .fillMaxWidth(0.7f)
                     .padding(horizontal = 16.dp),
                 onClick = onJoinEventClick
             ) {
-                Text(text = "Join event")
+                Text(text = "Присоединиться к событию")
             }
-            Spacer(modifier = Modifier.fillMaxHeight(0.1f))
         }
     }
 }
@@ -310,4 +315,139 @@ private fun ExpenseItem(
             Text(text = expense.timestamp, maxLines = 1)
         }
     }
+}
+
+@Preview
+@Composable
+private fun ExpensesScreenPreviewSuccessWithCreditors() {
+    ExpensesScreen(
+        onMenuClick = {},
+        onAddExpenseClick = {},
+        onDebtsDetailsClick = {},
+        onReplenishmentClick = {},
+        onJoinEventClick = {},
+        onCreateEventClick = {},
+        onRefresh = {},
+        state = SimpleScreenState.Success(mockExpensesScreenUiModel(withCreditors = true))
+    )
+}
+
+@Preview
+@Composable
+private fun ExpensesScreenPreviewSuccessWithoutCreditors() {
+    ExpensesScreen(
+        onMenuClick = {},
+        onAddExpenseClick = {},
+        onDebtsDetailsClick = {},
+        onReplenishmentClick = {},
+        onJoinEventClick = {},
+        onCreateEventClick = {},
+        onRefresh = {},
+        state = SimpleScreenState.Success(mockExpensesScreenUiModel(withCreditors = false))
+    )
+}
+
+@Composable
+@Preview
+private fun ExpensesScreenPreviewEmpty() {
+    ExpensesScreen(
+        onMenuClick = {},
+        onAddExpenseClick = {},
+        onDebtsDetailsClick = {},
+        onReplenishmentClick = {},
+        onJoinEventClick = {},
+        onCreateEventClick = {},
+        onRefresh = {},
+        state = SimpleScreenState.Empty
+    )
+}
+
+internal fun mockExpensesScreenUiModel(withCreditors: Boolean): ExpensesScreenUiModel {
+    val person1 = Person(
+        id = 1,
+        serverId = 11,
+        name = "Василий"
+    )
+    val person2 = Person(
+        id = 2,
+        serverId = 12,
+        name = "Максим"
+    )
+    return ExpensesScreenUiModel(
+        eventName = "France trip",
+        currentPersonId = person1.id,
+        currentPersonName = person1.name,
+        creditors = persistentListOf(
+            ExpensesScreenUiModel.DebtorShortUiModel(
+                personId = person1.id,
+                personName = person1.name,
+                currencyCode = "EUR",
+                currencyName = "Euro",
+                amount = "100"
+            ),
+            ExpensesScreenUiModel.DebtorShortUiModel(
+                personId = person2.id,
+                personName = person2.name,
+                currencyCode = "EUR",
+                currencyName = "Euro",
+                amount = "150"
+            )
+        ).takeIf { withCreditors } ?: persistentListOf(),
+        expenses = persistentListOf(
+            Expense(
+                expenseId = 1,
+                serverId = 11,
+                currency = Currency(
+                    id = 1,
+                    serverId = 11,
+                    code = "RUB",
+                    name = "Russian Ruble",
+                ),
+                expenseType = ExpenseType.Spending,
+                person = person1,
+                subjectExpenseSplitWithPersons = listOf(
+                    ExpenseSplitWithPerson(
+                        expenseSplitId = 1,
+                        expenseId = 1,
+                        person = person1,
+                        originalAmount = 100.toBigDecimal(),
+                        exchangedAmount = 100.toBigDecimal(),
+                    ),
+                    ExpenseSplitWithPerson(
+                        expenseSplitId = 2,
+                        expenseId = 1,
+                        person = person2,
+                        originalAmount = 150.333.toBigDecimal(),
+                        exchangedAmount = 100.toBigDecimal(),
+                    )
+                ),
+                timestamp = Clock.System.now(),
+                description = "Lunch",
+            ).toUiModel("EUR"),
+            Expense(
+                expenseId = 2,
+                serverId = 12,
+                currency = Currency(
+                    id = 2,
+                    serverId = 11,
+                    code = "USD",
+                    name = "US Dollar",
+                ),
+                expenseType = ExpenseType.Replenishment,
+                person = person2,
+                subjectExpenseSplitWithPersons = listOf(
+                    ExpenseSplitWithPerson(
+                        expenseSplitId = 4,
+                        expenseId = 2,
+                        person = person2,
+                        originalAmount = 132423423.toBigDecimal(),
+                        exchangedAmount = 132423423.toBigDecimal(),
+                    )
+                ),
+                timestamp = Clock.System.now(),
+                description = "Dinner and some text",
+            ).toUiModel("EUR")
+        ),
+        isRefreshing = false
+    )
 }
