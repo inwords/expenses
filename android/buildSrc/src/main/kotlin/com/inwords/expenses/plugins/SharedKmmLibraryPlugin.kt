@@ -18,12 +18,12 @@ class SharedKmmLibraryPlugin : Plugin<Project> {
         val kotlin = project.extensions.getByType<KotlinMultiplatformExtension>()
 
         android.apply {
-            compileSdk = 35
+            compileSdk = 36
             defaultConfig {
                 minSdk = 26
             }
             testOptions {
-                targetSdk = 35
+                targetSdk = 36
             }
 
             compileOptions {
