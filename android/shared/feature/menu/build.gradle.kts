@@ -27,6 +27,7 @@ kotlin {
             dependencies {
                 implementation(project(":shared:core:utils"))
                 implementation(project(":shared:core:ui-utils"))
+                implementation(project(":shared:core:ui-design"))
                 implementation(project(":shared:core:navigation"))
                 implementation(project(":shared:feature:events"))
                 implementation(project(":shared:feature:settings"))
@@ -43,19 +44,14 @@ kotlin {
 
                 implementation(compose.ui)
                 implementation(compose.material3)
+                implementation(compose.components.uiToolingPreview)
 
                 implementation(shared.navigation.compose.multiplatform)
+                implementation(shared.compose.material.icons.core)
             }
         }
         androidMain {
             dependencies {
-                implementation(shared.lifecycle.viewmodel.compose)
-                implementation(shared.navigation.compose)
-
-                val composeBom = project.dependencies.platform(shared.compose.bom)
-                implementation(composeBom)
-                implementation(shared.compose.ui)
-                implementation(shared.compose.material3)
                 implementation(shared.compose.ui.tooling)
             }
         }

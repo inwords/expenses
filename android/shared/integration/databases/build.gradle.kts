@@ -15,7 +15,7 @@ android {
 }
 
 kotlin {
-    applyKmmDefaults("shared-events")
+    applyKmmDefaults("shared-integration-databases")
 
     sourceSets {
         commonMain {

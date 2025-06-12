@@ -21,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 internal fun MenuDialog(
@@ -109,5 +111,21 @@ internal fun MenuDialog(
                 style = MaterialTheme.typography.bodyLarge
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun MenuDialogPreview() {
+    ExpensesTheme {
+        MenuDialog(
+            state = MenuDialogUiModel(
+                eventId = "1234",
+                eventAccessCode = "1111"
+            ),
+            onJoinEventClicked = {},
+            onLeaveEventClicked = {},
+            onChoosePersonClicked = {},
+        )
     }
 }
