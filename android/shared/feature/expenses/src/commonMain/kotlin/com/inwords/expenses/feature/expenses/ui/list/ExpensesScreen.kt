@@ -1,6 +1,7 @@
 package com.inwords.expenses.feature.expenses.ui.list
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
@@ -34,6 +36,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -63,6 +66,7 @@ internal fun ExpensesScreen(
     state: SimpleScreenState<ExpensesScreenUiModel>,
     onMenuClick: () -> Unit,
     onAddExpenseClick: () -> Unit,
+    onRevertExpenseClick: (expense: ExpenseUiModel) -> Unit,
     onDebtsDetailsClick: () -> Unit,
     onReplenishmentClick: (ExpensesScreenUiModel.DebtorShortUiModel) -> Unit,
     onCreateEventClick: () -> Unit,
@@ -75,6 +79,7 @@ internal fun ExpensesScreen(
             state = state.data,
             onMenuClick = onMenuClick,
             onAddExpenseClick = onAddExpenseClick,
+            onRevertExpenseClick = onRevertExpenseClick,
             onDebtsDetailsClick = onDebtsDetailsClick,
             onReplenishmentClick = onReplenishmentClick,
             onRefresh = onRefresh,
@@ -103,6 +108,7 @@ private fun ExpensesScreenSuccess(
     state: ExpensesScreenUiModel,
     onMenuClick: () -> Unit,
     onAddExpenseClick: () -> Unit,
+    onRevertExpenseClick: (expense: ExpenseUiModel) -> Unit,
     onDebtsDetailsClick: () -> Unit,
     onReplenishmentClick: (ExpensesScreenUiModel.DebtorShortUiModel) -> Unit,
     onRefresh: () -> Unit,
@@ -181,12 +187,20 @@ private fun ExpensesScreenSuccess(
                     style = MaterialTheme.typography.headlineMedium
                 )
 
+                val listState = rememberLazyListState()
+                LaunchedEffect(state.expenses.size) {
+                    if (state.expenses.isNotEmpty()) {
+                        listState.animateScrollToItem(0)
+                    }
+                }
+
                 val bottomPadding = paddingValues.calculateBottomPadding()
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
                         .consumeWindowInsets(PaddingValues(bottom = bottomPadding))
                         .padding(horizontal = 8.dp),
+                    state = listState,
                     contentPadding = PaddingValues(bottom = 88.dp + bottomPadding),
                 ) {
                     items(
@@ -196,7 +210,7 @@ private fun ExpensesScreenSuccess(
                         }
                     ) { index ->
                         val expense = state.expenses[state.expenses.lastIndex - index]
-                        ExpenseItem(expense)
+                        ExpenseItem(expense, onRevertExpenseClick)
                     }
                 }
             }
@@ -257,15 +271,18 @@ private fun ExpensesScreenEmpty(
 @Composable
 private fun ExpenseItem(
     expense: ExpenseUiModel,
+    onRevertExpenseClick: (expense: ExpenseUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val shape = RoundedCornerShape(8.dp)
-
     Row(
         modifier = modifier
-            .fillMaxWidth()
             .padding(vertical = 4.dp)
-            .border(border = AssistChipDefaults.assistChipBorder(false), shape = shape),
+            .clickable { onRevertExpenseClick.invoke(expense) }
+            .fillMaxWidth()
+            .border(
+                border = AssistChipDefaults.assistChipBorder(false),
+                shape = RoundedCornerShape(8.dp)
+            ),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(
@@ -323,6 +340,7 @@ private fun ExpensesScreenPreviewSuccessWithCreditors() {
     ExpensesScreen(
         onMenuClick = {},
         onAddExpenseClick = {},
+        onRevertExpenseClick = {},
         onDebtsDetailsClick = {},
         onReplenishmentClick = {},
         onJoinEventClick = {},
@@ -338,6 +356,7 @@ private fun ExpensesScreenPreviewSuccessWithoutCreditors() {
     ExpensesScreen(
         onMenuClick = {},
         onAddExpenseClick = {},
+        onRevertExpenseClick = {},
         onDebtsDetailsClick = {},
         onReplenishmentClick = {},
         onJoinEventClick = {},
@@ -353,6 +372,7 @@ private fun ExpensesScreenPreviewEmpty() {
     ExpensesScreen(
         onMenuClick = {},
         onAddExpenseClick = {},
+        onRevertExpenseClick = {},
         onDebtsDetailsClick = {},
         onReplenishmentClick = {},
         onJoinEventClick = {},

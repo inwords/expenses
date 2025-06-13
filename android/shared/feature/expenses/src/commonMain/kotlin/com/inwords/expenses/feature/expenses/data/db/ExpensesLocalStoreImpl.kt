@@ -27,6 +27,10 @@ internal class ExpensesLocalStoreImpl(
         return expensesDao.queryByEventId(eventId).map { entity -> entity.toDomain() }
     }
 
+    override suspend fun getExpense(expenseId: Long): Expense? {
+        return expensesDao.queryById(expenseId)?.toDomain()
+    }
+
     override suspend fun upsert(event: Event, expense: Expense): Expense {
         val id = expensesDao.upsert(
             expenseEntity = expense.toEntity(event),

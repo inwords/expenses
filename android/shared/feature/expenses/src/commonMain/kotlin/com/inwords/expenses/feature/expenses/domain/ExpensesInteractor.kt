@@ -125,6 +125,37 @@ class ExpensesInteractor internal constructor(
         expensesLocalStore.upsert(event, expense)
     }
 
+    // reverts expense by adding new expense
+    internal suspend fun revertExpense(event: Event, expenseId: Long) {
+        val originalExpense = expensesLocalStore.getExpense(expenseId) ?: return
+
+        val revertedSplits = originalExpense.subjectExpenseSplitWithPersons.map { split ->
+            ExpenseSplitWithPerson(
+                expenseSplitId = 0,
+                expenseId = 0,
+                person = split.person,
+                originalAmount = split.originalAmount?.negate(),
+                exchangedAmount = split.exchangedAmount.negate()
+            )
+        }
+
+        val revertedExpense = Expense(
+            expenseId = 0,
+            serverId = 0,
+            currency = originalExpense.currency,
+            expenseType = when (originalExpense.expenseType) {
+                ExpenseType.Spending -> ExpenseType.Replenishment
+                ExpenseType.Replenishment -> ExpenseType.Spending
+            },
+            person = originalExpense.person,
+            subjectExpenseSplitWithPersons = revertedSplits,
+            timestamp = Clock.System.now(),
+            description = "[ОТМЕНА] ${originalExpense.description}"
+        )
+
+        expensesLocalStore.upsert(event, revertedExpense)
+    }
+
     internal suspend fun onRefreshExpensesAsync(event: Event) {
         _refreshExpenses.emit(event)
     }

@@ -63,4 +63,8 @@ interface ExpensesDao {
     @Query("SELECT * FROM ${ExpenseEntity.TABLE_NAME} WHERE ${ExpenseEntity.ColumnNames.EVENT_ID} = :eventId")
     suspend fun queryByEventId(eventId: Long): List<ExpenseWithDetailsQuery>
 
+    @Transaction
+    @Query("SELECT * FROM ${ExpenseEntity.TABLE_NAME} WHERE ${ExpenseEntity.ColumnNames.ID} = :expenseId")
+    suspend fun queryById(expenseId: Long): ExpenseWithDetailsQuery?
+
 }
