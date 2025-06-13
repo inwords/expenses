@@ -16,6 +16,8 @@ import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenDestination
 import com.inwords.expenses.feature.expenses.ui.converter.toUiModel
 import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListScreenDestination
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.DebtorShortUiModel
+import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.ExpenseUiModel
+import com.inwords.expenses.feature.expenses.ui.list.dialog.ExpenseItemDialogDestination
 import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
 import com.inwords.expenses.feature.menu.ui.MenuDialogDestination
 import com.inwords.expenses.feature.settings.api.SettingsRepository
@@ -104,6 +106,15 @@ internal class ExpensesViewModel(
 
     fun onAddExpenseClick() {
         navigationController.navigateTo(AddExpenseScreenDestination())
+    }
+
+    fun onRevertExpenseClick(expense: ExpenseUiModel) {
+        navigationController.navigateTo(
+            ExpenseItemDialogDestination(
+                expenseId = expense.expenseId,
+                description = expense.description,
+            )
+        )
     }
 
     fun onDebtsDetailsClick() {

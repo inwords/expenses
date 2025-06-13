@@ -20,6 +20,7 @@ import com.inwords.expenses.feature.expenses.ui.add.addExpenseScreen
 import com.inwords.expenses.feature.expenses.ui.debts_list.addDebtsListScreen
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenDestination
 import com.inwords.expenses.feature.expenses.ui.list.addExpensesScreen
+import com.inwords.expenses.feature.expenses.ui.list.dialog.addExpenseItemDialog
 import com.inwords.expenses.feature.menu.api.MenuComponent
 import com.inwords.expenses.feature.menu.ui.addMenuDialog
 import com.inwords.expenses.feature.settings.api.SettingsComponent
@@ -76,6 +77,11 @@ fun MainNavHost(
             settingsRepository = settingsComponent.settingsRepository,
         )
         addDebtsListScreen(
+            navigationController = navigationController,
+            eventsInteractor = eventsComponent.eventsInteractor,
+            expensesInteractor = expensesComponent.expensesInteractor,
+        )
+        addExpenseItemDialog(
             navigationController = navigationController,
             eventsInteractor = eventsComponent.eventsInteractor,
             expensesInteractor = expensesComponent.expensesInteractor,
