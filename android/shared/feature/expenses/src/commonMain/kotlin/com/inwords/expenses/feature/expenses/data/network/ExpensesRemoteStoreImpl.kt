@@ -40,7 +40,7 @@ internal class ExpensesRemoteStoreImpl(
     ): IoResult<List<Expense>> {
         return client.requestWithExceptionHandling {
             get {
-                url(hostConfig) { pathSegments = listOf("user", "event", event.serverId.toString(), "expenses") }
+                url(hostConfig) { pathSegments = listOf("api", "user", "event", event.serverId.toString(), "expenses") }
             }.body<List<ExpenseDto>>().mapNotNull { it.toExpense(localExpense = null, currencies, persons) }
         }.toIoResult()
     }
@@ -64,7 +64,7 @@ internal class ExpensesRemoteStoreImpl(
     ): IoResult<Expense> {
         return client.requestWithExceptionHandling {
             post {
-                url(hostConfig) { pathSegments = listOf("user", "event", event.serverId.toString(), "expense") }
+                url(hostConfig) { pathSegments = listOf("api", "user", "event", event.serverId.toString(), "expense") }
                 contentType(ContentType.Application.Json)
                 setBody(
                     CreateExpenseRequest(
