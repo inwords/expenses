@@ -26,6 +26,6 @@ class NetworkComponent internal constructor(
         }
     }
 
-    val hostConfig: HostConfig = HostConfig(URLProtocol.HTTPS, "dev-api.commonex.ru/api")
+    val hostConfig: HostConfig = HostConfig(URLProtocol.HTTPS, "dev-api.commonex.ru")
 
 }
