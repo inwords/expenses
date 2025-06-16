@@ -16,6 +16,6 @@ interface CurrenciesDao {
     fun queryAll(): Flow<List<CurrencyEntity>>
 
     @Query("SELECT ${CurrencyEntity.ColumnNames.CODE} FROM ${CurrencyEntity.TABLE_NAME} WHERE ${CurrencyEntity.ColumnNames.ID} = :currencyId")
-    fun queryCodeById(currencyId: Long): String?
+    suspend fun queryCodeById(currencyId: Long): String?
 
 }

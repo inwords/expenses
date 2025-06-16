@@ -21,7 +21,7 @@ internal class CurrenciesLocalStoreImpl(
         }.distinctUntilChanged()
     }
 
-    override fun getCurrencyCodeById(currencyId: Long): String? {
+    override suspend fun getCurrencyCodeById(currencyId: Long): String? {
         return currenciesDao.queryCodeById(currencyId)
     }
 

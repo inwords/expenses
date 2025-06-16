@@ -7,7 +7,7 @@ interface CurrenciesLocalStore {
 
     fun getCurrencies(): Flow<List<Currency>>
 
-    fun getCurrencyCodeById(currencyId: Long): String?
+    suspend fun getCurrencyCodeById(currencyId: Long): String?
 
     suspend fun insert(currencies: List<Currency>): List<Currency>
 }

@@ -160,7 +160,7 @@ class ExpensesInteractor internal constructor(
         _refreshExpenses.emit(event)
     }
 
-    private fun exchanger(event: Event, originalCurrency: Currency): ((BigDecimal) -> BigDecimal)? {
+    private suspend fun exchanger(event: Event, originalCurrency: Currency): ((BigDecimal) -> BigDecimal)? {
         if (originalCurrency.id == event.primaryCurrencyId) {
             return { it }
         }
