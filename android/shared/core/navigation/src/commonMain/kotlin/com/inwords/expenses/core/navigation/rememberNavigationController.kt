@@ -7,6 +7,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun rememberNavigationController(navController: NavHostController): NavigationController {
@@ -14,8 +16,10 @@ fun rememberNavigationController(navController: NavHostController): NavigationCo
         initializer { NavigationViewModel() }
     }).navigationController
     LaunchedEffect(key1 = navController) {
-        for (command in navigationController.navCommands) {
-            command.execute(navController)
+        withContext(Dispatchers.Main.immediate) {
+            for (command in navigationController.navCommands) {
+                command.execute(navController)
+            }
         }
     }
     return navigationController
