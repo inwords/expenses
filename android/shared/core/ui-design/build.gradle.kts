@@ -35,6 +35,8 @@ kotlin {
         androidMain {
             dependencies {
                 implementation(shared.core.ktx)
+
+                implementation(shared.compose.ui.tooling)
             }
         }
     }

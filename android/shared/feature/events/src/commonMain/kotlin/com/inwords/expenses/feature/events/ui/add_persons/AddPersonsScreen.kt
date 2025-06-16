@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -44,7 +46,9 @@ internal fun AddPersonsScreen(
     onConfirmClicked: () -> Unit,
 ) {
     Scaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .imePadding(),
         topBar = {
             BasicTopAppBar()
         },
@@ -60,12 +64,12 @@ internal fun AddPersonsScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .consumeWindowInsets(paddingValues)
                 .padding(paddingValues)
         ) {
             Column(
                 modifier = Modifier
-                    .verticalScroll(rememberScrollState())
                     .animateContentSize()
                     .align(Alignment.Center),
             ) {
@@ -123,6 +127,8 @@ internal fun AddPersonsScreen(
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(Icons.Outlined.Add, contentDescription = null)
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
