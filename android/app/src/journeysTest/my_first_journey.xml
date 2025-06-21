@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<journey name="Journeys test 1">
+    <description>A Journey that tests basic event creation flow and a few expense operations</description>
+    <actions>
+        <action>Click on the button "Create new event" and wait until a next screen appears.</action>
+        <action>Select the currency "Euro".</action>
+        <action>Complete the event creation flow. Event name is "Jorneys test", there are 3 participants named "Test user 1", "Test user 2", "Test user 3".</action>
+        <action>Click on the button "+ Операция" to open expense add screen.</action>
+        <action>Enter text "Watermelon" in the description field located at the top of screen.</action>
+        <action>Enter value "120" in the amount field located at the bottom of screen.</action>
+        <action>Click on the button "Подтвердить" to add the operation.</action>
+        <action><![CDATA[Click on the blue text "детализация ->" at the upper half of the screen to navigate to a new screen. The new screen will show accumulated debts for each participant (not an all operations list).]]></action>
+        <action>Verify each participant (except "Test user 1") owes exactly 40 EUR to "Test user 1".</action>
+        <action>Return to the main screen named "Journeys test - Test user 1".</action>
+        <action>Click on the button "+ Операция" to make sure the expense add screen is opened
+            (another operation will be added).</action>
+        <action>Enter text "Pancake" in the description field located at the top of screen.</action>
+        <action>Enter value "180" in the amount field located at the bottom of screen.</action>
+        <action>Click on the button "Подтвердить" to add the operation.</action>
+        <action>Select the "Watermelon" 120 EUR expense item and click the cancel option.</action>
+        <action><![CDATA[Click on the blue text "детализация ->" at the upper half of the screen to navigate to a new screen. The new screen will show accumulated debts for each participant (not an all operations list).]]></action>
+        <action>Verify each participant (except "Test user 1") owes exactly 60 EUR to "Test user 1".</action>
+        <action>Return to the main screen named "Journeys test - Test user 1".</action>
+        <action>Click on the button "+ Операция" to make sure the expense add screen is opened
+            (another operation will be added).</action>
+        <action>Enter text "Juice" in the description field located at the top of screen.</action>
+        <action>Enter value "50" in the amount field located at the bottom of screen.</action>
+        <action>Select "Test user 2" under "Оплатил" header.</action>
+        <action>Unselect "Test user 1" and "Test user 2" under "Разделить" header. Only "Test user
+            3" should remain selected.</action>
+        <action>Click on the button "Подтвердить" to add the operation.</action>
+        <action>
+            <![CDATA[Click on the blue text "детализация ->" at the upper half of the screen to navigate to a new screen. The new screen will show accumulated debts for each participant (not an all operations list).]]></action>
+        <action>Verify "Test user 2" owes exactly 60 EUR to "Test user 1", "Test user 3" owes
+            exactly 60 EUR to "Test user 1" and exactly 50 EUR to "Test user 2".</action>
+    </actions>
+</journey>

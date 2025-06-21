@@ -77,3 +77,4 @@ room = { id = "androidx.room", version.ref = "room" }
 wire = { id = "com.squareup.wire", version = "5.3.3" } # https://square.github.io/wire/changelog/
 atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version = "0.27.0" }
 gradle-versions-checker = { id = "com.github.ben-manes.versions", version = "0.52.0" }
+android-junit5 = { id = "de.mannodermaus.android-junit5", version = "1.13.0.0" }

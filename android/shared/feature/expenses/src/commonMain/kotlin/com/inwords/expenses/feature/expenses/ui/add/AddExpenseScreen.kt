@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -245,6 +246,7 @@ private fun AddExpenseScreenSuccess(
                     onCheckedChange = onEqualSplitChange,
                     modifier = Modifier
                         .padding(end = 8.dp)
+                        .testTag("equal_split_switch")
                 )
                 Text(
                     modifier = Modifier

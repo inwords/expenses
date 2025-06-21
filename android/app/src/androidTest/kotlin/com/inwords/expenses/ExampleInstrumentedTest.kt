@@ -1,24 +1,91 @@
 package com.inwords.expenses
 
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.compose.ui.test.ExperimentalTestApi
+import com.inwords.expenses.screens.EmptyEventsScreen
+import com.inwords.expenses.ui.MainActivity
+import de.mannodermaus.junit5.compose.createAndroidComposeExtension
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
-import org.junit.Test
-import org.junit.runner.RunWith
+@OptIn(ExperimentalTestApi::class)
+class BasicInstrumentedTest {
 
-import org.junit.Assert.*
+    @RegisterExtension
+    @ExperimentalTestApi
+    private val extension = createAndroidComposeExtension<MainActivity>()
 
-/**
- * Instrumented test, which will execute on an Android device.
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-@RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
     @Test
-    fun useAppContext() {
-        // Context of the app under test.
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.inwords.expenses", appContext.packageName)
+    fun testBasicNewEventAndExpensesFlow() {
+        extension.use {
+            // Create event and add participants
+            val expensesScreen = EmptyEventsScreen()
+                .clickCreateEvent()
+                .enterEventName("UI Test Event")
+                .selectCurrency("Euro")
+                .clickContinueButton()
+                .enterOwnerName("Test User 1")
+                .addParticipant("Test User 2")
+                .addParticipant("Test User 3")
+                .clickContinueButton()
+                .waitUntilLoaded()
+
+            // Add first expense
+            expensesScreen
+                .clickAddExpense()
+                .enterDescription("Булка")
+                .enterAmount("120")
+                .clickConfirm()
+                .verifyExpenseAmount("-120")
+
+            // Add second expense
+            expensesScreen
+                .clickAddExpense()
+                .enterDescription("Хот-дог")
+                .enterAmount("180")
+                .clickConfirm()
+                .verifyExpenseAmount("-180")
+
+            // Cancel first expense
+            expensesScreen
+                .clickOnExpense("Булка")
+                .clickCancelExpense()
+                .verifyExpenseExists("[ОТМЕНА] Булка")
+
+            // Verify debts details
+            expensesScreen
+                .clickDebtDetails()
+                .verifyDebtAmount("60", "Test User 1", 2)
+        }
     }
+
+    @Test
+    fun testCreateEmptyEvent() {
+        extension.use {
+            EmptyEventsScreen()
+                .clickCreateEvent()
+                .enterEventName("UI Test Event")
+                .selectCurrency("Euro")
+                .clickContinueButton()
+                .enterOwnerName("Test User 1")
+                .clickContinueButton()
+                .waitUntilLoaded()
+        }
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    @Test
+    fun testJoinExistingEvent() {
+        extension.use {
+            EmptyEventsScreen()
+                .clickJoinEvent()
+                .joinEvent("62", Base64.decode("NzY=").decodeToString() + Base64.decode("OTU=").decodeToString()) // FIXME: costyl
+                .waitUntilLoaded()
+                .selectPerson("Test User 2")
+                .clickContinueButton()
+                .waitUntilLoaded()
+        }
+    }
+
 }
