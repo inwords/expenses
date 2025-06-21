@@ -96,6 +96,6 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.6.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestUtil("androidx.test:orchestrator:1.5.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-android:1.8.2")
+    androidTestImplementation("androidx.compose.ui:ui-test-android:1.8.3")
 
 }
