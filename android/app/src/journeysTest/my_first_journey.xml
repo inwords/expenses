@@ -4,7 +4,7 @@
     <actions>
         <action>Click on the button "Create new event" and wait until a next screen appears.</action>
         <action>Select the currency "Euro".</action>
-        <action>Complete the event creation flow. Event name is "Jorneys test", there are 3 participants named "Test user 1", "Test user 2", "Test user 3".</action>
+        <action>Complete the event creation flow. Event name is "Journeys test", there are 3 participants named "Test user 1", "Test user 2", "Test user 3".</action>
         <action>Click on the button "+ Операция" to open expense add screen.</action>
         <action>Enter text "Watermelon" in the description field located at the top of screen.</action>
         <action>Enter value "120" in the amount field located at the bottom of screen.</action>
