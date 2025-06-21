@@ -29,7 +29,7 @@ internal fun <T : HttpClientEngineConfig> createKtor(
 
         install(Logging) {
             logger = getLogger()
-            level = LogLevel.ALL
+            level = LogLevel.NONE
         }
     }
 }
