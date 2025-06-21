@@ -19,6 +19,9 @@ plugins {
     alias(shared.plugins.room) apply false
     alias(shared.plugins.wire) apply false
     alias(shared.plugins.atomicfu) apply false
+    alias(shared.plugins.android.junit5) apply false
+    alias(shared.plugins.sentry.kotlin.multiplatform) apply false
+    alias(shared.plugins.sentry.android.gradle) apply false
     alias(shared.plugins.gradle.versions.checker) apply true
 }
 

@@ -2,6 +2,14 @@ plugins {
     alias(buildSrc.plugins.android.application)
     alias(buildSrc.plugins.kotlin.android)
     alias(shared.plugins.compose.compiler)
+    alias(shared.plugins.android.junit5)
+    alias(shared.plugins.sentry.android.gradle)
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xcontext-parameters")
+    }
 }
 
 android {
@@ -16,6 +24,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
+
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -40,8 +50,14 @@ android {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
+    testOptions {
+        animationsDisabled = true
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
+    }
+
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
@@ -75,11 +91,32 @@ dependencies {
     implementation(shared.core.ktx)
     implementation(shared.activity.compose)
 
-    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.1")
+    androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.13.1")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test:runner:1.6.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    implementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    androidTestUtil("androidx.test:orchestrator:1.5.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-android:1.8.3")
 
+}
+
+sentry {
+    org.set("inwords")
+    projectName.set("commonex")
+
+    authToken.set(System.getenv("SENTRY_AUTH_TOKEN"))
+
+    tracingInstrumentation {
+        enabled.set(true)
+
+        features.set(emptySet())
+    }
+
+    autoInstallation {
+        enabled.set(false)
+    }
+
+    telemetry.set(false)
 }

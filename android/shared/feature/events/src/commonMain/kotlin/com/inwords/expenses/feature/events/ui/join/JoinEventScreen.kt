@@ -45,7 +45,7 @@ internal fun JoinEventScreen(
         },
         floatingActionButton = {
             BasicFloatingActionButton(
-                text = "К событию",
+                text = "Участники",
                 icon = Icons.AutoMirrored.Outlined.ArrowForward,
                 onClick = onConfirmClicked,
                 enabled = state.eventId.isNotBlank() && state.eventAccessCode.isNotBlank(),

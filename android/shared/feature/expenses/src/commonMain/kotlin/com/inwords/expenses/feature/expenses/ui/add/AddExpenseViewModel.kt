@@ -113,10 +113,20 @@ internal class AddExpenseViewModel(
                 )
             }
 
+            val state = (_state.value as? SimpleScreenState.Success<AddExpenseScreenModel>)?.data
+            val selectedCurrency = if (replenishment == null) {
+                val selectedCurrencyFromState = state?.currencies?.firstOrNull { it.selected }?.currency
+                selectedCurrencyFromState?.let {
+                    eventDetails.currencies.firstOrNull { it.code == selectedCurrencyFromState.code }
+                } ?: eventDetails.primaryCurrency
+            } else {
+                eventDetails.currencies.firstOrNull { it.code == replenishment.currencyCode }
+                    ?: eventDetails.primaryCurrency
+            }
             AddExpenseScreenModel(
                 event = eventDetails.event,
                 description = if (replenishment == null) {
-                    ""
+                    state?.description.orEmpty()
                 } else {
                     val currentPerson = eventDetails.persons.first { it.id == currentPersonId }
                     "Возврат от ${currentPerson.name}"
@@ -124,14 +134,10 @@ internal class AddExpenseViewModel(
                 currencies = eventDetails.currencies.map { currency ->
                     AddExpenseScreenModel.CurrencyInfoModel(
                         currency = currency,
-                        selected = if (replenishment == null) {
-                            currency.id == eventDetails.primaryCurrency.id
-                        } else {
-                            currency.code == replenishment.currencyCode
-                        }
+                        selected = currency == selectedCurrency,
                     )
                 },
-                expenseType = replenishment?.let { ExpenseType.Replenishment } ?: ExpenseType.Spending,
+                expenseType = replenishment?.let { ExpenseType.Replenishment } ?: state?.expenseType ?: ExpenseType.Spending,
                 persons = eventDetails.persons.map { person ->
                     PersonInfoModel(
                         person = person,
@@ -144,7 +150,7 @@ internal class AddExpenseViewModel(
                 },
                 subjectPersons = subjectPersons,
                 equalSplit = replenishment == null,
-                wholeAmount = AmountModel(
+                wholeAmount = state?.wholeAmount ?: AmountModel(
                     amount = null,
                     amountRaw = ""
                 ),

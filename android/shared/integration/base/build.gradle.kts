@@ -4,6 +4,7 @@ plugins {
     id("shared-kmm-library-plugin")
     alias(shared.plugins.compose.compiler)
     alias(shared.plugins.compose.multiplatform.compiler)
+    alias(shared.plugins.sentry.kotlin.multiplatform)
 }
 
 android {
@@ -48,7 +49,7 @@ kotlin {
 
                 api(shared.navigation.compose.multiplatform)
 
-                implementation("org.jetbrains.kotlinx:atomicfu:0.27.0") // TODO remove when atomicfu plugin is fixed
+                implementation("org.jetbrains.kotlinx:atomicfu:0.28.0") // TODO remove when atomicfu plugin is fixed
             }
         }
         androidMain {
