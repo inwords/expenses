@@ -40,18 +40,27 @@ export class SaveEventExpense implements UseCase<Input, Output> {
       const createdAt = new Date().toISOString();
 
       if (event.currencyId === input.currencyId) {
-        return this.upsertExpense.execute({...input, createdAt});
+        let splitInformation: SplitInfo[] = [];
+
+        for (let i of input.splitInformation) {
+          splitInformation.push({
+            ...i,
+            exchangedAmount: i.amount,
+          });
+        }
+
+        return this.upsertExpense.execute({...input, createdAt, splitInformation});
       } else {
         const expenseCurrencyCode = await this.findCurrency.execute({currencyId: input.currencyId});
         const eventCurrencyCode = await this.findCurrency.execute({currencyId: event.currencyId});
 
         if (!eventCurrencyCode || !expenseCurrencyCode) {
           throw new HttpException(
-              {
-                status: HttpStatus.BAD_REQUEST,
-                error: `Wrong Currency Id`,
-              },
-              HttpStatus.BAD_REQUEST,
+            {
+              status: HttpStatus.BAD_REQUEST,
+              error: `Wrong Currency Id`,
+            },
+            HttpStatus.BAD_REQUEST,
           );
         }
 
