@@ -3,6 +3,7 @@ plugins {
     alias(buildSrc.plugins.kotlin.android)
     alias(shared.plugins.compose.compiler)
     alias(shared.plugins.android.junit5)
+    alias(shared.plugins.sentry.android.gradle)
 }
 
 kotlin {
@@ -56,6 +57,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
@@ -98,4 +100,23 @@ dependencies {
     androidTestUtil("androidx.test:orchestrator:1.5.1")
     androidTestImplementation("androidx.compose.ui:ui-test-android:1.8.3")
 
+}
+
+sentry {
+    org.set("inwords")
+    projectName.set("commonex")
+
+    authToken.set(System.getenv("SENTRY_AUTH_TOKEN"))
+
+    tracingInstrumentation {
+        enabled.set(true)
+
+        features.set(emptySet())
+    }
+
+    autoInstallation {
+        enabled.set(false)
+    }
+
+    telemetry.set(false)
 }

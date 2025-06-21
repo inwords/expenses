@@ -4,6 +4,7 @@ plugins {
     id("shared-kmm-library-plugin")
     alias(shared.plugins.compose.compiler)
     alias(shared.plugins.compose.multiplatform.compiler)
+    alias(shared.plugins.sentry.kotlin.multiplatform)
 }
 
 android {

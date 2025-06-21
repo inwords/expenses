@@ -78,3 +78,5 @@ wire = { id = "com.squareup.wire", version = "5.3.3" } # https://square.github.i
 atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version = "0.28.0" }
 gradle-versions-checker = { id = "com.github.ben-manes.versions", version = "0.52.0" }
 android-junit5 = { id = "de.mannodermaus.android-junit5", version = "1.13.0.0" }
+sentry-kotlin-multiplatform = { id = "io.sentry.kotlin.multiplatform.gradle", version = "0.12.0" }
+sentry-android-gradle = { id = "io.sentry.android.gradle", version = "5.7.0" }
