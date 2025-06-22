@@ -63,15 +63,16 @@ internal class ExpensesRemoteStoreImpl(
         currencies: List<Currency>,
         persons: List<Person>
     ): IoResult<Expense> {
-        val serverId = event.serverId ?: return IoResult.Error.Failure // FIXME: non-fatal error
+        val serverId = event.serverId ?: return IoResult.Error.Failure // FIXME: non-fatal error, should not happen
         val userWhoPaidId = expense.person.serverId ?: return IoResult.Error.Failure // FIXME: non-fatal error, should not happen
+        val currencyServerId = expense.currency.serverId ?: return IoResult.Error.Failure // FIXME: non-fatal error, should not happen
         return client.requestWithExceptionHandling {
             post {
                 url(hostConfig) { pathSegments = listOf("api", "user", "event", serverId, "expense") }
                 contentType(ContentType.Application.Json)
                 setBody(
                     CreateExpenseRequest(
-                        currencyId = expense.currency.serverId,
+                        currencyId = currencyServerId,
                         expenseType = when (expense.expenseType) {
                             ExpenseType.Spending -> "expense"
                             ExpenseType.Replenishment -> "refund"

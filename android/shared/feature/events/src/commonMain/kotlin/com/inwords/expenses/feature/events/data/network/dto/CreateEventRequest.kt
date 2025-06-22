@@ -9,7 +9,7 @@ internal data class CreateEventRequest(
     val name: String,
 
     @SerialName("currencyId")
-    val currencyId: Long,
+    val currencyId: String,
 
     @SerialName("users")
     val users: List<CreateUserDto>,

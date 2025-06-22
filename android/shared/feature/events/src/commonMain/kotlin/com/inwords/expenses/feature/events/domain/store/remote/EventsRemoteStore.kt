@@ -24,7 +24,7 @@ internal interface EventsRemoteStore {
     suspend fun createEvent(
         event: Event,
         currencies: List<Currency>,
-        primaryCurrencyId: Long,
+        primaryCurrencyServerId: String,
         localPersons: List<Person>,
     ): IoResult<EventDetails>
 

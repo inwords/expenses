@@ -53,7 +53,7 @@ class CurrenciesPullTask internal constructor(
         val updatedCurrencies = networkCurrencies.map { networkCurrency ->
             val localCurrency = localCurrenciesMap[networkCurrency.code]
             if (localCurrency != null) {
-                if (localCurrency.serverId == 0L) {
+                if (localCurrency.serverId == null) {
                     hasUpdates = true
                     localCurrency.copy(serverId = networkCurrency.serverId)
                 } else {

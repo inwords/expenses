@@ -32,7 +32,7 @@ class EventExpensesPushTask internal constructor(
             ?.takeIf { details ->
                 details.event.serverId != null &&
                     details.persons.all { it.serverId != null } &&
-                    details.currencies.all { it.serverId != 0L }
+                    details.currencies.all { it.serverId != null }
             } ?: return@withContext IoResult.Error.Failure
 
         val localExpenses = expensesLocalStore.getExpenses(eventId)
@@ -41,7 +41,7 @@ class EventExpensesPushTask internal constructor(
         val expensesToAdd = localExpenses.filter { it.serverId == 0L }
         if (expensesToAdd.isEmpty()) return@withContext IoResult.Success(Unit)
 
-        val expensesToAddFiltered = expensesToAdd.filter { it.person.serverId != null && it.currency.serverId != 0L }
+        val expensesToAddFiltered = expensesToAdd.filter { it.person.serverId != null && it.currency.serverId != null }
         if (expensesToAddFiltered.isEmpty()) return@withContext IoResult.Success(Unit) // FIXME: non-fatal
 
         val networkResults = expensesRemoteStore.addExpensesToEvent(

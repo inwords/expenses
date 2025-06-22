@@ -28,11 +28,13 @@ class EventPushTask internal constructor(
         val localEventDetails = eventsLocalStore.getEventWithDetails(eventId) ?: return@withContext IoResult.Error.Failure
 
         if (localEventDetails.event.serverId != null) return@withContext IoResult.Success(Unit)
+        // FIXME: non-fatal error, should not happen
+        val primaryCurrencyServerId = localEventDetails.primaryCurrency.serverId ?: return@withContext IoResult.Error.Failure
 
         val remoteEventDetailsResult = eventsRemoteStore.createEvent(
             event = localEventDetails.event,
             currencies = localEventDetails.currencies,
-            primaryCurrencyId = localEventDetails.primaryCurrency.serverId,
+            primaryCurrencyServerId = primaryCurrencyServerId,
             localPersons = localEventDetails.persons
         )
         val networkEventDetails = when (remoteEventDetailsResult) {

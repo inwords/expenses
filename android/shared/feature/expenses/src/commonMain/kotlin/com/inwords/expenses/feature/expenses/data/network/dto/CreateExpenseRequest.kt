@@ -13,7 +13,7 @@ internal data class CreateExpenseRequest(
     val userWhoPaidId: String,
 
     @SerialName("currencyId")
-    val currencyId: Long,
+    val currencyId: String,
 
     @SerialName("expenseType")
     val expenseType: String,

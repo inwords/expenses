@@ -11,7 +11,7 @@ data class CurrencyEntity(
     val currencyId: Long = 0L,
 
     @ColumnInfo(ColumnNames.SERVER_ID)
-    val currencyServerId: Long,
+    val currencyServerId: String?,
 
     @ColumnInfo(ColumnNames.CODE)
     val code: String,

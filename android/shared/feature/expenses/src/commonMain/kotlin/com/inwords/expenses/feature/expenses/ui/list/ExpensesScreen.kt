@@ -419,7 +419,7 @@ internal fun mockExpensesScreenUiModel(withCreditors: Boolean): ExpensesScreenUi
                 serverId = 11,
                 currency = Currency(
                     id = 1,
-                    serverId = 11,
+                    serverId = "11",
                     code = "RUB",
                     name = "Russian Ruble",
                 ),
@@ -449,7 +449,7 @@ internal fun mockExpensesScreenUiModel(withCreditors: Boolean): ExpensesScreenUi
                 serverId = 12,
                 currency = Currency(
                     id = 2,
-                    serverId = 11,
+                    serverId = "11",
                     code = "USD",
                     name = "US Dollar",
                 ),

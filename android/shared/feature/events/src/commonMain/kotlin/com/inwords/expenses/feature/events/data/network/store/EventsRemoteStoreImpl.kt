@@ -66,7 +66,7 @@ internal class EventsRemoteStoreImpl(
     override suspend fun createEvent(
         event: Event,
         currencies: List<Currency>,
-        primaryCurrencyId: Long,
+        primaryCurrencyServerId: String,
         localPersons: List<Person>,
     ): IoResult<EventDetails> {
         return client.requestWithExceptionHandling {
@@ -76,7 +76,7 @@ internal class EventsRemoteStoreImpl(
                 setBody(
                     CreateEventRequest(
                         name = event.name,
-                        currencyId = primaryCurrencyId,
+                        currencyId = primaryCurrencyServerId,
                         users = localPersons.map { it.toCreateUserDto() },
                         pinCode = event.pinCode,
                     )
