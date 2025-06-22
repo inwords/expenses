@@ -51,7 +51,7 @@ class EventExpensesPullTask internal constructor(
         localExpenses: List<Expense>,
         remoteExpenses: List<Expense>
     ): List<Expense> {
-        val localExpensesMap = localExpenses.mapTo(HashSet()) { it.serverId }
+        val localExpensesMap = localExpenses.mapNotNullTo(HashSet()) { it.serverId }
 
         val expensesToInsert = remoteExpenses.filter { remoteExpense ->
             remoteExpense.serverId !in localExpensesMap

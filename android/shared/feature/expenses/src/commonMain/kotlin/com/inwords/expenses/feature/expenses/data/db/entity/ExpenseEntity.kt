@@ -48,8 +48,8 @@ data class ExpenseEntity(
     @ColumnInfo(ColumnNames.ID)
     val expenseId: Long = 0L,
 
-    @ColumnInfo(ColumnNames.SERVER_ID, defaultValue = "0")
-    val serverId: Long,
+    @ColumnInfo(ColumnNames.SERVER_ID)
+    val serverId: String?,
 
     @ColumnInfo(ColumnNames.EVENT_ID)
     val eventId: Long,

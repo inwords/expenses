@@ -38,7 +38,7 @@ class EventExpensesPushTask internal constructor(
         val localExpenses = expensesLocalStore.getExpenses(eventId)
         if (localExpenses.isEmpty()) return@withContext IoResult.Success(Unit)
 
-        val expensesToAdd = localExpenses.filter { it.serverId == 0L }
+        val expensesToAdd = localExpenses.filter { it.serverId == null }
         if (expensesToAdd.isEmpty()) return@withContext IoResult.Success(Unit)
 
         val expensesToAddFiltered = expensesToAdd.filter { it.person.serverId != null && it.currency.serverId != null }
@@ -60,8 +60,9 @@ class EventExpensesPushTask internal constructor(
 
         withContext(NonCancellable) {
             networkExpenses.forEachIndexed { expenseIndex, networkExpense ->
+                val networkExpenseServerId = networkExpense.serverId ?: return@forEachIndexed // FIXME: non-fatal error, should not happen
                 transactionHelper.immediateWriteTransaction {
-                    expensesLocalStore.updateExpenseServerId(networkExpense.expenseId, networkExpense.serverId)
+                    expensesLocalStore.updateExpenseServerId(networkExpense.expenseId, networkExpenseServerId)
                     networkExpense.subjectExpenseSplitWithPersons.forEachIndexed { splitIndex, networkSplit ->
                         expensesLocalStore.updateExpenseSplitExchangedAmount(
                             expenseSplitId = expensesToAddFiltered[expenseIndex].subjectExpenseSplitWithPersons[splitIndex].expenseSplitId,

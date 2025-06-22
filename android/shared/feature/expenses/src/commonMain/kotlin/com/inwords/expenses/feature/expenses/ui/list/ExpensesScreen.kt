@@ -416,7 +416,7 @@ internal fun mockExpensesScreenUiModel(withCreditors: Boolean): ExpensesScreenUi
         expenses = persistentListOf(
             Expense(
                 expenseId = 1,
-                serverId = 11,
+                serverId = "11",
                 currency = Currency(
                     id = 1,
                     serverId = "11",
@@ -446,7 +446,7 @@ internal fun mockExpensesScreenUiModel(withCreditors: Boolean): ExpensesScreenUi
             ).toUiModel("EUR"),
             Expense(
                 expenseId = 2,
-                serverId = 12,
+                serverId = "12",
                 currency = Currency(
                     id = 2,
                     serverId = "11",

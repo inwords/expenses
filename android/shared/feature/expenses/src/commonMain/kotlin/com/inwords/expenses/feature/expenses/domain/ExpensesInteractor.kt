@@ -79,7 +79,7 @@ class ExpensesInteractor internal constructor(
 
         val expense = Expense(
             expenseId = 0,
-            serverId = 0,
+            serverId = null,
             currency = selectedCurrency,
             expenseType = expenseType,
             person = selectedPerson,
@@ -113,7 +113,7 @@ class ExpensesInteractor internal constructor(
 
         val expense = Expense(
             expenseId = 0,
-            serverId = 0,
+            serverId = null,
             currency = selectedCurrency,
             expenseType = expenseType,
             person = selectedPerson,
@@ -141,7 +141,7 @@ class ExpensesInteractor internal constructor(
 
         val revertedExpense = Expense(
             expenseId = 0,
-            serverId = 0,
+            serverId = null,
             currency = originalExpense.currency,
             expenseType = when (originalExpense.expenseType) {
                 ExpenseType.Spending -> ExpenseType.Replenishment

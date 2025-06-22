@@ -7,10 +7,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 internal data class ExpenseDto(
     @SerialName("id")
-    val id: Long,
+    val id: String,
 
     @SerialName("eventId")
-    val eventId: Long,
+    val eventId: String,
 
     @SerialName("description")
     val description: String,

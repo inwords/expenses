@@ -19,5 +19,5 @@ internal interface ExpensesLocalStore {
 
     suspend fun updateExpenseSplitExchangedAmount(expenseSplitId: Long, exchangedAmount: BigDecimal): Boolean
 
-    suspend fun updateExpenseServerId(expenseId: Long, serverId: Long): Boolean
+    suspend fun updateExpenseServerId(expenseId: Long, serverId: String): Boolean
 }
