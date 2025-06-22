@@ -38,9 +38,10 @@ internal class ExpensesRemoteStoreImpl(
         currencies: List<Currency>,
         persons: List<Person>
     ): IoResult<List<Expense>> {
+        val serverId = event.serverId ?: return IoResult.Error.Failure // FIXME: non-fatal error
         return client.requestWithExceptionHandling {
             get {
-                url(hostConfig) { pathSegments = listOf("api", "user", "event", event.serverId.toString(), "expenses") }
+                url(hostConfig) { pathSegments = listOf("api", "user", "event", serverId, "expenses") }
             }.body<List<ExpenseDto>>().mapNotNull { it.toExpense(localExpense = null, currencies, persons) }
         }.toIoResult()
     }
@@ -62,22 +63,27 @@ internal class ExpensesRemoteStoreImpl(
         currencies: List<Currency>,
         persons: List<Person>
     ): IoResult<Expense> {
+        val serverId = event.serverId ?: return IoResult.Error.Failure // FIXME: non-fatal error, should not happen
+        val userWhoPaidId = expense.person.serverId ?: return IoResult.Error.Failure // FIXME: non-fatal error, should not happen
+        val currencyServerId = expense.currency.serverId ?: return IoResult.Error.Failure // FIXME: non-fatal error, should not happen
         return client.requestWithExceptionHandling {
             post {
-                url(hostConfig) { pathSegments = listOf("api", "user", "event", event.serverId.toString(), "expense") }
+                url(hostConfig) { pathSegments = listOf("api", "user", "event", serverId, "expense") }
                 contentType(ContentType.Application.Json)
                 setBody(
                     CreateExpenseRequest(
-                        currencyId = expense.currency.serverId,
+                        currencyId = currencyServerId,
                         expenseType = when (expense.expenseType) {
                             ExpenseType.Spending -> "expense"
                             ExpenseType.Replenishment -> "refund"
                         },
-                        userWhoPaidId = expense.person.serverId,
+                        userWhoPaidId = userWhoPaidId,
                         splitInformation = expense.subjectExpenseSplitWithPersons.map { expenseSplitWithPerson ->
+                            // FIXME: non-fatal error, should not happen
+                            val splitInformationUserId = expenseSplitWithPerson.person.serverId ?: return IoResult.Error.Failure
                             SplitInformationRequest(
-                                userId = expenseSplitWithPerson.person.serverId,
-                                amount = expenseSplitWithPerson.originalAmount?.doubleValue(false) ?: return IoResult.Error.Failure, // FIXME: non-fatal error
+                                userId = splitInformationUserId,
+                                amount = expenseSplitWithPerson.originalAmount.doubleValue(false),
                             )
                         },
                         description = expense.description
@@ -111,7 +117,7 @@ internal class ExpensesRemoteStoreImpl(
     private fun SplitInformationDto.toDomain(persons: List<Person>): ExpenseSplitWithPerson? {
         val person = persons.firstOrNull { it.serverId == userId } ?: return null
         val originalAmount = BigDecimal.fromDouble(amount)
-        val exchangedAmount = BigDecimal.fromDouble(exchangedAmount ?: amount)
+        val exchangedAmount = BigDecimal.fromDouble(exchangedAmount)
         return ExpenseSplitWithPerson(
             expenseSplitId = 0L,
             expenseId = 0L,

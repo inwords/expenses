@@ -23,9 +23,9 @@ class EventExpensesPullTask internal constructor(
     suspend fun pullEventExpenses(eventId: Long): IoResult<*> = withContext(IO) {
         val localEvent = eventsLocalStore.getEventWithDetails(eventId)
             ?.takeIf { details ->
-                details.event.serverId != 0L &&
-                    details.persons.all { it.serverId != 0L } &&
-                    details.currencies.all { it.serverId != 0L }
+                details.event.serverId != null &&
+                    details.persons.all { it.serverId != null } &&
+                    details.currencies.all { it.serverId != null }
             } ?: return@withContext IoResult.Error.Failure
 
         val remoteResult = expensesRemoteStore.getExpenses(
@@ -51,7 +51,7 @@ class EventExpensesPullTask internal constructor(
         localExpenses: List<Expense>,
         remoteExpenses: List<Expense>
     ): List<Expense> {
-        val localExpensesMap = localExpenses.mapTo(HashSet()) { it.serverId }
+        val localExpensesMap = localExpenses.mapNotNullTo(HashSet()) { it.serverId }
 
         val expensesToInsert = remoteExpenses.filter { remoteExpense ->
             remoteExpense.serverId !in localExpensesMap

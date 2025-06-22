@@ -30,18 +30,18 @@ class EventExpensesPushTask internal constructor(
     suspend fun pushEventExpenses(eventId: Long): IoResult<*> = withContext(IO) {
         val localEvent = eventsLocalStore.getEventWithDetails(eventId)
             ?.takeIf { details ->
-                details.event.serverId != 0L &&
-                    details.persons.all { it.serverId != 0L } &&
-                    details.currencies.all { it.serverId != 0L }
+                details.event.serverId != null &&
+                    details.persons.all { it.serverId != null } &&
+                    details.currencies.all { it.serverId != null }
             } ?: return@withContext IoResult.Error.Failure
 
         val localExpenses = expensesLocalStore.getExpenses(eventId)
         if (localExpenses.isEmpty()) return@withContext IoResult.Success(Unit)
 
-        val expensesToAdd = localExpenses.filter { it.serverId == 0L }
+        val expensesToAdd = localExpenses.filter { it.serverId == null }
         if (expensesToAdd.isEmpty()) return@withContext IoResult.Success(Unit)
 
-        val expensesToAddFiltered = expensesToAdd.filter { it.person.serverId != 0L && it.currency.serverId != 0L }
+        val expensesToAddFiltered = expensesToAdd.filter { it.person.serverId != null && it.currency.serverId != null }
         if (expensesToAddFiltered.isEmpty()) return@withContext IoResult.Success(Unit) // FIXME: non-fatal
 
         val networkResults = expensesRemoteStore.addExpensesToEvent(
@@ -60,8 +60,9 @@ class EventExpensesPushTask internal constructor(
 
         withContext(NonCancellable) {
             networkExpenses.forEachIndexed { expenseIndex, networkExpense ->
+                val networkExpenseServerId = networkExpense.serverId ?: return@forEachIndexed // FIXME: non-fatal error, should not happen
                 transactionHelper.immediateWriteTransaction {
-                    expensesLocalStore.updateExpenseServerId(networkExpense.expenseId, networkExpense.serverId)
+                    expensesLocalStore.updateExpenseServerId(networkExpense.expenseId, networkExpenseServerId)
                     networkExpense.subjectExpenseSplitWithPersons.forEachIndexed { splitIndex, networkSplit ->
                         expensesLocalStore.updateExpenseSplitExchangedAmount(
                             expenseSplitId = expensesToAddFiltered[expenseIndex].subjectExpenseSplitWithPersons[splitIndex].expenseSplitId,

@@ -9,25 +9,24 @@ import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
 import kotlinx.coroutines.withContext
 
 
-class EventPullCurrenciesAndPersonsTask internal constructor(
+class EventPullPersonsTask internal constructor(
     transactionHelperLazy: Lazy<TransactionHelper>,
     eventsLocalStoreLazy: Lazy<EventsLocalStore>,
     eventsRemoteStoreLazy: Lazy<EventsRemoteStore>,
-    currenciesPullTaskLazy: Lazy<CurrenciesPullTask>
 ) {
 
     private val transactionHelper by transactionHelperLazy
     private val eventsLocalStore by eventsLocalStoreLazy
     private val eventsRemoteStore by eventsRemoteStoreLazy
-    private val currenciesPullTask by currenciesPullTaskLazy
 
     /**
      * Prerequisites:
      * 1. Event has serverId
+     * 2. Currencies are already pulled
      */
-    suspend fun pullEventCurrenciesAndPersons(eventId: Long): IoResult<*> = withContext(IO) {
+    suspend fun pullEventPersons(eventId: Long): IoResult<*> = withContext(IO) {
         val localEvent = eventsLocalStore.getEventWithDetails(eventId)
-            ?.takeIf { it.event.serverId != 0L }
+            ?.takeIf { it.event.serverId != null }
             ?: return@withContext IoResult.Error.Failure
 
         val remoteResult = eventsRemoteStore.getEvent(
@@ -46,7 +45,6 @@ class EventPullCurrenciesAndPersonsTask internal constructor(
         }
 
         transactionHelper.immediateWriteTransaction {
-            currenciesPullTask.updateLocalCurrencies(remoteEventDetails.currencies, inTransaction = false)
             updateLocalEventPersons(
                 eventId = localEvent.event.id,
                 localPersons = localEvent.persons,
@@ -62,7 +60,7 @@ class EventPullCurrenciesAndPersonsTask internal constructor(
         localPersons: List<Person>,
         remotePersons: List<Person>
     ): List<Person> {
-        val localPersonsMap = localPersons.mapTo(HashSet()) { it.serverId }
+        val localPersonsMap = localPersons.mapNotNullTo(HashSet()) { it.serverId }
 
         val personsToInsert = remotePersons.filter { remotePerson ->
             remotePerson.serverId !in localPersonsMap

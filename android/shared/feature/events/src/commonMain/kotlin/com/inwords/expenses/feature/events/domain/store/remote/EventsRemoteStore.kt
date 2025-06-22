@@ -24,12 +24,12 @@ internal interface EventsRemoteStore {
     suspend fun createEvent(
         event: Event,
         currencies: List<Currency>,
-        primaryCurrencyId: Long,
+        primaryCurrencyServerId: String,
         localPersons: List<Person>,
     ): IoResult<EventDetails>
 
     suspend fun addPersonsToEvent(
-        eventServerId: Long,
+        eventServerId: String,
         pinCode: String,
         localPersons: List<Person>
     ): IoResult<List<Person>>

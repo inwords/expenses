@@ -37,10 +37,11 @@ internal class EventsRemoteStoreImpl(
         currencies: List<Currency>,
         localPersons: List<Person>?,
     ): GetEventResult {
+        val serverId = event.serverId ?: return GetEventResult.EventNotFound // FIXME: non-fatal error
         val result = client.requestWithExceptionHandling {
             get {
                 url(hostConfig) {
-                    pathSegments = listOf("api", "user", "event", event.serverId.toString())
+                    pathSegments = listOf("api", "user", "event", serverId)
                     parameters.append("pinCode", event.pinCode)
                 }
             }.body<EventDto>().toEventDetails(
@@ -65,7 +66,7 @@ internal class EventsRemoteStoreImpl(
     override suspend fun createEvent(
         event: Event,
         currencies: List<Currency>,
-        primaryCurrencyId: Long,
+        primaryCurrencyServerId: String,
         localPersons: List<Person>,
     ): IoResult<EventDetails> {
         return client.requestWithExceptionHandling {
@@ -75,7 +76,7 @@ internal class EventsRemoteStoreImpl(
                 setBody(
                     CreateEventRequest(
                         name = event.name,
-                        currencyId = primaryCurrencyId,
+                        currencyId = primaryCurrencyServerId,
                         users = localPersons.map { it.toCreateUserDto() },
                         pinCode = event.pinCode,
                     )
@@ -86,13 +87,13 @@ internal class EventsRemoteStoreImpl(
 
     // FIXME check pinCode on backend
     override suspend fun addPersonsToEvent(
-        eventServerId: Long,
+        eventServerId: String,
         pinCode: String,
         localPersons: List<Person>
     ): IoResult<List<Person>> {
         return client.requestWithExceptionHandling {
             post {
-                url(hostConfig) { pathSegments = listOf("api", "user", "event", eventServerId.toString(), "users") }
+                url(hostConfig) { pathSegments = listOf("api", "user", "event", eventServerId, "users") }
                 contentType(ContentType.Application.Json)
                 setBody(
                     AddUsersDto(users = localPersons.map { it.toCreateUserDto() })
@@ -104,7 +105,7 @@ internal class EventsRemoteStoreImpl(
     }
 
     private fun EventDto.toEventDetails(localEventId: Long, localPersons: List<Person>?, currencies: List<Currency>): EventDetails {
-        val primaryCurrency = currencies.first { it.id == currencyId }
+        val primaryCurrency = currencies.first { it.serverId == currencyId }
         return EventDetails(
             event = Event(id = localEventId, serverId = id, name = name, pinCode = pinCode, primaryCurrencyId = primaryCurrency.id),
             currencies = currencies,

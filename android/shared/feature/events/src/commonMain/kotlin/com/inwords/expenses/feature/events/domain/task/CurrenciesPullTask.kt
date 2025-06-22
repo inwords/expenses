@@ -19,31 +19,20 @@ class CurrenciesPullTask internal constructor(
     private val currenciesLocalStore by currenciesLocalStoreLazy
     private val currenciesRemoteStore by currenciesRemoteStoreLazy
 
-    suspend fun pullCurrencies(): IoResult<*> = withContext(IO) {
+    suspend fun pullCurrencies(): IoResult<List<Currency>> = withContext(IO) {
         val networkCurrencies = when (val networkResult = currenciesRemoteStore.getCurrencies()) {
             is IoResult.Success -> networkResult.data
             is IoResult.Error -> return@withContext networkResult
         }
 
-        updateLocalCurrencies(networkCurrencies, inTransaction = true)
-
-        IoResult.Success(Unit)
-    }
-
-    suspend fun updateLocalCurrencies(
-        networkCurrencies: List<Currency>,
-        inTransaction: Boolean,
-    ): List<Currency> = withContext(IO) {
-        if (inTransaction) {
-            transactionHelper.immediateWriteTransaction {
-                updateLocalCurrenciesInternal(networkCurrencies)
-            }
-        } else {
-            updateLocalCurrenciesInternal(networkCurrencies)
+        val currencies = transactionHelper.immediateWriteTransaction {
+            updateLocalCurrencies(networkCurrencies)
         }
+
+        IoResult.Success(currencies)
     }
 
-    private suspend fun updateLocalCurrenciesInternal(
+    private suspend fun updateLocalCurrencies(
         networkCurrencies: List<Currency>
     ): List<Currency> {
         val localCurrencies = currenciesLocalStore.getCurrencies().first()
@@ -53,7 +42,7 @@ class CurrenciesPullTask internal constructor(
         val updatedCurrencies = networkCurrencies.map { networkCurrency ->
             val localCurrency = localCurrenciesMap[networkCurrency.code]
             if (localCurrency != null) {
-                if (localCurrency.serverId == 0L) {
+                if (localCurrency.serverId == null) {
                     hasUpdates = true
                     localCurrency.copy(serverId = networkCurrency.serverId)
                 } else {

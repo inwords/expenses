@@ -35,7 +35,7 @@ internal class MenuViewModel(
             }
 
             _state.value = MenuDialogUiModel(
-                eventId = event.event.serverId.toString(),
+                eventId = event.event.serverId.orEmpty(),
                 eventAccessCode = event.event.pinCode,
             )
         }

@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 internal data class CurrencyDto(
     @SerialName("id")
-    val id: Long,
+    val id: String,
 
     @SerialName("code")
     val code: String,

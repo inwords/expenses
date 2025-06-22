@@ -37,7 +37,7 @@ internal actual class EventsSyncManager(
                     .then(
                         listOf(
                             EventPersonsPushWorker.buildEventPersonsPushRequest(eventId),
-                            EventPullCurrenciesAndPersonsWorker.buildEventPullCurrenciesAndPersonsRequest(eventId)
+                            EventPullPersonsWorker.buildEventPullPersonsRequest(eventId)
                         )
                     )
                     .then(

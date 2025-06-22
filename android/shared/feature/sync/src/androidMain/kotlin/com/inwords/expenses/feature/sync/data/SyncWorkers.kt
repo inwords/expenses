@@ -105,7 +105,7 @@ internal class EventPersonsPushWorker(
     }
 }
 
-internal class EventPullCurrenciesAndPersonsWorker(
+internal class EventPullPersonsWorker(
     appContext: Context,
     workerParams: WorkerParameters
 ) : CoroutineWorker(appContext, workerParams) {
@@ -117,15 +117,15 @@ internal class EventPullCurrenciesAndPersonsWorker(
 
         if (shouldFailure()) return Result.failure()
 
-        val ioResult = eventsComponent.eventPullCurrenciesAndPersonsTask.value.pullEventCurrenciesAndPersons(eventId)
+        val ioResult = eventsComponent.eventPullPersonsTask.value.pullEventPersons(eventId)
 
         return ioResult.toResult()
     }
 
     companion object {
 
-        fun buildEventPullCurrenciesAndPersonsRequest(eventId: Long): OneTimeWorkRequest {
-            return OneTimeWorkRequestBuilder<EventPullCurrenciesAndPersonsWorker>()
+        fun buildEventPullPersonsRequest(eventId: Long): OneTimeWorkRequest {
+            return OneTimeWorkRequestBuilder<EventPullPersonsWorker>()
                 .setCommonParameters()
                 .setInputDataEventId(eventId)
                 .addTag(getTagForEvent(eventId))
@@ -203,7 +203,7 @@ private const val KEY_EVENT_ID = "EVENT_ID"
 private fun Data.getEventId(): Long? {
     val eventId = getLong(KEY_EVENT_ID, -1L)
     if (eventId == -1L) {
-        // TODO log wtf
+        // TODO non-fatal error
         return null
     }
     return eventId

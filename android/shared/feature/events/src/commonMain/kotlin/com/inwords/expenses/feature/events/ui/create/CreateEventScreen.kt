@@ -23,7 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.appbar.BasicTopAppBar
-import com.inwords.expenses.core.ui.design.button.BasicFloatingActionButton
+import com.inwords.expenses.core.ui.design.button.BasicButton
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.feature.events.ui.common.EventNameField
 import com.inwords.expenses.feature.events.ui.create.CreateEventScreenUiModel.CurrencyInfoUiModel
@@ -47,7 +47,7 @@ internal fun CreateEventScreen(
             BasicTopAppBar()
         },
         floatingActionButton = {
-            BasicFloatingActionButton(
+            BasicButton(
                 text = "Участники",
                 icon = Icons.AutoMirrored.Outlined.ArrowForward,
                 onClick = onConfirmClicked,

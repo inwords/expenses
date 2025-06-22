@@ -20,6 +20,8 @@ internal class JoinEventViewModel(
     private val eventsInteractor: EventsInteractor,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
+    private val eventIdRegex = "[0-9A-HJKMNP-TV-Z]".toRegex()
+
     private var confirmJob: Job? = null
 
     private val _state = MutableStateFlow(JoinEventScreenUiModel("", ""))
@@ -27,7 +29,7 @@ internal class JoinEventViewModel(
 
     fun onEventIdChanged(eventId: String) {
         _state.update { value ->
-            value.copy(eventId = eventId.filter { it.isDigit() })
+            value.copy(eventId = eventId.filter { it.toString().matches(eventIdRegex) })
         }
     }
 
@@ -42,7 +44,7 @@ internal class JoinEventViewModel(
         confirmJob = viewModelScope.launch {
             val state = _state.value
             val result = eventsInteractor.joinEvent(
-                eventServerId = state.eventId.toLong(),
+                eventServerId = state.eventId,
                 accessCode = state.eventAccessCode
             )
             when (result) {

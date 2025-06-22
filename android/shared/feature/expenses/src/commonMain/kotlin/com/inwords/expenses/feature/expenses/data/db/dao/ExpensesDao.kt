@@ -53,7 +53,7 @@ interface ExpensesDao {
         "UPDATE ${ExpenseEntity.TABLE_NAME} SET ${ExpenseEntity.ColumnNames.SERVER_ID} = :serverId " +
             "WHERE ${ExpenseEntity.ColumnNames.ID} = :expenseId"
     )
-    suspend fun updateExpenseServerId(expenseId: Long, serverId: Long): Int
+    suspend fun updateExpenseServerId(expenseId: Long, serverId: String): Int
 
     @Transaction
     @Query("SELECT * FROM ${ExpenseEntity.TABLE_NAME} WHERE ${ExpenseEntity.ColumnNames.EVENT_ID} = :eventId")

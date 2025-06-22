@@ -50,7 +50,7 @@ internal class EventsLocalStoreImpl(
         return eventsDao.queryEventWithDetailsById(eventId)?.toDomain()
     }
 
-    override suspend fun getEventWithDetailsByServerId(eventServerId: Long): EventDetails? {
+    override suspend fun getEventWithDetailsByServerId(eventServerId: String): EventDetails? {
         return eventsDao.queryEventWithDetailsByServerId(eventServerId)?.toDomain()
     }
 
@@ -58,7 +58,7 @@ internal class EventsLocalStoreImpl(
         return eventsDao.queryEventPersonsById(eventId).map { it.toDomain() }
     }
 
-    override suspend fun update(eventId: Long, newServerId: Long): Boolean {
+    override suspend fun update(eventId: Long, newServerId: String): Boolean {
         return eventsDao.update(eventId, newServerId) >= 1
     }
 

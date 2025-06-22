@@ -32,7 +32,7 @@ internal actual class EventsSyncManager {
                 eventsComponent.currenciesPullTask.value.pullCurrencies() is IoResult.Success &&
                     eventsComponent.eventPushTask.value.pushEvent(eventId) is IoResult.Success &&
                     (eventsComponent.eventPersonsPushTask.value.pushEventPersons(eventId) is IoResult.Success ||
-                        eventsComponent.eventPullCurrenciesAndPersonsTask.value.pullEventCurrenciesAndPersons(eventId) is IoResult.Success) &&
+                        eventsComponent.eventPullPersonsTask.value.pullEventPersons(eventId) is IoResult.Success) &&
                     (expensesComponent.eventExpensesPushTask.value.pushEventExpenses(eventId) is IoResult.Success ||
                         expensesComponent.eventExpensesPullTask.value.pullEventExpenses(eventId) is IoResult.Success)
             }

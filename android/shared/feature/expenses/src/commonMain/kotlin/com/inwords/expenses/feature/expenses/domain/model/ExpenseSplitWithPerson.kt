@@ -7,6 +7,6 @@ data class ExpenseSplitWithPerson(
     val expenseSplitId: Long,
     val expenseId: Long,
     val person: Person,
-    val originalAmount: BigDecimal?,
+    val originalAmount: BigDecimal,
     val exchangedAmount: BigDecimal,
 )

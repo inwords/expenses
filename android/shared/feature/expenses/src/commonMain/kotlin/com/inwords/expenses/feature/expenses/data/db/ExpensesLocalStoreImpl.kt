@@ -55,7 +55,7 @@ internal class ExpensesLocalStoreImpl(
         ) >= 1
     }
 
-    override suspend fun updateExpenseServerId(expenseId: Long, serverId: Long): Boolean {
+    override suspend fun updateExpenseServerId(expenseId: Long, serverId: String): Boolean {
         return expensesDao.updateExpenseServerId(expenseId, serverId) >= 1
     }
 

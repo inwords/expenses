@@ -18,12 +18,8 @@ internal abstract class BaseScreen {
     }
 
     context(extension: ComposeContext)
-    fun assertElementWithTextExists(text: String, exists: Boolean = true) {
-        if (exists) { // FIXME: strange code
-            extension.onNodeWithText(text).assertIsDisplayed()
-        } else {
-            extension.onNodeWithText(text).assertDoesNotExist()
-        }
+    fun assertElementWithTextExists(text: String) {
+        extension.onNodeWithText(text).assertIsDisplayed()
     }
 
     context(extension: ComposeContext)

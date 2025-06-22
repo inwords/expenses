@@ -26,7 +26,7 @@ data class EventEntity(
     val eventId: Long = 0L,
 
     @ColumnInfo(ColumnNames.SERVER_ID)
-    val eventServerId: Long,
+    val eventServerId: String?,
 
     @ColumnInfo(ColumnNames.NAME)
     val name: String,

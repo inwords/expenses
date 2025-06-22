@@ -16,7 +16,7 @@ import com.inwords.expenses.feature.events.domain.store.remote.CurrenciesRemoteS
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
 import com.inwords.expenses.feature.events.domain.task.CurrenciesPullTask
 import com.inwords.expenses.feature.events.domain.task.EventPersonsPushTask
-import com.inwords.expenses.feature.events.domain.task.EventPullCurrenciesAndPersonsTask
+import com.inwords.expenses.feature.events.domain.task.EventPullPersonsTask
 import com.inwords.expenses.feature.events.domain.task.EventPushTask
 
 class EventsComponent internal constructor(
@@ -80,12 +80,11 @@ class EventsComponent internal constructor(
         )
     }
 
-    val eventPullCurrenciesAndPersonsTask: Lazy<EventPullCurrenciesAndPersonsTask> = lazy {
-        EventPullCurrenciesAndPersonsTask(
+    val eventPullPersonsTask: Lazy<EventPullPersonsTask> = lazy {
+        EventPullPersonsTask(
             transactionHelperLazy = transactionHelper,
             eventsLocalStoreLazy = eventsLocalStore,
             eventsRemoteStoreLazy = eventsRemoteStore,
-            currenciesPullTaskLazy = currenciesPullTask
         )
     }
 

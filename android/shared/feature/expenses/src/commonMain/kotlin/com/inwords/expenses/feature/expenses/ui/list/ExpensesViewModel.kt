@@ -151,7 +151,7 @@ internal class ExpensesViewModel(
         refreshJob = viewModelScope.launch {
             isRefreshing.value = true
             expensesInteractor.onRefreshExpensesAsync(event)
-            delay(2000)
+            delay(3000)
             isRefreshing.value = false
         }
     }
