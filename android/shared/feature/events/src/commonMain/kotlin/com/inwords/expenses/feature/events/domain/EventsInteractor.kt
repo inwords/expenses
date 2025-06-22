@@ -59,7 +59,7 @@ class EventsInteractor internal constructor(
         settingsRepository.clearCurrentPersonId()
     }
 
-    internal suspend fun joinEvent(eventServerId: Long, accessCode: String): JoinEventResult {
+    internal suspend fun joinEvent(eventServerId: String, accessCode: String): JoinEventResult {
         val localEvent = eventsLocalStore.getEventWithDetailsByServerId(eventServerId)
         if (localEvent != null) {
             settingsRepository.setCurrentEventId(localEvent.event.id)
@@ -108,7 +108,7 @@ class EventsInteractor internal constructor(
 
         val eventToInsert = Event(
             id = 0L,
-            serverId = 0L,
+            serverId = null,
             name = draft.draftEventName,
             // FIXME secure
             pinCode = Random.Default.nextLong(1000, 9999).toString(),

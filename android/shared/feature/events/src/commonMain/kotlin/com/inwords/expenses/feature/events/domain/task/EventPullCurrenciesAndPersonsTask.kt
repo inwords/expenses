@@ -27,7 +27,7 @@ class EventPullCurrenciesAndPersonsTask internal constructor(
      */
     suspend fun pullEventCurrenciesAndPersons(eventId: Long): IoResult<*> = withContext(IO) {
         val localEvent = eventsLocalStore.getEventWithDetails(eventId)
-            ?.takeIf { it.event.serverId != 0L }
+            ?.takeIf { it.event.serverId != null }
             ?: return@withContext IoResult.Error.Failure
 
         val remoteResult = eventsRemoteStore.getEvent(

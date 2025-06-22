@@ -30,7 +30,7 @@ class EventExpensesPushTask internal constructor(
     suspend fun pushEventExpenses(eventId: Long): IoResult<*> = withContext(IO) {
         val localEvent = eventsLocalStore.getEventWithDetails(eventId)
             ?.takeIf { details ->
-                details.event.serverId != 0L &&
+                details.event.serverId != null &&
                     details.persons.all { it.serverId != 0L } &&
                     details.currencies.all { it.serverId != 0L }
             } ?: return@withContext IoResult.Error.Failure

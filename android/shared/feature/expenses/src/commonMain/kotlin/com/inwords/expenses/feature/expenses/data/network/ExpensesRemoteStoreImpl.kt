@@ -38,9 +38,10 @@ internal class ExpensesRemoteStoreImpl(
         currencies: List<Currency>,
         persons: List<Person>
     ): IoResult<List<Expense>> {
+        val serverId = event.serverId ?: return IoResult.Error.Failure // FIXME: non-fatal error
         return client.requestWithExceptionHandling {
             get {
-                url(hostConfig) { pathSegments = listOf("api", "user", "event", event.serverId.toString(), "expenses") }
+                url(hostConfig) { pathSegments = listOf("api", "user", "event", serverId, "expenses") }
             }.body<List<ExpenseDto>>().mapNotNull { it.toExpense(localExpense = null, currencies, persons) }
         }.toIoResult()
     }
@@ -62,9 +63,10 @@ internal class ExpensesRemoteStoreImpl(
         currencies: List<Currency>,
         persons: List<Person>
     ): IoResult<Expense> {
+        val serverId = event.serverId ?: return IoResult.Error.Failure // FIXME: non-fatal error
         return client.requestWithExceptionHandling {
             post {
-                url(hostConfig) { pathSegments = listOf("api", "user", "event", event.serverId.toString(), "expense") }
+                url(hostConfig) { pathSegments = listOf("api", "user", "event", serverId, "expense") }
                 contentType(ContentType.Application.Json)
                 setBody(
                     CreateExpenseRequest(

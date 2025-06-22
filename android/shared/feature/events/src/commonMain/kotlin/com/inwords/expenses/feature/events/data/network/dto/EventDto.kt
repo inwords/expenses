@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 internal data class EventDto(
     @SerialName("id")
-    val id: Long,
+    val id: String,
 
     @SerialName("name")
     val name: String,

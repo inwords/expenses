@@ -21,13 +21,14 @@ class EventPersonsPushTask internal constructor(
      */
     suspend fun pushEventPersons(eventId: Long): IoResult<*> = withContext(IO) {
         val localEvent = eventsLocalStore.getEventWithDetails(eventId) ?: return@withContext IoResult.Error.Failure
+        val eventServerId = localEvent.event.serverId ?: return@withContext IoResult.Error.Failure // FIXME: non-fatal error
 
         val personsToAdd = localEvent.persons.filter { it.serverId == 0L }
 
         if (personsToAdd.isEmpty()) return@withContext IoResult.Success(Unit)
 
         val networkResult = eventsRemoteStore.addPersonsToEvent(
-            eventServerId = localEvent.event.serverId,
+            eventServerId = eventServerId,
             pinCode = localEvent.event.pinCode,
             localPersons = personsToAdd
         )

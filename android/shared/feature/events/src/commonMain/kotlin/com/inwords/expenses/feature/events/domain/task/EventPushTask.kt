@@ -27,7 +27,7 @@ class EventPushTask internal constructor(
     suspend fun pushEvent(eventId: Long): IoResult<*> = withContext(IO) {
         val localEventDetails = eventsLocalStore.getEventWithDetails(eventId) ?: return@withContext IoResult.Error.Failure
 
-        if (localEventDetails.event.serverId != 0L) return@withContext IoResult.Success(Unit)
+        if (localEventDetails.event.serverId != null) return@withContext IoResult.Success(Unit)
 
         val remoteEventDetailsResult = eventsRemoteStore.createEvent(
             event = localEventDetails.event,
@@ -39,21 +39,17 @@ class EventPushTask internal constructor(
             is IoResult.Success -> remoteEventDetailsResult.data
             is IoResult.Error -> return@withContext remoteEventDetailsResult
         }
+        val networkServerId = networkEventDetails.event.serverId ?: return@withContext IoResult.Error.Failure // FIXME: non-fatal error
 
         val localPersons = localEventDetails.persons
         val updatedPersons = networkEventDetails.persons.mapIndexed { i, networkPerson ->
             localPersons[i].copy(serverId = networkPerson.serverId)
         }
 
-        val updatedEvent = localEventDetails.copy(
-            event = localEventDetails.event.copy(serverId = networkEventDetails.event.serverId),
-            persons = updatedPersons
-        )
-
         transactionHelper.immediateWriteTransaction {
             personsLocalStore.insertWithoutCrossRefs(updatedPersons)
 
-            eventsLocalStore.update(eventId, updatedEvent.event.serverId)
+            eventsLocalStore.update(eventId, networkServerId)
         }
 
         IoResult.Success(Unit)

@@ -29,7 +29,7 @@ internal interface EventsRemoteStore {
     ): IoResult<EventDetails>
 
     suspend fun addPersonsToEvent(
-        eventServerId: Long,
+        eventServerId: String,
         pinCode: String,
         localPersons: List<Person>
     ): IoResult<List<Person>>
