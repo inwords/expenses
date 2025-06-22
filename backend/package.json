@@ -20,7 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "db:drop": "npx typeorm schema:drop -d datasource.js",
     "db:migrate": "ts-node --transpile-only scripts/migrate.ts",
-    "db:migrate:docker_prod": "node scripts/migrate.js",
+    "db:migrate:docker_prod": "node dist/scripts/migrate.js",
     "db:migrate:new": "typeorm migration:generate -p -d datasource.js ./migrations/default/init",
     "db:migrate:empty": "npx typeorm migration:create"
   },
