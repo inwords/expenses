@@ -22,7 +22,7 @@ export class ExpenseStore {
 
   get currentUserExpenses() {
     return this.expensesToView.filter((e) => {
-      return e.splitInformation.some((i) => Number(i.userId) === userStore.currentUser?.id);
+      return e.splitInformation.some((i) => i.userId === userStore.currentUser?.id);
     });
   }
 

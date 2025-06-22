@@ -25,7 +25,7 @@ export const AddExpenseFormRefund = observer(() => {
       onSuccess={async (d) => {
         if (id) {
           expenseStore.setIsExpenseRefundModalOpen(false);
-          await expenseService.createExpenseRefund({...d, eventId: Number(id)});
+          await expenseService.createExpenseRefund({...d, eventId: id});
         }
       }}
       defaultValues={initialValues}

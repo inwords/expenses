@@ -2,9 +2,9 @@ import {ExpenseType} from '@/5-entities/expense/constants';
 
 export interface CreateExpenseForm {
   description: string;
-  userWhoPaidId: number;
-  currencyId: number;
-  eventId: number;
+  userWhoPaidId: string;
+  currencyId: string;
+  eventId: string;
   splitInformation: Array<Omit<SplitInfo, 'exchangedAmount'>>;
   amount: number;
   splitOption: string;
@@ -12,11 +12,11 @@ export interface CreateExpenseForm {
 
 export interface CreateExpenseRefundForm {
   description: string;
-  userWhoPaidId: number;
-  currencyId: number;
-  eventId: number;
+  userWhoPaidId: string;
+  currencyId: string;
+  eventId: string;
   amount: number;
-  userWhoReceiveId: number;
+  userWhoReceiveId: string;
 }
 
 export interface CreateExpense extends Omit<CreateExpenseForm, 'amount' | 'splitOption'> {
@@ -24,7 +24,7 @@ export interface CreateExpense extends Omit<CreateExpenseForm, 'amount' | 'split
 }
 
 export interface SplitInfo {
-  userId: number;
+  userId: string;
   amount: number;
   exchangedAmount: number;
 }
@@ -32,9 +32,9 @@ export interface SplitInfo {
 export interface ExpenseBase {
   id: string;
   description: string;
-  userWhoPaidId: number;
-  currencyId: number;
-  eventId: number;
+  userWhoPaidId: string;
+  currencyId: string;
+  eventId: string;
   splitInformation: Array<SplitInfo>;
   createdAt: string;
 }

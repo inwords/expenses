@@ -3,7 +3,7 @@ import {User} from '@/5-entities/user/types/types';
 export interface Event {
   id: string;
   name: string;
-  currencyId: number;
+  currencyId: string;
   users: Array<User>;
   pinCode: string;
 }

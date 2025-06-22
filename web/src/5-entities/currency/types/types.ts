@@ -1,6 +1,6 @@
 import {CurrencyCode} from "@/5-entities/currency/constants";
 
 export interface Currency {
-    id: number;
+    id: string;
     code: CurrencyCode
 }
