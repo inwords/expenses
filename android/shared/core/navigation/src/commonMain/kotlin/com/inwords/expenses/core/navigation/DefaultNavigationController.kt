@@ -1,7 +1,6 @@
 package com.inwords.expenses.core.navigation
 
 import androidx.navigation.NavHostController
-import com.inwords.expenses.core.navigation.DefaultNavigationController.NavCommand
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 

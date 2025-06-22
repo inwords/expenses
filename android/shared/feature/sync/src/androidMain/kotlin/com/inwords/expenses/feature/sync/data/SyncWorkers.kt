@@ -203,7 +203,7 @@ private const val KEY_EVENT_ID = "EVENT_ID"
 private fun Data.getEventId(): Long? {
     val eventId = getLong(KEY_EVENT_ID, -1L)
     if (eventId == -1L) {
-        // TODO log wtf
+        // TODO non-fatal error
         return null
     }
     return eventId
