@@ -16,7 +16,7 @@ export class ExpenseService {
 
     const body = {
       ...rest,
-      eventId: Number(id),
+      eventId: id,
       splitInformation:
         expenseStore.splitOption === '1'
           ? userStore.users.map((u) => {
