@@ -1,10 +1,10 @@
 package com.inwords.expenses.feature.events.domain
 
 import com.inwords.expenses.core.storage.utils.TransactionHelper
+import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.feature.events.domain.EventsInteractor.JoinEventResult
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
-import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
@@ -27,12 +27,18 @@ internal class JoinRemoteEventUseCase(
 
     suspend fun joinRemoteEvent(
         event: Event,
-        localCurrencies: List<Currency>?,
-        localPersons: List<Person>?,
     ): JoinEventResult {
-        val currenciesNotNull = localCurrencies ?: currenciesLocalStore.getCurrencies().first()
+        val currenciesBeforeSync = currenciesLocalStore.getCurrencies().first()
+        val currencies = if (currenciesBeforeSync.any { it.serverId == null }) {
+            when (val currencies = currenciesPullTask.pullCurrencies()) {
+                is IoResult.Success<List<Currency>> -> currencies.data
+                is IoResult.Error -> return JoinEventResult.OtherError
+            }
+        } else {
+            currenciesBeforeSync
+        }
 
-        val remoteEvent = when (val eventResult = eventsRemoteStore.getEvent(event, currenciesNotNull, localPersons)) {
+        val remoteEvent = when (val eventResult = eventsRemoteStore.getEvent(event, currencies, localPersons = null)) {
             is EventsRemoteStore.GetEventResult.Event -> eventResult.event
 
             EventsRemoteStore.GetEventResult.EventNotFound -> return JoinEventResult.EventNotFound
@@ -41,12 +47,10 @@ internal class JoinRemoteEventUseCase(
         }
 
         val eventDetails = transactionHelper.immediateWriteTransaction {
-            val updatedCurrencies = currenciesPullTask.updateLocalCurrencies(remoteEvent.currencies, inTransaction = false)
-
             eventsLocalStore.deepInsert(
                 eventToInsert = remoteEvent.event,
                 personsToInsert = remoteEvent.persons,
-                prefetchedLocalCurrencies = updatedCurrencies,
+                prefetchedLocalCurrencies = remoteEvent.currencies,
                 inTransaction = false,
             )
         }

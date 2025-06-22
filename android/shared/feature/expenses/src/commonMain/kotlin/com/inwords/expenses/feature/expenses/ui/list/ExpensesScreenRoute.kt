@@ -1,6 +1,6 @@
 package com.inwords.expenses.feature.expenses.ui.list
 
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -34,7 +34,7 @@ fun NavGraphBuilder.addExpensesScreen(
             }
         })
         ExpensesScreen(
-            state = viewModel.state.collectAsStateWithLifecycle().value,
+            state = viewModel.state.collectAsState().value, // FIXME: collectAsStateWithLifecycle has issues with Compose Navigation
             onMenuClick = viewModel::onMenuClick,
             onAddExpenseClick = viewModel::onAddExpenseClick,
             onRevertExpenseClick = viewModel::onRevertExpenseClick,

@@ -68,8 +68,6 @@ class EventsInteractor internal constructor(
 
         val joinEventResult = joinRemoteEventUseCase.joinRemoteEvent(
             event = Event(0L, eventServerId, "", accessCode, 0L),
-            localCurrencies = null,
-            localPersons = null,
         )
 
         when (joinEventResult) {
