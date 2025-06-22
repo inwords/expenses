@@ -1,14 +1,13 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {IsDate, IsEnum, IsNumber, IsOptional, IsString, ValidateNested} from 'class-validator';
 import {Type} from 'class-transformer';
-import {ExpenseType} from "#domain/expense/constants";
-import {SplitInfo} from "#domain/expense/types";
-import {DateIsoString} from "#packages/types";
+
+import {ExpenseType, ISplitInfo} from '#domain/entities/expense.entity';
 
 class SplitInfoDto {
   @ApiProperty()
-  @IsNumber()
-  userId!: number;
+  @IsString()
+  userId!: string;
 
   @ApiProperty()
   @IsNumber()
@@ -21,12 +20,12 @@ export class CreatedExpenseDto {
   description!: string;
 
   @ApiProperty()
-  @IsNumber()
-  userWhoPaidId!: number;
+  @IsString()
+  userWhoPaidId!: string;
 
   @ApiProperty()
-  @IsNumber()
-  currencyId!: number;
+  @IsString()
+  currencyId!: string;
 
   @ApiProperty()
   @IsEnum(ExpenseType)
@@ -35,11 +34,11 @@ export class CreatedExpenseDto {
   @ApiProperty({isArray: true, type: SplitInfoDto})
   @ValidateNested()
   @Type(() => SplitInfoDto)
-  splitInformation!: Array<SplitInfo>;
+  splitInformation!: Array<ISplitInfo>;
 
   @ApiProperty({required: false, description: 'ISO String'})
   @IsOptional()
   @IsDate()
   @Type(() => Date)
-  createdAt?: DateIsoString;
+  createdAt?: Date;
 }

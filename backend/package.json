@@ -19,9 +19,9 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "db:drop": "npx typeorm schema:drop -d datasource.js",
-    "db:migrate": "npx typeorm migration:run -d datasource.js",
-    "db:migrate:docker_prod": "npx typeorm migration:run -d dist/datasource.js",
-    "db:migrate:new": "npx typeorm migration:generate -p -d datasource.js",
+    "db:migrate": "ts-node --transpile-only scripts/migrate.ts",
+    "db:migrate:docker_prod": "node scripts/migrate.js",
+    "db:migrate:new": "typeorm migration:generate -p -d datasource.js ./migrations/default/init",
     "db:migrate:empty": "npx typeorm migration:create"
   },
   "dependencies": {
