@@ -59,11 +59,10 @@ WORKDIR /usr/src/app
 COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
 COPY --chown=node:node --from=build /usr/src/app/dist ./dist
 COPY --chown=node:node --from=build /usr/src/app/package*.json ./
-COPY --chown=node:node --from=build /usr/src/app/datasource.js ./dist
 
 # Expose the port the app runs on
 EXPOSE 3001
 EXPOSE 5000
 
 # Command to run the app
-CMD npm run db:migrate:docker_prod && npm run start:prod
+CMD ls && npm run db:migrate:docker_prod && npm run start:prod
