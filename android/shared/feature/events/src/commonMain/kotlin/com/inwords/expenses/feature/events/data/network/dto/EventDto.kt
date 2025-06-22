@@ -12,7 +12,7 @@ internal data class EventDto(
     val name: String,
 
     @SerialName("currencyId")
-    val currencyId: Long,
+    val currencyId: String,
 
     @SerialName("pinCode")
     val pinCode: String,

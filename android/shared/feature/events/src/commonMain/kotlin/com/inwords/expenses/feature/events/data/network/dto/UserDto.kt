@@ -9,7 +9,7 @@ internal data class UserDto(
     val name: String,
 
     @SerialName("eventId")
-    val eventId: Long,
+    val eventId: String,
 
     @SerialName("id")
     val id: String

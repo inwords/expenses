@@ -105,7 +105,7 @@ internal class EventsRemoteStoreImpl(
     }
 
     private fun EventDto.toEventDetails(localEventId: Long, localPersons: List<Person>?, currencies: List<Currency>): EventDetails {
-        val primaryCurrency = currencies.first { it.id == currencyId }
+        val primaryCurrency = currencies.first { it.serverId == currencyId }
         return EventDetails(
             event = Event(id = localEventId, serverId = id, name = name, pinCode = pinCode, primaryCurrencyId = primaryCurrency.id),
             currencies = currencies,

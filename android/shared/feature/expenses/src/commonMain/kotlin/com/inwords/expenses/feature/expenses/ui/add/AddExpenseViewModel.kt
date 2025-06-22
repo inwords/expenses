@@ -128,7 +128,7 @@ internal class AddExpenseViewModel(
                 description = if (replenishment == null) {
                     state?.description.orEmpty()
                 } else {
-                    val currentPerson = eventDetails.persons.first { it.id == currentPersonId }
+                    val currentPerson = eventDetails.persons.first { it.id == replenishment.fromPersonId }
                     "Возврат от ${currentPerson.name}"
                 },
                 currencies = eventDetails.currencies.map { currency ->
