@@ -11,7 +11,7 @@ data class PersonEntity(
     val personId: Long = 0L,
 
     @ColumnInfo(ColumnNames.SERVER_ID)
-    val personServerId: Long,
+    val personServerId: String?,
 
     @ColumnInfo(ColumnNames.NAME)
     val name: String,

@@ -12,5 +12,5 @@ internal data class SplitInformationDto(
     val exchangedAmount: Double, // TODO pass as String
 
     @SerialName("userId")
-    val userId: Long
+    val userId: String
 )

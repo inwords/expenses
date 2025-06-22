@@ -385,12 +385,12 @@ private fun ExpensesScreenPreviewEmpty() {
 internal fun mockExpensesScreenUiModel(withCreditors: Boolean): ExpensesScreenUiModel {
     val person1 = Person(
         id = 1,
-        serverId = 11,
+        serverId = "11",
         name = "Василий"
     )
     val person2 = Person(
         id = 2,
-        serverId = 12,
+        serverId = "12",
         name = "Максим"
     )
     return ExpensesScreenUiModel(

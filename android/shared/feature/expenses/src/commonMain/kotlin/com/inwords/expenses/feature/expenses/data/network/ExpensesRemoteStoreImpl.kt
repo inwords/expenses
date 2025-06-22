@@ -64,6 +64,7 @@ internal class ExpensesRemoteStoreImpl(
         persons: List<Person>
     ): IoResult<Expense> {
         val serverId = event.serverId ?: return IoResult.Error.Failure // FIXME: non-fatal error
+        val userWhoPaidId = expense.person.serverId ?: return IoResult.Error.Failure // FIXME: non-fatal error, should not happen
         return client.requestWithExceptionHandling {
             post {
                 url(hostConfig) { pathSegments = listOf("api", "user", "event", serverId, "expense") }
@@ -75,10 +76,12 @@ internal class ExpensesRemoteStoreImpl(
                             ExpenseType.Spending -> "expense"
                             ExpenseType.Replenishment -> "refund"
                         },
-                        userWhoPaidId = expense.person.serverId,
+                        userWhoPaidId = userWhoPaidId,
                         splitInformation = expense.subjectExpenseSplitWithPersons.map { expenseSplitWithPerson ->
+                            // FIXME: non-fatal error, should not happen
+                            val splitInformationUserId = expenseSplitWithPerson.person.serverId ?: return IoResult.Error.Failure
                             SplitInformationRequest(
-                                userId = expenseSplitWithPerson.person.serverId,
+                                userId = splitInformationUserId,
                                 amount = expenseSplitWithPerson.originalAmount.doubleValue(false),
                             )
                         },

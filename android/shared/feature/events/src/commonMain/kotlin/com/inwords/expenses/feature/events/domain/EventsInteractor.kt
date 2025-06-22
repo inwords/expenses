@@ -103,7 +103,7 @@ class EventsInteractor internal constructor(
 
     internal suspend fun createEvent(): EventDetails {
         val personsToInsert = (listOf(draft.draftOwner) + draft.draftOtherPersons).map { personName ->
-            Person(0L, 0L, personName)
+            Person(0L, null, personName)
         }
 
         val eventToInsert = Event(

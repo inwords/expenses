@@ -24,7 +24,7 @@ class EventExpensesPullTask internal constructor(
         val localEvent = eventsLocalStore.getEventWithDetails(eventId)
             ?.takeIf { details ->
                 details.event.serverId != null &&
-                    details.persons.all { it.serverId != 0L } &&
+                    details.persons.all { it.serverId != null } &&
                     details.currencies.all { it.serverId != 0L }
             } ?: return@withContext IoResult.Error.Failure
 

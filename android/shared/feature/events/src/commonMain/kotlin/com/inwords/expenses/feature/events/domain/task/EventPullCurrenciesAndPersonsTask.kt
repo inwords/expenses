@@ -62,7 +62,7 @@ class EventPullCurrenciesAndPersonsTask internal constructor(
         localPersons: List<Person>,
         remotePersons: List<Person>
     ): List<Person> {
-        val localPersonsMap = localPersons.mapTo(HashSet()) { it.serverId }
+        val localPersonsMap = localPersons.mapNotNullTo(HashSet()) { it.serverId }
 
         val personsToInsert = remotePersons.filter { remotePerson ->
             remotePerson.serverId !in localPersonsMap

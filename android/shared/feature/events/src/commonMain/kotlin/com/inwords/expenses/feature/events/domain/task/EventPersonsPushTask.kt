@@ -23,7 +23,7 @@ class EventPersonsPushTask internal constructor(
         val localEvent = eventsLocalStore.getEventWithDetails(eventId) ?: return@withContext IoResult.Error.Failure
         val eventServerId = localEvent.event.serverId ?: return@withContext IoResult.Error.Failure // FIXME: non-fatal error
 
-        val personsToAdd = localEvent.persons.filter { it.serverId == 0L }
+        val personsToAdd = localEvent.persons.filter { it.serverId == null }
 
         if (personsToAdd.isEmpty()) return@withContext IoResult.Success(Unit)
 

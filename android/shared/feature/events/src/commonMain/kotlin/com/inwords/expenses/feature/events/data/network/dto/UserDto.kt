@@ -12,5 +12,5 @@ internal data class UserDto(
     val eventId: Long,
 
     @SerialName("id")
-    val id: Long
+    val id: String
 )
