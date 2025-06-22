@@ -25,11 +25,7 @@ fun BasicButton(
 ) {
     Button(
         modifier = modifier,
-        onClick = if (enabled) {
-            onClick
-        } else {
-            {}
-        },
+        onClick = onClick,
         enabled = enabled,
     ) {
         Text(text = text)
