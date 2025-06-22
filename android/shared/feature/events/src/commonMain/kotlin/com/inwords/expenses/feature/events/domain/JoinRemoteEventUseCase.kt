@@ -29,7 +29,7 @@ internal class JoinRemoteEventUseCase(
         event: Event,
     ): JoinEventResult {
         val currenciesBeforeSync = currenciesLocalStore.getCurrencies().first()
-        val currencies = if (currenciesBeforeSync.any { it.serverId == null }) {
+        val currencies = if (currenciesBeforeSync.isEmpty() || currenciesBeforeSync.any { it.serverId == null }) {
             when (val currencies = currenciesPullTask.pullCurrencies()) {
                 is IoResult.Success<List<Currency>> -> currencies.data
                 is IoResult.Error -> return JoinEventResult.OtherError
