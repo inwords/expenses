@@ -77,7 +77,7 @@ internal class ExpensesRemoteStoreImpl(
                         splitInformation = expense.subjectExpenseSplitWithPersons.map { expenseSplitWithPerson ->
                             SplitInformationRequest(
                                 userId = expenseSplitWithPerson.person.serverId,
-                                amount = expenseSplitWithPerson.originalAmount?.doubleValue(false) ?: return IoResult.Error.Failure, // FIXME: non-fatal error
+                                amount = expenseSplitWithPerson.originalAmount.doubleValue(false),
                             )
                         },
                         description = expense.description
@@ -111,7 +111,7 @@ internal class ExpensesRemoteStoreImpl(
     private fun SplitInformationDto.toDomain(persons: List<Person>): ExpenseSplitWithPerson? {
         val person = persons.firstOrNull { it.serverId == userId } ?: return null
         val originalAmount = BigDecimal.fromDouble(amount)
-        val exchangedAmount = BigDecimal.fromDouble(exchangedAmount ?: amount)
+        val exchangedAmount = BigDecimal.fromDouble(exchangedAmount)
         return ExpenseSplitWithPerson(
             expenseSplitId = 0L,
             expenseId = 0L,

@@ -134,7 +134,7 @@ class ExpensesInteractor internal constructor(
                 expenseSplitId = 0,
                 expenseId = 0,
                 person = split.person,
-                originalAmount = split.originalAmount?.negate(),
+                originalAmount = split.originalAmount.negate(),
                 exchangedAmount = split.exchangedAmount.negate()
             )
         }

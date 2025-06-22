@@ -44,10 +44,10 @@ data class ExpenseSplitEntity(
     val personId: Long,
 
     @ColumnInfo(ColumnNames.ORIGINAL_AMOUNT_UNSCALED)
-    val originalAmountUnscaled: BigInteger?,
+    val originalAmountUnscaled: BigInteger,
 
     @ColumnInfo(ColumnNames.ORIGINAL_AMOUNT_SCALE)
-    val originalAmountScale: Long?,
+    val originalAmountScale: Long,
 
     @ColumnInfo(name = ColumnNames.EXCHANGED_AMOUNT_UNSCALED)
     val exchangedAmountUnscaled: BigInteger,

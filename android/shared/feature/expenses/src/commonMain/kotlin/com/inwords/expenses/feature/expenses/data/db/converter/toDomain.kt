@@ -41,24 +41,17 @@ internal fun PersonEntity.toDomain(): Person {
 }
 
 internal fun ExpenseSplitWithPersonQuery.toDomain(): ExpenseSplitWithPerson {
-    val originalAmountUnscaled = this.expenseSplitEntity.originalAmountUnscaled
-    val originalAmountScale = this.expenseSplitEntity.originalAmountScale
-
     return ExpenseSplitWithPerson(
         expenseSplitId = this.expenseSplitEntity.expenseSplitId,
         expenseId = this.expenseSplitEntity.expenseId,
         person = this.person.toDomain(),
-        originalAmount = if (originalAmountUnscaled != null && originalAmountScale != null) {
-            BigDecimal.fromBigIntegerWithExponent(
-                bigInteger = originalAmountUnscaled,
-                exponent = originalAmountScale
-            )
-        } else {
-            null
-        },
+        originalAmount = BigDecimal.fromBigIntegerWithExponent(
+            bigInteger = expenseSplitEntity.originalAmountUnscaled,
+            exponent = expenseSplitEntity.originalAmountScale,
+        ),
         exchangedAmount = BigDecimal.fromBigIntegerWithExponent(
             bigInteger = this.expenseSplitEntity.exchangedAmountUnscaled,
-            exponent = this.expenseSplitEntity.exchangedAmountScale
+            exponent = this.expenseSplitEntity.exchangedAmountScale,
         ),
     )
 }
