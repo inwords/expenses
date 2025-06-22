@@ -7,23 +7,24 @@ import {GetEventInfoQueryDto} from './dto/get-event-info.dto';
 import {EventIdDto} from './dto/event-id.dto';
 import {AddUsersToEventDto} from './dto/add-users-to-event.dto';
 import {CreatedExpenseDto} from './dto/create-expense.dto';
-import {GetEventExpenses} from '#interaction/expense/use-cases/get-event-expenses';
-import {SaveEventExpense} from '#interaction/expense/use-cases/save-event-expense';
-import {GetAllCurrencies} from '#interaction/currency/use-cases/get-all-currencies';
-import {SaveEvent} from '#interaction/event/use-cases/save-event';
-import {GetEventInfo} from '#interaction/event/use-cases/get-event-info';
-import {SaveUsersToEvent} from '#interaction/user/use-cases/save-users-to-event';
+
+import {GetAllCurrenciesUseCase} from '#usecases/users/get-all-currencies.usecase';
+import {GetEventExpensesUseCase} from '#usecases/users/get-event-expenses.usecase';
+import {SaveEventExpenseUseCase} from '#usecases/users/save-event-expense.usecase';
+import {SaveEventUseCase} from '#usecases/users/save-event.usecase';
+import {GetEventInfoUseCase} from '#usecases/users/get-event-info.usecase';
+import {SaveUsersToEventUseCase} from '#usecases/users/save-users-to-event.usecase';
 
 @Controller(UserRoutes.root)
 @ApiTags('User')
 export class UserController {
   constructor(
-    private readonly getEventExpensesUseCase: GetEventExpenses,
-    private readonly saveEventExpenseUseCase: SaveEventExpense,
-    private readonly getAllCurrenciesUseCase: GetAllCurrencies,
-    private readonly saveEventUseCase: SaveEvent,
-    private readonly getEventInfoUseCase: GetEventInfo,
-    private readonly saveUsersToEventUseCase: SaveUsersToEvent,
+    private readonly getEventExpensesUseCase: GetEventExpensesUseCase,
+    private readonly saveEventExpenseUseCase: SaveEventExpenseUseCase,
+    private readonly getAllCurrenciesUseCase: GetAllCurrenciesUseCase,
+    private readonly saveEventUseCase: SaveEventUseCase,
+    private readonly getEventInfoUseCase: GetEventInfoUseCase,
+    private readonly saveUsersToEventUseCase: SaveUsersToEventUseCase,
   ) {}
   @Get(UserRoutes.getAllCurrencies)
   @HttpCode(200)
@@ -47,7 +48,7 @@ export class UserController {
   @Post(UserRoutes.addUsersToEvent)
   @HttpCode(201)
   async addUserToEvent(@Param() {eventId}: EventIdDto, @Body() body: AddUsersToEventDto) {
-    return this.saveUsersToEventUseCase.execute({id: eventId, ...body});
+    return this.saveUsersToEventUseCase.execute({eventId, ...body});
   }
 
   @Get(UserRoutes.getAllEventExpenses)

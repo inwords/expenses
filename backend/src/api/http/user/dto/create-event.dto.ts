@@ -1,24 +1,24 @@
-import {ApiProperty} from "@nestjs/swagger";
-import {IsNumber, IsString, ValidateNested} from "class-validator";
-import {Type} from "class-transformer";
-import {UserDto} from "./user.dto";
-import {User} from "#domain/user/types";
+import {ApiProperty} from '@nestjs/swagger';
+import {IsString, ValidateNested} from 'class-validator';
+import {Type} from 'class-transformer';
+import {UserDto} from './user.dto';
+import {IUser} from '#domain/entities/user.enitity';
 
 export class CrateEventBodyDto {
-    @ApiProperty()
-    @IsString()
-    name!: string;
+  @ApiProperty()
+  @IsString()
+  name!: string;
 
-    @ApiProperty()
-    @IsNumber()
-    currencyId!: number;
+  @ApiProperty()
+  @IsString()
+  currencyId!: string;
 
-    @ApiProperty({isArray: true, type: UserDto})
-    @ValidateNested()
-    @Type(() => UserDto)
-    users!: Array<Omit<User, 'id' | 'eventId'>>;
+  @ApiProperty({isArray: true, type: UserDto})
+  @ValidateNested()
+  @Type(() => UserDto)
+  users!: Array<Omit<IUser, 'id' | 'eventId'>>;
 
-    @ApiProperty()
-    @IsString()
-    pinCode!: string;
+  @ApiProperty()
+  @IsString()
+  pinCode!: string;
 }
