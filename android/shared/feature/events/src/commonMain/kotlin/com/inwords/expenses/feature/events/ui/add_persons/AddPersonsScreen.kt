@@ -31,7 +31,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.appbar.BasicTopAppBar
-import com.inwords.expenses.core.ui.design.button.BasicFloatingActionButton
+import com.inwords.expenses.core.ui.design.button.BasicButton
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.feature.events.ui.common.PersonNameField
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -53,7 +53,7 @@ internal fun AddPersonsScreen(
             BasicTopAppBar()
         },
         floatingActionButton = {
-            BasicFloatingActionButton(
+            BasicButton(
                 text = "К событию",
                 icon = Icons.AutoMirrored.Outlined.ArrowForward,
                 onClick = onConfirmClicked,

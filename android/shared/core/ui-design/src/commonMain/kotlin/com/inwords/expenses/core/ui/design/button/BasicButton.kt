@@ -4,8 +4,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,15 +16,21 @@ import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun BasicFloatingActionButton(
+fun BasicButton(
     text: String,
     icon: ImageVector,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
-    ExtendedFloatingActionButton(
+    Button(
         modifier = modifier,
-        onClick = onClick,
+        onClick = if (enabled) {
+            onClick
+        } else {
+            {}
+        },
+        enabled = enabled,
     ) {
         Text(text = text)
         Spacer(modifier = Modifier.width(8.dp))
@@ -33,12 +40,31 @@ fun BasicFloatingActionButton(
 
 @Preview
 @Composable
-private fun BasicFloatingActionButtonPreview() {
+private fun BasicButtonDisabledPreview() {
     ExpensesTheme {
-        BasicFloatingActionButton(
-            text = "Add Expense",
-            icon = Icons.Outlined.Add,
-            onClick = {},
-        )
+        Surface {
+            BasicButton(
+                text = "Add Expense",
+                icon = Icons.Outlined.Add,
+                onClick = {},
+                enabled = false,
+            )
+        }
+    }
+}
+
+
+@Preview
+@Composable
+private fun BasicButtonEnabledPreview() {
+    ExpensesTheme {
+        Surface {
+            BasicButton(
+                text = "Add Expense",
+                icon = Icons.Outlined.Add,
+                onClick = {},
+                enabled = true,
+            )
+        }
     }
 }

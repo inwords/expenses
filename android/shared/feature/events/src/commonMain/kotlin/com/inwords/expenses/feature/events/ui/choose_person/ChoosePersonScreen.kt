@@ -37,7 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.appbar.BasicTopAppBar
-import com.inwords.expenses.core.ui.design.button.BasicFloatingActionButton
+import com.inwords.expenses.core.ui.design.button.BasicButton
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonScreenUiModel.PersonUiModel
@@ -100,7 +100,7 @@ internal fun ChoosePersonContent(
             BasicTopAppBar()
         },
         floatingActionButton = {
-            BasicFloatingActionButton(
+            BasicButton(
                 text = "Продолжить",
                 icon = Icons.AutoMirrored.Outlined.ArrowForward,
                 onClick = onConfirmClicked,
