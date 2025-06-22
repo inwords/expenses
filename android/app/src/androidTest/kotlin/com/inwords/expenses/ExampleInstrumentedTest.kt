@@ -80,7 +80,7 @@ class BasicInstrumentedTest {
         extension.use {
             EmptyEventsScreen()
                 .clickJoinEvent()
-                .joinEvent("62", Base64.decode("NzY=").decodeToString() + Base64.decode("OTU=").decodeToString()) // FIXME: costyl
+                .joinEvent("01JYC8BX30EKQYWBRTPKVX6S26", Base64.decode("NTc=").decodeToString() + Base64.decode("NTQ=").decodeToString()) // FIXME: costyl
                 .waitUntilLoaded()
                 .selectPerson("Test User 2")
                 .clickContinueButton()
