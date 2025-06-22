@@ -30,7 +30,7 @@ import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseSplitEntity
     autoMigrations = [
 
     ],
-    version = 4
+    version = 1
 )
 @ConstructedBy(AppDatabaseConstructor::class)
 internal abstract class AppDatabase : RoomDatabase() {
