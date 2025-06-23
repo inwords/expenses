@@ -42,6 +42,8 @@ rootProject.name = "Expenses"
 
 include(":app")
 
+include(":baselineprofile")
+
 include(":shared")
 include(":shared:core")
 include(":shared:core:ui-design")

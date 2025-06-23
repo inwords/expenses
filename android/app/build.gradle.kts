@@ -4,6 +4,7 @@ plugins {
     alias(shared.plugins.compose.compiler)
     alias(shared.plugins.android.junit5)
     alias(shared.plugins.sentry.android.gradle)
+    alias(shared.plugins.androidx.baselineprofile)
 }
 
 kotlin {
@@ -91,6 +92,8 @@ dependencies {
     implementation(shared.core.ktx)
     implementation(shared.activity.compose)
 
+    implementation(shared.profileinstaller)
+
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.1")
     androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.13.1")
@@ -100,6 +103,7 @@ dependencies {
     androidTestUtil("androidx.test:orchestrator:1.5.1")
     androidTestImplementation("androidx.compose.ui:ui-test-android:1.8.3")
 
+    baselineProfile(project(":baselineprofile"))
 }
 
 sentry {
@@ -119,4 +123,8 @@ sentry {
     }
 
     telemetry.set(false)
+}
+
+baselineProfile {
+    dexLayoutOptimization = true
 }

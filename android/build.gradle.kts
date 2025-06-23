@@ -10,6 +10,7 @@ buildscript {
 plugins {
     id("shared-library-plugin") apply false
     alias(buildSrc.plugins.android.application) apply false
+    alias(buildSrc.plugins.android.test) apply false
     alias(buildSrc.plugins.android.library) apply false
     alias(buildSrc.plugins.kotlin.android) apply false
     alias(shared.plugins.compose.compiler) apply false
@@ -22,6 +23,7 @@ plugins {
     alias(shared.plugins.android.junit5) apply false
     alias(shared.plugins.sentry.kotlin.multiplatform) apply false
     alias(shared.plugins.sentry.android.gradle) apply false
+    alias(shared.plugins.androidx.baselineprofile) apply false
     alias(shared.plugins.gradle.versions.checker) apply true
 }
 
