@@ -69,6 +69,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":shared:core:utils"))
     implementation(project(":shared:core:ui-design"))
     implementation(project(":shared:integration:base"))
 
@@ -87,6 +88,8 @@ dependencies {
     // misc androidx stuff
     implementation(shared.core.ktx)
     implementation(shared.activity.compose)
+
+    implementation(shared.work.runtime.ktx)
 
     implementation(shared.profileinstaller)
 
@@ -117,6 +120,8 @@ sentry {
     autoInstallation {
         enabled.set(false)
     }
+
+    includeDependenciesReport = false
 
     telemetry.set(false)
 }
