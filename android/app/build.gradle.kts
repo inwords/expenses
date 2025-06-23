@@ -4,6 +4,7 @@ plugins {
     alias(shared.plugins.compose.compiler)
     alias(shared.plugins.android.junit5)
     alias(shared.plugins.sentry.android.gradle)
+    alias(shared.plugins.androidx.baselineprofile)
 }
 
 kotlin {
@@ -68,6 +69,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":shared:core:utils"))
     implementation(project(":shared:core:ui-design"))
     implementation(project(":shared:integration:base"))
 
@@ -83,13 +85,13 @@ dependencies {
     implementation(shared.compose.material3)
     implementation(shared.compose.ui.tooling)
 
-    // other UI-related staff
-    implementation(shared.coil.base)
-    implementation(shared.coil.compose.base)
-
     // misc androidx stuff
     implementation(shared.core.ktx)
     implementation(shared.activity.compose)
+
+    implementation(shared.work.runtime.ktx)
+
+    implementation(shared.profileinstaller)
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.1")
@@ -100,6 +102,7 @@ dependencies {
     androidTestUtil("androidx.test:orchestrator:1.5.1")
     androidTestImplementation("androidx.compose.ui:ui-test-android:1.8.3")
 
+    baselineProfile(project(":baselineprofile"))
 }
 
 sentry {
@@ -118,5 +121,11 @@ sentry {
         enabled.set(false)
     }
 
+    includeDependenciesReport = false
+
     telemetry.set(false)
+}
+
+baselineProfile {
+    dexLayoutOptimization = true
 }

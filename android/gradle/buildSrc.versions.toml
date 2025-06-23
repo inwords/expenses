@@ -9,4 +9,5 @@ kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-p
 [plugins]
 android-application = { id = "com.android.application" }
 android-library = { id = "com.android.library" }
+android-test = { id = "com.android.test" }
 kotlin-android = { id = "org.jetbrains.kotlin.android" }
