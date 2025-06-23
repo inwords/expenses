@@ -84,10 +84,6 @@ dependencies {
     implementation(shared.compose.material3)
     implementation(shared.compose.ui.tooling)
 
-    // other UI-related staff
-    implementation(shared.coil.base)
-    implementation(shared.coil.compose.base)
-
     // misc androidx stuff
     implementation(shared.core.ktx)
     implementation(shared.activity.compose)
