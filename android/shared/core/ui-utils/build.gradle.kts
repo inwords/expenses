@@ -2,6 +2,8 @@ import com.inwords.expenses.plugins.SharedKmmLibraryPlugin.Companion.applyKmmDef
 
 plugins {
     id("shared-kmm-library-plugin")
+    alias(shared.plugins.compose.compiler)
+    alias(shared.plugins.compose.multiplatform.compiler)
 }
 
 android {
@@ -20,6 +22,8 @@ kotlin {
             dependencies {
                 implementation(shared.coroutines.core)
                 implementation(shared.kotlinx.datetime)
+
+                implementation(compose.ui)
             }
         }
     }

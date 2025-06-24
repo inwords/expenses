@@ -33,6 +33,7 @@ kotlin {
                 implementation(project(":shared:feature:events"))
                 implementation(project(":shared:feature:expenses"))
                 implementation(project(":shared:feature:sync"))
+                implementation(project(":shared:feature:share"))
                 implementation(project(":shared:feature:settings"))
                 implementation(project(":shared:feature:menu"))
                 implementation(project(":shared:integration:databases"))

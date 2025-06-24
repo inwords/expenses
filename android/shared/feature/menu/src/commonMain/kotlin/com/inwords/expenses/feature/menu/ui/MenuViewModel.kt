@@ -8,6 +8,7 @@ import com.inwords.expenses.core.utils.collectIn
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonScreenDestination
 import com.inwords.expenses.feature.events.ui.join.JoinEventScreenDestination
+import com.inwords.expenses.feature.share.api.ShareManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -18,9 +19,10 @@ import kotlinx.coroutines.launch
 internal class MenuViewModel(
     private val navigationController: NavigationController,
     private val eventsInteractor: EventsInteractor,
+    private val shareManagerLazy: Lazy<ShareManager>,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
-    private val emptyState = MenuDialogUiModel("", "")
+    private val emptyState = MenuDialogUiModel("", "", "")
 
     private var leaveEventJob: Job? = null
 
@@ -35,6 +37,7 @@ internal class MenuViewModel(
             }
 
             _state.value = MenuDialogUiModel(
+                eventName = event.event.name,
                 eventId = event.event.serverId.orEmpty(),
                 eventAccessCode = event.event.pinCode,
             )
@@ -57,4 +60,13 @@ internal class MenuViewModel(
     fun onChoosePersonClicked() {
         navigationController.navigateTo(ChoosePersonScreenDestination)
     }
+
+    fun onShareClicked() {
+        val state = _state.value
+        val eventName = state.eventName.ifEmpty { return }
+        val eventId = state.eventId.ifEmpty { return }
+        val eventAccessCode = state.eventAccessCode.ifEmpty { return }
+        shareManagerLazy.value.shareUrl(eventName, "https://commonex.ru/event/$eventId?pinCode=$eventAccessCode")
+    }
+
 }
