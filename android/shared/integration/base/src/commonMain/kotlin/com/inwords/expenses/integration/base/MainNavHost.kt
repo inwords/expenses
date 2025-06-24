@@ -24,6 +24,7 @@ import com.inwords.expenses.feature.expenses.ui.list.dialog.addExpenseItemDialog
 import com.inwords.expenses.feature.menu.api.MenuComponent
 import com.inwords.expenses.feature.menu.ui.addMenuDialog
 import com.inwords.expenses.feature.settings.api.SettingsComponent
+import com.inwords.expenses.feature.share.api.ShareComponent
 
 @Composable
 fun MainNavHost(
@@ -36,6 +37,7 @@ fun MainNavHost(
     val settingsComponent = remember { ComponentsMap.getComponent<SettingsComponent>() }
     val eventsComponent = remember { ComponentsMap.getComponent<EventsComponent>() }
     val expensesComponent = remember { ComponentsMap.getComponent<ExpensesComponent>() }
+    val shareComponent = remember { ComponentsMap.getComponent<ShareComponent>() }
     val menuComponent = remember { ComponentsMap.getComponent<MenuComponent>() } // TODO
 
     NavHost(
@@ -90,6 +92,7 @@ fun MainNavHost(
         addMenuDialog(
             navigationController = navigationController,
             eventsInteractor = eventsComponent.eventsInteractor,
+            shareManagerLazy = shareComponent.shareManagerLazy,
         )
     }
 }

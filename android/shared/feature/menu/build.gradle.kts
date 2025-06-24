@@ -31,6 +31,7 @@ kotlin {
                 implementation(project(":shared:core:navigation"))
                 implementation(project(":shared:feature:events"))
                 implementation(project(":shared:feature:settings"))
+                implementation(project(":shared:feature:share"))
 
                 implementation(shared.annotation)
 

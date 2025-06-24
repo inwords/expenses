@@ -20,6 +20,8 @@ import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.menu.api.MenuComponent
 import com.inwords.expenses.feature.settings.api.SettingsComponentFactory
 import com.inwords.expenses.feature.settings.api.SettingsRepository
+import com.inwords.expenses.feature.share.api.ShareComponentFactory
+import com.inwords.expenses.feature.share.api.ShareManager
 import com.inwords.expenses.feature.sync.api.SyncComponentFactory
 import com.inwords.expenses.integration.databases.api.DatabasesComponentFactory
 import io.ktor.client.HttpClient
@@ -42,6 +44,12 @@ fun registerComponents(appContext: Context) {
 
     val networkComponent = lazy {
         NetworkComponentFactory(appContext).create()
+    }
+
+    val shareComponent = lazy {
+        ShareComponentFactory(object : ShareComponentFactory.Deps {
+            override val context get() = appContext
+        }).create()
     }
 
     val eventsComponent = lazy {
@@ -73,6 +81,9 @@ fun registerComponents(appContext: Context) {
             deps = object : MenuComponent.Deps {
                 override val eventsInteractor: EventsInteractor
                     get() = eventsComponent.value.eventsInteractor
+
+                override val shareManager: ShareManager
+                    get() = shareComponent.value.shareManagerLazy.value
             }
         )
     }
@@ -119,4 +130,5 @@ fun registerComponents(appContext: Context) {
     ComponentsMap.registerComponent(expensesComponent)
     ComponentsMap.registerComponent(menuComponent)
     ComponentsMap.registerComponent(syncComponent)
+    ComponentsMap.registerComponent(shareComponent)
 }
