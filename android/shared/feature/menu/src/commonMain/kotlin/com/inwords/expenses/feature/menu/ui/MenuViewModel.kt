@@ -45,7 +45,7 @@ internal class MenuViewModel(
     }
 
     fun onJoinEventClicked() {
-        navigationController.navigateTo(JoinEventScreenDestination)
+        navigationController.navigateTo(JoinEventScreenDestination())
     }
 
     fun onLeaveEventClicked() {
