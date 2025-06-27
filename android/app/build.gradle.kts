@@ -120,6 +120,9 @@ sentry {
 
     authToken.set(System.getenv("SENTRY_AUTH_TOKEN"))
 
+    val uploadMapping = System.getenv("CI") == "true"
+    autoUploadProguardMapping.set(uploadMapping)
+
     tracingInstrumentation {
         enabled.set(true)
 
