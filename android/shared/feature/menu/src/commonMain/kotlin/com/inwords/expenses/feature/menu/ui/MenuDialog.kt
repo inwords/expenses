@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.core.ui.utils.clipEntryOf
+import com.inwords.expenses.core.utils.IO
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -75,10 +76,14 @@ internal fun MenuDialog(
                         border = AssistChipDefaults.assistChipBorder(true),
                         shape = RoundedCornerShape(8.dp)
                     )
-                    .clickable {
-                        coroutineScope.launch {
+                    .clickable(
+                        enabled = state.shareUrl != null
+                    ) {
+                        val shareUrl = state.shareUrl ?: return@clickable
+                        val eventName = state.eventName
+                        coroutineScope.launch(IO) {
                             clipboard.setClipEntry(
-                                clipEntryOf("Event ID and Access Code", "ID ${state.eventId}, PIN ${state.eventAccessCode}")
+                                clipEntryOf(eventName, shareUrl)
                             )
                         }
                     }
@@ -160,8 +165,24 @@ private fun MenuDialogPreview() {
         MenuDialog(
             state = MenuDialogUiModel(
                 eventName = "Пример события",
-                eventId = "1234",
-                eventAccessCode = "1111"
+                shareUrl = "https://commonex.ru/event/ASDASD?pinCode=1234"
+            ),
+            onJoinEventClicked = {},
+            onLeaveEventClicked = {},
+            onChoosePersonClicked = {},
+            onShareClicked = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun MenuDialogEmptyShareUrlPreview() {
+    ExpensesTheme {
+        MenuDialog(
+            state = MenuDialogUiModel(
+                eventName = "Пример события",
+                shareUrl = null
             ),
             onJoinEventClicked = {},
             onLeaveEventClicked = {},

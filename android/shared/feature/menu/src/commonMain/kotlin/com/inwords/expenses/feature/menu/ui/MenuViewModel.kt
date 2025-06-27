@@ -22,7 +22,7 @@ internal class MenuViewModel(
     private val shareManagerLazy: Lazy<ShareManager>,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
-    private val emptyState = MenuDialogUiModel("", "", "")
+    private val emptyState = MenuDialogUiModel("", "")
 
     private var leaveEventJob: Job? = null
 
@@ -36,10 +36,14 @@ internal class MenuViewModel(
                 return@collectIn
             }
 
+            val serverId = event.event.serverId
             _state.value = MenuDialogUiModel(
                 eventName = event.event.name,
-                eventId = event.event.serverId.orEmpty(),
-                eventAccessCode = event.event.pinCode,
+                shareUrl = if (serverId == null) {
+                    null
+                } else {
+                    "https://commonex.ru/event/$serverId?pinCode=${event.event.pinCode}"
+                },
             )
         }
     }
@@ -64,9 +68,8 @@ internal class MenuViewModel(
     fun onShareClicked() {
         val state = _state.value
         val eventName = state.eventName.ifEmpty { return }
-        val eventId = state.eventId.ifEmpty { return }
-        val eventAccessCode = state.eventAccessCode.ifEmpty { return }
-        shareManagerLazy.value.shareUrl(eventName, "https://commonex.ru/event/$eventId?pinCode=$eventAccessCode")
+        val shareUrl = state.shareUrl ?: return
+        shareManagerLazy.value.shareUrl(eventName, shareUrl)
     }
 
 }
