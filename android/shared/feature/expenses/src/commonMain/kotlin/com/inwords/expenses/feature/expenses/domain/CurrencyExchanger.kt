@@ -6,7 +6,7 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 // FIXME get real rates
 internal class CurrencyExchanger {
 
-    private val exchangeRates: Map<Pair<String, String>, BigDecimal> = mutableMapOf(
+    private val exchangeRates: Map<Pair<String, String>, BigDecimal> = mapOf(
         Pair("USD", "EUR") to BigDecimal.fromDouble(0.8543),
         Pair("USD", "RUB") to BigDecimal.fromDouble(78.4997),
         Pair("USD", "TRY") to BigDecimal.fromDouble(39.8828),
