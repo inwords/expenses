@@ -1,4 +1,4 @@
-package com.inwords.expenses.screens
+package ru.commonex.screens
 
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.state.ToggleableState

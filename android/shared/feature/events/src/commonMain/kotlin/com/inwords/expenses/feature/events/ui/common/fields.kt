@@ -48,7 +48,7 @@ internal fun EventIdField(
         singleLine = true,
         textStyle = MaterialTheme.typography.headlineMedium,
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number,
+            keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Next
         )
     )

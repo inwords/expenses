@@ -14,11 +14,11 @@ kotlin {
 }
 
 android {
-    namespace = "com.inwords.expenses"
+    namespace = "ru.commonex"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.inwords.expenses"
+        applicationId = "ru.commonex"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -39,7 +39,16 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (System.getenv("CI") == "true") {
+                signingConfigs.create("release") {
+                    storeFile = file("keystore.jks")
+                    storePassword = System.getenv("KEYSTORE_PASSWORD")
+                    keyAlias = System.getenv("KEY_ALIAS")
+                    keyPassword = System.getenv("KEY_PASSWORD")
+                }
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
     compileOptions {
@@ -110,6 +119,9 @@ sentry {
     projectName.set("commonex")
 
     authToken.set(System.getenv("SENTRY_AUTH_TOKEN"))
+
+    val uploadMapping = System.getenv("CI") == "true"
+    autoUploadProguardMapping.set(uploadMapping)
 
     tracingInstrumentation {
         enabled.set(true)

@@ -18,13 +18,20 @@ import kotlinx.coroutines.launch
 internal class JoinEventViewModel(
     private val navigationController: NavigationController,
     private val eventsInteractor: EventsInteractor,
+    initialEventId: String,
+    initialPinCode: String,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
     private val eventIdRegex = "[0-9A-HJKMNP-TV-Z]".toRegex()
 
     private var confirmJob: Job? = null
 
-    private val _state = MutableStateFlow(JoinEventScreenUiModel("", ""))
+    private val _state = MutableStateFlow(
+        JoinEventScreenUiModel(
+            eventId = initialEventId.filter { it.toString().matches(eventIdRegex) },
+            eventAccessCode = initialPinCode.filter { it.isDigit() }
+        )
+    )
     val state: StateFlow<JoinEventScreenUiModel> = _state
 
     fun onEventIdChanged(eventId: String) {

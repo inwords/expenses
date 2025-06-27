@@ -61,6 +61,7 @@ internal fun JoinEventScreen(
             Column(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp)
                     .align(Alignment.Center),
             ) {
                 Text(
@@ -68,21 +69,23 @@ internal fun JoinEventScreen(
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier
-                        .padding(bottom = 32.dp)
-                        .fillMaxWidth(0.7f),
+                        .align(Alignment.CenterHorizontally)
+                        .fillMaxWidth(0.8f)
+                        .padding(bottom = 32.dp),
                 )
 
                 EventIdField(
                     modifier = Modifier
-                        .padding(bottom = 16.dp)
-                        .fillMaxWidth(0.7f),
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
                     eventId = state.eventId,
                     onEventIdChanged = onEventIdChanged
                 )
 
                 EventAccessCodeField(
                     modifier = Modifier
-                        .fillMaxWidth(0.7f),
+                        .align(Alignment.End)
+                        .fillMaxWidth(0.5f),
                     eventAccessCode = state.eventAccessCode,
                     onDone = onConfirmClicked,
                     onEventAccessCodeChanged = onEventAccessCodeChanged,

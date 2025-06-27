@@ -141,7 +141,7 @@ internal class ExpensesViewModel(
     }
 
     fun onJoinEventClick() {
-        navigationController.navigateTo(JoinEventScreenDestination)
+        navigationController.navigateTo(JoinEventScreenDestination())
     }
 
     fun onRefresh() {

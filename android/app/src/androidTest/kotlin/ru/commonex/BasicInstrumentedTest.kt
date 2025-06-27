@@ -1,11 +1,11 @@
-package com.inwords.expenses
+package ru.commonex
 
 import androidx.compose.ui.test.ExperimentalTestApi
-import com.inwords.expenses.screens.EmptyEventsScreen
-import com.inwords.expenses.ui.MainActivity
 import de.mannodermaus.junit5.compose.createAndroidComposeExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import ru.commonex.screens.EmptyEventsScreen
+import ru.commonex.ui.MainActivity
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 

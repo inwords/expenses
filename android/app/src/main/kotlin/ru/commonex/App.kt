@@ -1,11 +1,12 @@
-package com.inwords.expenses
+package ru.commonex
 
 import android.app.Application
+import android.util.Log
 import androidx.work.Configuration
+import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.integration.base.enableSync
 import com.inwords.expenses.integration.base.initializeSentry
 import com.inwords.expenses.integration.base.registerComponents
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.asExecutor
 
 class App : Application(), Configuration.Provider {
@@ -26,9 +27,9 @@ class App : Application(), Configuration.Provider {
             .setTaskExecutor(IO.limitedParallelism(4).asExecutor())
             .setMinimumLoggingLevel(
                 if (BuildConfig.DEBUG) {
-                    android.util.Log.INFO
+                    Log.INFO
                 } else {
-                    android.util.Log.ASSERT
+                    Log.ASSERT
                 }
             )
             .build()
