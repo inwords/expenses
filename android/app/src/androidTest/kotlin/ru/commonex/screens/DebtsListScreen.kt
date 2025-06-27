@@ -1,4 +1,4 @@
-package com.inwords.expenses.screens
+package ru.commonex.screens
 
 import de.mannodermaus.junit5.compose.ComposeContext
 

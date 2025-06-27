@@ -14,11 +14,11 @@ kotlin {
 }
 
 android {
-    namespace = "com.inwords.expenses"
+    namespace = "ru.commonex"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.inwords.expenses"
+        applicationId = "ru.commonex"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

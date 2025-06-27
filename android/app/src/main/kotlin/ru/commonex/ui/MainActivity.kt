@@ -1,4 +1,4 @@
-package com.inwords.expenses.ui
+package ru.commonex.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
