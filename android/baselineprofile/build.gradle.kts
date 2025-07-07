@@ -1,10 +1,16 @@
 import com.android.build.api.dsl.ManagedVirtualDevice
-import kotlin.collections.plusAssign
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(buildSrc.plugins.kotlin.android)
     alias(buildSrc.plugins.android.test)
     alias(shared.plugins.androidx.baselineprofile)
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_11)
+    }
 }
 
 android {
@@ -14,10 +20,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    kotlinOptions {
-        jvmTarget = "11"
     }
 
     defaultConfig {

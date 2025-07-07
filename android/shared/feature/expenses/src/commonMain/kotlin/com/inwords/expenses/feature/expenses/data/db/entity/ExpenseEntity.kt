@@ -12,7 +12,7 @@ import com.inwords.expenses.feature.events.data.db.entity.EventEntity
 import com.inwords.expenses.feature.events.data.db.entity.PersonEntity
 import com.inwords.expenses.feature.expenses.data.db.type_converter.ExpenseTypeConverter
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @Entity(
     tableName = ExpenseEntity.TABLE_NAME,

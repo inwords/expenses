@@ -1,16 +1,17 @@
 [versions]
-kotlin = "2.1.21" # https://github.com/jetbrains/kotlin/releases https://kotlinlang.org/docs/releases.html#release-details
-ksp = "2.1.21-2.0.2" # https://github.com/google/ksp/releases
+kotlin = "2.2.0" # https://github.com/jetbrains/kotlin/releases https://kotlinlang.org/docs/releases.html#release-details
+ksp = "2.2.0-2.0.2" # https://github.com/google/ksp/releases
 
 room = "2.7.2" # https://developer.android.com/jetpack/androidx/releases/room
 datastore = "1.1.7" # https://developer.android.com/jetpack/androidx/releases/datastore
 
-ktor = "3.1.3" # https://github.com/ktorio/ktor/releases
+ktor = "3.2.1" # https://github.com/ktorio/ktor/releases
 cronet = "119.6045.31"
 
 coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines/releases
 
-kotlinx-serialization = "1.8.1" # https://github.com/Kotlin/kotlinx.serialization/releases
+kotlinx-serialization = "1.9.0" # https://github.com/Kotlin/kotlinx.serialization/releases
+kotlinx-atomicfu = "0.29.0" # https://github.com/Kotlin/kotlinx-atomicfu/releases TODO remove when atomicfu plugin is fixed
 
 compose-bom = "2025.06.01" # https://developer.android.com/jetpack/androidx/releases/compose
 compose-multiplatform = "1.8.2" # https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
@@ -34,8 +35,9 @@ cronet-api = { group = "org.chromium.net", name = "cronet-api", version.ref = "c
 coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
-kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version = "0.6.2" } # https://github.com/Kotlin/kotlinx-datetime/releases
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version = "0.7.0" } # https://github.com/Kotlin/kotlinx-datetime/releases
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version = "0.4.0" } # https://github.com/Kotlin/kotlinx.collections.immutable/releases
+kotlinx-atomicfu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version.ref = "kotlinx-atomicfu" } # https://github.com/Kotlin/kotlinx-atomicfu/releases TODO remove when atomicfu plugin is fixed
 
 lifecycle-runtime-compose-multiplatform = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version = "2.9.1" }
 lifecycle-viewmodel-compose-multiplatform = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-compose", version = "2.9.1" }
@@ -52,7 +54,7 @@ compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.10.1" }
-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version = "2.9.0" } # https://developer.android.com/jetpack/androidx/releases/navigation
+navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version = "2.9.1" } # https://developer.android.com/jetpack/androidx/releases/navigation
 navigation-compose-multiplatform = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version = "2.9.0-beta03" } # https://mvnrepository.com/artifact/org.jetbrains.androidx.navigation/navigation-compose
 compose-material-icons-core = { group = "org.jetbrains.compose.material", name = "material-icons-core", version = "1.7.3" }
 
@@ -65,9 +67,9 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
 wire = { id = "com.squareup.wire", version = "5.3.3" } # https://square.github.io/wire/changelog/
-atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version = "0.28.0" }
+atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "kotlinx-atomicfu" } # https://github.com/Kotlin/kotlinx-atomicfu/releases
 gradle-versions-checker = { id = "com.github.ben-manes.versions", version = "0.52.0" }
-android-junit5 = { id = "de.mannodermaus.android-junit5", version = "1.13.0.0" }
-sentry-kotlin-multiplatform = { id = "io.sentry.kotlin.multiplatform.gradle", version = "0.12.0" }
+android-junit5 = { id = "de.mannodermaus.android-junit5", version = "1.13.1.0" } # https://github.com/mannodermaus/android-junit5/releases
+sentry-kotlin-multiplatform = { id = "io.sentry.kotlin.multiplatform.gradle", version = "0.13.0" } # https://github.com/getsentry/sentry-kotlin-multiplatform/blob/main/CHANGELOG.md
 sentry-android-gradle = { id = "io.sentry.android.gradle", version = "5.8.0" } # https://github.com/getsentry/sentry-android-gradle-plugin/blob/main/CHANGELOG.md
 androidx-baselineprofile = { id = "androidx.baselineprofile", version = "1.3.4" }

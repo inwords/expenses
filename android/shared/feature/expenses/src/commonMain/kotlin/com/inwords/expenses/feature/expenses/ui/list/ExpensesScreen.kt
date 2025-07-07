@@ -58,8 +58,8 @@ import com.inwords.expenses.feature.expenses.ui.converter.toUiModel
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.ExpenseUiModel
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.datetime.Clock
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.time.Clock
 
 @Composable
 internal fun ExpensesScreen(

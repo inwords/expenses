@@ -1,8 +1,8 @@
 package com.inwords.expenses.feature.expenses.data.network.dto
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 internal data class ExpenseDto(
