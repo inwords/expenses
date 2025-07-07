@@ -3,3 +3,23 @@
 /workspace.xml
 # Editor-based HTTP Client requests
 /httpRequests/
+
+/appInsightsSettings.xml
+/deploymentTargetDropDown.xml
+/deploymentTargetSelector.xml
+/gradle.xml
+/kotlinc.xml
+/migrations.xml
+/misc.xml
+/protoeditor.xml
+/.name
+/other.xml
+/runConfigurations.xml
+/deviceManager.xml
+/ChatHistory_schema_v2.xml
+/androidTestResultsUserPreferences.xml
+
+/caches/
+/dataSources/
+/dataSources.local.xml
+/dataSources.xml
