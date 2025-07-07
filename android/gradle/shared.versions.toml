@@ -1,6 +1,6 @@
 [versions]
-kotlin = "2.1.21" # https://github.com/jetbrains/kotlin/releases https://kotlinlang.org/docs/releases.html#release-details
-ksp = "2.1.21-2.0.2" # https://github.com/google/ksp/releases
+kotlin = "2.2.0" # https://github.com/jetbrains/kotlin/releases https://kotlinlang.org/docs/releases.html#release-details
+ksp = "2.2.0-2.0.2" # https://github.com/google/ksp/releases
 
 room = "2.7.2" # https://developer.android.com/jetpack/androidx/releases/room
 datastore = "1.1.7" # https://developer.android.com/jetpack/androidx/releases/datastore
