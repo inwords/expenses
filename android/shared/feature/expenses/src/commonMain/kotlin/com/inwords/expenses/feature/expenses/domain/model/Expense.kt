@@ -4,7 +4,7 @@ import com.inwords.expenses.core.utils.sumOf
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class Expense(
     val expenseId: Long,

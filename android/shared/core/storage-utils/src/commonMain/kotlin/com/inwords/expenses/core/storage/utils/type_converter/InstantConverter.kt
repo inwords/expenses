@@ -1,7 +1,7 @@
 package com.inwords.expenses.core.storage.utils.type_converter
 
 import androidx.room.TypeConverter
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 object InstantConverter {
     @TypeConverter

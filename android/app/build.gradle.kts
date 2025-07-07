@@ -102,9 +102,9 @@ dependencies {
 
     implementation(shared.profileinstaller)
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.1")
-    androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.13.1")
+    androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test:runner:1.6.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")

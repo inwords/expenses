@@ -24,10 +24,14 @@ kotlin {
                 implementation(shared.room.runtime)
 
                 implementation(shared.datastore.core.okio)
-                implementation("org.jetbrains.kotlinx:atomicfu:0.28.0") // TODO remove when atomicfu plugin is fixed
+                implementation(shared.kotlinx.atomicfu) // TODO remove when atomicfu plugin is fixed
 
                 implementation(shared.ionspin.kotlin.bignum)
             }
         }
+    }
+
+    compilerOptions {
+        freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
     }
 }

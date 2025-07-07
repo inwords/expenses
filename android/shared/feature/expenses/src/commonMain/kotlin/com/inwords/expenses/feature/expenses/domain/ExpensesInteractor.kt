@@ -18,7 +18,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 
 class ExpensesInteractor internal constructor(
     expensesLocalStoreLazy: Lazy<ExpensesLocalStore>,
