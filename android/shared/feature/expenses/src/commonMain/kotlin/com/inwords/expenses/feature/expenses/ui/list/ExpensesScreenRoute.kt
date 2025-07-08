@@ -42,6 +42,7 @@ fun NavGraphBuilder.addExpensesScreen(
             onReplenishmentClick = viewModel::onReplenishmentClick,
             onCreateEventClick = viewModel::onCreateEventClick,
             onJoinEventClick = viewModel::onJoinEventClick,
+            onJoinLocalEventClick = viewModel::onJoinLocalEventClick,
             onRefresh = viewModel::onRefresh,
         )
     }

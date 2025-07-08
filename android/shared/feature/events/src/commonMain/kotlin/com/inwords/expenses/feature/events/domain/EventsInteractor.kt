@@ -54,9 +54,23 @@ class EventsInteractor internal constructor(
         return currenciesLocalStore.getCurrencies()
     }
 
+    fun getEvents(): Flow<List<Event>> {
+        return eventsLocalStore.getEventsFlow()
+    }
+
     suspend fun leaveEvent() {
         settingsRepository.clearCurrentEventId()
         settingsRepository.clearCurrentPersonId()
+    }
+
+    suspend fun joinLocalEvent(eventId: Long): Boolean {
+        val localEvent = eventsLocalStore.getEvent(eventId)
+        return if (localEvent == null) {
+            false
+        } else {
+            settingsRepository.setCurrentEventId(localEvent.id)
+            true
+        }
     }
 
     internal suspend fun joinEvent(eventServerId: String, accessCode: String): JoinEventResult {
