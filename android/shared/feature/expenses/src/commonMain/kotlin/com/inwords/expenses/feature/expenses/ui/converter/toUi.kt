@@ -11,12 +11,12 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 
-internal fun Expense.toUiModel(primaryCurrencyName: String): ExpensesScreenUiModel.ExpenseUiModel {
+internal fun Expense.toUiModel(primaryCurrencyName: String): ExpensesScreenUiModel.Expenses.ExpenseUiModel {
     val amountSign = when (expenseType) {
         ExpenseType.Spending -> "-"
         ExpenseType.Replenishment -> "+"
     }
-    return ExpensesScreenUiModel.ExpenseUiModel(
+    return ExpensesScreenUiModel.Expenses.ExpenseUiModel(
         expenseId = expenseId,
         currencyText = if (currency.name == primaryCurrencyName) {
             currency.name

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
@@ -44,7 +43,7 @@ internal fun MenuDialog(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 200.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.large,
     ) {
         Row(
             modifier = Modifier
@@ -74,7 +73,7 @@ internal fun MenuDialog(
                     .align(Alignment.CenterVertically)
                     .border(
                         border = AssistChipDefaults.assistChipBorder(true),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = MaterialTheme.shapes.small
                     )
                     .clickable(
                         enabled = state.shareUrl != null

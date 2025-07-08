@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Menu
@@ -47,6 +46,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.appbar.BasicTopAppBar
 import com.inwords.expenses.core.ui.design.button.BasicFloatingActionButton
+import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Person
@@ -55,7 +55,10 @@ import com.inwords.expenses.feature.expenses.domain.model.Expense
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseSplitWithPerson
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
 import com.inwords.expenses.feature.expenses.ui.converter.toUiModel
-import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.ExpenseUiModel
+import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.Expenses.DebtorShortUiModel
+import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.Expenses.ExpenseUiModel
+import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.LocalEvents
+import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.LocalEvents.LocalEventUiModel
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -68,23 +71,36 @@ internal fun ExpensesScreen(
     onAddExpenseClick: () -> Unit,
     onRevertExpenseClick: (expense: ExpenseUiModel) -> Unit,
     onDebtsDetailsClick: () -> Unit,
-    onReplenishmentClick: (ExpensesScreenUiModel.DebtorShortUiModel) -> Unit,
+    onReplenishmentClick: (debtor: DebtorShortUiModel) -> Unit,
     onCreateEventClick: () -> Unit,
     onJoinEventClick: () -> Unit,
+    onJoinLocalEventClick: (event: LocalEventUiModel) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (state) {
-        is SimpleScreenState.Success -> ExpensesScreenSuccess(
-            state = state.data,
-            onMenuClick = onMenuClick,
-            onAddExpenseClick = onAddExpenseClick,
-            onRevertExpenseClick = onRevertExpenseClick,
-            onDebtsDetailsClick = onDebtsDetailsClick,
-            onReplenishmentClick = onReplenishmentClick,
-            onRefresh = onRefresh,
-            modifier = modifier,
-        )
+        is SimpleScreenState.Success -> {
+            when (val state = state.data) {
+                is ExpensesScreenUiModel.Expenses -> ExpensesScreenSuccess(
+                    state = state,
+                    onMenuClick = onMenuClick,
+                    onAddExpenseClick = onAddExpenseClick,
+                    onRevertExpenseClick = onRevertExpenseClick,
+                    onDebtsDetailsClick = onDebtsDetailsClick,
+                    onReplenishmentClick = onReplenishmentClick,
+                    onRefresh = onRefresh,
+                    modifier = modifier
+                )
+
+                is LocalEvents -> ExpensesScreenLocalEvents(
+                    onCreateEventClick = onCreateEventClick,
+                    onJoinEventClick = onJoinEventClick,
+                    onJoinLocalEventClick = onJoinLocalEventClick,
+                    localEvents = state,
+                    modifier = modifier
+                )
+            }
+        }
 
         is SimpleScreenState.Loading -> {
             Text(text = "Loading")
@@ -105,12 +121,12 @@ internal fun ExpensesScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ExpensesScreenSuccess(
-    state: ExpensesScreenUiModel,
+    state: ExpensesScreenUiModel.Expenses,
     onMenuClick: () -> Unit,
     onAddExpenseClick: () -> Unit,
     onRevertExpenseClick: (expense: ExpenseUiModel) -> Unit,
     onDebtsDetailsClick: () -> Unit,
-    onReplenishmentClick: (ExpensesScreenUiModel.DebtorShortUiModel) -> Unit,
+    onReplenishmentClick: (debtor: DebtorShortUiModel) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -220,6 +236,76 @@ private fun ExpensesScreenSuccess(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+private fun ExpensesScreenLocalEvents(
+    onCreateEventClick: () -> Unit,
+    onJoinEventClick: () -> Unit,
+    onJoinLocalEventClick: (event: LocalEventUiModel) -> Unit,
+    localEvents: LocalEvents,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = { BasicTopAppBar() },
+        floatingActionButton = {
+            BasicFloatingActionButton(
+                text = "Новое событие",
+                icon = Icons.Outlined.Add,
+                onClick = onCreateEventClick,
+            )
+        },
+    ) { paddingValues ->
+        val topAndHorizontalPaddings = PaddingValues(
+            top = paddingValues.calculateTopPadding(),
+            start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
+            end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .consumeWindowInsets(topAndHorizontalPaddings)
+                .padding(topAndHorizontalPaddings),
+        ) {
+            JoinEventButton(
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .fillMaxWidth()
+                    .align(Alignment.End),
+                onJoinEventClick = onJoinEventClick
+            )
+
+            Text(
+                text = "Сохранено",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp)
+            )
+
+            val bottomPadding = paddingValues.calculateBottomPadding()
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .consumeWindowInsets(PaddingValues(bottom = bottomPadding))
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(bottom = 88.dp + bottomPadding),
+            ) {
+                items(
+                    count = localEvents.events.size,
+                    key = { index -> localEvents.events[index].eventId }
+                ) { index ->
+                    val event = localEvents.events[index]
+                    LocalEventItem(
+                        event = event,
+                        onJoinLocalEventClick = onJoinLocalEventClick
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 private fun ExpensesScreenEmpty(
     onCreateEventClick: () -> Unit,
     onJoinEventClick: () -> Unit,
@@ -247,24 +333,40 @@ private fun ExpensesScreenEmpty(
                     .fillMaxWidth(0.7f)
                     .padding(bottom = 32.dp, start = 16.dp, end = 16.dp),
             )
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .padding(horizontal = 16.dp),
-                onClick = onCreateEventClick
-            ) {
-                Text(text = "Новое событие")
-            }
+            NewEventButton(onCreateEventClick)
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedButton(
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .padding(horizontal = 16.dp),
-                onClick = onJoinEventClick
-            ) {
-                Text(text = "Присоединиться к событию")
-            }
+            JoinEventButton(onJoinEventClick)
         }
+    }
+}
+
+@Composable
+private fun NewEventButton(
+    onCreateEventClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        modifier = modifier
+            .fillMaxWidth(0.7f)
+            .padding(horizontal = 16.dp),
+        onClick = onCreateEventClick
+    ) {
+        Text(text = "Новое событие")
+    }
+}
+
+@Composable
+private fun JoinEventButton(
+    onJoinEventClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    OutlinedButton(
+        modifier = modifier
+            .fillMaxWidth(0.7f)
+            .padding(horizontal = 16.dp),
+        onClick = onJoinEventClick
+    ) {
+        Text(text = "Присоединиться к событию")
     }
 }
 
@@ -281,7 +383,7 @@ private fun ExpenseItem(
             .fillMaxWidth()
             .border(
                 border = AssistChipDefaults.assistChipBorder(false),
-                shape = RoundedCornerShape(8.dp)
+                shape = MaterialTheme.shapes.small,
             ),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -334,52 +436,110 @@ private fun ExpenseItem(
     }
 }
 
+@Composable
+private fun LocalEventItem(
+    event: LocalEventUiModel,
+    onJoinLocalEventClick: (event: LocalEventUiModel) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onJoinLocalEventClick(event) }
+            .border(
+                border = AssistChipDefaults.assistChipBorder(false),
+                shape = MaterialTheme.shapes.small
+            )
+            .padding(16.dp),
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(vertical = 8.dp),
+            text = event.eventName,
+            style = MaterialTheme.typography.titleMedium,
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun ExpensesScreenPreviewSuccessWithCreditors() {
-    ExpensesScreen(
-        onMenuClick = {},
-        onAddExpenseClick = {},
-        onRevertExpenseClick = {},
-        onDebtsDetailsClick = {},
-        onReplenishmentClick = {},
-        onJoinEventClick = {},
-        onCreateEventClick = {},
-        onRefresh = {},
-        state = SimpleScreenState.Success(mockExpensesScreenUiModel(withCreditors = true))
-    )
+    ExpensesTheme {
+        ExpensesScreen(
+            onMenuClick = {},
+            onAddExpenseClick = {},
+            onRevertExpenseClick = {},
+            onDebtsDetailsClick = {},
+            onReplenishmentClick = {},
+            onJoinEventClick = {},
+            onJoinLocalEventClick = {},
+            onCreateEventClick = {},
+            onRefresh = {},
+            state = SimpleScreenState.Success(mockExpensesScreenUiModel(withCreditors = true))
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun ExpensesScreenPreviewSuccessWithoutCreditors() {
-    ExpensesScreen(
-        onMenuClick = {},
-        onAddExpenseClick = {},
-        onRevertExpenseClick = {},
-        onDebtsDetailsClick = {},
-        onReplenishmentClick = {},
-        onJoinEventClick = {},
-        onCreateEventClick = {},
-        onRefresh = {},
-        state = SimpleScreenState.Success(mockExpensesScreenUiModel(withCreditors = false))
-    )
+    ExpensesTheme {
+        ExpensesScreen(
+            onMenuClick = {},
+            onAddExpenseClick = {},
+            onRevertExpenseClick = {},
+            onDebtsDetailsClick = {},
+            onReplenishmentClick = {},
+            onJoinEventClick = {},
+            onJoinLocalEventClick = {},
+            onCreateEventClick = {},
+            onRefresh = {},
+            state = SimpleScreenState.Success(mockExpensesScreenUiModel(withCreditors = false))
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun ExpensesScreenLocalEventsPreview() {
+    ExpensesTheme {
+        ExpensesScreenLocalEvents(
+            onCreateEventClick = {},
+            onJoinEventClick = {},
+            onJoinLocalEventClick = {},
+            localEvents = LocalEvents(
+                events = persistentListOf(
+                    LocalEventUiModel(
+                        eventId = 1,
+                        eventName = "Local Event 1",
+                    ),
+                    LocalEventUiModel(
+                        eventId = 2,
+                        eventName = "Local Event 2",
+                    ),
+                )
+            ),
+        )
+    }
 }
 
 @Composable
 @Preview
 private fun ExpensesScreenPreviewEmpty() {
-    ExpensesScreen(
-        onMenuClick = {},
-        onAddExpenseClick = {},
-        onRevertExpenseClick = {},
-        onDebtsDetailsClick = {},
-        onReplenishmentClick = {},
-        onJoinEventClick = {},
-        onCreateEventClick = {},
-        onRefresh = {},
-        state = SimpleScreenState.Empty
-    )
+    ExpensesTheme {
+        ExpensesScreen(
+            onMenuClick = {},
+            onAddExpenseClick = {},
+            onRevertExpenseClick = {},
+            onDebtsDetailsClick = {},
+            onReplenishmentClick = {},
+            onJoinEventClick = {},
+            onJoinLocalEventClick = {},
+            onCreateEventClick = {},
+            onRefresh = {},
+            state = SimpleScreenState.Empty
+        )
+    }
 }
 
 internal fun mockExpensesScreenUiModel(withCreditors: Boolean): ExpensesScreenUiModel {
@@ -393,19 +553,19 @@ internal fun mockExpensesScreenUiModel(withCreditors: Boolean): ExpensesScreenUi
         serverId = "12",
         name = "Максим"
     )
-    return ExpensesScreenUiModel(
+    return ExpensesScreenUiModel.Expenses(
         eventName = "France trip",
         currentPersonId = person1.id,
         currentPersonName = person1.name,
         creditors = persistentListOf(
-            ExpensesScreenUiModel.DebtorShortUiModel(
+            DebtorShortUiModel(
                 personId = person1.id,
                 personName = person1.name,
                 currencyCode = "EUR",
                 currencyName = "Euro",
                 amount = "100"
             ),
-            ExpensesScreenUiModel.DebtorShortUiModel(
+            DebtorShortUiModel(
                 personId = person2.id,
                 personName = person2.name,
                 currencyCode = "EUR",

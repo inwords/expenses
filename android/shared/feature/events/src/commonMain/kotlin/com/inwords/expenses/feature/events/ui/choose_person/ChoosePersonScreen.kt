@@ -1,8 +1,9 @@
 package com.inwords.expenses.feature.events.ui.choose_person
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,7 +22,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material3.CircularProgressIndicator
@@ -168,10 +168,11 @@ private fun PersonSelectionItem(
     modifier: Modifier = Modifier
 ) {
     val colorScheme = MaterialTheme.colorScheme
-    val animatedBorderColor by animateColorAsState(
-        targetValue = if (person.selected) colorScheme.primary else colorScheme.outline,
-        animationSpec = tween()
-    )
+    val transition = updateTransition(person.selected, label = "transition_enabled")
+    val animatedBorderColor by transition.animateColor(
+        label = "border_color",
+        transitionSpec = { tween(durationMillis = 300) }
+    ) { selected -> if (selected) colorScheme.primary else colorScheme.outline }
 
     Row(
         modifier = modifier
@@ -180,19 +181,19 @@ private fun PersonSelectionItem(
             .border(
                 width = 1.dp,
                 color = animatedBorderColor,
-                shape = RoundedCornerShape(8.dp)
+                shape = MaterialTheme.shapes.small
             )
-            .padding(horizontal = 12.dp, vertical = 12.dp),
+            .padding(all = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val animatedBackgroundColor by animateColorAsState(
-            targetValue = if (person.selected) colorScheme.primary else colorScheme.surfaceVariant,
-            animationSpec = tween()
-        )
-        val animatedTextColor by animateColorAsState(
-            targetValue = if (person.selected) colorScheme.onPrimary else colorScheme.onSurfaceVariant,
-            animationSpec = tween()
-        )
+        val animatedBackgroundColor by transition.animateColor(
+            label = "background_color",
+            transitionSpec = { tween(durationMillis = 300) }
+        ) { selected -> if (selected) colorScheme.primary else colorScheme.surfaceVariant }
+        val animatedTextColor by transition.animateColor(
+            label = "text_color",
+            transitionSpec = { tween(durationMillis = 300) }
+        ) { selected -> if (selected) colorScheme.onPrimary else colorScheme.onSurfaceVariant }
 
         Text(
             modifier = Modifier
@@ -210,14 +211,14 @@ private fun PersonSelectionItem(
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        val animatedFontWeight by animateIntAsState(
-            targetValue = if (person.selected) FontWeight.SemiBold.weight else FontWeight.Normal.weight,
-            animationSpec = tween()
-        )
-        val animatedNameTextColor by animateColorAsState(
-            targetValue = if (person.selected) colorScheme.onPrimaryContainer else colorScheme.onSurface,
-            animationSpec = tween()
-        )
+        val animatedFontWeight by transition.animateInt(
+            label = "font_weight",
+            transitionSpec = { tween(durationMillis = 300) }
+        ) { selected -> if (selected) FontWeight.SemiBold.weight else FontWeight.Normal.weight }
+        val animatedNameTextColor by transition.animateColor(
+            label = "name_text_color",
+            transitionSpec = { tween(durationMillis = 300) }
+        ) { selected -> if (selected) colorScheme.onPrimaryContainer else colorScheme.onSurface }
 
         Text(
             text = person.name,
