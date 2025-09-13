@@ -8,4 +8,9 @@ internal expect class RoomDatabaseBuilderFactory {
     fun getDatabaseBuilder(): RoomDatabase.Builder<AppDatabase>
 }
 
-internal expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase>
+// The Room compiler generates the `actual` implementations.
+@Suppress("KotlinNoActualForExpect")
+internal expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
+
+    override fun initialize(): AppDatabase
+}

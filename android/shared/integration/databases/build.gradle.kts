@@ -56,7 +56,11 @@ kotlin {
 }
 
 dependencies {
-    ksp(shared.room.compiler)
+    // TODO is there a better way to do this?
+    kspAndroid(shared.room.compiler)
+    add("kspIosX64", shared.room.compiler)
+    add("kspIosArm64", shared.room.compiler)
+    add("kspIosSimulatorArm64", shared.room.compiler)
 }
 
 room {
