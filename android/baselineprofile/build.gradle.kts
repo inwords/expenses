@@ -11,6 +11,7 @@ kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_11)
         freeCompilerArgs.add("-Xdata-flow-based-exhaustiveness")
+        extraWarnings.set(true)
     }
 }
 

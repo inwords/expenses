@@ -39,6 +39,7 @@ class SharedKmmLibraryPlugin : Plugin<Project> {
         }
 
         kotlin.compilerOptions {
+            extraWarnings.set(true)
             freeCompilerArgs.add("-Xdata-flow-based-exhaustiveness")
         }
     }
