@@ -25,9 +25,9 @@ fun BasicFloatingActionButton(
         modifier = modifier,
         onClick = onClick,
     ) {
-        Text(text = text)
-        Spacer(modifier = Modifier.width(8.dp))
         Icon(icon, contentDescription = null)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = text)
     }
 }
 

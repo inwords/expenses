@@ -150,7 +150,7 @@ internal fun MenuDialog(
             )
             Text(
                 modifier = Modifier.align(Alignment.CenterVertically),
-                text = "Покинуть событие",
+                text = "К списку событий",
                 style = MaterialTheme.typography.bodyLarge
             )
         }

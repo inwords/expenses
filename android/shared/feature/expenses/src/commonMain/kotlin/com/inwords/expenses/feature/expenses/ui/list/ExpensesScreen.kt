@@ -20,10 +20,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -266,18 +268,22 @@ private fun ExpensesScreenLocalEvents(
                 .consumeWindowInsets(topAndHorizontalPaddings)
                 .padding(topAndHorizontalPaddings),
         ) {
+            Text(
+                text = "Событие уже создано?",
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
             JoinEventButton(
                 modifier = Modifier
-                    .padding(top = 8.dp)
-                    .fillMaxWidth()
-                    .align(Alignment.End),
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
                 onJoinEventClick = onJoinEventClick
             )
 
             Text(
-                text = "Сохранено",
+                text = "Сохранённые события",
                 style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp)
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
             val bottomPadding = paddingValues.calculateBottomPadding()
@@ -366,7 +372,7 @@ private fun JoinEventButton(
             .padding(horizontal = 16.dp),
         onClick = onJoinEventClick
     ) {
-        Text(text = "Присоединиться к событию")
+        Text(text = "Присоединиться")
     }
 }
 
@@ -442,22 +448,32 @@ private fun LocalEventItem(
     onJoinLocalEventClick: (event: LocalEventUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onJoinLocalEventClick(event) }
-            .border(
-                border = AssistChipDefaults.assistChipBorder(false),
-                shape = MaterialTheme.shapes.small
-            )
-            .padding(16.dp),
+            .clickable { onJoinLocalEventClick(event) },
+        shape = MaterialTheme.shapes.medium,
     ) {
-        Text(
-            modifier = Modifier
-                .padding(vertical = 8.dp),
-            text = event.eventName,
-            style = MaterialTheme.typography.titleMedium,
-        )
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 8.dp),
+                text = event.eventName,
+                style = MaterialTheme.typography.titleLarge,
+            )
+
+            Icon(
+                imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
     }
 }
 
