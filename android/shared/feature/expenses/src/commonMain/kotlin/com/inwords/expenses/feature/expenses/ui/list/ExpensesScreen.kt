@@ -457,7 +457,6 @@ private fun LocalEventItem(
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .clickable { onJoinLocalEventClick(event) }
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
