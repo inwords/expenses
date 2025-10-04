@@ -1,11 +1,14 @@
 # https://nginx.org/en/CHANGES
-ARG NGINX_VERSION=1.27.4
+ARG NGINX_VERSION=1.29.1
+
+# https://github.com/nginxinc/nginx-otel/releases
+ARG NGINX_OTEL_VERSION=0.1.2
 
 # https://github.com/google/ngx_brotli
 ARG NGX_BROTLI_COMMIT=a71f9312c2deb28875acc7bacfdd5695a111aa53
 
 # https://github.com/openssl/openssl/releases
-ARG OPENSSL_VERSION=3.4.1
+ARG OPENSSL_VERSION=3.6.0
 
 # NGINX UID / GID
 ARG NGINX_USER_UID=1000
@@ -27,6 +30,7 @@ ARG CONFIG="\
     --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
     --user=nginx \
     --group=nginx \
+    --with-compat \
     --with-cc=gcc \
     --without-http_fastcgi_module \
     --without-http_uwsgi_module \
@@ -35,12 +39,14 @@ ARG CONFIG="\
     --with-http_v2_module \
     --with-http_v3_module \
     --with-openssl=/usr/src/openssl-$OPENSSL_VERSION \
+    --with-openssl-opt=enable-ec_nistp_64_gcc_128 \
     --add-module=/usr/src/ngx_brotli \
 "
 
 FROM alpine:3.20 AS base
 
 ARG NGINX_VERSION
+ARG NGINX_OTEL_VERSION
 ARG NGX_BROTLI_COMMIT
 ARG OPENSSL_VERSION
 ARG NGINX_USER_UID
@@ -58,7 +64,7 @@ RUN \
         make \
         musl-dev \
         ninja \
-        pcre-dev \
+        pcre2-dev \
         zlib-dev \
         autoconf \
         automake \
@@ -66,6 +72,13 @@ RUN \
         g++ \
         git \
         libtool \
+        build-base \
+        pkgconfig \
+        c-ares-dev \
+        re2-dev \
+        openssl-dev \
+        abseil-cpp-dev \
+        abseil-cpp \
    && git config --global init.defaultBranch master
 
 WORKDIR /usr/src/
@@ -73,6 +86,10 @@ WORKDIR /usr/src/
 RUN \
     echo "Cloning nginx $NGINX_VERSION ..." \
     && git clone --branch release-${NGINX_VERSION} --depth 1 https://github.com/nginx/nginx.git /usr/src/nginx-$NGINX_VERSION
+
+RUN \
+    echo "Cloning ngx_otel_module $NGINX_OTEL_VERSION ..." \
+    && git clone --branch v${NGINX_OTEL_VERSION} --depth 1 https://github.com/nginxinc/nginx-otel.git /usr/src/nginx-otel-$NGINX_OTEL_VERSION
 
 RUN \
     echo "Cloning brotli $NGX_BROTLI_COMMIT ..." \
@@ -94,17 +111,42 @@ ARG LD_OPT='-Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -flto=auto -Wl
 RUN \
     echo "Building nginx ..." \
     && mkdir -p /var/run/nginx/ \
+    && mkdir -p /usr/lib/nginx/modules \
     && cd /usr/src/nginx-$NGINX_VERSION \
     && ./auto/configure $CONFIG --with-cc-opt="$CC_OPT" --with-ld-opt="$LD_OPT" \
     && make -j"$(getconf _NPROCESSORS_ONLN)"
+
+ENV CXXFLAGS="-std=c++17"
+
+RUN \
+    echo "Building ngx_otel_module ..." \
+    && cd /usr/src/nginx-otel-$NGINX_OTEL_VERSION \
+    && mkdir build \
+    && cd build \
+    && cmake \
+             -DNGX_OTEL_NGINX_BUILD_DIR=/usr/src/nginx-$NGINX_VERSION/objs \
+             -DCMAKE_CXX_STANDARD=17 \
+             -DCMAKE_BUILD_TYPE=Release \
+             -DCMAKE_C_FLAGS_RELEASE="-O2 -fPIC -ffunction-sections -fdata-sections" \
+             -DCMAKE_CXX_FLAGS_RELEASE="-O2 -fPIC -ffunction-sections -fdata-sections" \
+             -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--gc-sections" \
+             -DABSL_PROPAGATE_CXX_STD=ON \
+             -DgRPC_ZLIB_PROVIDER=package \
+             -DgRPC_SSL_PROVIDER=package \
+             -DgRPC_RE2_PROVIDER=package \
+             -DgRPC_CARES_PROVIDER=package \
+             -DgRPC_ABSL_PROVIDER=package  \
+             .. \
+    && make -j"$(getconf _NPROCESSORS_ONLN)" \
+    && cp ngx_otel_module.so /usr/lib/nginx/modules/
 
 RUN \
     cd /usr/src/nginx-$NGINX_VERSION \
     && make install \
     && rm -rf /etc/nginx/html/ \
     && mkdir /etc/nginx/conf.d/ \
-    && strip /usr/sbin/nginx* \
-    \
+    && strip --strip-unneeded /usr/sbin/nginx* \
+    && strip --strip-unneeded /usr/lib/nginx/modules/*.so \
     && scanelf --needed --nobanner /usr/sbin/nginx /usr/lib/nginx/modules/*.so \
          | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
          | sort -u \
@@ -122,6 +164,7 @@ COPY --from=base /var/run/nginx/ /var/run/nginx/
 COPY --from=base /etc/nginx /etc/nginx
 COPY --from=base /usr/sbin/nginx /usr/sbin/
 COPY --from=base /tmp/nginx-runDeps.txt /tmp/nginx-runDeps.txt
+COPY --from=base /usr/lib/nginx/modules/*.so /usr/lib/nginx/modules/
 
 RUN \
     addgroup --gid $NGINX_GROUP_GID -S nginx \
@@ -129,7 +172,7 @@ RUN \
     && apk add --no-cache --virtual .nginx-rundeps tzdata $(cat /tmp/nginx-runDeps.txt) \
     && rm /tmp/nginx-runDeps.txt \
     && ln -s /usr/lib/nginx/modules /etc/nginx/modules \
-    # forward request and error logs to docker log collector
+    # forward request and error logs to docker log collector \
     && mkdir /var/log/nginx \
     && touch /var/log/nginx/access.log /var/log/nginx/error.log \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
