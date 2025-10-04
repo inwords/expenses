@@ -8,6 +8,7 @@ import kotlinx.coroutines.withContext
 import org.chromium.net.ConnectionMigrationOptions
 import org.chromium.net.CronetEngine
 import org.chromium.net.DnsOptions
+import org.chromium.net.QuicOptions
 import java.io.File
 
 internal actual class HttpClientFactory(private val context: Context) {
@@ -27,12 +28,14 @@ internal actual class HttpClientFactory(private val context: Context) {
         }
 
         return CronetEngine.Builder(context)
+            .setStoragePath(storagePath)
             .enableHttp2(true)
             .enableQuic(true)
             .enableBrotli(true)
             .setConnectionMigrationOptions(
                 ConnectionMigrationOptions.builder()
                     .enableDefaultNetworkMigration(true)
+                    .enablePathDegradationMigration(true)
                     .build()
             )
             .setDnsOptions(
@@ -40,7 +43,12 @@ internal actual class HttpClientFactory(private val context: Context) {
                     .persistHostCache(true)
                     .build()
             )
-            .setStoragePath(storagePath)
+            .setQuicOptions(
+                QuicOptions.builder()
+                    .enableTlsZeroRtt(true)
+                    .setInMemoryServerConfigsCacheSize(5)
+                    .delayJobsWithAvailableSpdySession(true)
+            )
             .setUserAgent("Android/Expenses/1.0") // TODO choose good user agent
             .build()
     }

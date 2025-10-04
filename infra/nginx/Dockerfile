@@ -1,6 +1,9 @@
 # https://nginx.org/en/CHANGES
 ARG NGINX_VERSION=1.27.4
 
+# https://github.com/nginxinc/nginx-otel/releases
+ARG NGINX_OTEL_VERSION=0.1.2
+
 # https://github.com/google/ngx_brotli
 ARG NGX_BROTLI_COMMIT=a71f9312c2deb28875acc7bacfdd5695a111aa53
 
@@ -36,6 +39,7 @@ ARG CONFIG="\
     --with-http_v3_module \
     --with-openssl=/usr/src/openssl-$OPENSSL_VERSION \
     --add-module=/usr/src/ngx_brotli \
+    --add-dynamic-module=/usr/src/nginx-otel-$NGINX_OTEL_VERSION \
 "
 
 FROM alpine:3.20 AS base
@@ -75,6 +79,10 @@ RUN \
     && git clone --branch release-${NGINX_VERSION} --depth 1 https://github.com/nginx/nginx.git /usr/src/nginx-$NGINX_VERSION
 
 RUN \
+    echo "Cloning ngx_otel_module $NGINX_OTEL_VERSION ..." \
+    && git clone --branch v${NGINX_OTEL_VERSION} --depth 1 https://github.com/nginxinc/nginx-otel.git /usr/src/nginx-otel-$NGINX_OTEL_VERSION
+
+RUN \
     echo "Cloning brotli $NGX_BROTLI_COMMIT ..." \
     && mkdir /usr/src/ngx_brotli \
     && cd /usr/src/ngx_brotli \
@@ -92,8 +100,9 @@ RUN \
 ARG CC_OPT='-O2 -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -fPIC -Wdate-time -D_FORTIFY_SOURCE=2'
 ARG LD_OPT='-Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -flto=auto -Wl,-z,relro -Wl,-z,now -fPIC'
 RUN \
-    echo "Building nginx ..." \
+    echo "Building nginx with dynamic modules..." \
     && mkdir -p /var/run/nginx/ \
+    && mkdir -p /usr/lib/nginx/modules \
     && cd /usr/src/nginx-$NGINX_VERSION \
     && ./auto/configure $CONFIG --with-cc-opt="$CC_OPT" --with-ld-opt="$LD_OPT" \
     && make -j"$(getconf _NPROCESSORS_ONLN)"
@@ -122,6 +131,7 @@ COPY --from=base /var/run/nginx/ /var/run/nginx/
 COPY --from=base /etc/nginx /etc/nginx
 COPY --from=base /usr/sbin/nginx /usr/sbin/
 COPY --from=base /tmp/nginx-runDeps.txt /tmp/nginx-runDeps.txt
+COPY --from=base /usr/lib/nginx/modules/ngx_otel_module.so /usr/lib/nginx/modules/ngx_otel_module.so
 
 RUN \
     addgroup --gid $NGINX_GROUP_GID -S nginx \
