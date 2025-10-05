@@ -167,4 +167,5 @@ services:
 volumes:
   postgres_data:
   victoriametrics_data:
+  victoriatraces_data:
   grafana_data:
