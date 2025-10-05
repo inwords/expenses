@@ -18,9 +18,20 @@ exporters:
     compression: gzip
     encoding: proto
     metrics_endpoint: http://victoriametrics:8428/opentelemetry/v1/metrics
-    traces_endpoint: http://victoriatraces:10428/opentelemetry/v1/traces
+    traces_endpoint: http://victoriatraces:10428/insert/opentelemetry/v1/traces
     tls:
       insecure: true
+
+connectors:
+  spanmetrics:
+    dimensions:
+      - name: service.name
+      - name: span.name
+      - name: http.route
+      - name: status.code
+    histogram:
+      explicit:
+        buckets: [0.05s, 0.1s, 0.25s, 0.5s, 1s, 2.5s, 5s, 10s, 15s]
 
 extensions:
   health_check:
@@ -29,10 +40,10 @@ service:
   extensions: [ health_check ]
   pipelines:
     metrics:
-      receivers: [ otlp, docker_stats ]
+      receivers: [ otlp, docker_stats, spanmetrics ]
       processors: [ batch ]
       exporters: [ otlphttp/victoriametrics ]
     traces:
       receivers: [ otlp ]
       processors: [ batch ]
-      exporters: [ otlphttp/victoriametrics ]
+      exporters: [ otlphttp/victoriametrics, spanmetrics ]
