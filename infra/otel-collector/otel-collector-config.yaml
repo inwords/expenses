@@ -25,10 +25,7 @@ exporters:
 connectors:
   spanmetrics:
     dimensions:
-      - name: service.name
-      - name: span.name
       - name: http.route
-      - name: status.code
     histogram:
       explicit:
         buckets: [0.05s, 0.1s, 0.25s, 0.5s, 1s, 2.5s, 5s, 10s, 15s]

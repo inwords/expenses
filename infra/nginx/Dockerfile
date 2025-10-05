@@ -43,7 +43,7 @@ ARG CONFIG="\
     --add-module=/usr/src/ngx_brotli \
 "
 
-FROM alpine:3.20 AS base
+FROM alpine:3.22 AS base
 
 ARG NGINX_VERSION
 ARG NGINX_OTEL_VERSION
@@ -153,7 +153,7 @@ RUN \
          | xargs -r apk info --installed \
          | sort -u > /tmp/nginx-runDeps.txt
 
-FROM alpine:3.20
+FROM alpine:3.22
 ARG NGINX_VERSION
 ARG NGINX_USER_UID
 ARG NGINX_GROUP_GID
