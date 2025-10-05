@@ -1,7 +1,7 @@
 # Stage 1: Builder
-FROM golang:1.23-alpine3.20 AS builder
+FROM golang:1.25-alpine3.22 AS builder
 
-ARG OTEL_VERSION=0.114.0
+ARG OTEL_VERSION=0.136.0
 
 WORKDIR /build
 
@@ -15,7 +15,7 @@ COPY manifest.yaml .
 RUN CGO_ENABLED=0 builder --config=manifest.yaml
 
 # Stage 2: Final Image
-FROM alpine:3.20
+FROM alpine:3.22
 
 WORKDIR /
 
@@ -23,7 +23,7 @@ WORKDIR /
 COPY --from=builder /build/otelcol-custom .
 
 # Expose necessary ports
-EXPOSE 4317/tcp 4318/tcp
+EXPOSE 4317/tcp
 
 # Set the default command
 ENTRYPOINT ["/otelcol-custom"]
