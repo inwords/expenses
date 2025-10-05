@@ -115,6 +115,23 @@ services:
     volumes:
       - victoriametrics_data:/victoria-metrics-data
 
+  victoriatraces:
+    image: victoriametrics/victoria-traces:v0.3.0
+    container_name: victoriatraces
+    deploy:
+      resources:
+        limits:
+          memory: 600M
+          cpus: '0.80'
+        reservations:
+          memory: 230M
+    memswap_limit: 2048M
+    restart: unless-stopped
+    command:
+      - "--storageDataPath=/victoria-traces-data"
+    volumes:
+      - victoriatraces_data:/victoria-traces-data
+
   grafana:
     image: grafana/grafana:11.3.1
     container_name: grafana
@@ -128,6 +145,7 @@ services:
     restart: unless-stopped
     depends_on:
       - victoriametrics
+      - victoriatraces
     environment:
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
