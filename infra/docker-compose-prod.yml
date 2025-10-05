@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:17-alpine3.20
+    image: postgres:17-alpine3.22
     deploy:
       resources:
         limits:
@@ -99,7 +99,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
   victoriametrics:
-    image: victoriametrics/victoria-metrics:v1.109.1
+    image: victoriametrics/victoria-metrics:v1.127.0
     container_name: victoriametrics
     deploy:
       resources:
@@ -133,7 +133,7 @@ services:
       - victoriatraces_data:/victoria-traces-data
 
   grafana:
-    image: grafana/grafana:11.3.1
+    image: grafana/grafana:12.2
     container_name: grafana
     deploy:
       resources:
@@ -155,7 +155,7 @@ services:
       - grafana_data:/var/lib/grafana
 
   certbot:
-    image: certbot/certbot:v2.11.0
+    image: certbot/certbot:v5.0.0
     deploy:
       resources:
         limits:
