@@ -19,7 +19,7 @@ export class UserRepository extends BaseRepository implements UserRepositoryAbst
     eventId: IUser['eventId'],
     trx,
   ): Promise<[result: IUser[] | null, queryDetails: IQueryDetails]> => {
-    const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
+    const ctx = trx instanceof EntityManager ? trx : undefined;
 
     let query = this.getRepository(ctx).createQueryBuilder(this.queryName);
 
@@ -37,7 +37,7 @@ export class UserRepository extends BaseRepository implements UserRepositoryAbst
     input: IUser | IUser[],
     trx,
   ): Promise<[result: undefined, queryDetails: IQueryDetails]> => {
-    const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
+    const ctx = trx instanceof EntityManager ? trx : undefined;
 
     const query = this.getRepository(ctx).createQueryBuilder().insert().values(input);
     const queryDetails = this.getQueryDetails(query);

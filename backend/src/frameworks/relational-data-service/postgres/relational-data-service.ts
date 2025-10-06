@@ -13,11 +13,11 @@ export class RelationalDataService implements RelationalDataServiceAbstract {
   readonly showQueryDetails;
   readonly transaction;
 
-  readonly event;
-  readonly user;
-  readonly currency;
-  readonly expense;
-  readonly currencyRate;
+  readonly event: EventRepository;
+  readonly user: UserRepository;
+  readonly currency: CurrencyRepository;
+  readonly expense: ExpenseRepository;
+  readonly currencyRate: CurrencyRateRepository;
 
   constructor({dbConfig, showQueryDetails}) {
     this.dbConfig = dbConfig;
