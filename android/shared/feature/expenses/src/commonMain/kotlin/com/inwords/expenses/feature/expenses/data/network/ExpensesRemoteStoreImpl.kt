@@ -26,6 +26,7 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 
 internal class ExpensesRemoteStoreImpl(
@@ -54,7 +55,7 @@ internal class ExpensesRemoteStoreImpl(
     ): List<IoResult<Expense>> = coroutineScope {
         expenses.map { expense ->
             async { addExpenseToEvent(event, expense, currencies, persons) }
-        }.map { it.await() }
+        }.awaitAll()
     }
 
     private suspend fun addExpenseToEvent(
