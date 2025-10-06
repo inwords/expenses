@@ -22,86 +22,94 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
   public async execute(input: Input) {
     const [event] = await this.rDataService.event.findById(input.eventId);
 
-    if (event) {
-      return this.rDataService.transaction(async (ctx) => {
-        if (event.currencyId === input.currencyId) {
-          let splitInformation: ISplitInfo[] = [];
+    if (!event) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: `Event with id ${input.eventId} not found`,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
-          for (let i of input.splitInformation) {
-            splitInformation.push({
-              ...i,
-              exchangedAmount: i.amount,
-            });
+    return this.rDataService.transaction(async (ctx) => {
+      if (event.currencyId === input.currencyId) {
+        let splitInformation: ISplitInfo[] = [];
+
+        for (let i of input.splitInformation) {
+          splitInformation.push({
+            ...i,
+            exchangedAmount: i.amount,
+          });
+        }
+
+        const expense = new ExpenseValueObject({...input, splitInformation}).value;
+
+        await this.rDataService.expense.insert(expense, ctx);
+
+        return expense;
+      } else {
+        // TODO cкорее всего стоит переделать на один запрос
+        const [expenseCurrencyCode] = await this.rDataService.currency.findById(input.currencyId, ctx);
+        const [eventCurrencyCode] = await this.rDataService.currency.findById(event.currencyId, ctx);
+
+        if (!eventCurrencyCode || !expenseCurrencyCode) {
+          throw new HttpException(
+            {
+              status: HttpStatus.BAD_REQUEST,
+              error: `Wrong Currency Id`,
+            },
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        if (expenseCurrencyCode && eventCurrencyCode) {
+          const date = getCurrentDateWithoutTime();
+          const getDateForExchangeRate = input.createdAt
+            ? getDateWithoutTimeWithMoscowTimezone(new Date(input.createdAt))
+            : date;
+
+          let [currencyRate] = await this.rDataService.currencyRate.findByDate(getDateForExchangeRate, ctx);
+
+          if (!currencyRate) {
+            currencyRate = new CurrencyRateValueObject({
+              date,
+              rate: await this.currencyRateService.getCurrencyRate(getDateForExchangeRate),
+            }).value;
+
+            await this.rDataService.currencyRate.insert(currencyRate, ctx);
           }
 
-          const expense = new ExpenseValueObject({...input, splitInformation}).value;
+          if (currencyRate.rate) {
+            const exchangeRate =
+              currencyRate.rate[eventCurrencyCode.code] / currencyRate.rate[expenseCurrencyCode.code];
 
-          await this.rDataService.expense.insert(expense, ctx);
+            let splitInformation: ISplitInfo[] = [];
 
-          return expense;
-        } else {
-          // TODO cкорее всего стоит переделать на один запрос
-          const [expenseCurrencyCode] = await this.rDataService.currency.findById(input.currencyId, ctx);
-          const [eventCurrencyCode] = await this.rDataService.currency.findById(event.currencyId, ctx);
+            for (let i of input.splitInformation) {
+              splitInformation.push({
+                ...i,
+                exchangedAmount: Number(Number(i.amount * exchangeRate).toFixed(2)),
+              });
+            }
 
-          if (!eventCurrencyCode || !expenseCurrencyCode) {
+            const expense = new ExpenseValueObject({...input, splitInformation}).value;
+
+            await this.rDataService.expense.insert(expense, ctx);
+
+            return expense;
+          } else {
+            // https://www.youtube.com/watch?v=WR0Uh3-AVNA
             throw new HttpException(
               {
-                status: HttpStatus.BAD_REQUEST,
-                error: `Wrong Currency Id`,
+                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                error: `No currency rate available for ${getDateWithoutTimeWithMoscowTimezone(new Date(input.createdAt))} date`,
               },
-              HttpStatus.BAD_REQUEST,
+              HttpStatus.INTERNAL_SERVER_ERROR,
             );
           }
-
-          if (expenseCurrencyCode && eventCurrencyCode) {
-            const date = getCurrentDateWithoutTime();
-            const getDateForExchangeRate = input.createdAt
-              ? getDateWithoutTimeWithMoscowTimezone(new Date(input.createdAt))
-              : date;
-
-            let [currencyRate] = await this.rDataService.currencyRate.findByDate(getDateForExchangeRate, ctx);
-
-            if (!currencyRate) {
-              currencyRate = new CurrencyRateValueObject({
-                date,
-                rate: await this.currencyRateService.getCurrencyRate(getDateForExchangeRate),
-              }).value;
-
-              await this.rDataService.currencyRate.insert(currencyRate, ctx);
-            }
-
-            if (currencyRate.rate) {
-              const exchangeRate =
-                currencyRate.rate[eventCurrencyCode.code] / currencyRate.rate[expenseCurrencyCode.code];
-
-              let splitInformation: ISplitInfo[] = [];
-
-              for (let i of input.splitInformation) {
-                splitInformation.push({
-                  ...i,
-                  exchangedAmount: Number(Number(i.amount * exchangeRate).toFixed(2)),
-                });
-              }
-
-              const expense = new ExpenseValueObject({...input, splitInformation}).value;
-
-              await this.rDataService.expense.insert(expense, ctx);
-
-              return expense;
-            } else {
-              // https://www.youtube.com/watch?v=WR0Uh3-AVNA
-              throw new HttpException(
-                {
-                  status: HttpStatus.INTERNAL_SERVER_ERROR,
-                  error: `No currency rate available for ${getDateWithoutTimeWithMoscowTimezone(new Date(input.createdAt))} date`,
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR,
-              );
-            }
-          }
         }
-      });
-    }
+      }
+    });
   }
 }
