@@ -13,7 +13,7 @@ internal class EmptyEventsScreen : BaseScreen() {
 
     context(extension: ComposeContext)
     fun clickJoinEvent(): JoinEventScreen {
-        extension.onNodeWithText("Присоединиться к событию").performClick()
+        extension.onNodeWithText("Присоединиться").performClick()
         return JoinEventScreen()
     }
 

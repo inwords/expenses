@@ -14,7 +14,7 @@ kotlinx-serialization = "1.9.0" # https://github.com/Kotlin/kotlinx.serializatio
 kotlinx-atomicfu = "0.29.0" # https://github.com/Kotlin/kotlinx-atomicfu/releases TODO remove when atomicfu plugin is fixed
 
 compose-bom = "2025.09.00" # https://developer.android.com/jetpack/androidx/releases/compose
-compose-multiplatform = "1.9.0-rc02" # https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
+compose-multiplatform = "1.9.0" # https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
 
 [libraries]
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
@@ -55,7 +55,7 @@ compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.11.0" }
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version = "2.9.4" } # https://developer.android.com/jetpack/androidx/releases/navigation
-navigation-compose-multiplatform = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version = "2.9.0-rc02" } # https://mvnrepository.com/artifact/org.jetbrains.androidx.navigation/navigation-compose
+navigation-compose-multiplatform = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version = "2.9.0" } # https://mvnrepository.com/artifact/org.jetbrains.androidx.navigation/navigation-compose
 compose-material-icons-core = { group = "org.jetbrains.compose.material", name = "material-icons-core", version = "1.7.3" }
 
 ionspin-kotlin-bignum = { group = "com.ionspin.kotlin", name = "bignum", version = "0.3.10" }
