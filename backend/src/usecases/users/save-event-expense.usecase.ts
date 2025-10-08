@@ -45,13 +45,13 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
 
         const expense = new ExpenseValueObject({...input, splitInformation}).value;
 
-        await this.rDataService.expense.insert(expense, ctx);
+        await this.rDataService.expense.insert(expense, {ctx});
 
         return expense;
       } else {
         // TODO cкорее всего стоит переделать на один запрос
-        const [expenseCurrencyCode] = await this.rDataService.currency.findById(input.currencyId, ctx);
-        const [eventCurrencyCode] = await this.rDataService.currency.findById(event.currencyId, ctx);
+        const [expenseCurrencyCode] = await this.rDataService.currency.findById(input.currencyId, {ctx});
+        const [eventCurrencyCode] = await this.rDataService.currency.findById(event.currencyId, {ctx});
 
         if (!eventCurrencyCode || !expenseCurrencyCode) {
           throw new HttpException(
@@ -69,7 +69,7 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
             ? getDateWithoutTimeWithMoscowTimezone(new Date(input.createdAt))
             : date;
 
-          let [currencyRate] = await this.rDataService.currencyRate.findByDate(getDateForExchangeRate, ctx);
+          let [currencyRate] = await this.rDataService.currencyRate.findByDate(getDateForExchangeRate, {ctx});
 
           if (!currencyRate) {
             currencyRate = new CurrencyRateValueObject({
@@ -77,7 +77,7 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
               rate: await this.currencyRateService.getCurrencyRate(getDateForExchangeRate),
             }).value;
 
-            await this.rDataService.currencyRate.insert(currencyRate, ctx);
+            await this.rDataService.currencyRate.insert(currencyRate, {ctx});
           }
 
           if (currencyRate.rate) {
@@ -95,7 +95,7 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
 
             const expense = new ExpenseValueObject({...input, splitInformation}).value;
 
-            await this.rDataService.expense.insert(expense, ctx);
+            await this.rDataService.expense.insert(expense, {ctx});
 
             return expense;
           } else {

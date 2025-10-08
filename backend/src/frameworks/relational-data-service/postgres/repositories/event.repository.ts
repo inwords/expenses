@@ -19,7 +19,7 @@ export class EventRepository extends BaseRepository implements EventRepositoryAb
     id: IEvent['id'],
     trx,
   ): Promise<[result: IEvent | null, queryDetails: IQueryDetails]> => {
-    const ctx = trx instanceof EntityManager ? trx : undefined;
+    const ctx = trx.ctx instanceof EntityManager ? trx.ctx : undefined;
 
     let query = this.getRepository(ctx).createQueryBuilder(this.queryName);
 

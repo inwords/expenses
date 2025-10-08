@@ -19,7 +19,7 @@ export class CurrencyRateRepository extends BaseRepository implements CurrencyRa
     date: ICurrencyRate['date'],
     trx,
   ): Promise<[result: ICurrencyRate | null, queryDetails: IQueryDetails]> => {
-    const ctx = trx instanceof EntityManager ? trx : undefined;
+    const ctx = trx.ctx instanceof EntityManager ? trx.ctx : undefined;
 
     let query = this.getRepository(ctx).createQueryBuilder(this.queryName);
 

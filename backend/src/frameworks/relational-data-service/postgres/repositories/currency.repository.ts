@@ -19,7 +19,7 @@ export class CurrencyRepository extends BaseRepository implements CurrencyReposi
     id: ICurrency['id'],
     trx,
   ): Promise<[result: ICurrency | null, queryDetails: IQueryDetails]> => {
-    const ctx = trx instanceof EntityManager ? trx : undefined;
+    const ctx = trx.ctx instanceof EntityManager ? trx.ctx : undefined;
 
     let query = this.getRepository(ctx).createQueryBuilder(this.queryName);
 

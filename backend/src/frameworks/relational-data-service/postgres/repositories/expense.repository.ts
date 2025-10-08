@@ -19,7 +19,7 @@ export class ExpenseRepository extends BaseRepository implements ExpenseReposito
     eventId: IExpense['eventId'],
     trx,
   ): Promise<[result: IExpense[] | null, queryDetails: IQueryDetails]> => {
-    const ctx = trx instanceof EntityManager ? trx : undefined;
+    const ctx = trx.ctx instanceof EntityManager ? trx.ctx : undefined;
 
     let query = this.getRepository(ctx).createQueryBuilder(this.queryName);
 

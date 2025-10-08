@@ -17,11 +17,11 @@ export class SaveEventUseCase implements UseCase<Input, Output> {
     return await this.rDataService.transaction(async (ctx) => {
       const eventValueObject = new EventValueObject(event);
 
-      await this.rDataService.event.insert(eventValueObject.value, ctx);
+      await this.rDataService.event.insert(eventValueObject.value, {ctx});
 
       const usersValue = users.map((u) => new UserValueObject({...u, eventId: eventValueObject.value.id}).value);
 
-      await this.rDataService.user.insert(usersValue, ctx);
+      await this.rDataService.user.insert(usersValue, {ctx});
 
       return {...eventValueObject.value, users: usersValue};
     });
