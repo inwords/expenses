@@ -3,6 +3,7 @@ package com.inwords.expenses.core.utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -10,10 +11,12 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.experimental.ExperimentalTypeInference
+import kotlin.time.Duration
 
 val UI = Dispatchers.Main.immediate
 val IO = Dispatchers.IO
@@ -60,4 +63,19 @@ inline fun <T, R> Flow<T>.flatMapLatestNoBuffer(
 ): Flow<R> {
     return this.flatMapLatest(transform)
         .buffer(0)
+}
+
+@OptIn(FlowPreview::class)
+fun <T> Flow<T>.debounceAfterInitial(
+    timeout: Duration,
+): Flow<T> {
+    var initial = true
+    return this.debounce {
+        if (initial) {
+            initial = false
+            Duration.ZERO
+        } else {
+            timeout
+        }
+    }
 }
