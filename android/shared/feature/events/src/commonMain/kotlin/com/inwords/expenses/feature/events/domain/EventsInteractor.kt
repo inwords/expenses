@@ -123,7 +123,7 @@ class EventsInteractor internal constructor(
             serverId = null,
             name = draft.draftEventName,
             // FIXME secure
-            pinCode = Random.Default.nextLong(1000, 9999).toString(),
+            pinCode = Random.nextLong(1000, 9999).toString(),
             primaryCurrencyId = draft.draftPrimaryCurrencyId
         )
 

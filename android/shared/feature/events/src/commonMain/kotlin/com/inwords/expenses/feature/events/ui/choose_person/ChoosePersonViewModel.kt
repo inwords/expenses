@@ -38,8 +38,6 @@ internal class ChoosePersonViewModel(
         val persons: List<Person>
     )
 
-    private var confirmJob: Job? = null
-
     private val selectedPersonId = MutableStateFlow<Long?>(null)
 
     val state: StateFlow<SimpleScreenState<ChoosePersonScreenUiModel>> = combine(
@@ -76,6 +74,8 @@ internal class ChoosePersonViewModel(
             )
         )
     }.stateInWhileSubscribed(viewModelScope, SimpleScreenState.Loading)
+
+    private var confirmJob: Job? = null
 
     fun onPersonSelected(personId: Long) {
         selectedPersonId.value = personId
