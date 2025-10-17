@@ -11,13 +11,17 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun EventInfoBlock(
     eventName: String,
-    currentPersonName: String,
+    currentPersonName: String?,
     modifier: Modifier = Modifier,
 ) {
     Text(
         modifier = modifier
             .padding(horizontal = 16.dp),
-        text = "$eventName — $currentPersonName",
+        text = if (currentPersonName == null) {
+            eventName
+        } else {
+            "$eventName — $currentPersonName"
+        },
         style = MaterialTheme.typography.headlineMedium,
         textAlign = TextAlign.Center
     )

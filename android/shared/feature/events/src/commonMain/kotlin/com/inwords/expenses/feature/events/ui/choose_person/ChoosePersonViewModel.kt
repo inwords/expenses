@@ -5,15 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
-import com.inwords.expenses.core.ui.utils.updateIfSuccess
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.asImmutableListAdapter
+import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
+import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonScreenUiModel.PersonUiModel
 import com.inwords.expenses.feature.settings.api.SettingsRepository
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -38,63 +38,55 @@ internal class ChoosePersonViewModel(
         val persons: List<Person>
     )
 
-    private val _state = MutableStateFlow<SimpleScreenState<ChoosePersonScreenUiModel>>(SimpleScreenState.Loading)
-    val state: StateFlow<SimpleScreenState<ChoosePersonScreenUiModel>> = _state
-
     private var confirmJob: Job? = null
 
-    init {
-        combine(
-            eventsInteractor.currentEvent
-                .filterNotNull() // TODO mvp
-                .map { EventWithPersons(event = it.event, persons = it.persons) }
-                .distinctUntilChanged(),
-            settingsRepository.getCurrentPersonId()
-        ) { eventWithPersons, currentPersonId ->
-            var needToSelectFirst = !eventWithPersons.persons.any { person -> person.id == currentPersonId }
-            val persons = eventWithPersons.persons.map { person ->
-                val model = PersonUiModel(
-                    id = person.id,
-                    name = person.name,
-                    selected = person.id == currentPersonId || needToSelectFirst
-                )
-                needToSelectFirst = false
-                model
-            }
+    private val selectedPersonId = MutableStateFlow<Long?>(null)
 
-            _state.value = if (persons.isEmpty()) {
-                SimpleScreenState.Empty
+    val state: StateFlow<SimpleScreenState<ChoosePersonScreenUiModel>> = combine(
+        eventsInteractor.currentEvent
+            .filterNotNull() // TODO mvp
+            .map { EventWithPersons(event = it.event, persons = it.persons) }
+            .distinctUntilChanged(),
+        selectedPersonId.flatMapLatestNoBuffer { selectedPersonId ->
+            if (selectedPersonId == null) {
+                settingsRepository.getCurrentPersonId()
             } else {
-                SimpleScreenState.Success(
-                    ChoosePersonScreenUiModel(
-                        eventId = eventWithPersons.event.id,
-                        eventName = eventWithPersons.event.name,
-                        persons = persons.asImmutableListAdapter(),
-                    )
-                )
+                flowOf(selectedPersonId)
             }
-        }.launchIn(viewModelScope)
-    }
+        },
+    ) { eventWithPersons, selectedPersonId ->
+        if (eventWithPersons.persons.isEmpty()) {
+            return@combine SimpleScreenState.Empty
+        }
 
-    fun onPersonSelected(personId: Long) {
-        _state.updateIfSuccess { currentState ->
-            ChoosePersonScreenUiModel(
-                eventId = currentState.eventId,
-                eventName = currentState.eventName,
-                persons = currentState.persons.map { person ->
-                    person.copy(selected = person.id == personId)
-                }.asImmutableListAdapter()
+        val personIdToSelect: Long = selectedPersonId ?: eventWithPersons.persons.first().id
+        val persons = eventWithPersons.persons.map { person ->
+            PersonUiModel(
+                id = person.id,
+                name = person.name,
+                selected = person.id == personIdToSelect
             )
         }
+
+        SimpleScreenState.Success(
+            ChoosePersonScreenUiModel(
+                eventId = eventWithPersons.event.id,
+                eventName = eventWithPersons.event.name,
+                persons = persons.asImmutableListAdapter(),
+            )
+        )
+    }.stateInWhileSubscribed(viewModelScope, SimpleScreenState.Loading)
+
+    fun onPersonSelected(personId: Long) {
+        selectedPersonId.value = personId
     }
 
     fun onConfirmClicked() {
         confirmJob?.cancel()
         confirmJob = viewModelScope.launch {
-            val currentState = _state.value as? SimpleScreenState.Success ?: return@launch
+            val currentState = state.value as? SimpleScreenState.Success ?: return@launch
 
-            val selectedPersonId = (currentState.data.persons.firstOrNull { it.selected }
-                ?: currentState.data.persons.first()).id
+            val selectedPersonId = currentState.data.persons.first { it.selected }.id
             settingsRepository.setCurrentPersonId(selectedPersonId)
             navigationController.navigateTo(
                 destination = expensesScreenDestination,
@@ -102,19 +94,6 @@ internal class ChoosePersonViewModel(
                 launchSingleTop = true
             )
         }
-    }
-
-    private fun ChoosePersonScreenUiModel(
-        eventId: Long,
-        eventName: String,
-        persons: ImmutableList<PersonUiModel>
-    ): ChoosePersonScreenUiModel {
-        return ChoosePersonScreenUiModel(
-            eventId = eventId,
-            eventName = eventName,
-            persons = persons,
-            selectedPersonName = persons.first { it.selected }.name
-        )
     }
 
 }
