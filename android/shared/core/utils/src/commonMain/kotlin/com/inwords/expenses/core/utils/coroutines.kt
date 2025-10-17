@@ -6,9 +6,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.experimental.ExperimentalTypeInference
 
@@ -33,6 +36,22 @@ fun <T> Flow<T>.collectLatestIn(
     scope.launch {
         flow.collectLatest(action)
     }
+}
+
+fun <T> Flow<T>.stateInWhileSubscribed(
+    scope: CoroutineScope,
+    initialValue: T,
+    stopTimeoutMillis: Long = 1500L,
+    replayExpirationMillis: Long = Long.MAX_VALUE
+): StateFlow<T> {
+    return stateIn(
+        scope = scope,
+        started = SharingStarted.WhileSubscribed(
+            stopTimeoutMillis = stopTimeoutMillis,
+            replayExpirationMillis = replayExpirationMillis
+        ),
+        initialValue = initialValue,
+    )
 }
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTypeInference::class)
