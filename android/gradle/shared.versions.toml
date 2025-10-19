@@ -60,6 +60,8 @@ compose-material-icons-core = { group = "org.jetbrains.compose.material", name =
 
 ionspin-kotlin-bignum = { group = "com.ionspin.kotlin", name = "bignum", version = "0.3.10" }
 
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose-multiplatform-compiler = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }

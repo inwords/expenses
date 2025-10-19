@@ -11,6 +11,8 @@ fun String.toBigDecimalOrNull(): BigDecimal? {
         null
     } catch (e: ArithmeticException) {
         null
+    } catch (e: IndexOutOfBoundsException) { // TODO broken library behavior
+        null
     }
 }
 

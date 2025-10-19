@@ -65,6 +65,11 @@ kotlin {
                 implementation(shared.compose.ui.tooling)
             }
         }
+        commonTest {
+            dependencies {
+                implementation(shared.kotlin.test)
+            }
+        }
     }
 
     compilerOptions {
