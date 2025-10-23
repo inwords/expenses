@@ -74,7 +74,7 @@ junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", v
 junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "jupiter" }
 coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 mockk = { group = "io.mockk", name = "mockk", version = "1.14.6" }
-tourbine = { group = "app.cash.turbine", name = "turbine", version = "1.2.1" }
+turbine = { group = "app.cash.turbine", name = "turbine", version = "1.2.1" }
 
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

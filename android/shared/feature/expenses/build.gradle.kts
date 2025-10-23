@@ -71,7 +71,7 @@ kotlin {
                 implementation(shared.coroutines.test)
                 implementation(shared.junit.jupiter.api)
                 implementation(shared.mockk)
-                implementation(shared.tourbine)
+                implementation(shared.turbine)
             }
         }
         commonTest {
