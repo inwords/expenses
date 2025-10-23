@@ -56,10 +56,10 @@ baselineProfile {
 }
 
 dependencies {
-    implementation("androidx.test:runner:1.7.0")
-    implementation("androidx.test.ext:junit:1.3.0")
-    implementation("androidx.test.uiautomator:uiautomator:2.3.0")
-    implementation("androidx.benchmark:benchmark-macro-junit4:1.4.1")
+    implementation(shared.androidx.test.runner)
+    implementation(shared.androidx.test.ext.junit)
+    implementation(shared.androidx.test.uiautomator)
+    implementation(shared.androidx.test.benchmark.macro.junit4)
 }
 
 androidComponents {

@@ -7,22 +7,19 @@ import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.core.utils.asImmutableListAdapter
-import com.inwords.expenses.core.utils.collectIn
+import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.ui.add_persons.AddPersonsScreenDestination
 import com.inwords.expenses.feature.events.ui.create.CreateEventScreenUiModel.CurrencyInfoUiModel
 import com.inwords.expenses.feature.events.ui.create.CreateEventViewModel.CreateEventScreenModel.CurrencyInfoModel
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
@@ -43,40 +40,45 @@ internal class CreateEventViewModel(
         )
     }
 
-    private var confirmJob: Job? = null
+    private val initialValue = CreateEventScreenModel("", emptyList())
 
-    private val _state = MutableStateFlow(CreateEventScreenModel("", emptyList())) // TODO use screen state
+    private val inputEventName = MutableStateFlow(initialValue.eventName)
+    private val selectedCurrencyCode = MutableStateFlow<String?>(null)
+
+    private val _state: StateFlow<CreateEventScreenModel> = combine(
+        eventsInteractor.getCurrencies(),
+        inputEventName,
+        selectedCurrencyCode
+    ) { currencies, inputEventName, selectedCurrencyCode ->
+        val currencyCodeToSelect = selectedCurrencyCode ?: "RUB"
+        CreateEventScreenModel(
+            eventName = inputEventName,
+            currencies = currencies.map { currency ->
+                currency.toUiModel(
+                    selected = currency.code == currencyCodeToSelect
+                )
+            }
+        )
+    }.stateInWhileSubscribed(
+        scope = viewModelScope + UI,
+        initialValue = initialValue
+    )
+
     val state: StateFlow<CreateEventScreenUiModel> = _state
         .map { state -> state.toUiModel() }
-        .stateIn(viewModelScope + UI, started = SharingStarted.Eagerly, initialValue = CreateEventScreenUiModel("", persistentListOf()))
+        .stateInWhileSubscribed(
+            scope = viewModelScope + UI,
+            initialValue = initialValue.toUiModel()
+        )
 
-    init {
-        eventsInteractor.getCurrencies()
-            .collectIn(viewModelScope) { currencies ->
-                _state.update { value ->
-                    value.copy(
-                        currencies = currencies.map { currency ->
-                            currency.toUiModel(selected = currency.code == "RUB")
-                        }
-                    )
-                }
-            }
-    }
+    private var confirmJob: Job? = null
 
     fun onEventNameChanged(eventName: String) {
-        _state.update { value ->
-            value.copy(eventName = eventName)
-        }
+        inputEventName.value = eventName
     }
 
     fun onCurrencyClicked(currency: CurrencyInfoUiModel) {
-        _state.update { state ->
-            state.copy(
-                currencies = state.currencies.map { currencyUiModel ->
-                    currencyUiModel.copy(selected = currency.currencyCode == currencyUiModel.currency.code)
-                }
-            )
-        }
+        selectedCurrencyCode.value = currency.currencyCode
     }
 
     fun onConfirmClicked() {

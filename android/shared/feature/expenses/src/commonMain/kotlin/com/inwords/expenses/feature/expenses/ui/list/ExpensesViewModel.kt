@@ -6,8 +6,9 @@ import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.asImmutableListAdapter
-import com.inwords.expenses.core.utils.collectIn
+import com.inwords.expenses.core.utils.debounceAfterInitial
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
+import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonScreenDestination
 import com.inwords.expenses.feature.events.ui.create.CreateEventScreenDestination
@@ -26,7 +27,6 @@ import com.inwords.expenses.feature.menu.ui.MenuDialogDestination
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 internal class ExpensesViewModel(
     private val navigationController: NavigationController,
@@ -49,87 +50,84 @@ internal class ExpensesViewModel(
 
     private val isRefreshing = MutableStateFlow(false)
 
-    private val _state = MutableStateFlow<SimpleScreenState<ExpensesScreenUiModel>>(SimpleScreenState.Loading)
-    val state: StateFlow<SimpleScreenState<ExpensesScreenUiModel>> = _state
-
-    init {
-        @OptIn(ExperimentalCoroutinesApi::class)
-        combine(
-            eventsInteractor.currentEvent
-                .flatMapLatestNoBuffer { currentEvent ->
-                    if (currentEvent == null) {
-                        flowOf(null)
-                    } else {
-                        expensesInteractor.getExpensesDetails(currentEvent)
-                    }
-                },
-            settingsRepository.getCurrentPersonId()
-        ) { expensesDetails, currentPersonId ->
-            expensesDetails to currentPersonId
-        }.flatMapLatestNoBuffer { (expensesDetails, currentPersonId) ->
-            val currentPerson = expensesDetails?.event?.persons?.firstOrNull { it.id == currentPersonId }
-            if (expensesDetails == null || currentPerson == null) {
-                // local events branch
-                return@flatMapLatestNoBuffer eventsInteractor.getEvents().map { events ->
-                    if (events.isEmpty()) {
-                        SimpleScreenState.Empty
-                    } else {
-                        SimpleScreenState.Success(
-                            LocalEvents(
-                                events = events.map { event ->
-                                    LocalEventUiModel(
-                                        eventId = event.id,
-                                        eventName = event.name,
-                                    )
-                                }.asImmutableListAdapter()
-                            )
+    val state: StateFlow<SimpleScreenState<ExpensesScreenUiModel>> = combine(
+        eventsInteractor.currentEvent
+            .flatMapLatestNoBuffer { currentEvent ->
+                if (currentEvent == null) {
+                    flowOf(null)
+                } else {
+                    expensesInteractor.getExpensesDetails(currentEvent)
+                        .debounceAfterInitial(500.milliseconds)
+                }
+            },
+        settingsRepository.getCurrentPersonId()
+    ) { expensesDetails, currentPersonId ->
+        expensesDetails to currentPersonId
+    }.flatMapLatestNoBuffer { (expensesDetails, currentPersonId) ->
+        val currentPerson = expensesDetails?.event?.persons?.firstOrNull { it.id == currentPersonId }
+        if (expensesDetails == null || currentPerson == null) {
+            // local events branch
+            return@flatMapLatestNoBuffer eventsInteractor.getEvents().map { events ->
+                if (events.isEmpty()) {
+                    SimpleScreenState.Empty
+                } else {
+                    SimpleScreenState.Success(
+                        data = LocalEvents(
+                            events = events.map { event ->
+                                LocalEventUiModel(
+                                    eventId = event.id,
+                                    eventName = event.name,
+                                )
+                            }.asImmutableListAdapter()
                         )
-                    }
+                    )
                 }
             }
+        }
 
-            val debtors = expensesDetails.debtCalculator.getBarterAccumulatedDebtForPerson(currentPerson)
-                .map { (person, barterAccumulatedDebt) ->
-                    DebtorShortUiModel(
-                        personId = person.id,
-                        personName = person.name,
-                        currencyCode = barterAccumulatedDebt.currency.code,
-                        currencyName = barterAccumulatedDebt.currency.name,
-                        amount = barterAccumulatedDebt.barterAmount.toRoundedString()
-                    )
-                }
-                .sortedBy { it.amount }
-                .toPersistentList()
+        val debtors = expensesDetails.debtCalculator.getBarterAccumulatedDebtForPerson(currentPerson)
+            .map { (person, barterAccumulatedDebt) ->
+                DebtorShortUiModel(
+                    personId = person.id,
+                    personName = person.name,
+                    currencyCode = barterAccumulatedDebt.currency.code,
+                    currencyName = barterAccumulatedDebt.currency.name,
+                    amount = barterAccumulatedDebt.barterAmount.toRoundedString()
+                )
+            }
+            .sortedBy { it.amount }
+            .toPersistentList()
 
-            flowOf(
-                SimpleScreenState.Success(
-                    ExpensesScreenUiModel.Expenses(
-                        eventName = expensesDetails.event.event.name,
-                        currentPersonId = currentPerson.id,
-                        currentPersonName = currentPerson.name,
-                        creditors = debtors,
-                        expenses = expensesDetails.expenses.map { expense ->
-                            expense.toUiModel(primaryCurrencyName = expensesDetails.event.primaryCurrency.name)
-                        }.asImmutableListAdapter(),
-                        isRefreshing = false // TODO costyl
-                    )
+        flowOf(
+            SimpleScreenState.Success(
+                ExpensesScreenUiModel.Expenses(
+                    eventName = expensesDetails.event.event.name,
+                    currentPersonId = currentPerson.id,
+                    currentPersonName = currentPerson.name,
+                    creditors = debtors,
+                    expenses = expensesDetails.expenses.map { expense ->
+                        expense.toUiModel(primaryCurrencyName = expensesDetails.event.primaryCurrency.name)
+                    }.asImmutableListAdapter(),
+                    isRefreshing = false // TODO costyl
                 )
             )
-        }
-            .combine(isRefreshing) { state, isRefreshing ->
-                if (state is SimpleScreenState.Success) {
-                    when (val data = state.data) {
-                        is ExpensesScreenUiModel.Expenses -> state.copy(data = data.copy(isRefreshing = isRefreshing))
-                        is LocalEvents -> state
-                    }
-                } else {
-                    state
-                }
-            }
-            .collectIn(viewModelScope) {
-                _state.value = it
-            }
+        )
     }
+        .combine(isRefreshing) { state, isRefreshing ->
+            if (state is SimpleScreenState.Success) {
+                when (val data = state.data) {
+                    is ExpensesScreenUiModel.Expenses -> state.copy(data = data.copy(isRefreshing = isRefreshing))
+                    is LocalEvents -> state
+                }
+            } else {
+                state
+            }
+        }
+        .stateInWhileSubscribed(
+            scope = viewModelScope,
+            initialValue = SimpleScreenState.Loading,
+            replayExpirationMillis = 5000
+        )
 
     fun onMenuClick() {
         navigationController.navigateTo(MenuDialogDestination)
@@ -153,7 +151,7 @@ internal class ExpensesViewModel(
     }
 
     fun onReplenishmentClick(creditor: DebtorShortUiModel) {
-        val state = (_state.value as? SimpleScreenState.Success)?.data ?: return
+        val state = (state.value as? SimpleScreenState.Success)?.data ?: return
         val currentPersonId = when (state) {
             is ExpensesScreenUiModel.Expenses -> state.currentPersonId
             is LocalEvents -> return

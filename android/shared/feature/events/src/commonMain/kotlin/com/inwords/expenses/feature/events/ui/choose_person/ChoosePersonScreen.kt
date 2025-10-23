@@ -120,7 +120,7 @@ internal fun ChoosePersonContent(
                         .fillMaxWidth()
                         .padding(bottom = 16.dp),
                     eventName = state.eventName,
-                    currentPersonName = state.selectedPersonName
+                    currentPersonName = null
                 )
 
                 Text(
@@ -238,7 +238,6 @@ private fun ChoosePersonScreenPreview() {
                 ChoosePersonScreenUiModel(
                     eventId = 1,
                     eventName = "Weekend Trip",
-                    selectedPersonName = "John Doe",
                     persons = persistentListOf(
                         PersonUiModel(id = 1, name = "John Doe", selected = true),
                         PersonUiModel(id = 2, name = "Jane Smith", selected = false),

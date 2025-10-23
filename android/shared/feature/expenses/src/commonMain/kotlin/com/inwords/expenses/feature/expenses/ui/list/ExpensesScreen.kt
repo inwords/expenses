@@ -25,6 +25,7 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -104,9 +105,7 @@ internal fun ExpensesScreen(
             }
         }
 
-        is SimpleScreenState.Loading -> {
-            Text(text = "Loading")
-        }
+        is SimpleScreenState.Loading -> ExpensesScreenLoading(modifier)
 
         is SimpleScreenState.Error -> {
             Text(text = "Error")
@@ -312,6 +311,27 @@ private fun ExpensesScreenLocalEvents(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+private fun ExpensesScreenLoading(
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = { BasicTopAppBar() },
+    ) { paddingValues ->
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .consumeWindowInsets(paddingValues)
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 private fun ExpensesScreenEmpty(
     onCreateEventClick: () -> Unit,
     onJoinEventClick: () -> Unit,
@@ -319,9 +339,7 @@ private fun ExpensesScreenEmpty(
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = {
-            BasicTopAppBar()
-        },
+        topBar = { BasicTopAppBar() },
     ) { paddingValues ->
         Column(
             modifier = modifier
@@ -554,6 +572,25 @@ private fun ExpensesScreenPreviewEmpty() {
             onCreateEventClick = {},
             onRefresh = {},
             state = SimpleScreenState.Empty
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun ExpensesScreenPreviewLoading() {
+    ExpensesTheme {
+        ExpensesScreen(
+            onMenuClick = {},
+            onAddExpenseClick = {},
+            onRevertExpenseClick = {},
+            onDebtsDetailsClick = {},
+            onReplenishmentClick = {},
+            onJoinEventClick = {},
+            onJoinLocalEventClick = {},
+            onCreateEventClick = {},
+            onRefresh = {},
+            state = SimpleScreenState.Loading
         )
     }
 }

@@ -4,12 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
-import com.inwords.expenses.core.ui.utils.updateIfSuccess
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.core.utils.asImmutableListAdapter
-import com.inwords.expenses.core.utils.collectIn
+import com.inwords.expenses.core.utils.combine
 import com.inwords.expenses.core.utils.divide
+import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
+import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.core.utils.toBigDecimalOrNull
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.domain.model.Currency
@@ -32,12 +33,10 @@ import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
@@ -58,7 +57,7 @@ internal class AddExpenseViewModel(
         val subjectPersons: List<PersonInfoModel>,
         val equalSplit: Boolean,
         val wholeAmount: AmountModel,
-        val split: List<ExpenseSplitWithPersonModel>,
+        val split: List<ExpenseSplitWithPersonModel>?,
     ) {
 
         data class CurrencyInfoModel(
@@ -80,81 +79,89 @@ internal class AddExpenseViewModel(
             val amount: BigDecimal?,
             val amountRaw: String,
         )
-
     }
 
-    private val _state = MutableStateFlow<SimpleScreenState<AddExpenseScreenModel>>(SimpleScreenState.Empty)
-
-    val state: StateFlow<SimpleScreenState<AddExpenseScreenUiModel>> = _state
-        .map { state ->
-            when (state) {
-                SimpleScreenState.Empty -> SimpleScreenState.Empty
-                SimpleScreenState.Error -> SimpleScreenState.Error
-                SimpleScreenState.Loading -> SimpleScreenState.Loading
-                is SimpleScreenState.Success -> SimpleScreenState.Success(state.data.toUiModel())
-            }
+    private val selectedExpenseType = MutableStateFlow(replenishment?.let { ExpenseType.Replenishment } ?: ExpenseType.Spending)
+    private val selectedCurrencyCode = MutableStateFlow(replenishment?.currencyCode)
+    private val selectedPersonId = MutableStateFlow(replenishment?.fromPersonId)
+    private val selectedSubjectPersonsIds = MutableStateFlow(replenishment?.toPersonId?.let { setOf(it) })
+    private val inputDescription = MutableStateFlow(if (replenishment == null) "" else null)
+    private val inputEqualSplit = MutableStateFlow(replenishment == null)
+    private val inputWholeAmount = MutableStateFlow(
+        if (replenishment == null) {
+            AmountModel(null, "")
+        } else {
+            AmountModel(
+                amount = replenishment.amount.toBigDecimalOrNull(),
+                amountRaw = replenishment.amount
+            )
         }
-        .stateIn(viewModelScope + UI, started = SharingStarted.Eagerly, initialValue = SimpleScreenState.Empty)
+    )
+    private val inputSplit = MutableStateFlow<List<ExpenseSplitWithPersonModel>?>(null)
 
-    init {
-        combine(
-            eventsInteractor.currentEvent
-                .filterNotNull(), // TODO mvp
-            settingsRepository.getCurrentPersonId()
-        ) { eventDetails, currentPersonId ->
-            val subjectPersons = eventDetails.persons.map { person ->
-                PersonInfoModel(
-                    person = person,
-                    selected = if (replenishment == null) {
-                        true
-                    } else {
-                        person.id == replenishment.toPersonId
-                    }
+    private val _state: StateFlow<SimpleScreenState<AddExpenseScreenModel>> = combine(
+        eventsInteractor.currentEvent,
+        selectedExpenseType,
+        selectedCurrencyCode,
+        selectedPersonId.flatMapLatestNoBuffer {
+            it?.let { flowOf(it) } ?: settingsRepository.getCurrentPersonId()
+        },
+        selectedSubjectPersonsIds,
+        inputDescription,
+        inputEqualSplit,
+        inputWholeAmount,
+        inputSplit,
+    ) { eventDetails,
+        selectedExpenseType,
+        selectedCurrencyCode,
+        selectedPersonId,
+        selectedSubjectPersonsIds,
+        inputDescription,
+        inputEqualSplit,
+        inputWholeAmount,
+        inputSplit ->
+
+        eventDetails ?: return@combine SimpleScreenState.Error // can't work without event
+        selectedPersonId ?: return@combine SimpleScreenState.Error // it's current person if not selected, can't work without current person
+
+        val persons = eventDetails.persons.map { person ->
+            PersonInfoModel(
+                person = person,
+                selected = person.id == selectedPersonId
+            )
+        }
+        val subjectPersons = eventDetails.persons.map { person ->
+            PersonInfoModel(
+                person = person,
+                selected = selectedSubjectPersonsIds?.contains(person.id) ?: true
+            )
+        }
+
+        val selectedCurrency = eventDetails.currencies
+            .firstOrNull { it.code == selectedCurrencyCode }
+            ?: eventDetails.primaryCurrency
+
+        val model = AddExpenseScreenModel(
+            event = eventDetails.event,
+            description = inputDescription ?: run {
+                val currentPerson = persons.first { it.selected }
+                "Возврат от ${currentPerson.person.name}"
+            },
+            currencies = eventDetails.currencies.map { currency ->
+                AddExpenseScreenModel.CurrencyInfoModel(
+                    currency = currency,
+                    selected = currency == selectedCurrency,
                 )
-            }
-
-            val state = (_state.value as? SimpleScreenState.Success<AddExpenseScreenModel>)?.data
-            val selectedCurrency = if (replenishment == null) {
-                val selectedCurrencyFromState = state?.currencies?.firstOrNull { it.selected }?.currency
-                selectedCurrencyFromState?.let {
-                    eventDetails.currencies.firstOrNull { it.code == selectedCurrencyFromState.code }
-                } ?: eventDetails.primaryCurrency
-            } else {
-                eventDetails.currencies.firstOrNull { it.code == replenishment.currencyCode }
-                    ?: eventDetails.primaryCurrency
-            }
-            AddExpenseScreenModel(
-                event = eventDetails.event,
-                description = if (replenishment == null) {
-                    state?.description.orEmpty()
-                } else {
-                    val currentPerson = eventDetails.persons.first { it.id == replenishment.fromPersonId }
-                    "Возврат от ${currentPerson.name}"
-                },
-                currencies = eventDetails.currencies.map { currency ->
-                    AddExpenseScreenModel.CurrencyInfoModel(
-                        currency = currency,
-                        selected = currency == selectedCurrency,
-                    )
-                },
-                expenseType = replenishment?.let { ExpenseType.Replenishment } ?: state?.expenseType ?: ExpenseType.Spending,
-                persons = eventDetails.persons.map { person ->
-                    PersonInfoModel(
-                        person = person,
-                        selected = if (replenishment == null) {
-                            person.id == currentPersonId
-                        } else {
-                            person.id == replenishment.fromPersonId
-                        }
-                    )
-                },
-                subjectPersons = subjectPersons,
-                equalSplit = replenishment == null,
-                wholeAmount = state?.wholeAmount ?: AmountModel(
-                    amount = null,
-                    amountRaw = ""
-                ),
-                split = if (replenishment == null) {
+            },
+            expenseType = selectedExpenseType,
+            persons = persons,
+            subjectPersons = subjectPersons,
+            equalSplit = inputEqualSplit,
+            wholeAmount = inputWholeAmount,
+            split = ensureSplitCalculated(
+                equalSplit = inputEqualSplit,
+                wholeAmount = inputWholeAmount,
+                split = inputSplit ?: if (replenishment == null) {
                     emptyList()
                 } else {
                     listOf(
@@ -166,90 +173,56 @@ internal class AddExpenseViewModel(
                             )
                         )
                     )
-                }
+                },
+                subjectPersons = subjectPersons
             )
-        }
-            .collectIn(viewModelScope) { screenUiModel ->
-                // TODO mvp - needs error handling and user input preservation (mask)
-                _state.value = SimpleScreenState.Success(screenUiModel)
+        )
+        SimpleScreenState.Success(model)
+    }.stateInWhileSubscribed(viewModelScope + UI, initialValue = SimpleScreenState.Loading)
+
+    val state: StateFlow<SimpleScreenState<AddExpenseScreenUiModel>> = _state
+        .map { state ->
+            when (state) {
+                SimpleScreenState.Empty -> SimpleScreenState.Empty
+                SimpleScreenState.Error -> SimpleScreenState.Error
+                SimpleScreenState.Loading -> SimpleScreenState.Loading
+                is SimpleScreenState.Success -> SimpleScreenState.Success(state.data.toUiModel())
             }
-    }
+        }
+        .stateInWhileSubscribed(viewModelScope + UI, initialValue = SimpleScreenState.Loading)
 
     fun onExpenseTypeClicked(type: ExpenseType) {
-        _state.updateIfSuccess { state ->
-            state.copy(expenseType = type)
-        }
+        selectedExpenseType.value = type
     }
 
     fun onCurrencyClicked(currency: CurrencyInfoUiModel) {
-        _state.updateIfSuccess { state ->
-            state.copy(
-                currencies = state.currencies.map { currencyUiModel ->
-                    currencyUiModel.copy(selected = currency.currencyCode == currencyUiModel.currency.code)
-                }
-            )
-        }
+        selectedCurrencyCode.value = currency.currencyCode
     }
 
     fun onPersonClicked(person: PersonInfoUiModel) {
-        _state.updateIfSuccess { state ->
-            val newSubjectPersons = state.persons.map {
-                state.subjectPersons.firstOrNull { personUiModel -> personUiModel.person.id == it.person.id } ?: it
-            }
-            val newSplit = ensureSplitCalculated(
-                equalSplit = state.equalSplit,
-                wholeAmount = state.wholeAmount,
-                split = state.split,
-                subjectPersons = newSubjectPersons
-            )
-            state.copy(
-                persons = state.persons.map { personUiModel ->
-                    personUiModel.copy(selected = personUiModel.person.id == person.personId)
-                },
-                subjectPersons = newSubjectPersons,
-                split = newSplit,
-            )
-        }
+        selectedPersonId.value = person.personId
     }
 
     fun onSubjectPersonClicked(person: PersonInfoUiModel) {
-        _state.updateIfSuccess { state ->
-            val newSubjectPersons = state.subjectPersons.map { personUiModel ->
-                if (personUiModel.person.id == person.personId) {
-                    personUiModel.copy(selected = !personUiModel.selected)
-                } else {
-                    personUiModel
-                }
+        selectedSubjectPersonsIds.update { current ->
+            val selectedSubjectPersonsIds = if (current == null) {
+                // initialize set if it's null
+                val state = (_state.value as? SimpleScreenState.Success)?.data ?: return@update current
+                state.subjectPersons.mapTo(HashSet()) { it.person.id }
+            } else {
+                current
             }
 
-            val newSplit = ensureSplitCalculated(
-                equalSplit = state.equalSplit,
-                wholeAmount = state.wholeAmount,
-                split = state.split,
-                subjectPersons = newSubjectPersons
-            )
-
-            state.copy(
-                subjectPersons = newSubjectPersons,
-                split = newSplit,
-            )
+            if (selectedSubjectPersonsIds.contains(person.personId)) {
+                selectedSubjectPersonsIds - person.personId
+            } else {
+                selectedSubjectPersonsIds + person.personId
+            }
         }
     }
 
     fun onEqualSplitChange(equalSplit: Boolean) {
-        _state.updateIfSuccess { state ->
-            val newSplit = ensureSplitCalculated(
-                equalSplit = equalSplit,
-                wholeAmount = state.wholeAmount,
-                split = state.split,
-                subjectPersons = state.subjectPersons
-            )
-
-            state.copy(
-                equalSplit = equalSplit,
-                split = newSplit,
-            )
-        }
+        inputEqualSplit.value = equalSplit
     }
 
     private fun ensureSplitCalculated(
@@ -292,24 +265,22 @@ internal class AddExpenseViewModel(
     fun onWholeAmountChanged(amount: String) {
         val newAmount = amount.parseToAmountModel()
 
-        _state.updateIfSuccess { state ->
-            state.copy(wholeAmount = newAmount)
-        }
+        inputWholeAmount.value = newAmount
     }
 
     fun onSplitAmountChanged(person: ExpenseSplitWithPersonUiModel, amount: String) {
         val newAmount = amount.parseToAmountModel()
 
-        _state.updateIfSuccess { state ->
-            state.copy(
-                split = state.split.map { split ->
-                    if (split.person.person.id == person.person.personId) {
-                        split.copy(amount = newAmount)
-                    } else {
-                        split
-                    }
+        inputSplit.update { current ->
+            val split = current ?: (_state.value as? SimpleScreenState.Success)?.data?.split ?: return@update current
+
+            split.map { splitWithPerson ->
+                if (splitWithPerson.person.person.id == person.person.personId) {
+                    splitWithPerson.copy(amount = newAmount)
+                } else {
+                    splitWithPerson
                 }
-            )
+            }
         }
     }
 
@@ -322,17 +293,15 @@ internal class AddExpenseViewModel(
     }
 
     fun onDescriptionChanged(description: String) {
-        _state.updateIfSuccess { state ->
-            state.copy(description = description)
-        }
+        inputDescription.value = description
     }
 
     fun onConfirmClicked() {
         val state = (_state.value as? SimpleScreenState.Success)?.data ?: return
 
         viewModelScope.launch {
-            val selectedCurrency = state.currencies.first { it.selected }.currency
-            val selectedPerson = state.persons.first { it.selected }.person
+            val selectedCurrency = state.currencies.firstOrNull { it.selected }?.currency ?: return@launch
+            val selectedPerson = state.persons.firstOrNull { it.selected }?.person ?: return@launch
             if (state.equalSplit) {
                 expensesInteractor.addExpenseEqualSplit(
                     event = state.event,
@@ -344,9 +313,9 @@ internal class AddExpenseViewModel(
                     selectedPerson = selectedPerson,
                 )
             } else {
-                val personWithAmountSplit = state.split.map {
+                val personWithAmountSplit = state.split?.map {
                     PersonWithAmount(it.person.person, it.amount.amount ?: return@launch)
-                }
+                } ?: return@launch
                 expensesInteractor.addExpenseCustomSplit(
                     event = state.event,
                     expenseType = state.expenseType,
@@ -392,7 +361,7 @@ internal class AddExpenseViewModel(
             }.asImmutableListAdapter(),
             equalSplit = this.equalSplit,
             wholeAmount = this.wholeAmount.amountRaw,
-            split = this.split.map { expenseSplitWithPersonModel ->
+            split = this.split.orEmpty().map { expenseSplitWithPersonModel ->
                 ExpenseSplitWithPersonUiModel(
                     person = PersonInfoUiModel(
                         personId = expenseSplitWithPersonModel.person.person.id,

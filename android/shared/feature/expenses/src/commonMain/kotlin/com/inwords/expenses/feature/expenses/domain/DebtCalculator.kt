@@ -51,7 +51,7 @@ internal class DebtCalculator(
 
         expenses.forEach { expense ->
             expense.subjectExpenseSplitWithPersons.forEach { subjectExpenseSplit ->
-                if (subjectExpenseSplit.person != expense.person) {
+                if (subjectExpenseSplit.person != expense.person && subjectExpenseSplit.exchangedAmount != BigDecimal.ZERO) {
                     val subjectDebtorToCreditorDebts = debtorToCreditorDebts.getOrPut(subjectExpenseSplit.person) { mutableMapOf() }
 
                     val debt = Debt(
