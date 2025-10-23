@@ -104,14 +104,14 @@ dependencies {
 
     implementation(shared.profileinstaller)
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.2")
-    androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test:runner:1.6.2")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestUtil("androidx.test:orchestrator:1.5.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-android:1.8.3")
+    testImplementation(shared.junit.jupiter.api)
+    testRuntimeOnly(shared.junit.jupiter.engine)
+    androidTestImplementation(shared.junit.jupiter.api)
+    androidTestImplementation(shared.androidx.test.ext.junit)
+    androidTestImplementation(shared.androidx.test.runner)
+    androidTestImplementation(shared.androidx.test.espresso.core)
+    androidTestUtil(shared.androidx.test.orchestrator)
+    androidTestImplementation(shared.androidx.compose.ui.test.android)
 
     baselineProfile(project(":baselineprofile"))
 }

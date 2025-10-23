@@ -65,6 +65,15 @@ kotlin {
                 implementation(shared.compose.ui.tooling)
             }
         }
+        androidUnitTest {
+            dependencies {
+                implementation(shared.kotlin.test)
+                implementation(shared.coroutines.test)
+                implementation(shared.junit.jupiter.api)
+                implementation(shared.mockk)
+                implementation(shared.tourbine)
+            }
+        }
         commonTest {
             dependencies {
                 implementation(shared.kotlin.test)
