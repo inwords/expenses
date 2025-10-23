@@ -300,8 +300,8 @@ internal class AddExpenseViewModel(
         val state = (_state.value as? SimpleScreenState.Success)?.data ?: return
 
         viewModelScope.launch {
-            val selectedCurrency = state.currencies.first { it.selected }.currency
-            val selectedPerson = state.persons.first { it.selected }.person
+            val selectedCurrency = state.currencies.firstOrNull { it.selected }?.currency ?: return@launch
+            val selectedPerson = state.persons.firstOrNull { it.selected }?.person ?: return@launch
             if (state.equalSplit) {
                 expensesInteractor.addExpenseEqualSplit(
                     event = state.event,
