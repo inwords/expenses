@@ -3,7 +3,7 @@ package com.inwords.expenses.feature.expenses.ui.list
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
 import kotlinx.collections.immutable.ImmutableList
 
-internal sealed interface ExpensesScreenUiModel {
+internal sealed interface ExpensesPaneUiModel {
 
     data class Expenses(
         val eventName: String,
@@ -12,7 +12,7 @@ internal sealed interface ExpensesScreenUiModel {
         val creditors: ImmutableList<DebtorShortUiModel>,
         val expenses: ImmutableList<ExpenseUiModel>,
         val isRefreshing: Boolean,
-    ) : ExpensesScreenUiModel {
+    ) : ExpensesPaneUiModel {
 
         data class DebtorShortUiModel(
             val personId: Long,
@@ -36,7 +36,7 @@ internal sealed interface ExpensesScreenUiModel {
 
     data class LocalEvents(
         val events: ImmutableList<LocalEventUiModel>
-    ) : ExpensesScreenUiModel {
+    ) : ExpensesPaneUiModel {
 
         data class LocalEventUiModel(
             val eventId: Long,

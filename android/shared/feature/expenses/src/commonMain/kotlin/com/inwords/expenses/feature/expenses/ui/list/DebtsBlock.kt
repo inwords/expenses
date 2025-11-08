@@ -22,13 +22,13 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.Expenses.DebtorShortUiModel
+import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.Expenses.DebtorShortUiModel
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun DebtsBlock(
     onDebtsDetailsClick: () -> Unit,
-    state: ExpensesScreenUiModel.Expenses,
+    state: ExpensesPaneUiModel.Expenses,
     onReplenishmentClick: (DebtorShortUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {

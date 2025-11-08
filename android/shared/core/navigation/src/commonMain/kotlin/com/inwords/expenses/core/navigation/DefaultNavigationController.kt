@@ -1,44 +1,57 @@
 package com.inwords.expenses.core.navigation
 
-import androidx.navigation.NavHostController
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
+import androidx.navigation3.runtime.NavBackStack
 
-internal class DefaultNavigationController : NavigationController {
+internal class DefaultNavigationController() : AttachableNavigationController {
 
-    fun interface NavCommand {
+    private var backStack: NavBackStack<Destination>? = null
 
-        fun execute(navController: NavHostController)
+    override fun attachTo(navBackStack: NavBackStack<Destination>) {
+        backStack = navBackStack
     }
 
-    private val _navCommands = Channel<NavCommand>(capacity = 10)
-    val navCommands: ReceiveChannel<NavCommand> = _navCommands
-
     override fun navigateTo(destination: Destination) {
-        _navCommands.trySend(NavCommand { it.navigate(destination) })
+        getBackStack().add(destination)
     }
 
     override fun navigateTo(destination: Destination, popUpTo: Destination, launchSingleTop: Boolean) {
-        _navCommands.trySend(
-            NavCommand {
-                it.navigate(destination) {
-                    popUpTo(popUpTo)
-                    this.launchSingleTop = launchSingleTop
+        getBackStack().apply {
+            popBackStack(toDestination = popUpTo, inclusive = false)
+
+            val existingDestinationIndex = lastIndexOf(destination)
+            if (launchSingleTop && existingDestinationIndex != -1) {
+                if (existingDestinationIndex != lastIndex) {
+                    val top = removeAt(existingDestinationIndex)
+                    add(top)
                 }
+            } else {
+                add(destination)
             }
-        )
+        }
     }
 
     override fun popBackStack() {
-        _navCommands.trySend(NavCommand { it.popBackStack() })
+        getBackStack().removeLastOrNull()
     }
 
     override fun popBackStack(toDestination: Destination, inclusive: Boolean) {
-        _navCommands.trySend(
-            NavCommand {
-                it.popBackStack(toDestination, inclusive)
+        getBackStack().apply {
+            val toIndex = lastIndexOf(toDestination)
+            if (toIndex != -1) {
+                val targetIndex = if (inclusive) toIndex else toIndex + 1
+                if (targetIndex < size) {
+                    repeat(size - targetIndex) {
+                        removeAt(lastIndex)
+                    }
+                }
+            } else {
+                clear()
             }
-        )
+        }
+    }
+
+    private fun getBackStack(): NavBackStack<Destination> {
+        return requireNotNull(backStack) { "NavigationController is not attached to NavBackStack" }
     }
 
 }

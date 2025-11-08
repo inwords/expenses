@@ -3,7 +3,7 @@ package com.inwords.expenses.feature.expenses.ui.add
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
 import kotlinx.collections.immutable.ImmutableList
 
-internal data class AddExpenseScreenUiModel(
+internal data class AddExpensePaneUiModel(
     val description: String,
     val currencies: ImmutableList<CurrencyInfoUiModel>,
     val expenseType: ExpenseType,

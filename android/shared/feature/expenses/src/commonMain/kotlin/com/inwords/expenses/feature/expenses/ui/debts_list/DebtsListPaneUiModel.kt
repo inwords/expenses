@@ -3,7 +3,7 @@ package com.inwords.expenses.feature.expenses.ui.debts_list
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 
-internal data class DebtsListScreenUiModel(
+internal data class DebtsListPaneUiModel(
     val eventName: String,
     val creditors: ImmutableMap<PersonUiModel, ImmutableList<DebtorShortUiModel>>,
 ) {

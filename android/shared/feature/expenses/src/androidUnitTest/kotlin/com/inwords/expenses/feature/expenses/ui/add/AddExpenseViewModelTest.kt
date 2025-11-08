@@ -11,9 +11,9 @@ import com.inwords.expenses.feature.events.domain.model.EventDetails
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
-import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.CurrencyInfoUiModel
-import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.ExpenseSplitWithPersonUiModel
-import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.PersonInfoUiModel
+import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneUiModel.CurrencyInfoUiModel
+import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneUiModel.ExpenseSplitWithPersonUiModel
+import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneUiModel.PersonInfoUiModel
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import io.mockk.coEvery
@@ -365,7 +365,7 @@ internal class AddExpenseViewModelTest {
     @Test
     fun `replenishment pre-fills type currency payer payee description amount and split`() = scope.runTest {
         // Arrange — from p2 → to p3 in EUR amount 7.5
-        val repl = AddExpenseScreenDestination.Replenishment(
+        val repl = AddExpensePaneDestination.Replenishment(
             fromPersonId = Fixtures.person2.id,
             toPersonId = Fixtures.person3.id,
             currencyCode = Fixtures.EUR.code,
@@ -391,19 +391,6 @@ internal class AddExpenseViewModelTest {
 
             cancelAndIgnoreRemainingEvents()
         }
-    }
-
-    @Test
-    fun `onCloseClicked pops back stack`() = scope.runTest {
-        // Arrange
-        currentEventFlow.value = Fixtures.eventDetails
-        val vm = createViewModel()
-
-        // Act
-        vm.onCloseClicked()
-
-        // Assert
-        coVerify(exactly = 1) { navigation.popBackStack() }
     }
 
     @Test
@@ -610,7 +597,7 @@ internal class AddExpenseViewModelTest {
     }
 
     private fun createViewModel(
-        replenishment: AddExpenseScreenDestination.Replenishment? = null
+        replenishment: AddExpensePaneDestination.Replenishment? = null
     ): AddExpenseViewModel {
         return AddExpenseViewModel(
             navigationController = navigation,
@@ -623,13 +610,13 @@ internal class AddExpenseViewModelTest {
 
     // ---------- Helpers ----------
 
-    private suspend fun ReceiveTurbine<SimpleScreenState<AddExpenseScreenUiModel>>.awaitLoading() {
+    private suspend fun ReceiveTurbine<SimpleScreenState<AddExpensePaneUiModel>>.awaitLoading() {
         assertIs<SimpleScreenState.Loading>(awaitItem())
     }
 
-    private suspend fun ReceiveTurbine<SimpleScreenState<AddExpenseScreenUiModel>>.awaitSuccess(): AddExpenseScreenUiModel {
+    private suspend fun ReceiveTurbine<SimpleScreenState<AddExpensePaneUiModel>>.awaitSuccess(): AddExpensePaneUiModel {
         val state = awaitItem()
-        assertIs<SimpleScreenState.Success<AddExpenseScreenUiModel>>(state)
+        assertIs<SimpleScreenState.Success<AddExpensePaneUiModel>>(state)
         return state.data
     }
 

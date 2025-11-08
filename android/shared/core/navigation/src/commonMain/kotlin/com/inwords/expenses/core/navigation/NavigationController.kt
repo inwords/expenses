@@ -1,5 +1,7 @@
 package com.inwords.expenses.core.navigation
 
+import androidx.navigation3.runtime.NavBackStack
+
 interface NavigationController {
 
     fun navigateTo(destination: Destination)
@@ -9,4 +11,9 @@ interface NavigationController {
     fun popBackStack()
 
     fun popBackStack(toDestination: Destination, inclusive: Boolean)
+}
+
+interface AttachableNavigationController : NavigationController {
+
+    fun attachTo(navBackStack: NavBackStack<Destination>)
 }

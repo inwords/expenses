@@ -2,7 +2,7 @@ package com.inwords.expenses.feature.events.ui.create
 
 import kotlinx.collections.immutable.ImmutableList
 
-internal data class CreateEventScreenUiModel(
+internal data class CreateEventPaneUiModel(
     val eventName: String,
     val currencies: ImmutableList<CurrencyInfoUiModel>,
 ) {

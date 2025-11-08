@@ -25,7 +25,6 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -50,6 +49,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.appbar.BasicTopAppBar
 import com.inwords.expenses.core.ui.design.button.BasicFloatingActionButton
+import com.inwords.expenses.core.ui.design.loading.DefaultProgressIndicator
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.feature.events.domain.model.Currency
@@ -59,17 +59,17 @@ import com.inwords.expenses.feature.expenses.domain.model.Expense
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseSplitWithPerson
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
 import com.inwords.expenses.feature.expenses.ui.converter.toUiModel
-import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.Expenses.DebtorShortUiModel
-import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.Expenses.ExpenseUiModel
-import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.LocalEvents
-import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.LocalEvents.LocalEventUiModel
+import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.Expenses.DebtorShortUiModel
+import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.Expenses.ExpenseUiModel
+import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents
+import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents.LocalEventUiModel
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.collections.immutable.persistentListOf
 import kotlin.time.Clock
 
 @Composable
-internal fun ExpensesScreen(
-    state: SimpleScreenState<ExpensesScreenUiModel>,
+internal fun ExpensesPane(
+    state: SimpleScreenState<ExpensesPaneUiModel>,
     onMenuClick: () -> Unit,
     onAddExpenseClick: () -> Unit,
     onRevertExpenseClick: (expense: ExpenseUiModel) -> Unit,
@@ -84,7 +84,7 @@ internal fun ExpensesScreen(
     when (state) {
         is SimpleScreenState.Success -> {
             when (val state = state.data) {
-                is ExpensesScreenUiModel.Expenses -> ExpensesScreenSuccess(
+                is ExpensesPaneUiModel.Expenses -> ExpensesPaneSuccess(
                     state = state,
                     onMenuClick = onMenuClick,
                     onAddExpenseClick = onAddExpenseClick,
@@ -95,7 +95,7 @@ internal fun ExpensesScreen(
                     modifier = modifier
                 )
 
-                is LocalEvents -> ExpensesScreenLocalEvents(
+                is LocalEvents -> ExpensesPaneLocalEvents(
                     onCreateEventClick = onCreateEventClick,
                     onJoinEventClick = onJoinEventClick,
                     onJoinLocalEventClick = onJoinLocalEventClick,
@@ -105,13 +105,13 @@ internal fun ExpensesScreen(
             }
         }
 
-        is SimpleScreenState.Loading -> ExpensesScreenLoading(modifier)
+        is SimpleScreenState.Loading -> ExpensesPaneLoading(modifier)
 
         is SimpleScreenState.Error -> {
             Text(text = "Error")
         }
 
-        SimpleScreenState.Empty -> ExpensesScreenEmpty(
+        SimpleScreenState.Empty -> ExpensesPaneEmpty(
             onCreateEventClick = onCreateEventClick,
             onJoinEventClick = onJoinEventClick,
             modifier = modifier,
@@ -121,8 +121,8 @@ internal fun ExpensesScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ExpensesScreenSuccess(
-    state: ExpensesScreenUiModel.Expenses,
+private fun ExpensesPaneSuccess(
+    state: ExpensesPaneUiModel.Expenses,
     onMenuClick: () -> Unit,
     onAddExpenseClick: () -> Unit,
     onRevertExpenseClick: (expense: ExpenseUiModel) -> Unit,
@@ -237,7 +237,7 @@ private fun ExpensesScreenSuccess(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ExpensesScreenLocalEvents(
+private fun ExpensesPaneLocalEvents(
     onCreateEventClick: () -> Unit,
     onJoinEventClick: () -> Unit,
     onJoinLocalEventClick: (event: LocalEventUiModel) -> Unit,
@@ -311,7 +311,7 @@ private fun ExpensesScreenLocalEvents(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ExpensesScreenLoading(
+private fun ExpensesPaneLoading(
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -325,14 +325,14 @@ private fun ExpensesScreenLoading(
                 .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator()
+            DefaultProgressIndicator()
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ExpensesScreenEmpty(
+private fun ExpensesPaneEmpty(
     onCreateEventClick: () -> Unit,
     onJoinEventClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -497,9 +497,9 @@ private fun LocalEventItem(
 
 @Preview
 @Composable
-private fun ExpensesScreenPreviewSuccessWithCreditors() {
+private fun ExpensesPanePreviewSuccessWithCreditors() {
     ExpensesTheme {
-        ExpensesScreen(
+        ExpensesPane(
             onMenuClick = {},
             onAddExpenseClick = {},
             onRevertExpenseClick = {},
@@ -509,16 +509,16 @@ private fun ExpensesScreenPreviewSuccessWithCreditors() {
             onJoinLocalEventClick = {},
             onCreateEventClick = {},
             onRefresh = {},
-            state = SimpleScreenState.Success(mockExpensesScreenUiModel(withCreditors = true))
+            state = SimpleScreenState.Success(mockExpensesPaneUiModel(withCreditors = true))
         )
     }
 }
 
 @Preview
 @Composable
-private fun ExpensesScreenPreviewSuccessWithoutCreditors() {
+private fun ExpensesPanePreviewSuccessWithoutCreditors() {
     ExpensesTheme {
-        ExpensesScreen(
+        ExpensesPane(
             onMenuClick = {},
             onAddExpenseClick = {},
             onRevertExpenseClick = {},
@@ -528,16 +528,16 @@ private fun ExpensesScreenPreviewSuccessWithoutCreditors() {
             onJoinLocalEventClick = {},
             onCreateEventClick = {},
             onRefresh = {},
-            state = SimpleScreenState.Success(mockExpensesScreenUiModel(withCreditors = false))
+            state = SimpleScreenState.Success(mockExpensesPaneUiModel(withCreditors = false))
         )
     }
 }
 
 @Composable
 @Preview
-private fun ExpensesScreenLocalEventsPreview() {
+private fun ExpensesPaneLocalEventsPreview() {
     ExpensesTheme {
-        ExpensesScreenLocalEvents(
+        ExpensesPaneLocalEvents(
             onCreateEventClick = {},
             onJoinEventClick = {},
             onJoinLocalEventClick = {},
@@ -559,9 +559,9 @@ private fun ExpensesScreenLocalEventsPreview() {
 
 @Composable
 @Preview
-private fun ExpensesScreenPreviewEmpty() {
+private fun ExpensesPanePreviewEmpty() {
     ExpensesTheme {
-        ExpensesScreen(
+        ExpensesPane(
             onMenuClick = {},
             onAddExpenseClick = {},
             onRevertExpenseClick = {},
@@ -578,9 +578,9 @@ private fun ExpensesScreenPreviewEmpty() {
 
 @Composable
 @Preview
-private fun ExpensesScreenPreviewLoading() {
+private fun ExpensesPanePreviewLoading() {
     ExpensesTheme {
-        ExpensesScreen(
+        ExpensesPane(
             onMenuClick = {},
             onAddExpenseClick = {},
             onRevertExpenseClick = {},
@@ -595,7 +595,7 @@ private fun ExpensesScreenPreviewLoading() {
     }
 }
 
-internal fun mockExpensesScreenUiModel(withCreditors: Boolean): ExpensesScreenUiModel {
+internal fun mockExpensesPaneUiModel(withCreditors: Boolean): ExpensesPaneUiModel {
     val person1 = Person(
         id = 1,
         serverId = "11",
@@ -606,7 +606,7 @@ internal fun mockExpensesScreenUiModel(withCreditors: Boolean): ExpensesScreenUi
         serverId = "12",
         name = "Максим"
     )
-    return ExpensesScreenUiModel.Expenses(
+    return ExpensesPaneUiModel.Expenses(
         eventName = "France trip",
         currentPersonId = person1.id,
         currentPersonName = person1.name,

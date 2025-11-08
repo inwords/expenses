@@ -6,7 +6,7 @@ import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.domain.EventsInteractor.JoinEventResult
-import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonScreenDestination
+import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -27,12 +27,12 @@ internal class JoinEventViewModel(
     private var confirmJob: Job? = null
 
     private val _state = MutableStateFlow(
-        JoinEventScreenUiModel(
+        JoinEventPaneUiModel(
             eventId = initialEventId.filter { it.toString().matches(eventIdRegex) },
             eventAccessCode = initialPinCode.filter { it.isDigit() }
         )
     )
-    val state: StateFlow<JoinEventScreenUiModel> = _state
+    val state: StateFlow<JoinEventPaneUiModel> = _state
 
     fun onEventIdChanged(eventId: String) {
         _state.update { value ->
@@ -56,7 +56,7 @@ internal class JoinEventViewModel(
             )
             when (result) {
                 is JoinEventResult.NewCurrentEvent -> navigationController.navigateTo(
-                    destination = ChoosePersonScreenDestination
+                    destination = ChoosePersonPaneDestination
                 )
 
                 JoinEventResult.InvalidAccessCode -> Unit

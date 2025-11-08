@@ -27,14 +27,14 @@ import com.inwords.expenses.core.ui.design.appbar.BasicTopAppBar
 import com.inwords.expenses.core.ui.design.button.BasicButton
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.feature.events.ui.common.EventNameField
-import com.inwords.expenses.feature.events.ui.create.CreateEventScreenUiModel.CurrencyInfoUiModel
+import com.inwords.expenses.feature.events.ui.create.CreateEventPaneUiModel.CurrencyInfoUiModel
 import kotlinx.collections.immutable.persistentListOf
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-internal fun CreateEventScreen(
+internal fun CreateEventPane(
     modifier: Modifier = Modifier,
-    state: CreateEventScreenUiModel,
+    state: CreateEventPaneUiModel,
     onEventNameChanged: (String) -> Unit,
     onCurrencyClicked: (CurrencyInfoUiModel) -> Unit,
     onConfirmClicked: () -> Unit,
@@ -102,10 +102,10 @@ internal fun CreateEventScreen(
 
 @Preview
 @Composable
-private fun CreateEventScreenPreview() {
+private fun CreateEventPanePreview() {
     ExpensesTheme {
-        CreateEventScreen(
-            state = CreateEventScreenUiModel(
+        CreateEventPane(
+            state = CreateEventPaneUiModel(
                 eventName = "",
                 currencies = persistentListOf(
                     CurrencyInfoUiModel(

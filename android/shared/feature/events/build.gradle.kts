@@ -42,6 +42,7 @@ kotlin {
 
                 implementation(shared.lifecycle.runtime.compose.multiplatform)
                 implementation(shared.lifecycle.viewmodel.compose.multiplatform)
+                implementation(shared.lifecycle.viewmodel.navigation3.multiplatform)
 
                 implementation(shared.room.runtime)
 
@@ -52,7 +53,6 @@ kotlin {
                 implementation(shared.compose.ui.tooling.preview.multiplatform)
 
                 implementation(shared.compose.material.icons.core)
-                implementation(shared.navigation.compose.multiplatform)
             }
         }
 

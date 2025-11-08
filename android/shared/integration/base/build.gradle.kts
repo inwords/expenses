@@ -48,16 +48,10 @@ kotlin {
                 implementation(shared.compose.material3.multiplatform)
                 implementation(shared.compose.ui.tooling.preview.multiplatform)
 
-                api(shared.navigation.compose.multiplatform)
-                implementation(shared.navigation3.ui.multiplatform)
+                api(shared.navigation3.ui.multiplatform)
                 implementation(shared.lifecycle.viewmodel.navigation3.multiplatform)
 
                 implementation(shared.kotlinx.atomicfu) // TODO remove when atomicfu plugin is fixed
-            }
-        }
-        androidMain {
-            dependencies {
-                api(shared.navigation.compose)
             }
         }
     }

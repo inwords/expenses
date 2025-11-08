@@ -24,7 +24,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -39,48 +38,41 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.appbar.BasicTopAppBar
 import com.inwords.expenses.core.ui.design.button.BasicButton
+import com.inwords.expenses.core.ui.design.loading.DefaultProgressIndicator
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
-import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonScreenUiModel.PersonUiModel
+import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneUiModel.PersonUiModel
 import com.inwords.expenses.feature.events.ui.common.EventInfoBlock
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
-internal fun ChoosePersonScreen(
+internal fun ChoosePersonPane(
     modifier: Modifier = Modifier,
-    state: SimpleScreenState<ChoosePersonScreenUiModel>,
+    state: SimpleScreenState<ChoosePersonPaneUiModel>,
     onPersonSelected: (Long) -> Unit,
     onConfirmClicked: () -> Unit,
 ) {
     when (state) {
-        is SimpleScreenState.Loading -> {
-            LoadingState(modifier = modifier)
+        is SimpleScreenState.Success -> ChoosePersonContent(
+            modifier = modifier,
+            state = state.data,
+            onPersonSelected = onPersonSelected,
+            onConfirmClicked = onConfirmClicked
+        )
+
+        is SimpleScreenState.Loading -> ChoosePersonPaneLoading(modifier = modifier)
+
+        is SimpleScreenState.Empty -> Box(modifier = modifier.fillMaxSize()) {
+            Text(
+                text = "No persons available",
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
 
-        is SimpleScreenState.Empty -> {
-            Box(modifier = modifier.fillMaxSize()) {
-                Text(
-                    text = "No persons available",
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-        }
-
-        is SimpleScreenState.Error -> {
-            Box(modifier = modifier.fillMaxSize()) {
-                Text(
-                    text = "An error occurred",
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-        }
-
-        is SimpleScreenState.Success -> {
-            ChoosePersonContent(
-                modifier = modifier,
-                state = state.data,
-                onPersonSelected = onPersonSelected,
-                onConfirmClicked = onConfirmClicked
+        is SimpleScreenState.Error -> Box(modifier = modifier.fillMaxSize()) {
+            Text(
+                text = "An error occurred",
+                modifier = Modifier.align(Alignment.Center)
             )
         }
     }
@@ -90,7 +82,7 @@ internal fun ChoosePersonScreen(
 @Composable
 internal fun ChoosePersonContent(
     modifier: Modifier = Modifier,
-    state: ChoosePersonScreenUiModel,
+    state: ChoosePersonPaneUiModel,
     onPersonSelected: (Long) -> Unit,
     onConfirmClicked: () -> Unit,
 ) {
@@ -155,9 +147,9 @@ internal fun ChoosePersonContent(
 }
 
 @Composable
-private fun LoadingState(modifier: Modifier = Modifier) {
+private fun ChoosePersonPaneLoading(modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
+        DefaultProgressIndicator()
     }
 }
 
@@ -231,11 +223,11 @@ private fun PersonSelectionItem(
 
 @Preview
 @Composable
-private fun ChoosePersonScreenPreview() {
+private fun ChoosePersonPanePreview() {
     ExpensesTheme {
-        ChoosePersonScreen(
+        ChoosePersonPane(
             state = SimpleScreenState.Success(
-                ChoosePersonScreenUiModel(
+                ChoosePersonPaneUiModel(
                     eventId = 1,
                     eventName = "Weekend Trip",
                     persons = persistentListOf(

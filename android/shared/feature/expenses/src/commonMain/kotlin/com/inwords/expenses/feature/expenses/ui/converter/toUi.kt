@@ -4,19 +4,19 @@ import com.inwords.expenses.core.ui.utils.defaultDateFormat
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.domain.model.Expense
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
-import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListScreenUiModel
-import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel
+import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListPaneUiModel
+import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel
 import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 
-internal fun Expense.toUiModel(primaryCurrencyName: String): ExpensesScreenUiModel.Expenses.ExpenseUiModel {
+internal fun Expense.toUiModel(primaryCurrencyName: String): ExpensesPaneUiModel.Expenses.ExpenseUiModel {
     val amountSign = when (expenseType) {
         ExpenseType.Spending -> "-"
         ExpenseType.Replenishment -> "+"
     }
-    return ExpensesScreenUiModel.Expenses.ExpenseUiModel(
+    return ExpensesPaneUiModel.Expenses.ExpenseUiModel(
         expenseId = expenseId,
         currencyText = if (currency.name == primaryCurrencyName) {
             currency.name
@@ -31,8 +31,8 @@ internal fun Expense.toUiModel(primaryCurrencyName: String): ExpensesScreenUiMod
     )
 }
 
-internal fun Person.toUiModel(): DebtsListScreenUiModel.PersonUiModel {
-    return DebtsListScreenUiModel.PersonUiModel(
+internal fun Person.toUiModel(): DebtsListPaneUiModel.PersonUiModel {
+    return DebtsListPaneUiModel.PersonUiModel(
         personId = id,
         personName = name
     )

@@ -6,7 +6,7 @@ import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
-import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenDestination
+import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -26,7 +26,7 @@ internal class ExpenseItemDialogViewModel(
             expensesInteractor.revertExpense(event = event, expenseId = expenseId)
 
             navigationController.popBackStack(
-                toDestination = ExpensesScreenDestination,
+                toDestination = ExpensesPaneDestination,
                 inclusive = false
             )
         }

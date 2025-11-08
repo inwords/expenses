@@ -22,8 +22,8 @@ internal class AddPersonsViewModel(
 
     private var confirmJob: Job? = null
 
-    private val _state = MutableStateFlow(AddPersonsScreenUiModel("", emptyList()))
-    val state: StateFlow<AddPersonsScreenUiModel> = _state
+    private val _state = MutableStateFlow(AddPersonsPaneUiModel("", emptyList()))
+    val state: StateFlow<AddPersonsPaneUiModel> = _state
 
     fun onOwnerNameChanged(ownerName: String) {
         _state.update { value ->

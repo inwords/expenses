@@ -37,9 +37,9 @@ import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.feature.events.ui.common.PersonNameField
 
 @Composable
-internal fun AddPersonsScreen(
+internal fun AddPersonsPane(
     modifier: Modifier = Modifier,
-    state: AddPersonsScreenUiModel,
+    state: AddPersonsPaneUiModel,
     onOwnerNameChanged: (String) -> Unit,
     onParticipantNameChanged: (Int, String) -> Unit,
     onAddParticipantClicked: () -> Unit,
@@ -136,10 +136,10 @@ internal fun AddPersonsScreen(
 
 @Preview
 @Composable
-private fun AddPersonsScreenPreview() {
+private fun AddPersonsPanePreview() {
     ExpensesTheme {
-        AddPersonsScreen(
-            state = AddPersonsScreenUiModel(
+        AddPersonsPane(
+            state = AddPersonsPaneUiModel(
                 ownerName = "",
                 persons = listOf("Анжела", "Саша")
             ),

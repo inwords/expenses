@@ -24,8 +24,12 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
+                implementation(project(":shared:core:utils"))
+
+                // for BottomSheetScene
+                implementation(shared.compose.material3.multiplatform)
+
                 implementation(shared.lifecycle.viewmodel.compose.multiplatform)
-                implementation(shared.navigation.compose.multiplatform)
                 implementation(shared.navigation3.ui.multiplatform)
             }
         }

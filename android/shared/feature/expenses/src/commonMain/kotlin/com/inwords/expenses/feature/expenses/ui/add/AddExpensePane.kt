@@ -1,18 +1,15 @@
 package com.inwords.expenses.feature.expenses.ui.add
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -22,40 +19,37 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.inwords.expenses.core.ui.design.loading.DefaultProgressIndicator
+import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
-import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.CurrencyInfoUiModel
-import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.ExpenseSplitWithPersonUiModel
-import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.PersonInfoUiModel
+import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneUiModel.CurrencyInfoUiModel
+import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneUiModel.ExpenseSplitWithPersonUiModel
+import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneUiModel.PersonInfoUiModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
-internal fun AddExpenseScreen(
-    state: SimpleScreenState<AddExpenseScreenUiModel>,
+internal fun AddExpensePane(
+    state: SimpleScreenState<AddExpensePaneUiModel>,
     onCurrencyClicked: (CurrencyInfoUiModel) -> Unit,
     onExpenseTypeClicked: (ExpenseType) -> Unit,
     onPersonClicked: (PersonInfoUiModel) -> Unit,
@@ -65,11 +59,10 @@ internal fun AddExpenseScreen(
     onSplitAmountChanged: (ExpenseSplitWithPersonUiModel, String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
     onConfirmClicked: () -> Unit,
-    onCloseClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (state) {
-        is SimpleScreenState.Success -> AddExpenseScreenSuccess(
+        is SimpleScreenState.Success -> AddExpensePaneSuccess(
             state = state.data,
             onCurrencyClicked = onCurrencyClicked,
             onExpenseTypeClicked = onExpenseTypeClicked,
@@ -80,13 +73,10 @@ internal fun AddExpenseScreen(
             onSplitAmountChanged = onSplitAmountChanged,
             onDescriptionChanged = onDescriptionChanged,
             onConfirmClicked = onConfirmClicked,
-            onCloseClicked = onCloseClicked,
             modifier = modifier
         )
 
-        is SimpleScreenState.Loading -> {
-            Text(text = "Loading")
-        }
+        is SimpleScreenState.Loading -> AddExpensePaneLoading()
 
         is SimpleScreenState.Error -> {
             Text(text = "Error")
@@ -98,10 +88,23 @@ internal fun AddExpenseScreen(
     }
 }
 
+@Composable
+private fun AddExpensePaneLoading(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 300.dp)
+            .verticalScroll(rememberScrollState()),
+        contentAlignment = Alignment.Center
+    ) {
+        DefaultProgressIndicator()
+    }
+}
+
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
-private fun AddExpenseScreenSuccess(
-    state: AddExpenseScreenUiModel,
+private fun AddExpensePaneSuccess(
+    state: AddExpensePaneUiModel,
     onCurrencyClicked: (CurrencyInfoUiModel) -> Unit,
     onExpenseTypeClicked: (ExpenseType) -> Unit,
     onPersonClicked: (PersonInfoUiModel) -> Unit,
@@ -111,201 +114,170 @@ private fun AddExpenseScreenSuccess(
     onSplitAmountChanged: (ExpenseSplitWithPersonUiModel, String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
     onConfirmClicked: () -> Unit,
-    onCloseClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Scaffold(
+    Column(
         modifier = modifier
-            .fillMaxSize()
-            .imePadding(),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = "Операция")
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = onCloseClicked
-                    ) {
-                        Icon(imageVector = Icons.Outlined.Close, contentDescription = null)
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
-        val topAndHorizontalPaddings = PaddingValues(
-            top = paddingValues.calculateTopPadding(),
-            start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
-            end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
+            .imePadding()
+            .verticalScroll(rememberScrollState()),
+    ) {
+        val keyboardController = LocalSoftwareKeyboardController.current
+
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            textStyle = MaterialTheme.typography.headlineSmall,
+            value = state.description,
+            label = { Text(text = "Описание") },
+            onValueChange = onDescriptionChanged,
+            keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+            keyboardOptions = KeyboardOptions(
+                autoCorrectEnabled = true,
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done,
+            ),
+            singleLine = true
         )
 
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .consumeWindowInsets(topAndHorizontalPaddings)
-                .padding(topAndHorizontalPaddings)
-                .verticalScroll(rememberScrollState()),
+        Text(
+            modifier = Modifier
+                .padding(start = 16.dp, top = 16.dp, end = 12.dp),
+            text = "Оплатил",
+            style = MaterialTheme.typography.headlineMedium
+        )
+        FlowRow(
+            modifier = Modifier
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            val keyboardController = LocalSoftwareKeyboardController.current
+            state.persons.forEach { person ->
+                InputChip(
+                    selected = person.selected,
+                    onClick = { onPersonClicked.invoke(person) },
+                    label = { Text(text = person.personName) }
+                )
+            }
+        }
 
-            OutlinedTextField(
+        // TODO duplicate UI
+        Text(
+            modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp),
+            text = "Валюта",
+            style = MaterialTheme.typography.headlineMedium
+        )
+        FlowRow(
+            modifier = Modifier
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            state.currencies.forEach { currencyInfo ->
+                InputChip(
+                    selected = currencyInfo.selected,
+                    onClick = { onCurrencyClicked.invoke(currencyInfo) },
+                    label = { Text(text = currencyInfo.currencyName) }
+                )
+            }
+        }
+
+        Text(
+            modifier = Modifier
+                .padding(start = 16.dp, top = 8.dp, end = 16.dp),
+            text = "Тип",
+            style = MaterialTheme.typography.headlineMedium
+        )
+        FlowRow(
+            modifier = Modifier
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            InputChip(
+                selected = state.expenseType == ExpenseType.Spending,
+                onClick = { onExpenseTypeClicked.invoke(ExpenseType.Spending) },
+                label = { Text(text = "Трата") }
+            )
+            InputChip(
+                selected = state.expenseType == ExpenseType.Replenishment,
+                onClick = { onExpenseTypeClicked.invoke(ExpenseType.Replenishment) },
+                label = { Text(text = "Возврат") }
+            )
+        }
+
+        Text(
+            modifier = Modifier
+                .padding(start = 16.dp, top = 8.dp, end = 16.dp),
+            text = "Разделить",
+            style = MaterialTheme.typography.headlineMedium
+        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp),
+                text = "Поровну",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Switch(
+                checked = state.equalSplit,
+                onCheckedChange = onEqualSplitChange,
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .testTag("equal_split_switch")
+            )
+            Text(
+                modifier = Modifier
+                    .padding(end = 8.dp),
+                text = "между:",
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+        FlowRow(
+            modifier = Modifier
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            state.subjectPersons.forEach { person ->
+                InputChip(
+                    selected = person.selected,
+                    onClick = { onSubjectPersonClicked.invoke(person) },
+                    label = { Text(text = person.personName) }
+                )
+            }
+        }
+
+        if (state.equalSplit) {
+            SplitEqualPartsInput(
+                amount = state.wholeAmount,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp),
-                textStyle = MaterialTheme.typography.headlineSmall,
-                value = state.description,
-                label = { Text(text = "Описание") },
-                onValueChange = onDescriptionChanged,
-                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-                keyboardOptions = KeyboardOptions(
-                    autoCorrectEnabled = true,
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done,
-                ),
-                singleLine = true
+                onAmountChanged = {
+                    onWholeAmountChanged.invoke(it)
+                },
+                onDoneClicked = { keyboardController?.hide() }
             )
-
-            Text(
+        } else {
+            SplitCustomPartsInputsBLock(
+                split = state.split,
                 modifier = Modifier
-                    .padding(start = 16.dp, top = 16.dp, end = 12.dp),
-                text = "Оплатил",
-                style = MaterialTheme.typography.headlineMedium
-            )
-            FlowRow(
-                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                state.persons.forEach { person ->
-                    InputChip(
-                        selected = person.selected,
-                        onClick = { onPersonClicked.invoke(person) },
-                        label = { Text(text = person.personName) }
-                    )
-                }
-            }
-
-            // TODO duplicate UI
-            Text(
-                modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp),
-                text = "Валюта",
-                style = MaterialTheme.typography.headlineMedium
+                onSplitAmountChanged = onSplitAmountChanged,
+                onDoneClicked = onConfirmClicked
             )
-            FlowRow(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                state.currencies.forEach { currencyInfo ->
-                    InputChip(
-                        selected = currencyInfo.selected,
-                        onClick = { onCurrencyClicked.invoke(currencyInfo) },
-                        label = { Text(text = currencyInfo.currencyName) }
-                    )
-                }
-            }
+        }
 
-            Text(
-                modifier = Modifier
-                    .padding(start = 16.dp, top = 8.dp, end = 16.dp),
-                text = "Тип",
-                style = MaterialTheme.typography.headlineMedium
+        Button(
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+            onClick = onConfirmClicked,
+        ) {
+            Text(text = "Подтвердить")
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.Outlined.Check,
+                contentDescription = null
             )
-            FlowRow(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                InputChip(
-                    selected = state.expenseType == ExpenseType.Spending,
-                    onClick = { onExpenseTypeClicked.invoke(ExpenseType.Spending) },
-                    label = { Text(text = "Трата") }
-                )
-                InputChip(
-                    selected = state.expenseType == ExpenseType.Replenishment,
-                    onClick = { onExpenseTypeClicked.invoke(ExpenseType.Replenishment) },
-                    label = { Text(text = "Возврат") }
-                )
-            }
-
-            Text(
-                modifier = Modifier
-                    .padding(start = 16.dp, top = 8.dp, end = 16.dp),
-                text = "Разделить",
-                style = MaterialTheme.typography.headlineMedium
-            )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp),
-                    text = "Поровну",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Switch(
-                    checked = state.equalSplit,
-                    onCheckedChange = onEqualSplitChange,
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .testTag("equal_split_switch")
-                )
-                Text(
-                    modifier = Modifier
-                        .padding(end = 8.dp),
-                    text = "между:",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-            FlowRow(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                state.subjectPersons.forEach { person ->
-                    InputChip(
-                        selected = person.selected,
-                        onClick = { onSubjectPersonClicked.invoke(person) },
-                        label = { Text(text = person.personName) }
-                    )
-                }
-            }
-
-            if (state.equalSplit) {
-                SplitEqualPartsInput(
-                    amount = state.wholeAmount,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp),
-                    onAmountChanged = {
-                        onWholeAmountChanged.invoke(it)
-                    },
-                    onDoneClicked = { keyboardController?.hide() }
-                )
-            } else {
-                SplitCustomPartsInputsBLock(
-                    split = state.split,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp),
-                    onSplitAmountChanged = onSplitAmountChanged,
-                    onDoneClicked = onConfirmClicked
-                )
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Button(
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp + paddingValues.calculateBottomPadding()),
-                onClick = onConfirmClicked,
-            ) {
-                Text(text = "Подтвердить")
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    imageVector = Icons.Outlined.Check,
-                    contentDescription = null
-                )
-            }
         }
     }
 }
@@ -380,25 +352,26 @@ private fun SplitCustomPartInput(
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-private fun AddExpenseScreenSuccessPreview() {
-    AddExpenseScreen(
-        onCurrencyClicked = {},
-        onExpenseTypeClicked = {},
-        onPersonClicked = {},
-        onSubjectPersonClicked = {},
-        onEqualSplitChange = {},
-        onDescriptionChanged = {},
-        onWholeAmountChanged = {},
-        onSplitAmountChanged = { _, _ -> },
-        onConfirmClicked = {},
-        onCloseClicked = {},
-        state = SimpleScreenState.Success(mockAddExpenseScreenUiModel()),
-    )
+private fun AddExpensePaneSuccessPreview() {
+    ExpensesTheme {
+        AddExpensePane(
+            onCurrencyClicked = {},
+            onExpenseTypeClicked = {},
+            onPersonClicked = {},
+            onSubjectPersonClicked = {},
+            onEqualSplitChange = {},
+            onDescriptionChanged = {},
+            onWholeAmountChanged = {},
+            onSplitAmountChanged = { _, _ -> },
+            onConfirmClicked = {},
+            state = SimpleScreenState.Success(mockAddExpenseScreenUiModel()),
+        )
+    }
 }
 
-internal fun mockAddExpenseScreenUiModel(): AddExpenseScreenUiModel {
+internal fun mockAddExpenseScreenUiModel(): AddExpensePaneUiModel {
     val person1 = Person(
         id = 1,
         serverId = "11",
@@ -419,7 +392,7 @@ internal fun mockAddExpenseScreenUiModel(): AddExpenseScreenUiModel {
         serverId = "14",
         name = "Саша"
     )
-    return AddExpenseScreenUiModel(
+    return AddExpensePaneUiModel(
         description = "Чипсы и кола",
         currencies = persistentListOf(
             CurrencyInfoUiModel(

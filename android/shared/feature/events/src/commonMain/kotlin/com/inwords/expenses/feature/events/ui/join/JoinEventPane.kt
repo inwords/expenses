@@ -29,9 +29,9 @@ import com.inwords.expenses.feature.events.ui.common.EventIdField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun JoinEventScreen(
+internal fun JoinEventPane(
     modifier: Modifier = Modifier,
-    state: JoinEventScreenUiModel,
+    state: JoinEventPaneUiModel,
     onEventIdChanged: (String) -> Unit,
     onEventAccessCodeChanged: (String) -> Unit,
     onConfirmClicked: () -> Unit,
@@ -97,10 +97,10 @@ internal fun JoinEventScreen(
 
 @Preview
 @Composable
-private fun EventsScreenPreview() {
+private fun EventsPanePreview() {
     ExpensesTheme {
-        JoinEventScreen(
-            state = JoinEventScreenUiModel(
+        JoinEventPane(
+            state = JoinEventPaneUiModel(
                 eventId = "",
                 eventAccessCode = ""
             ),
