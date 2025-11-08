@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.appbar.BasicTopAppBar
 import com.inwords.expenses.core.ui.design.button.BasicFloatingActionButton
@@ -64,7 +65,6 @@ import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.Local
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.LocalEvents.LocalEventUiModel
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.collections.immutable.persistentListOf
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.Clock
 
 @Composable

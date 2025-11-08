@@ -43,9 +43,9 @@ kotlin {
                 implementation(shared.lifecycle.runtime.compose.multiplatform)
                 implementation(shared.lifecycle.viewmodel.compose.multiplatform)
 
-                implementation(compose.ui)
-                implementation(compose.material3)
-                implementation(compose.components.uiToolingPreview)
+                implementation(shared.compose.ui.multiplatform)
+                implementation(shared.compose.material3.multiplatform)
+                implementation(shared.compose.ui.tooling.preview.multiplatform)
 
                 implementation(shared.navigation.compose.multiplatform)
                 implementation(shared.compose.material.icons.core)

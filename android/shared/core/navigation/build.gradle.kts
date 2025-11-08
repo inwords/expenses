@@ -26,6 +26,7 @@ kotlin {
             dependencies {
                 implementation(shared.lifecycle.viewmodel.compose.multiplatform)
                 implementation(shared.navigation.compose.multiplatform)
+                implementation(shared.navigation3.ui.multiplatform)
             }
         }
     }

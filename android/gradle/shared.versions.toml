@@ -13,8 +13,8 @@ coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines/releases
 kotlinx-serialization = "1.9.0" # https://github.com/Kotlin/kotlinx.serialization/releases
 kotlinx-atomicfu = "0.29.0" # https://github.com/Kotlin/kotlinx-atomicfu/releases TODO remove when atomicfu plugin is fixed
 
-compose-bom = "2025.09.00" # https://developer.android.com/jetpack/androidx/releases/compose
-compose-multiplatform = "1.9.0" # https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
+compose-bom = "2025.11.00" # https://developer.android.com/jetpack/androidx/releases/compose
+compose-multiplatform = "1.10.0-beta01" # https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
 
 jupiter = "5.14.0" # https://docs.junit.org/current/release-notes/index.html
 
@@ -43,6 +43,7 @@ kotlinx-atomicfu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version
 
 lifecycle-runtime-compose-multiplatform = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version = "2.9.3" }
 lifecycle-viewmodel-compose-multiplatform = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-compose", version = "2.9.3" }
+lifecycle-viewmodel-navigation3-multiplatform = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-navigation3", version = "2.10.0-alpha04" }
 
 work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version = "2.10.4" } # https://developer.android.com/jetpack/androidx/releases/work
 core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.17.0" } # https://developer.android.com/jetpack/androidx/releases/core
@@ -55,7 +56,13 @@ compose-ui = { group = "androidx.compose.ui", name = "ui" }
 compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+compose-ui-multiplatform = { group = "org.jetbrains.compose.ui", name = "ui", version.ref = "compose-multiplatform" }
+compose-foundation-multiplatform = { group = "org.jetbrains.compose.foundation", name = "foundation", version.ref = "compose-multiplatform" }
+compose-runtime-multiplatform = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "compose-multiplatform" }
+compose-ui-tooling-preview-multiplatform = { group = "org.jetbrains.compose.ui", name = "ui-tooling-preview", version.ref = "compose-multiplatform" }
+compose-material3-multiplatform = { group = "org.jetbrains.compose.material3", name = "material3", version = "1.10.0-alpha04" }
 activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.11.0" }
+navigation3-ui-multiplatform = { group = "org.jetbrains.androidx.navigation3", name = "navigation3-ui", version = "1.0.0-alpha04" }
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version = "2.9.4" } # https://developer.android.com/jetpack/androidx/releases/navigation
 navigation-compose-multiplatform = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version = "2.9.0" } # https://mvnrepository.com/artifact/org.jetbrains.androidx.navigation/navigation-compose
 compose-material-icons-core = { group = "org.jetbrains.compose.material", name = "material-icons-core", version = "1.7.3" }

@@ -23,7 +23,7 @@ kotlin {
                 implementation(shared.coroutines.core)
                 implementation(shared.kotlinx.datetime)
 
-                implementation(compose.ui)
+                implementation(shared.compose.ui.multiplatform)
             }
         }
     }

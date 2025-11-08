@@ -28,13 +28,13 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListScreenUiModel.DebtorShortUiModel
 import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListScreenUiModel.PersonUiModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 internal fun DebtsListScreen(

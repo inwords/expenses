@@ -24,10 +24,10 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(compose.ui)
-                implementation(compose.foundation)
-                implementation(compose.material3)
-                implementation(compose.components.uiToolingPreview)
+                implementation(shared.compose.ui.multiplatform)
+                implementation(shared.compose.foundation.multiplatform)
+                implementation(shared.compose.material3.multiplatform)
+                implementation(shared.compose.ui.tooling.preview.multiplatform)
 
                 implementation(shared.compose.material.icons.core)
             }
