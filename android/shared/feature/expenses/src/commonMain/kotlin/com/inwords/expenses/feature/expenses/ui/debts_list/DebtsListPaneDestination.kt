@@ -9,7 +9,6 @@ import com.inwords.expenses.core.navigation.NavModule
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
-import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneDestination
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -20,7 +19,7 @@ fun getDebtsListPaneNavModule(
     eventsInteractor: EventsInteractor,
     expensesInteractor: ExpensesInteractor,
 ): NavModule {
-    return NavModule(AddExpensePaneDestination.serializer()) {
+    return NavModule(DebtsListPaneDestination.serializer()) {
         entry<DebtsListPaneDestination> {
             val viewModel = viewModel<DebtsListViewModel>(factory = viewModelFactory {
                 initializer {
