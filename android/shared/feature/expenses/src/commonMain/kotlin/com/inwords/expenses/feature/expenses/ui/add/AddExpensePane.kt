@@ -5,28 +5,28 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowColumn
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.InputChip
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TonalToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +36,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.inwords.expenses.core.ui.design.button.ButtonWithIconAndText
+import com.inwords.expenses.core.ui.design.group.MultiSelectConnectedButtonGroupWithFlowLayout
+import com.inwords.expenses.core.ui.design.group.ToggleButtonOption
 import com.inwords.expenses.core.ui.design.loading.DefaultProgressIndicator
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
@@ -101,7 +104,7 @@ private fun AddExpensePaneLoading(modifier: Modifier = Modifier) {
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun AddExpensePaneSuccess(
     state: AddExpensePaneUiModel,
@@ -146,68 +149,42 @@ private fun AddExpensePaneSuccess(
             text = "Оплатил",
             style = MaterialTheme.typography.headlineMedium
         )
-        FlowRow(
+        MultiSelectConnectedButtonGroupWithFlowLayout(
             modifier = Modifier
                 .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            state.persons.forEach { person ->
-                InputChip(
-                    selected = person.selected,
-                    onClick = { onPersonClicked.invoke(person) },
-                    label = { Text(text = person.personName) }
+            options = state.persons.map { person ->
+                ToggleButtonOption(
+                    text = person.personName,
+                    checked = person.selected,
+                    payload = person
                 )
-            }
-        }
+            },
+            onCheckedChange = { _, _, person -> onPersonClicked.invoke(person) },
+        )
 
-        // TODO duplicate UI
         Text(
             modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp),
             text = "Валюта",
             style = MaterialTheme.typography.headlineMedium
         )
-        FlowRow(
+        MultiSelectConnectedButtonGroupWithFlowLayout(
             modifier = Modifier
                 .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            state.currencies.forEach { currencyInfo ->
-                InputChip(
-                    selected = currencyInfo.selected,
-                    onClick = { onCurrencyClicked.invoke(currencyInfo) },
-                    label = { Text(text = currencyInfo.currencyName) }
+            options = state.currencies.map { currencyInfo ->
+                ToggleButtonOption(
+                    text = currencyInfo.currencyName,
+                    checked = currencyInfo.selected,
+                    payload = currencyInfo
                 )
-            }
-        }
-
-        Text(
-            modifier = Modifier
-                .padding(start = 16.dp, top = 8.dp, end = 16.dp),
-            text = "Тип",
-            style = MaterialTheme.typography.headlineMedium
+            },
+            onCheckedChange = { _, _, currencyInfo -> onCurrencyClicked.invoke(currencyInfo) },
         )
-        FlowRow(
-            modifier = Modifier
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            InputChip(
-                selected = state.expenseType == ExpenseType.Spending,
-                onClick = { onExpenseTypeClicked.invoke(ExpenseType.Spending) },
-                label = { Text(text = "Трата") }
-            )
-            InputChip(
-                selected = state.expenseType == ExpenseType.Replenishment,
-                onClick = { onExpenseTypeClicked.invoke(ExpenseType.Replenishment) },
-                label = { Text(text = "Возврат") }
-            )
-        }
 
         Text(
             modifier = Modifier
                 .padding(start = 16.dp, top = 8.dp, end = 16.dp),
             text = "Разделить",
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineSmall
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -230,19 +207,18 @@ private fun AddExpensePaneSuccess(
                 style = MaterialTheme.typography.bodyLarge
             )
         }
-        FlowRow(
+        MultiSelectConnectedButtonGroupWithFlowLayout(
             modifier = Modifier
                 .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            state.subjectPersons.forEach { person ->
-                InputChip(
-                    selected = person.selected,
-                    onClick = { onSubjectPersonClicked.invoke(person) },
-                    label = { Text(text = person.personName) }
+            options = state.subjectPersons.map { person ->
+                ToggleButtonOption(
+                    text = person.personName,
+                    checked = person.selected,
+                    payload = person
                 )
-            }
-        }
+            },
+            onCheckedChange = { _, _, person -> onSubjectPersonClicked.invoke(person) },
+        )
 
         if (state.equalSplit) {
             SplitEqualPartsInput(
@@ -266,19 +242,37 @@ private fun AddExpensePaneSuccess(
             )
         }
 
-        Button(
+        Spacer(modifier = Modifier.height(14.dp))
+
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+        ) {
+            TonalToggleButton(
+                modifier = Modifier.weight(1f),
+                checked = state.expenseType == ExpenseType.Spending,
+                onCheckedChange = { onExpenseTypeClicked.invoke(ExpenseType.Spending) },
+                shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+            ) { Text(text = "Трата") }
+            TonalToggleButton(
+                modifier = Modifier.weight(1f),
+                checked = state.expenseType == ExpenseType.Replenishment,
+                onCheckedChange = { onExpenseTypeClicked.invoke(ExpenseType.Replenishment) },
+                shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+            ) { Text(text = "Возврат") }
+        }
+
+        ButtonWithIconAndText(
             modifier = Modifier
                 .align(Alignment.End)
-                .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 16.dp),
             onClick = onConfirmClicked,
-        ) {
-            Text(text = "Подтвердить")
-            Spacer(modifier = Modifier.width(8.dp))
-            Icon(
-                imageVector = Icons.Outlined.Check,
-                contentDescription = null
-            )
-        }
+            text = "Сохранить",
+            imageVector = Icons.Outlined.Check,
+            minHeight = ButtonDefaults.MediumContainerHeight,
+        )
     }
 }
 
@@ -350,6 +344,25 @@ private fun SplitCustomPartInput(
         ),
         singleLine = true
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AddExpensePaneSuccessEqualSplitPreview() {
+    ExpensesTheme {
+        AddExpensePane(
+            onCurrencyClicked = {},
+            onExpenseTypeClicked = {},
+            onPersonClicked = {},
+            onSubjectPersonClicked = {},
+            onEqualSplitChange = {},
+            onDescriptionChanged = {},
+            onWholeAmountChanged = {},
+            onSplitAmountChanged = { _, _ -> },
+            onConfirmClicked = {},
+            state = SimpleScreenState.Success(mockAddExpenseScreenUiModel().copy(equalSplit = true)),
+        )
+    }
 }
 
 @Preview(showBackground = true)

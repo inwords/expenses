@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -24,13 +25,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.appbar.BasicTopAppBar
-import com.inwords.expenses.core.ui.design.button.BasicButton
+import com.inwords.expenses.core.ui.design.button.ButtonWithIconAndText
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.feature.events.ui.common.EventNameField
 import com.inwords.expenses.feature.events.ui.create.CreateEventPaneUiModel.CurrencyInfoUiModel
 import kotlinx.collections.immutable.persistentListOf
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun CreateEventPane(
     modifier: Modifier = Modifier,
@@ -47,10 +48,10 @@ internal fun CreateEventPane(
             BasicTopAppBar()
         },
         floatingActionButton = {
-            BasicButton(
-                text = "Участники",
-                icon = Icons.AutoMirrored.Outlined.ArrowForward,
+            ButtonWithIconAndText(
                 onClick = onConfirmClicked,
+                text = "Участники",
+                imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
                 enabled = state.eventName.isNotBlank(),
             )
         }

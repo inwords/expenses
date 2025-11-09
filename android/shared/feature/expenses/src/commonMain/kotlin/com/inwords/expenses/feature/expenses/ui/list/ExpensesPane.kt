@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -24,17 +26,19 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.Button
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,6 +53,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.appbar.BasicTopAppBar
 import com.inwords.expenses.core.ui.design.button.BasicFloatingActionButton
+import com.inwords.expenses.core.ui.design.button.ButtonWithIconAndText
+import com.inwords.expenses.core.ui.design.button.OutlinedButtonWithText
 import com.inwords.expenses.core.ui.design.loading.DefaultProgressIndicator
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
@@ -58,8 +64,8 @@ import com.inwords.expenses.feature.events.ui.common.EventInfoBlock
 import com.inwords.expenses.feature.expenses.domain.model.Expense
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseSplitWithPerson
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
+import com.inwords.expenses.feature.expenses.ui.common.DebtShortUiModel
 import com.inwords.expenses.feature.expenses.ui.converter.toUiModel
-import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.Expenses.DebtorShortUiModel
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.Expenses.ExpenseUiModel
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents.LocalEventUiModel
@@ -74,7 +80,7 @@ internal fun ExpensesPane(
     onAddExpenseClick: () -> Unit,
     onRevertExpenseClick: (expense: ExpenseUiModel) -> Unit,
     onDebtsDetailsClick: () -> Unit,
-    onReplenishmentClick: (debtor: DebtorShortUiModel) -> Unit,
+    onReplenishmentClick: (debtor: DebtShortUiModel) -> Unit,
     onCreateEventClick: () -> Unit,
     onJoinEventClick: () -> Unit,
     onJoinLocalEventClick: (event: LocalEventUiModel) -> Unit,
@@ -119,7 +125,7 @@ internal fun ExpensesPane(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ExpensesPaneSuccess(
     state: ExpensesPaneUiModel.Expenses,
@@ -127,7 +133,7 @@ private fun ExpensesPaneSuccess(
     onAddExpenseClick: () -> Unit,
     onRevertExpenseClick: (expense: ExpenseUiModel) -> Unit,
     onDebtsDetailsClick: () -> Unit,
-    onReplenishmentClick: (debtor: DebtorShortUiModel) -> Unit,
+    onReplenishmentClick: (debtor: DebtShortUiModel) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -164,7 +170,7 @@ private fun ExpensesPaneSuccess(
         floatingActionButton = {
             BasicFloatingActionButton(
                 text = "Операция",
-                icon = Icons.Outlined.Add,
+                imageVector = Icons.Outlined.Add,
                 onClick = onAddExpenseClick,
             )
         }
@@ -175,13 +181,21 @@ private fun ExpensesPaneSuccess(
             end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
         )
 
+        val pullToRefreshState = rememberPullToRefreshState()
         PullToRefreshBox(
             modifier = Modifier
                 .fillMaxSize()
                 .consumeWindowInsets(topAndHorizontalPaddings)
                 .padding(topAndHorizontalPaddings),
-            state = rememberPullToRefreshState(),
+            state = pullToRefreshState,
             isRefreshing = state.isRefreshing,
+            indicator = {
+                PullToRefreshDefaults.LoadingIndicator(
+                    modifier = Modifier.align(Alignment.TopCenter),
+                    isRefreshing = state.isRefreshing,
+                    state = pullToRefreshState,
+                )
+            },
             onRefresh = onRefresh,
         ) {
             Column(
@@ -235,7 +249,7 @@ private fun ExpensesPaneSuccess(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ExpensesPaneLocalEvents(
     onCreateEventClick: () -> Unit,
@@ -247,13 +261,6 @@ private fun ExpensesPaneLocalEvents(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = { BasicTopAppBar() },
-        floatingActionButton = {
-            BasicFloatingActionButton(
-                text = "Новое событие",
-                icon = Icons.Outlined.Add,
-                onClick = onCreateEventClick,
-            )
-        },
     ) { paddingValues ->
         val topAndHorizontalPaddings = PaddingValues(
             top = paddingValues.calculateTopPadding(),
@@ -268,19 +275,37 @@ private fun ExpensesPaneLocalEvents(
                 .padding(topAndHorizontalPaddings),
         ) {
             Text(
-                text = "Событие уже создано?",
-                style = MaterialTheme.typography.headlineSmall,
+                text = "Событие",
+                style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
-            JoinEventButton(
+            Row(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                onJoinEventClick = onJoinEventClick
-            )
+                    .height(IntrinsicSize.Min)
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                OutlinedButtonWithText(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    onClick = onJoinEventClick,
+                    text = "Присоединиться",
+                    minHeight = ButtonDefaults.MediumContainerHeight,
+                )
+                ButtonWithIconAndText(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    onClick = onCreateEventClick,
+                    text = "Создать",
+                    imageVector = Icons.Outlined.Add,
+                    minHeight = ButtonDefaults.MediumContainerHeight,
+                )
+            }
 
             Text(
-                text = "Сохранённые события",
+                text = "Ваше",
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
@@ -290,7 +315,7 @@ private fun ExpensesPaneLocalEvents(
                 modifier = Modifier
                     .fillMaxWidth()
                     .consumeWindowInsets(PaddingValues(bottom = bottomPadding))
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(bottom = 88.dp + bottomPadding),
             ) {
@@ -330,7 +355,7 @@ private fun ExpensesPaneLoading(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ExpensesPaneEmpty(
     onCreateEventClick: () -> Unit,
@@ -344,10 +369,11 @@ private fun ExpensesPaneEmpty(
         Column(
             modifier = modifier
                 .fillMaxSize()
+                .padding(horizontal = 16.dp)
                 .consumeWindowInsets(paddingValues)
                 .padding(paddingValues),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = "Вы можете создать новое событие или присоединиться к существующему",
@@ -355,42 +381,25 @@ private fun ExpensesPaneEmpty(
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
                     .fillMaxWidth(0.7f)
-                    .padding(bottom = 32.dp, start = 16.dp, end = 16.dp),
+                    .padding(bottom = 32.dp),
             )
-            NewEventButton(onCreateEventClick)
+            ButtonWithIconAndText(
+                modifier = modifier
+                    .fillMaxWidth(0.7f),
+                onClick = onCreateEventClick,
+                text = "Создать",
+                imageVector = Icons.Outlined.Add,
+                minHeight = ButtonDefaults.MediumContainerHeight,
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            JoinEventButton(onJoinEventClick)
+            OutlinedButtonWithText(
+                modifier = modifier
+                    .fillMaxWidth(0.7f),
+                onClick = onJoinEventClick,
+                text = "Присоединиться",
+                minHeight = ButtonDefaults.MediumContainerHeight,
+            )
         }
-    }
-}
-
-@Composable
-private fun NewEventButton(
-    onCreateEventClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Button(
-        modifier = modifier
-            .fillMaxWidth(0.7f)
-            .padding(horizontal = 16.dp),
-        onClick = onCreateEventClick
-    ) {
-        Text(text = "Новое событие")
-    }
-}
-
-@Composable
-private fun JoinEventButton(
-    onJoinEventClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    OutlinedButton(
-        modifier = modifier
-            .fillMaxWidth(0.7f)
-            .padding(horizontal = 16.dp),
-        onClick = onJoinEventClick
-    ) {
-        Text(text = "Присоединиться")
     }
 }
 
@@ -460,17 +469,21 @@ private fun ExpenseItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun LocalEventItem(
     event: LocalEventUiModel,
     onJoinLocalEventClick: (event: LocalEventUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ElevatedCard(
+    Card(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onJoinLocalEventClick(event) },
-        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+        ),
     ) {
         Row(
             modifier = modifier
@@ -487,9 +500,10 @@ private fun LocalEventItem(
             )
 
             Icon(
+                modifier = Modifier.size(ButtonDefaults.LargeIconSize),
                 imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.onPrimary,
             )
         }
     }
@@ -509,7 +523,7 @@ private fun ExpensesPanePreviewSuccessWithCreditors() {
             onJoinLocalEventClick = {},
             onCreateEventClick = {},
             onRefresh = {},
-            state = SimpleScreenState.Success(mockExpensesPaneUiModel(withCreditors = true))
+            state = SimpleScreenState.Success(mockExpensesPaneUiModel(withDebts = true))
         )
     }
 }
@@ -528,7 +542,7 @@ private fun ExpensesPanePreviewSuccessWithoutCreditors() {
             onJoinLocalEventClick = {},
             onCreateEventClick = {},
             onRefresh = {},
-            state = SimpleScreenState.Success(mockExpensesPaneUiModel(withCreditors = false))
+            state = SimpleScreenState.Success(mockExpensesPaneUiModel(withDebts = false))
         )
     }
 }
@@ -595,7 +609,7 @@ private fun ExpensesPanePreviewLoading() {
     }
 }
 
-internal fun mockExpensesPaneUiModel(withCreditors: Boolean): ExpensesPaneUiModel {
+internal fun mockExpensesPaneUiModel(withDebts: Boolean): ExpensesPaneUiModel {
     val person1 = Person(
         id = 1,
         serverId = "11",
@@ -610,22 +624,22 @@ internal fun mockExpensesPaneUiModel(withCreditors: Boolean): ExpensesPaneUiMode
         eventName = "France trip",
         currentPersonId = person1.id,
         currentPersonName = person1.name,
-        creditors = persistentListOf(
-            DebtorShortUiModel(
+        debts = persistentListOf(
+            DebtShortUiModel(
                 personId = person1.id,
                 personName = person1.name,
                 currencyCode = "EUR",
                 currencyName = "Euro",
                 amount = "100"
             ),
-            DebtorShortUiModel(
+            DebtShortUiModel(
                 personId = person2.id,
                 personName = person2.name,
                 currencyCode = "EUR",
                 currencyName = "Euro",
                 amount = "150"
             )
-        ).takeIf { withCreditors } ?: persistentListOf(),
+        ).takeIf { withDebts } ?: persistentListOf(),
         expenses = persistentListOf(
             Expense(
                 expenseId = 1,

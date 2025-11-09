@@ -12,8 +12,8 @@ import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneDestination
+import com.inwords.expenses.feature.expenses.ui.common.DebtShortUiModel
 import com.inwords.expenses.feature.expenses.ui.converter.toUiModel
-import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListPaneUiModel.DebtorShortUiModel
 import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListPaneUiModel.PersonUiModel
 import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
 import kotlinx.collections.immutable.ImmutableList
@@ -33,11 +33,12 @@ internal class DebtsListViewModel(
         .filterNotNull() // TODO mvp
         .flatMapLatestNoBuffer { expensesInteractor.getExpensesDetails(it) }
         .map { expensesDetails ->
-            val creditors = hashMapOf<PersonUiModel, ImmutableList<DebtorShortUiModel>>()
+            val creditors = hashMapOf<PersonUiModel, ImmutableList<DebtShortUiModel>>()
             expensesDetails.debtCalculator.barterAccumulatedDebts.forEach { (debtor, barterAccumulatedDebts) ->
                 creditors[debtor.toUiModel()] = barterAccumulatedDebts.map { (creditor, barterAccumulatedDebt) ->
-                    DebtorShortUiModel(
-                        person = creditor.toUiModel(),
+                    DebtShortUiModel(
+                        personId = creditor.id,
+                        personName = creditor.name,
                         currencyCode = barterAccumulatedDebt.currency.code,
                         currencyName = barterAccumulatedDebt.currency.name,
                         amount = barterAccumulatedDebt.barterAmount.toRoundedString()
@@ -54,12 +55,12 @@ internal class DebtsListViewModel(
         }
         .stateInWhileSubscribed(viewModelScope, initialValue = SimpleScreenState.Loading)
 
-    fun onReplenishmentClick(debtor: PersonUiModel, creditor: DebtorShortUiModel) {
+    fun onReplenishmentClick(debtor: PersonUiModel, creditor: DebtShortUiModel) {
         navigationController.navigateTo(
             AddExpensePaneDestination(
                 replenishment = AddExpensePaneDestination.Replenishment(
                     fromPersonId = debtor.personId,
-                    toPersonId = creditor.person.personId,
+                    toPersonId = creditor.personId,
                     currencyCode = creditor.currencyCode,
                     amount = creditor.amount
                 )

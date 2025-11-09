@@ -32,7 +32,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.appbar.BasicTopAppBar
-import com.inwords.expenses.core.ui.design.button.BasicButton
+import com.inwords.expenses.core.ui.design.button.ButtonWithIconAndText
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.feature.events.ui.common.PersonNameField
 
@@ -53,11 +53,10 @@ internal fun AddPersonsPane(
             BasicTopAppBar()
         },
         floatingActionButton = {
-            BasicButton(
-                text = "К событию",
-                icon = Icons.AutoMirrored.Outlined.ArrowForward,
+            ButtonWithIconAndText(
                 onClick = onConfirmClicked,
-                enabled = true,
+                text = "К событию",
+                imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
             )
         }
     ) { paddingValues ->

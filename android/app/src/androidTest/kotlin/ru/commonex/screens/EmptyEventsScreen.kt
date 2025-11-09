@@ -7,7 +7,7 @@ import de.mannodermaus.junit5.compose.ComposeContext
 internal class EmptyEventsScreen : BaseScreen() {
     context(extension: ComposeContext)
     fun clickCreateEvent(): CreateEventScreen {
-        extension.onNodeWithText("Новое событие").performClick()
+        extension.onNodeWithText("Создать").performClick()
         return CreateEventScreen()
     }
 

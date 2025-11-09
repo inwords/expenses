@@ -15,9 +15,9 @@ import com.inwords.expenses.feature.events.ui.create.CreateEventPaneDestination
 import com.inwords.expenses.feature.events.ui.join.JoinEventPaneDestination
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneDestination
+import com.inwords.expenses.feature.expenses.ui.common.DebtShortUiModel
 import com.inwords.expenses.feature.expenses.ui.converter.toUiModel
 import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListPaneDestination
-import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.Expenses.DebtorShortUiModel
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.Expenses.ExpenseUiModel
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents.LocalEventUiModel
@@ -85,9 +85,9 @@ internal class ExpensesViewModel(
             }
         }
 
-        val debtors = expensesDetails.debtCalculator.getBarterAccumulatedDebtForPerson(currentPerson)
+        val debts = expensesDetails.debtCalculator.getBarterAccumulatedDebtForPerson(currentPerson)
             .map { (person, barterAccumulatedDebt) ->
-                DebtorShortUiModel(
+                DebtShortUiModel(
                     personId = person.id,
                     personName = person.name,
                     currencyCode = barterAccumulatedDebt.currency.code,
@@ -104,7 +104,7 @@ internal class ExpensesViewModel(
                     eventName = expensesDetails.event.event.name,
                     currentPersonId = currentPerson.id,
                     currentPersonName = currentPerson.name,
-                    creditors = debtors,
+                    debts = debts,
                     expenses = expensesDetails.expenses.map { expense ->
                         expense.toUiModel(primaryCurrencyName = expensesDetails.event.primaryCurrency.name)
                     }.asImmutableListAdapter(),
@@ -150,7 +150,7 @@ internal class ExpensesViewModel(
         navigationController.navigateTo(DebtsListPaneDestination)
     }
 
-    fun onReplenishmentClick(creditor: DebtorShortUiModel) {
+    fun onReplenishmentClick(creditor: DebtShortUiModel) {
         val state = (state.value as? SimpleScreenState.Success)?.data ?: return
         val currentPersonId = when (state) {
             is ExpensesPaneUiModel.Expenses -> state.currentPersonId
