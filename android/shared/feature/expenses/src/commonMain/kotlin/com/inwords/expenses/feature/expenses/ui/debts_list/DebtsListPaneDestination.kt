@@ -33,7 +33,7 @@ fun getDebtsListPaneNavModule(
             DebtsListPane(
                 state = viewModel.state.collectAsStateWithLifecycle().value,
                 onReplenishmentClick = viewModel::onReplenishmentClick,
-                onCloseClick = viewModel::onCloseClick
+                onNavIconClicked = viewModel::onNavIconClicked,
             )
         }
     }

@@ -22,7 +22,7 @@ internal fun EventNameField(
         modifier = modifier,
         value = eventName,
         onValueChange = onEventNameChanged,
-        placeholder = { Text("Название события") },
+        placeholder = { Text("Название") },
         singleLine = true,
         textStyle = MaterialTheme.typography.headlineMedium,
         keyboardActions = KeyboardActions(onDone = { onDone() }),

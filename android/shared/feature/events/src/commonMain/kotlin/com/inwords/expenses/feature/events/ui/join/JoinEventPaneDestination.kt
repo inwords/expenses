@@ -43,6 +43,7 @@ fun getJoinEventPaneNavModule(
                 onEventIdChanged = viewModel::onEventIdChanged,
                 onEventAccessCodeChanged = viewModel::onEventAccessCodeChanged,
                 onConfirmClicked = viewModel::onConfirmClicked,
+                onNavIconClicked = viewModel::onNavIconClicked,
             )
         }
     }

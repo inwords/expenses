@@ -79,15 +79,10 @@ internal class ChoosePersonViewModel(
 
     fun onPersonSelected(personId: Long) {
         selectedPersonId.value = personId
-    }
 
-    fun onConfirmClicked() {
         confirmJob?.cancel()
         confirmJob = viewModelScope.launch {
-            val currentState = state.value as? SimpleScreenState.Success ?: return@launch
-
-            val selectedPersonId = currentState.data.persons.first { it.selected }.id
-            settingsRepository.setCurrentPersonId(selectedPersonId)
+            settingsRepository.setCurrentPersonId(personId)
             navigationController.navigateTo(
                 destination = expensesScreenDestination,
                 popUpTo = expensesScreenDestination,
@@ -96,4 +91,7 @@ internal class ChoosePersonViewModel(
         }
     }
 
+    fun onNavIconClicked() {
+        navigationController.popBackStack()
+    }
 }

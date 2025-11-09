@@ -16,21 +16,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.inwords.expenses.core.ui.design.appbar.TopAppBarWithNavIconAndText
 import com.inwords.expenses.core.ui.design.loading.DefaultProgressIndicator
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.feature.expenses.ui.common.DebtReplenishmentButton
@@ -44,23 +42,17 @@ import kotlinx.collections.immutable.persistentMapOf
 internal fun DebtsListPane(
     modifier: Modifier = Modifier,
     onReplenishmentClick: (debtor: PersonUiModel, creditor: DebtShortUiModel) -> Unit,
-    onCloseClick: () -> Unit,
+    onNavIconClicked: () -> Unit,
     state: SimpleScreenState<DebtsListPaneUiModel>,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = (state as? SimpleScreenState.Success)?.data?.eventName ?: "...")
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = onCloseClick
-                    ) {
-                        Icon(imageVector = Icons.Outlined.Close, contentDescription = null)
-                    }
-                }
+            TopAppBarWithNavIconAndText(
+                onNavIconClicked = onNavIconClicked,
+                title = (state as? SimpleScreenState.Success)?.data?.eventName ?: "...",
+                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                contentDescription = "Назад",
             )
         }
     ) { paddingValues ->
@@ -159,7 +151,7 @@ private fun DebtsListPanePreview() {
     DebtsListPane(
         state = SimpleScreenState.Success(mockDebtsListPaneUiModel()),
         onReplenishmentClick = { _, _ -> },
-        onCloseClick = { }
+        onNavIconClicked = { },
     )
 }
 

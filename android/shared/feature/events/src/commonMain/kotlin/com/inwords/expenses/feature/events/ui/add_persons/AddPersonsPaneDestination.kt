@@ -35,6 +35,7 @@ fun getAddPersonsPaneNavModule(
                 onParticipantNameChanged = viewModel::onParticipantNameChanged,
                 onAddParticipantClicked = viewModel::onAddParticipantClicked,
                 onConfirmClicked = viewModel::onConfirmClicked,
+                onNavIconClicked = viewModel::onNavIconClicked,
             )
         }
     }

@@ -65,4 +65,8 @@ internal class JoinEventViewModel(
             }
         }
     }
+
+    fun onNavIconClicked() {
+        navigationController.popBackStack()
+    }
 }

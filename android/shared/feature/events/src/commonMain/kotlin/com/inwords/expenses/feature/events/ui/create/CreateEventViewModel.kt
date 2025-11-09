@@ -94,9 +94,12 @@ internal class CreateEventViewModel(
             )
             navigationController.navigateTo(
                 destination = AddPersonsPaneDestination,
-                popUpTo = expensesScreenDestination,
             )
         }
+    }
+
+    fun onNavIconClicked() {
+        navigationController.popBackStack()
     }
 
     private fun Currency.toUiModel(selected: Boolean): CurrencyInfoModel {

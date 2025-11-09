@@ -35,7 +35,7 @@ fun getChoosePersonPaneNavModule(
             ChoosePersonPane(
                 state = viewModel.state.collectAsStateWithLifecycle().value,
                 onPersonSelected = viewModel::onPersonSelected,
-                onConfirmClicked = viewModel::onConfirmClicked,
+                onNavIconClicked = viewModel::onNavIconClicked,
             )
         }
     }

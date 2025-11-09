@@ -10,7 +10,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -20,11 +19,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -36,8 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.inwords.expenses.core.ui.design.appbar.BasicTopAppBar
-import com.inwords.expenses.core.ui.design.button.ButtonWithIconAndText
+import com.inwords.expenses.core.ui.design.appbar.TopAppBarWithNavIconAndText
 import com.inwords.expenses.core.ui.design.loading.DefaultProgressIndicator
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
@@ -50,14 +50,14 @@ internal fun ChoosePersonPane(
     modifier: Modifier = Modifier,
     state: SimpleScreenState<ChoosePersonPaneUiModel>,
     onPersonSelected: (Long) -> Unit,
-    onConfirmClicked: () -> Unit,
+    onNavIconClicked: () -> Unit,
 ) {
     when (state) {
         is SimpleScreenState.Success -> ChoosePersonContent(
             modifier = modifier,
             state = state.data,
             onPersonSelected = onPersonSelected,
-            onConfirmClicked = onConfirmClicked
+            onNavIconClicked = onNavIconClicked,
         )
 
         is SimpleScreenState.Loading -> ChoosePersonPaneLoading(modifier = modifier)
@@ -78,70 +78,63 @@ internal fun ChoosePersonPane(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun ChoosePersonContent(
     modifier: Modifier = Modifier,
     state: ChoosePersonPaneUiModel,
     onPersonSelected: (Long) -> Unit,
-    onConfirmClicked: () -> Unit,
+    onNavIconClicked: () -> Unit,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            BasicTopAppBar()
-        },
-        floatingActionButton = {
-            ButtonWithIconAndText(
-                onClick = onConfirmClicked,
-                text = "Продолжить",
-                imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
-                enabled = state.persons.any { it.selected },
+            TopAppBarWithNavIconAndText(
+                onNavIconClicked = onNavIconClicked,
+                title = "Выбор участника",
+                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                contentDescription = "Назад",
             )
-        }
+        },
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .consumeWindowInsets(paddingValues)
+                .padding(horizontal = 8.dp)
                 .padding(paddingValues)
         ) {
-            Column {
-                EventInfoBlock(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    eventName = state.eventName,
-                    currentPersonName = null
-                )
+            EventInfoBlock(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                eventName = state.eventName,
+                currentPersonName = null
+            )
 
-                Text(
-                    text = "Ваше имя",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 4.dp)
-                )
+            Spacer(modifier = Modifier.weight(1f))
 
-                val bottomPadding = paddingValues.calculateBottomPadding()
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .consumeWindowInsets(PaddingValues(bottom = bottomPadding))
-                        .padding(horizontal = 16.dp),
-                    contentPadding = PaddingValues(bottom = 88.dp + bottomPadding),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(
-                        count = state.persons.size,
-                        key = { index -> state.persons[index].id }
-                    ) { index ->
-                        val person = state.persons[index]
-                        PersonSelectionItem(
-                            person = person,
-                            onPersonSelected = onPersonSelected,
-                        )
-                    }
+            Text(
+                text = "Ваше имя",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 4.dp)
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                state.persons.forEach { person ->
+                    PersonSelectionItem(
+                        person = person,
+                        onPersonSelected = onPersonSelected,
+                    )
                 }
             }
+
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
@@ -238,7 +231,7 @@ private fun ChoosePersonPanePreview() {
                 )
             ),
             onPersonSelected = {},
-            onConfirmClicked = {}
+            onNavIconClicked = {},
         )
     }
 }

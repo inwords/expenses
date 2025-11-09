@@ -34,6 +34,7 @@ fun getCreateEventPaneNavModule(
                 onEventNameChanged = viewModel::onEventNameChanged,
                 onCurrencyClicked = viewModel::onCurrencyClicked,
                 onConfirmClicked = viewModel::onConfirmClicked,
+                onNavIconClicked = viewModel::onNavIconClicked,
             )
         }
     }

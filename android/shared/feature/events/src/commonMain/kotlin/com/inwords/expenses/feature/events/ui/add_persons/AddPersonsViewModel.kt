@@ -61,4 +61,8 @@ internal class AddPersonsViewModel(
             )
         }
     }
+
+    fun onNavIconClicked() {
+        navigationController.popBackStack()
+    }
 }

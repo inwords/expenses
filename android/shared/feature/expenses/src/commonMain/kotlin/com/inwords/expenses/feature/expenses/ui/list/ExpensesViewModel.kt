@@ -126,7 +126,7 @@ internal class ExpensesViewModel(
         .stateInWhileSubscribed(
             scope = viewModelScope,
             initialValue = SimpleScreenState.Loading,
-            replayExpirationMillis = 5000
+            replayExpirationMillis = 3000,
         )
 
     fun onMenuClick() {

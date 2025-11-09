@@ -68,7 +68,7 @@ internal class DebtsListViewModel(
         )
     }
 
-    fun onCloseClick() {
+    fun onNavIconClicked() {
         navigationController.popBackStack()
     }
 
