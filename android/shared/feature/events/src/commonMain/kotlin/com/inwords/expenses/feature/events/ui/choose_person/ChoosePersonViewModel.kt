@@ -83,10 +83,9 @@ internal class ChoosePersonViewModel(
         confirmJob?.cancel()
         confirmJob = viewModelScope.launch {
             settingsRepository.setCurrentPersonId(personId)
-            navigationController.navigateTo(
-                destination = expensesScreenDestination,
-                popUpTo = expensesScreenDestination,
-                launchSingleTop = true
+            navigationController.popBackStack(
+                toDestination = expensesScreenDestination,
+                inclusive = false,
             )
         }
     }

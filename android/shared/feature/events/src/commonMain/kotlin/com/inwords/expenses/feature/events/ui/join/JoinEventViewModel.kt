@@ -26,23 +26,28 @@ internal class JoinEventViewModel(
 
     private var confirmJob: Job? = null
 
-    private val _state = MutableStateFlow(
-        JoinEventPaneUiModel(
-            eventId = initialEventId.filter { it.toString().matches(eventIdRegex) },
-            eventAccessCode = initialPinCode.filter { it.isDigit() }
-        )
+    private val initialState = JoinEventPaneUiModel(
+        eventId = initialEventId.filteredEventId(),
+        eventAccessCode = initialPinCode.filteredPinCode(),
     )
+    private val _state = MutableStateFlow(initialState)
     val state: StateFlow<JoinEventPaneUiModel> = _state
+
+    init {
+        if (initialState.eventId.isNotBlank() && initialState.eventAccessCode.isNotBlank()) {
+            onConfirmClicked()
+        }
+    }
 
     fun onEventIdChanged(eventId: String) {
         _state.update { value ->
-            value.copy(eventId = eventId.filter { it.toString().matches(eventIdRegex) })
+            value.copy(eventId = eventId.filteredEventId())
         }
     }
 
     fun onEventAccessCodeChanged(eventAccessCode: String) {
         _state.update { value ->
-            value.copy(eventAccessCode = eventAccessCode.filter { it.isDigit() })
+            value.copy(eventAccessCode = eventAccessCode.filteredPinCode())
         }
     }
 
@@ -69,4 +74,13 @@ internal class JoinEventViewModel(
     fun onNavIconClicked() {
         navigationController.popBackStack()
     }
+
+    private fun String.filteredEventId(): String {
+        return this.filter { it.toString().matches(eventIdRegex) }
+    }
+
+    private fun String.filteredPinCode(): String {
+        return this.filter { it.isDigit() }
+    }
+
 }

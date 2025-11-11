@@ -2,6 +2,7 @@ import com.inwords.expenses.plugins.SharedKmmLibraryPlugin.Companion.applyKmmDef
 
 plugins {
     id("shared-kmm-library-plugin")
+    alias(shared.plugins.kotlin.serialization)
     alias(shared.plugins.compose.compiler)
     alias(shared.plugins.compose.multiplatform.compiler)
 }
@@ -26,6 +27,11 @@ kotlin {
             dependencies {
                 implementation(project(":shared:core:utils"))
 
+                // TODO the whole ktor for URL parsing
+                implementation(shared.ktor.client.core)
+
+                implementation(shared.kotlinx.serialization.json)
+
                 // for BottomSheetScene
                 implementation(shared.compose.material3.multiplatform)
 
@@ -33,5 +39,9 @@ kotlin {
                 implementation(shared.navigation3.ui.multiplatform)
             }
         }
+    }
+
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 }

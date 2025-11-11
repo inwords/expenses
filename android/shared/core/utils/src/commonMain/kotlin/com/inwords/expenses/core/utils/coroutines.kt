@@ -20,6 +20,7 @@ import kotlin.experimental.ExperimentalTypeInference
 import kotlin.time.Duration
 
 val UI = Dispatchers.Main.immediate
+val DF = Dispatchers.Default
 val IO = Dispatchers.IO
 
 fun <T> Flow<T>.collectIn(

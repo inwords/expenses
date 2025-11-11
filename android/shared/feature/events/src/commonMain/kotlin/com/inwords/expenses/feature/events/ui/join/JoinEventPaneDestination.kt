@@ -7,6 +7,8 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavModule
 import com.inwords.expenses.core.navigation.NavigationController
+import com.inwords.expenses.core.navigation.deeplinkHostPath
+import com.inwords.expenses.core.navigation.navDeepLink
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -26,7 +28,11 @@ fun getJoinEventPaneNavModule(
     navigationController: NavigationController,
     eventsInteractor: EventsInteractor,
 ): NavModule {
-    return NavModule(JoinEventPaneDestination.serializer()) {
+    val serializer = JoinEventPaneDestination.serializer()
+    return NavModule(
+        actualSerializer = serializer,
+        deepLinks = listOf(navDeepLink(basePath = "$deeplinkHostPath/event", route = serializer)),
+    ) {
         entry<JoinEventPaneDestination> { key ->
             val viewModel = viewModel<JoinEventViewModel>(factory = viewModelFactory {
                 initializer {

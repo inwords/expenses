@@ -15,7 +15,9 @@ import androidx.savedstate.serialization.SavedStateConfiguration
 import com.inwords.expenses.core.locator.ComponentsMap
 import com.inwords.expenses.core.locator.getComponent
 import com.inwords.expenses.core.navigation.BottomSheetSceneStrategy
+import com.inwords.expenses.core.navigation.DeeplinkProvider
 import com.inwords.expenses.core.navigation.Destination
+import com.inwords.expenses.core.navigation.HandleDeeplinks
 import com.inwords.expenses.core.navigation.rememberNavigationController
 import com.inwords.expenses.feature.events.api.EventsComponent
 import com.inwords.expenses.feature.events.ui.add_persons.getAddPersonsPaneNavModule
@@ -36,6 +38,7 @@ import kotlinx.serialization.modules.SerializersModule
 
 @Composable
 fun MainNavHost(
+    deeplinkProvider: DeeplinkProvider,
     modifier: Modifier = Modifier,
     startDestination: Destination = ExpensesPaneDestination
 ) {
@@ -115,6 +118,12 @@ fun MainNavHost(
     remember(navigationController, backStack) {
         navigationController.attachTo(backStack)
     }
+
+    HandleDeeplinks(
+        deeplinkProvider = deeplinkProvider,
+        navigationController = navigationController,
+        navDeepLinks = remember { modules.flatMapTo(HashSet()) { it.deepLinks } }
+    )
 
     val strategy = remember {
         BottomSheetSceneStrategy<Destination>() then
