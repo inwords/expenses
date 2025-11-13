@@ -5,6 +5,7 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import de.mannodermaus.junit5.compose.ComposeContext
 
@@ -35,7 +36,7 @@ internal class AddExpenseScreen : BaseScreen() {
 
     context(extension: ComposeContext)
     fun clickConfirm(): ExpensesScreen {
-        extension.onNodeWithText("Подтвердить").performClick()
+        extension.onNodeWithText("Сохранить").performScrollTo().performClick()
         return ExpensesScreen()
     }
 }

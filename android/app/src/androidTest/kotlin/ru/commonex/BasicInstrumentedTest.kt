@@ -81,9 +81,8 @@ class BasicInstrumentedTest {
             EmptyEventsScreen()
                 .clickJoinEvent()
                 .joinEvent("01JYC8BX30EKQYWBRTPKVX6S26", Base64.decode("NTc=").decodeToString() + Base64.decode("NTQ=").decodeToString()) // FIXME: costyl
-                .waitUntilLoaded()
+                .waitUntilLoaded("Test User 2")
                 .selectPerson("Test User 2")
-                .clickContinueButton()
                 .waitUntilLoaded()
         }
     }
