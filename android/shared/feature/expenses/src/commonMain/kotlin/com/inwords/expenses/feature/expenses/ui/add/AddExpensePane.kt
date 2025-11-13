@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -226,9 +225,7 @@ private fun AddExpensePaneSuccess(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp),
-                onAmountChanged = {
-                    onWholeAmountChanged.invoke(it)
-                },
+                onAmountChanged = onWholeAmountChanged,
                 onDoneClicked = { keyboardController?.hide() }
             )
         } else {
@@ -238,7 +235,7 @@ private fun AddExpensePaneSuccess(
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp),
                 onSplitAmountChanged = onSplitAmountChanged,
-                onDoneClicked = onConfirmClicked
+                onDoneClicked = { keyboardController?.hide() }
             )
         }
 
@@ -307,17 +304,22 @@ private fun SplitCustomPartsInputsBLock(
     onDoneClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    FlowColumn(
+    Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        split.forEach { expenseSplit ->
+        split.forEachIndexed { i, expenseSplit ->
             SplitCustomPartInput(
                 modifier = Modifier
                     .fillMaxWidth(),
                 expenseSplit = expenseSplit,
                 onAmountChanged = { onSplitAmountChanged(expenseSplit, it) },
-                onDoneClicked = onDoneClicked
+                onDoneClicked = onDoneClicked,
+                imeAction = if (i == split.lastIndex) {
+                    ImeAction.Done
+                } else {
+                    ImeAction.Next
+                },
             )
         }
     }
@@ -328,6 +330,7 @@ private fun SplitCustomPartInput(
     expenseSplit: ExpenseSplitWithPersonUiModel,
     onAmountChanged: (String) -> Unit,
     onDoneClicked: () -> Unit,
+    imeAction: ImeAction,
     modifier: Modifier = Modifier,
 ) {
     OutlinedTextField(
@@ -340,7 +343,7 @@ private fun SplitCustomPartInput(
         keyboardOptions = KeyboardOptions(
             autoCorrectEnabled = false,
             keyboardType = KeyboardType.Decimal,
-            imeAction = ImeAction.Next,
+            imeAction = imeAction,
         ),
         singleLine = true
     )
