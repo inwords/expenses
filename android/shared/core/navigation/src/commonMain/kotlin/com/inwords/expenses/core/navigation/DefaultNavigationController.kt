@@ -36,7 +36,7 @@ internal class DefaultNavigationController() : AttachableNavigationController {
 
     override fun popBackStack(toDestination: Destination, inclusive: Boolean) {
         getBackStack().apply {
-            while (isNotEmpty()) { // Prevent removing the last destination
+            while (isNotEmpty()) {
                 val top = last()
                 if (top == toDestination) {
                     if (inclusive) {
