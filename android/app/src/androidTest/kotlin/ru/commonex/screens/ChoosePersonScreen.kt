@@ -7,20 +7,14 @@ import de.mannodermaus.junit5.compose.ComposeContext
 internal class ChoosePersonScreen : BaseScreen() {
 
     context(extension: ComposeContext)
-    fun waitUntilLoaded(): ChoosePersonScreen {
-        waitForElementWithText("Продолжить")
+    fun waitUntilLoaded(name: String): ChoosePersonScreen {
+        waitForElementWithText(name)
         return this
     }
 
     context(extension: ComposeContext)
-    fun selectPerson(name: String): ChoosePersonScreen {
+    fun selectPerson(name: String): ExpensesScreen {
         extension.onNodeWithText(name).performClick()
-        return this
-    }
-
-    context(extension: ComposeContext)
-    fun clickContinueButton(): ExpensesScreen {
-        extension.onNodeWithText("Продолжить").performClick()
         return ExpensesScreen()
     }
 

@@ -10,17 +10,17 @@ import com.inwords.expenses.core.utils.debounceAfterInitial
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.feature.events.domain.EventsInteractor
-import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonScreenDestination
-import com.inwords.expenses.feature.events.ui.create.CreateEventScreenDestination
-import com.inwords.expenses.feature.events.ui.join.JoinEventScreenDestination
+import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneDestination
+import com.inwords.expenses.feature.events.ui.create.CreateEventPaneDestination
+import com.inwords.expenses.feature.events.ui.join.JoinEventPaneDestination
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
-import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenDestination
+import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneDestination
+import com.inwords.expenses.feature.expenses.ui.common.DebtShortUiModel
 import com.inwords.expenses.feature.expenses.ui.converter.toUiModel
-import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListScreenDestination
-import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.Expenses.DebtorShortUiModel
-import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.Expenses.ExpenseUiModel
-import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.LocalEvents
-import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.LocalEvents.LocalEventUiModel
+import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListPaneDestination
+import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.Expenses.ExpenseUiModel
+import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents
+import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents.LocalEventUiModel
 import com.inwords.expenses.feature.expenses.ui.list.dialog.ExpenseItemDialogDestination
 import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
 import com.inwords.expenses.feature.menu.ui.MenuDialogDestination
@@ -50,7 +50,7 @@ internal class ExpensesViewModel(
 
     private val isRefreshing = MutableStateFlow(false)
 
-    val state: StateFlow<SimpleScreenState<ExpensesScreenUiModel>> = combine(
+    val state: StateFlow<SimpleScreenState<ExpensesPaneUiModel>> = combine(
         eventsInteractor.currentEvent
             .flatMapLatestNoBuffer { currentEvent ->
                 if (currentEvent == null) {
@@ -85,9 +85,9 @@ internal class ExpensesViewModel(
             }
         }
 
-        val debtors = expensesDetails.debtCalculator.getBarterAccumulatedDebtForPerson(currentPerson)
+        val debts = expensesDetails.debtCalculator.getBarterAccumulatedDebtForPerson(currentPerson)
             .map { (person, barterAccumulatedDebt) ->
-                DebtorShortUiModel(
+                DebtShortUiModel(
                     personId = person.id,
                     personName = person.name,
                     currencyCode = barterAccumulatedDebt.currency.code,
@@ -100,11 +100,11 @@ internal class ExpensesViewModel(
 
         flowOf(
             SimpleScreenState.Success(
-                ExpensesScreenUiModel.Expenses(
+                ExpensesPaneUiModel.Expenses(
                     eventName = expensesDetails.event.event.name,
                     currentPersonId = currentPerson.id,
                     currentPersonName = currentPerson.name,
-                    creditors = debtors,
+                    debts = debts,
                     expenses = expensesDetails.expenses.map { expense ->
                         expense.toUiModel(primaryCurrencyName = expensesDetails.event.primaryCurrency.name)
                     }.asImmutableListAdapter(),
@@ -116,7 +116,7 @@ internal class ExpensesViewModel(
         .combine(isRefreshing) { state, isRefreshing ->
             if (state is SimpleScreenState.Success) {
                 when (val data = state.data) {
-                    is ExpensesScreenUiModel.Expenses -> state.copy(data = data.copy(isRefreshing = isRefreshing))
+                    is ExpensesPaneUiModel.Expenses -> state.copy(data = data.copy(isRefreshing = isRefreshing))
                     is LocalEvents -> state
                 }
             } else {
@@ -126,7 +126,7 @@ internal class ExpensesViewModel(
         .stateInWhileSubscribed(
             scope = viewModelScope,
             initialValue = SimpleScreenState.Loading,
-            replayExpirationMillis = 5000
+            replayExpirationMillis = 3000,
         )
 
     fun onMenuClick() {
@@ -134,7 +134,7 @@ internal class ExpensesViewModel(
     }
 
     fun onAddExpenseClick() {
-        navigationController.navigateTo(AddExpenseScreenDestination())
+        navigationController.navigateTo(AddExpensePaneDestination())
     }
 
     fun onRevertExpenseClick(expense: ExpenseUiModel) {
@@ -147,19 +147,19 @@ internal class ExpensesViewModel(
     }
 
     fun onDebtsDetailsClick() {
-        navigationController.navigateTo(DebtsListScreenDestination)
+        navigationController.navigateTo(DebtsListPaneDestination)
     }
 
-    fun onReplenishmentClick(creditor: DebtorShortUiModel) {
+    fun onReplenishmentClick(creditor: DebtShortUiModel) {
         val state = (state.value as? SimpleScreenState.Success)?.data ?: return
         val currentPersonId = when (state) {
-            is ExpensesScreenUiModel.Expenses -> state.currentPersonId
+            is ExpensesPaneUiModel.Expenses -> state.currentPersonId
             is LocalEvents -> return
         }
 
         navigationController.navigateTo(
-            AddExpenseScreenDestination(
-                replenishment = AddExpenseScreenDestination.Replenishment(
+            AddExpensePaneDestination(
+                replenishment = AddExpensePaneDestination.Replenishment(
                     fromPersonId = currentPersonId,
                     toPersonId = creditor.personId,
                     currencyCode = creditor.currencyCode,
@@ -170,11 +170,11 @@ internal class ExpensesViewModel(
     }
 
     fun onCreateEventClick() {
-        navigationController.navigateTo(CreateEventScreenDestination)
+        navigationController.navigateTo(CreateEventPaneDestination)
     }
 
     fun onJoinEventClick() {
-        navigationController.navigateTo(JoinEventScreenDestination())
+        navigationController.navigateTo(JoinEventPaneDestination())
     }
 
     fun onRefresh() {
@@ -195,7 +195,7 @@ internal class ExpensesViewModel(
             val joined = eventsInteractor.joinLocalEvent(event.eventId)
             if (joined) {
                 navigationController.navigateTo(
-                    destination = ChoosePersonScreenDestination
+                    destination = ChoosePersonPaneDestination
                 )
             } else {
                 // FIXME: non-fatal error, show a message to the user

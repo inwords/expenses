@@ -6,8 +6,8 @@ import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.feature.events.domain.EventsInteractor
-import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonScreenDestination
-import com.inwords.expenses.feature.events.ui.join.JoinEventScreenDestination
+import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneDestination
+import com.inwords.expenses.feature.events.ui.join.JoinEventPaneDestination
 import com.inwords.expenses.feature.share.api.ShareManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -43,7 +43,8 @@ internal class MenuViewModel(
         .stateInWhileSubscribed(scope = viewModelScope, initialValue = emptyState)
 
     fun onJoinEventClicked() {
-        navigationController.navigateTo(JoinEventScreenDestination())
+        navigationController.popBackStack()
+        navigationController.navigateTo(destination = JoinEventPaneDestination())
     }
 
     fun onLeaveEventClicked() {
@@ -56,7 +57,8 @@ internal class MenuViewModel(
     }
 
     fun onChoosePersonClicked() {
-        navigationController.navigateTo(ChoosePersonScreenDestination)
+        navigationController.popBackStack()
+        navigationController.navigateTo(ChoosePersonPaneDestination)
     }
 
     fun onShareClicked() {

@@ -50,11 +50,11 @@ kotlin {
 
                 implementation(shared.ktor.client.core)
 
-                implementation(compose.ui)
-                implementation(compose.material3)
-                implementation(compose.components.uiToolingPreview)
+                implementation(shared.compose.ui.multiplatform)
+                implementation(shared.compose.material3.multiplatform)
+                implementation(shared.compose.ui.tooling.preview.multiplatform)
 
-                implementation(shared.navigation.compose.multiplatform)
+                implementation(shared.navigation3.ui.multiplatform)
                 implementation(shared.compose.material.icons.core)
 
                 implementation(shared.ionspin.kotlin.bignum)

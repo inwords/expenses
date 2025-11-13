@@ -12,7 +12,7 @@ import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.Person
-import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonScreenUiModel.PersonUiModel
+import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneUiModel.PersonUiModel
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -40,7 +40,7 @@ internal class ChoosePersonViewModel(
 
     private val selectedPersonId = MutableStateFlow<Long?>(null)
 
-    val state: StateFlow<SimpleScreenState<ChoosePersonScreenUiModel>> = combine(
+    val state: StateFlow<SimpleScreenState<ChoosePersonPaneUiModel>> = combine(
         eventsInteractor.currentEvent
             .filterNotNull() // TODO mvp
             .map { EventWithPersons(event = it.event, persons = it.persons) }
@@ -67,7 +67,7 @@ internal class ChoosePersonViewModel(
         }
 
         SimpleScreenState.Success(
-            ChoosePersonScreenUiModel(
+            ChoosePersonPaneUiModel(
                 eventId = eventWithPersons.event.id,
                 eventName = eventWithPersons.event.name,
                 persons = persons.asImmutableListAdapter(),
@@ -79,21 +79,18 @@ internal class ChoosePersonViewModel(
 
     fun onPersonSelected(personId: Long) {
         selectedPersonId.value = personId
-    }
 
-    fun onConfirmClicked() {
         confirmJob?.cancel()
         confirmJob = viewModelScope.launch {
-            val currentState = state.value as? SimpleScreenState.Success ?: return@launch
-
-            val selectedPersonId = currentState.data.persons.first { it.selected }.id
-            settingsRepository.setCurrentPersonId(selectedPersonId)
-            navigationController.navigateTo(
-                destination = expensesScreenDestination,
-                popUpTo = expensesScreenDestination,
-                launchSingleTop = true
+            settingsRepository.setCurrentPersonId(personId)
+            navigationController.popBackStack(
+                toDestination = expensesScreenDestination,
+                inclusive = false,
             )
         }
     }
 
+    fun onNavIconClicked() {
+        navigationController.popBackStack()
+    }
 }

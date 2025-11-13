@@ -10,11 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,14 +21,16 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.inwords.expenses.feature.expenses.ui.list.ExpensesScreenUiModel.Expenses.DebtorShortUiModel
+import com.inwords.expenses.core.ui.design.button.OutlinedButtonWithIconAndText
+import com.inwords.expenses.feature.expenses.ui.common.DebtReplenishmentButton
+import com.inwords.expenses.feature.expenses.ui.common.DebtShortUiModel
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun DebtsBlock(
     onDebtsDetailsClick: () -> Unit,
-    state: ExpensesScreenUiModel.Expenses,
-    onReplenishmentClick: (DebtorShortUiModel) -> Unit,
+    state: ExpensesPaneUiModel.Expenses,
+    onReplenishmentClick: (DebtShortUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -44,20 +45,14 @@ internal fun DebtsBlock(
                 text = "Долги",
                 style = MaterialTheme.typography.headlineMedium
             )
-            TextButton(
-                onClick = onDebtsDetailsClick
-            ) {
-                Text(
-                    modifier = Modifier
-                        .padding(end = 8.dp),
-                    text = "детализация",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
-            }
+            OutlinedButtonWithIconAndText(
+                onClick = onDebtsDetailsClick,
+                text = "детали",
+                imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
+            )
         }
 
-        if (state.creditors.isEmpty()) {
+        if (state.debts.isEmpty()) {
             Row(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             ) {
@@ -82,29 +77,10 @@ internal fun DebtsBlock(
                     .padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                state.creditors.forEach { creditor ->
-                    ReturnCreditorDebtButton(creditor, { onReplenishmentClick.invoke(creditor) })
+                state.debts.forEach { debt ->
+                    DebtReplenishmentButton(debt = debt, onClick = { onReplenishmentClick.invoke(debt) })
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun ReturnCreditorDebtButton(
-    creditor: DebtorShortUiModel,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    OutlinedButton(
-        modifier = modifier,
-        onClick = onClick
-    ) {
-        Text(
-            text = "${creditor.amount} ${creditor.currencyName},  ${creditor.personName}",
-            modifier = Modifier.padding(end = 8.dp),
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
     }
 }

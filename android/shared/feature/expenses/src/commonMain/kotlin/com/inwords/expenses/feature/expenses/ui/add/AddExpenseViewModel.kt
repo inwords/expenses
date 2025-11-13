@@ -19,10 +19,10 @@ import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
 import com.inwords.expenses.feature.expenses.domain.model.PersonWithAmount
-import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenDestination.Replenishment
-import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.CurrencyInfoUiModel
-import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.ExpenseSplitWithPersonUiModel
-import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenUiModel.PersonInfoUiModel
+import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneDestination.Replenishment
+import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneUiModel.CurrencyInfoUiModel
+import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneUiModel.ExpenseSplitWithPersonUiModel
+import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneUiModel.PersonInfoUiModel
 import com.inwords.expenses.feature.expenses.ui.add.AddExpenseViewModel.AddExpenseScreenModel.AmountModel
 import com.inwords.expenses.feature.expenses.ui.add.AddExpenseViewModel.AddExpenseScreenModel.ExpenseSplitWithPersonModel
 import com.inwords.expenses.feature.expenses.ui.add.AddExpenseViewModel.AddExpenseScreenModel.PersonInfoModel
@@ -180,7 +180,7 @@ internal class AddExpenseViewModel(
         SimpleScreenState.Success(model)
     }.stateInWhileSubscribed(viewModelScope + UI, initialValue = SimpleScreenState.Loading)
 
-    val state: StateFlow<SimpleScreenState<AddExpenseScreenUiModel>> = _state
+    val state: StateFlow<SimpleScreenState<AddExpensePaneUiModel>> = _state
         .map { state ->
             when (state) {
                 SimpleScreenState.Empty -> SimpleScreenState.Empty
@@ -330,12 +330,8 @@ internal class AddExpenseViewModel(
         }
     }
 
-    fun onCloseClicked() {
-        navigationController.popBackStack()
-    }
-
-    private fun AddExpenseScreenModel.toUiModel(): AddExpenseScreenUiModel {
-        return AddExpenseScreenUiModel(
+    private fun AddExpenseScreenModel.toUiModel(): AddExpensePaneUiModel {
+        return AddExpensePaneUiModel(
             description = this.description,
             currencies = this.currencies.map { currencyInfoModel ->
                 CurrencyInfoUiModel(

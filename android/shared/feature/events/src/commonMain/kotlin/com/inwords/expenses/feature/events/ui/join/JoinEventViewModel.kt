@@ -6,7 +6,7 @@ import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.domain.EventsInteractor.JoinEventResult
-import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonScreenDestination
+import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -26,23 +26,28 @@ internal class JoinEventViewModel(
 
     private var confirmJob: Job? = null
 
-    private val _state = MutableStateFlow(
-        JoinEventScreenUiModel(
-            eventId = initialEventId.filter { it.toString().matches(eventIdRegex) },
-            eventAccessCode = initialPinCode.filter { it.isDigit() }
-        )
+    private val initialState = JoinEventPaneUiModel(
+        eventId = initialEventId.filteredEventId(),
+        eventAccessCode = initialPinCode.filteredPinCode(),
     )
-    val state: StateFlow<JoinEventScreenUiModel> = _state
+    private val _state = MutableStateFlow(initialState)
+    val state: StateFlow<JoinEventPaneUiModel> = _state
+
+    init {
+        if (initialState.eventId.isNotBlank() && initialState.eventAccessCode.isNotBlank()) {
+            onConfirmClicked()
+        }
+    }
 
     fun onEventIdChanged(eventId: String) {
         _state.update { value ->
-            value.copy(eventId = eventId.filter { it.toString().matches(eventIdRegex) })
+            value.copy(eventId = eventId.filteredEventId())
         }
     }
 
     fun onEventAccessCodeChanged(eventAccessCode: String) {
         _state.update { value ->
-            value.copy(eventAccessCode = eventAccessCode.filter { it.isDigit() })
+            value.copy(eventAccessCode = eventAccessCode.filteredPinCode())
         }
     }
 
@@ -56,7 +61,7 @@ internal class JoinEventViewModel(
             )
             when (result) {
                 is JoinEventResult.NewCurrentEvent -> navigationController.navigateTo(
-                    destination = ChoosePersonScreenDestination
+                    destination = ChoosePersonPaneDestination
                 )
 
                 JoinEventResult.InvalidAccessCode -> Unit
@@ -65,4 +70,17 @@ internal class JoinEventViewModel(
             }
         }
     }
+
+    fun onNavIconClicked() {
+        navigationController.popBackStack()
+    }
+
+    private fun String.filteredEventId(): String {
+        return this.filter { it.toString().matches(eventIdRegex) }
+    }
+
+    private fun String.filteredPinCode(): String {
+        return this.filter { it.isDigit() }
+    }
+
 }

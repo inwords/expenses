@@ -8,7 +8,7 @@ import de.mannodermaus.junit5.compose.ComposeContext
 internal class CreateEventScreen : BaseScreen() {
     context(extension: ComposeContext)
     fun enterEventName(name: String): CreateEventScreen {
-        extension.onNodeWithText("Название события").performTextInput(name)
+        extension.onNodeWithText("Название").performTextInput(name)
         return this
     }
 

@@ -10,9 +10,9 @@ import com.inwords.expenses.core.utils.asImmutableListAdapter
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.domain.model.Currency
-import com.inwords.expenses.feature.events.ui.add_persons.AddPersonsScreenDestination
-import com.inwords.expenses.feature.events.ui.create.CreateEventScreenUiModel.CurrencyInfoUiModel
-import com.inwords.expenses.feature.events.ui.create.CreateEventViewModel.CreateEventScreenModel.CurrencyInfoModel
+import com.inwords.expenses.feature.events.ui.add_persons.AddPersonsPaneDestination
+import com.inwords.expenses.feature.events.ui.create.CreateEventPaneUiModel.CurrencyInfoUiModel
+import com.inwords.expenses.feature.events.ui.create.CreateEventViewModel.CreateEventPaneModel.CurrencyInfoModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -29,7 +29,7 @@ internal class CreateEventViewModel(
     private val expensesScreenDestination: Destination,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
-    private data class CreateEventScreenModel(
+    private data class CreateEventPaneModel(
         val eventName: String,
         val currencies: List<CurrencyInfoModel>,
     ) {
@@ -40,18 +40,18 @@ internal class CreateEventViewModel(
         )
     }
 
-    private val initialValue = CreateEventScreenModel("", emptyList())
+    private val initialValue = CreateEventPaneModel("", emptyList())
 
     private val inputEventName = MutableStateFlow(initialValue.eventName)
     private val selectedCurrencyCode = MutableStateFlow<String?>(null)
 
-    private val _state: StateFlow<CreateEventScreenModel> = combine(
+    private val _state: StateFlow<CreateEventPaneModel> = combine(
         eventsInteractor.getCurrencies(),
         inputEventName,
         selectedCurrencyCode
     ) { currencies, inputEventName, selectedCurrencyCode ->
         val currencyCodeToSelect = selectedCurrencyCode ?: "RUB"
-        CreateEventScreenModel(
+        CreateEventPaneModel(
             eventName = inputEventName,
             currencies = currencies.map { currency ->
                 currency.toUiModel(
@@ -64,7 +64,7 @@ internal class CreateEventViewModel(
         initialValue = initialValue
     )
 
-    val state: StateFlow<CreateEventScreenUiModel> = _state
+    val state: StateFlow<CreateEventPaneUiModel> = _state
         .map { state -> state.toUiModel() }
         .stateInWhileSubscribed(
             scope = viewModelScope + UI,
@@ -93,10 +93,13 @@ internal class CreateEventViewModel(
                 currency = state.currencies.first { it.selected }.currency
             )
             navigationController.navigateTo(
-                destination = AddPersonsScreenDestination,
-                popUpTo = expensesScreenDestination,
+                destination = AddPersonsPaneDestination,
             )
         }
+    }
+
+    fun onNavIconClicked() {
+        navigationController.popBackStack()
     }
 
     private fun Currency.toUiModel(selected: Boolean): CurrencyInfoModel {
@@ -114,8 +117,8 @@ internal class CreateEventViewModel(
         )
     }
 
-    private fun CreateEventScreenModel.toUiModel(): CreateEventScreenUiModel {
-        return CreateEventScreenUiModel(
+    private fun CreateEventPaneModel.toUiModel(): CreateEventPaneUiModel {
+        return CreateEventPaneUiModel(
             eventName = eventName,
             currencies = currencies.map { currency ->
                 currency.toUiModel()

@@ -26,7 +26,7 @@ internal class ExpensesScreen : BaseScreen() {
 
     context(extension: ComposeContext)
     fun clickDebtDetails(): DebtsListScreen {
-        extension.onNodeWithText("детализация").performClick()
+        extension.onNodeWithText("детали").performClick()
         return DebtsListScreen()
     }
 

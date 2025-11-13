@@ -11,10 +11,10 @@ import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
-import com.inwords.expenses.feature.expenses.ui.add.AddExpenseScreenDestination
+import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneDestination
+import com.inwords.expenses.feature.expenses.ui.common.DebtShortUiModel
 import com.inwords.expenses.feature.expenses.ui.converter.toUiModel
-import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListScreenUiModel.DebtorShortUiModel
-import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListScreenUiModel.PersonUiModel
+import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListPaneUiModel.PersonUiModel
 import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.CoroutineScope
@@ -29,15 +29,16 @@ internal class DebtsListViewModel(
     expensesInteractor: ExpensesInteractor,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
-    val state: StateFlow<SimpleScreenState<DebtsListScreenUiModel>> = eventsInteractor.currentEvent
+    val state: StateFlow<SimpleScreenState<DebtsListPaneUiModel>> = eventsInteractor.currentEvent
         .filterNotNull() // TODO mvp
         .flatMapLatestNoBuffer { expensesInteractor.getExpensesDetails(it) }
         .map { expensesDetails ->
-            val creditors = hashMapOf<PersonUiModel, ImmutableList<DebtorShortUiModel>>()
+            val creditors = hashMapOf<PersonUiModel, ImmutableList<DebtShortUiModel>>()
             expensesDetails.debtCalculator.barterAccumulatedDebts.forEach { (debtor, barterAccumulatedDebts) ->
                 creditors[debtor.toUiModel()] = barterAccumulatedDebts.map { (creditor, barterAccumulatedDebt) ->
-                    DebtorShortUiModel(
-                        person = creditor.toUiModel(),
+                    DebtShortUiModel(
+                        personId = creditor.id,
+                        personName = creditor.name,
                         currencyCode = barterAccumulatedDebt.currency.code,
                         currencyName = barterAccumulatedDebt.currency.name,
                         amount = barterAccumulatedDebt.barterAmount.toRoundedString()
@@ -46,7 +47,7 @@ internal class DebtsListViewModel(
             }
 
             SimpleScreenState.Success(
-                data = DebtsListScreenUiModel(
+                data = DebtsListPaneUiModel(
                     eventName = expensesDetails.event.event.name,
                     creditors = creditors.asImmutableMap()
                 )
@@ -54,12 +55,12 @@ internal class DebtsListViewModel(
         }
         .stateInWhileSubscribed(viewModelScope, initialValue = SimpleScreenState.Loading)
 
-    fun onReplenishmentClick(debtor: PersonUiModel, creditor: DebtorShortUiModel) {
+    fun onReplenishmentClick(debtor: PersonUiModel, creditor: DebtShortUiModel) {
         navigationController.navigateTo(
-            AddExpenseScreenDestination(
-                replenishment = AddExpenseScreenDestination.Replenishment(
+            AddExpensePaneDestination(
+                replenishment = AddExpensePaneDestination.Replenishment(
                     fromPersonId = debtor.personId,
-                    toPersonId = creditor.person.personId,
+                    toPersonId = creditor.personId,
                     currencyCode = creditor.currencyCode,
                     amount = creditor.amount
                 )
@@ -67,7 +68,7 @@ internal class DebtsListViewModel(
         )
     }
 
-    fun onCloseClick() {
+    fun onNavIconClicked() {
         navigationController.popBackStack()
     }
 
