@@ -25,3 +25,5 @@ The project consists of:
 - **Android and iOS apps** - Kotlin Multiplatform + Compose Multiplatform + a little of host code.
 - **Web** - Next.js-based web interface
 - **Backend and Infra** - NestJS service and infrastructure
+
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/inwords/expenses)
