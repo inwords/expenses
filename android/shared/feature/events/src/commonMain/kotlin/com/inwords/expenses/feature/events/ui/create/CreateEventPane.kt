@@ -30,7 +30,14 @@ import com.inwords.expenses.core.ui.design.group.ToggleButtonOption
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.feature.events.ui.common.EventNameField
 import com.inwords.expenses.feature.events.ui.create.CreateEventPaneUiModel.CurrencyInfoUiModel
+import expenses.shared.feature.events.generated.resources.Res
+import expenses.shared.feature.events.generated.resources.common_back
+import expenses.shared.feature.events.generated.resources.events_create_title
+import expenses.shared.feature.events.generated.resources.events_currency_section_title
+import expenses.shared.feature.events.generated.resources.events_participants_title
+import expenses.shared.feature.events.generated.resources.events_section_title
 import kotlinx.collections.immutable.persistentListOf
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -49,9 +56,9 @@ internal fun CreateEventPane(
         topBar = {
             TopAppBarWithNavIconAndText(
                 onNavIconClicked = onNavIconClicked,
-                title = "Создание события",
+                title = stringResource(Res.string.events_create_title),
                 imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                contentDescription = "Назад",
+                contentDescription = stringResource(Res.string.common_back),
             )
         },
     ) { paddingValues ->
@@ -66,7 +73,7 @@ internal fun CreateEventPane(
             Spacer(modifier = Modifier.weight(1f))
 
             Text(
-                text = "Событие",
+                text = stringResource(Res.string.events_section_title),
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
@@ -82,7 +89,7 @@ internal fun CreateEventPane(
             // TODO duplicate UI
             Text(
                 modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
-                text = "Валюта",
+                text = stringResource(Res.string.events_currency_section_title),
                 style = MaterialTheme.typography.headlineMedium
             )
             MultiSelectConnectedButtonGroupWithFlowLayout(
@@ -104,7 +111,7 @@ internal fun CreateEventPane(
                     .padding(vertical = 16.dp),
                 onClick = onConfirmClicked,
                 enabled = state.eventName.isNotBlank(),
-                text = "Участники",
+                text = stringResource(Res.string.events_participants_title),
                 imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
                 minHeight = ButtonDefaults.MediumContainerHeight,
             )

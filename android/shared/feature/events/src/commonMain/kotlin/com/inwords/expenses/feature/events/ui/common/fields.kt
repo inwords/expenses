@@ -10,6 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import expenses.shared.feature.events.generated.resources.Res
+import expenses.shared.feature.events.generated.resources.events_access_code_placeholder
+import expenses.shared.feature.events.generated.resources.events_id_placeholder
+import expenses.shared.feature.events.generated.resources.events_name_placeholder
+import expenses.shared.feature.events.generated.resources.events_person_name_placeholder
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun EventNameField(
@@ -22,7 +28,7 @@ internal fun EventNameField(
         modifier = modifier,
         value = eventName,
         onValueChange = onEventNameChanged,
-        placeholder = { Text("Название") },
+        placeholder = { Text(stringResource(Res.string.events_name_placeholder)) },
         singleLine = true,
         textStyle = MaterialTheme.typography.headlineMedium,
         keyboardActions = KeyboardActions(onDone = { onDone() }),
@@ -44,7 +50,7 @@ internal fun EventIdField(
         modifier = modifier,
         value = eventId,
         onValueChange = onEventIdChanged,
-        placeholder = { Text("ID события") },
+        placeholder = { Text(stringResource(Res.string.events_id_placeholder)) },
         singleLine = true,
         textStyle = MaterialTheme.typography.headlineMedium,
         keyboardOptions = KeyboardOptions(
@@ -65,7 +71,7 @@ internal fun EventAccessCodeField(
         modifier = modifier,
         value = eventAccessCode,
         onValueChange = onEventAccessCodeChanged,
-        placeholder = { Text("Код доступа") },
+        placeholder = { Text(stringResource(Res.string.events_access_code_placeholder)) },
         singleLine = true,
         textStyle = MaterialTheme.typography.headlineMedium,
         keyboardActions = KeyboardActions(onDone = { onDone.invoke() }),
@@ -88,7 +94,7 @@ internal fun PersonNameField(
         modifier = modifier,
         value = participantName,
         onValueChange = onParticipantNameChanged,
-        placeholder = { Text("Имя") },
+        placeholder = { Text(stringResource(Res.string.events_person_name_placeholder)) },
         singleLine = true,
         textStyle = MaterialTheme.typography.headlineMedium,
         keyboardActions = KeyboardActions(onAny = { onImeAction.invoke() }),

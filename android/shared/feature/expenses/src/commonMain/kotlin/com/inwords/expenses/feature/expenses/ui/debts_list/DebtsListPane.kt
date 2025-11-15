@@ -34,8 +34,14 @@ import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.feature.expenses.ui.common.DebtReplenishmentButton
 import com.inwords.expenses.feature.expenses.ui.common.DebtShortUiModel
 import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListPaneUiModel.PersonUiModel
+import expenses.shared.feature.expenses.generated.resources.Res
+import expenses.shared.feature.expenses.generated.resources.common_back
+import expenses.shared.feature.expenses.generated.resources.common_error
+import expenses.shared.feature.expenses.generated.resources.expenses_no_expenses
+import expenses.shared.feature.expenses.generated.resources.expenses_owes
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,7 +58,7 @@ internal fun DebtsListPane(
                 onNavIconClicked = onNavIconClicked,
                 title = (state as? SimpleScreenState.Success)?.data?.eventName ?: "...",
                 imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                contentDescription = "Назад",
+                contentDescription = stringResource(Res.string.common_back),
             )
         }
     ) { paddingValues ->
@@ -70,11 +76,11 @@ internal fun DebtsListPane(
             )
 
             is SimpleScreenState.Error -> {
-                Text(text = "Error")
+                Text(text = stringResource(Res.string.common_error))
             }
 
             SimpleScreenState.Empty -> {
-                Text(text = "No expenses")
+                Text(text = stringResource(Res.string.expenses_no_expenses))
             }
         }
     }
@@ -109,7 +115,7 @@ internal fun DebtsListPaneSuccess(
                 Text(
                     modifier = Modifier
                         .padding(horizontal = 16.dp),
-                    text = "${debtor.personName} должен",
+                    text = "${debtor.personName} ${stringResource(Res.string.expenses_owes)}",
                     style = MaterialTheme.typography.headlineMedium
                 )
                 state.creditors[debtor]!!.forEach { debtorDebt ->

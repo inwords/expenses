@@ -9,6 +9,7 @@ import com.inwords.expenses.core.navigation.NavModule
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
+import com.inwords.expenses.feature.expenses.domain.store.ExpensesLocalStore
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -21,6 +22,7 @@ fun getExpenseItemDialogNavModule(
     navigationController: NavigationController,
     eventsInteractor: EventsInteractor,
     expensesInteractor: ExpensesInteractor,
+    expensesLocalStore: ExpensesLocalStore,
 ): NavModule {
     return NavModule(ExpenseItemDialogDestination.serializer()) {
         entry<ExpenseItemDialogDestination>(metadata = dialog()) { key ->
@@ -30,6 +32,7 @@ fun getExpenseItemDialogNavModule(
                         navigationController = navigationController,
                         eventsInteractor = eventsInteractor,
                         expensesInteractor = expensesInteractor,
+                        expensesLocalStore = expensesLocalStore,
                         expenseId = key.expenseId
                     )
                 }

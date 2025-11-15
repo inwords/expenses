@@ -61,6 +61,7 @@ compose-foundation-multiplatform = { group = "org.jetbrains.compose.foundation",
 compose-runtime-multiplatform = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "compose-multiplatform" }
 compose-ui-tooling-preview-multiplatform = { group = "org.jetbrains.compose.ui", name = "ui-tooling-preview", version.ref = "compose-multiplatform" }
 compose-material3-multiplatform = { group = "org.jetbrains.compose.material3", name = "material3", version = "1.10.0-alpha04" }
+compose-components-resources-multiplatform = { group = "org.jetbrains.compose.components", name = "components-resources", version.ref = "compose-multiplatform" }
 activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.11.0" }
 navigation3-ui-multiplatform = { group = "org.jetbrains.androidx.navigation3", name = "navigation3-ui", version = "1.0.0-alpha04" }
 compose-material-icons-core = { group = "org.jetbrains.compose.material", name = "material-icons-core", version = "1.7.3" }

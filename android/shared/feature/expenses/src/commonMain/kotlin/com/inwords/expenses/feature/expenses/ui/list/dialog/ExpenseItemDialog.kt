@@ -18,6 +18,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
+import expenses.shared.feature.expenses.generated.resources.Res
+import expenses.shared.feature.expenses.generated.resources.expenses_revert_operation
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun ExpenseItemDialog(
@@ -56,7 +59,7 @@ internal fun ExpenseItemDialog(
             )
             Text(
                 modifier = Modifier.align(Alignment.CenterVertically),
-                text = "Отменить операцию",
+                text = stringResource(Res.string.expenses_revert_operation),
                 style = MaterialTheme.typography.bodyLarge
             )
         }

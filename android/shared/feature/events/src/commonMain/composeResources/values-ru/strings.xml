@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_back">Назад</string>
+    <string name="events_access_code_placeholder">Код доступа</string>
+    <string name="events_add_participant">Добавить участника</string>
+    <string name="events_choose_person_title">Выбор участника</string>
+    <string name="events_continue_button">К событию</string>
+    <string name="events_create_title">Создание события</string>
+    <string name="events_currency_section_title">Валюта</string>
+    <string name="events_empty_state">Нет доступных участников</string>
+    <string name="events_error_state">Не удалось загрузить данные события</string>
+    <string name="events_id_placeholder">ID события</string>
+    <string name="events_info_with_person">%1$s — %2$s</string>
+    <string name="events_join_description">Введите ID события и код доступа, чтобы присоединиться</string>
+    <string name="events_name_placeholder">Название</string>
+    <string name="events_owner_label">Меня зовут</string>
+    <string name="events_participants_label">Ещё участвуют</string>
+    <string name="events_participants_title">Участники</string>
+    <string name="events_person_name_placeholder">Имя</string>
+    <string name="events_section_title">Событие</string>
+    <string name="events_your_name_label">Ваше имя</string>
+</resources>

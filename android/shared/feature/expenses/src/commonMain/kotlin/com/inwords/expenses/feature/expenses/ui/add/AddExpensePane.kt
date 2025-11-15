@@ -46,8 +46,22 @@ import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
 import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneUiModel.CurrencyInfoUiModel
 import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneUiModel.ExpenseSplitWithPersonUiModel
 import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneUiModel.PersonInfoUiModel
+import expenses.shared.feature.expenses.generated.resources.Res
+import expenses.shared.feature.expenses.generated.resources.common_error
+import expenses.shared.feature.expenses.generated.resources.expenses_between
+import expenses.shared.feature.expenses.generated.resources.expenses_currency
+import expenses.shared.feature.expenses.generated.resources.expenses_description
+import expenses.shared.feature.expenses.generated.resources.expenses_equally
+import expenses.shared.feature.expenses.generated.resources.expenses_expense
+import expenses.shared.feature.expenses.generated.resources.expenses_no_expenses
+import expenses.shared.feature.expenses.generated.resources.expenses_paid_by
+import expenses.shared.feature.expenses.generated.resources.expenses_repayment
+import expenses.shared.feature.expenses.generated.resources.expenses_save
+import expenses.shared.feature.expenses.generated.resources.expenses_split
+import expenses.shared.feature.expenses.generated.resources.expenses_total_amount
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun AddExpensePane(
@@ -81,11 +95,11 @@ internal fun AddExpensePane(
         is SimpleScreenState.Loading -> AddExpensePaneLoading()
 
         is SimpleScreenState.Error -> {
-            Text(text = "Error")
+            Text(text = stringResource(Res.string.common_error))
         }
 
         SimpleScreenState.Empty -> {
-            Text(text = "No expenses")
+            Text(text = stringResource(Res.string.expenses_no_expenses))
         }
     }
 }
@@ -131,7 +145,7 @@ private fun AddExpensePaneSuccess(
                 .padding(horizontal = 8.dp),
             textStyle = MaterialTheme.typography.headlineSmall,
             value = state.description,
-            label = { Text(text = "Описание") },
+            label = { Text(text = stringResource(Res.string.expenses_description)) },
             onValueChange = onDescriptionChanged,
             keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
             keyboardOptions = KeyboardOptions(
@@ -145,7 +159,7 @@ private fun AddExpensePaneSuccess(
         Text(
             modifier = Modifier
                 .padding(start = 16.dp, top = 16.dp, end = 12.dp),
-            text = "Оплатил",
+            text = stringResource(Res.string.expenses_paid_by),
             style = MaterialTheme.typography.headlineMedium
         )
         MultiSelectConnectedButtonGroupWithFlowLayout(
@@ -163,7 +177,7 @@ private fun AddExpensePaneSuccess(
 
         Text(
             modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp),
-            text = "Валюта",
+            text = stringResource(Res.string.expenses_currency),
             style = MaterialTheme.typography.headlineMedium
         )
         MultiSelectConnectedButtonGroupWithFlowLayout(
@@ -182,14 +196,14 @@ private fun AddExpensePaneSuccess(
         Text(
             modifier = Modifier
                 .padding(start = 16.dp, top = 8.dp, end = 16.dp),
-            text = "Разделить",
+            text = stringResource(Res.string.expenses_split),
             style = MaterialTheme.typography.headlineSmall
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 modifier = Modifier
                     .padding(horizontal = 8.dp),
-                text = "Поровну",
+                text = stringResource(Res.string.expenses_equally),
                 style = MaterialTheme.typography.bodyLarge
             )
             Switch(
@@ -202,7 +216,7 @@ private fun AddExpensePaneSuccess(
             Text(
                 modifier = Modifier
                     .padding(end = 8.dp),
-                text = "между:",
+                text = stringResource(Res.string.expenses_between),
                 style = MaterialTheme.typography.bodyLarge
             )
         }
@@ -251,13 +265,13 @@ private fun AddExpensePaneSuccess(
                 checked = state.expenseType == ExpenseType.Spending,
                 onCheckedChange = { onExpenseTypeClicked.invoke(ExpenseType.Spending) },
                 shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
-            ) { Text(text = "Трата") }
+            ) { Text(text = stringResource(Res.string.expenses_expense)) }
             TonalToggleButton(
                 modifier = Modifier.weight(1f),
                 checked = state.expenseType == ExpenseType.Replenishment,
                 onCheckedChange = { onExpenseTypeClicked.invoke(ExpenseType.Replenishment) },
                 shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
-            ) { Text(text = "Возврат") }
+            ) { Text(text = stringResource(Res.string.expenses_repayment)) }
         }
 
         ButtonWithIconAndText(
@@ -266,7 +280,7 @@ private fun AddExpensePaneSuccess(
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 16.dp),
             onClick = onConfirmClicked,
-            text = "Сохранить",
+            text = stringResource(Res.string.expenses_save),
             imageVector = Icons.Outlined.Check,
             minHeight = ButtonDefaults.MediumContainerHeight,
         )
@@ -284,7 +298,7 @@ private fun SplitEqualPartsInput(
         modifier = modifier,
         textStyle = MaterialTheme.typography.headlineSmall,
         value = amount,
-        label = { Text(text = "Общая сумма") },
+        label = { Text(text = stringResource(Res.string.expenses_total_amount)) },
         onValueChange = onAmountChanged,
         keyboardActions = KeyboardActions(onDone = { onDoneClicked.invoke() }),
         keyboardOptions = KeyboardOptions(

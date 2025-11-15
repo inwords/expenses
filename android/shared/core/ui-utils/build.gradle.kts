@@ -24,6 +24,7 @@ kotlin {
                 implementation(shared.kotlinx.datetime)
 
                 implementation(shared.compose.ui.multiplatform)
+                implementation(shared.compose.components.resources.multiplatform)
             }
         }
     }

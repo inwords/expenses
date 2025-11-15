@@ -94,6 +94,7 @@ fun MainNavHost(
                 navigationController = navigationController,
                 eventsInteractor = eventsComponent.eventsInteractor,
                 expensesInteractor = expensesComponent.expensesInteractor,
+                expensesLocalStore = expensesComponent.expensesLocalStore.value,
             ),
 
             getMenuDialogNavModule(

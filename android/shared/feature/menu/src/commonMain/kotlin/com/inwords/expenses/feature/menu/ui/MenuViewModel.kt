@@ -65,7 +65,9 @@ internal class MenuViewModel(
         val state = state.value
         val eventName = state.eventName.ifEmpty { return }
         val shareUrl = state.shareUrl ?: return
-        shareManagerLazy.value.shareUrl(eventName, shareUrl)
+        viewModelScope.launch {
+            shareManagerLazy.value.shareUrl(eventName, shareUrl)
+        }
     }
 
 }

@@ -70,7 +70,18 @@ import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.Expense
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents.LocalEventUiModel
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
+import expenses.shared.feature.expenses.generated.resources.Res
+import expenses.shared.feature.expenses.generated.resources.common_error
+import expenses.shared.feature.expenses.generated.resources.expenses_app_name
+import expenses.shared.feature.expenses.generated.resources.expenses_create
+import expenses.shared.feature.expenses.generated.resources.expenses_create_join_description
+import expenses.shared.feature.expenses.generated.resources.expenses_event
+import expenses.shared.feature.expenses.generated.resources.expenses_join
+import expenses.shared.feature.expenses.generated.resources.expenses_operation
+import expenses.shared.feature.expenses.generated.resources.expenses_operations
+import expenses.shared.feature.expenses.generated.resources.expenses_your
 import kotlinx.collections.immutable.persistentListOf
+import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Clock
 
 @Composable
@@ -114,7 +125,7 @@ internal fun ExpensesPane(
         is SimpleScreenState.Loading -> ExpensesPaneLoading(modifier)
 
         is SimpleScreenState.Error -> {
-            Text(text = "Error")
+            Text(text = stringResource(Res.string.common_error))
         }
 
         SimpleScreenState.Empty -> ExpensesPaneEmpty(
@@ -149,7 +160,7 @@ private fun ExpensesPaneSuccess(
                     ) {
                         Text(
                             modifier = Modifier.align(Alignment.Center),
-                            text = "CommonEx",
+                            text = stringResource(Res.string.expenses_app_name),
                             fontStyle = FontStyle.Italic,
                             fontWeight = FontWeight.Bold
                         )
@@ -169,7 +180,7 @@ private fun ExpensesPaneSuccess(
         },
         floatingActionButton = {
             BasicFloatingActionButton(
-                text = "Операция",
+                text = stringResource(Res.string.expenses_operation),
                 imageVector = Icons.Outlined.Add,
                 onClick = onAddExpenseClick,
             )
@@ -214,7 +225,7 @@ private fun ExpensesPaneSuccess(
 
                 Text(
                     modifier = Modifier.padding(start = 16.dp, top = 24.dp, end = 16.dp, bottom = 4.dp),
-                    text = "Операции",
+                    text = stringResource(Res.string.expenses_operations),
                     style = MaterialTheme.typography.headlineMedium
                 )
 
@@ -275,7 +286,7 @@ private fun ExpensesPaneLocalEvents(
                 .padding(topAndHorizontalPaddings),
         ) {
             Text(
-                text = "Событие",
+                text = stringResource(Res.string.expenses_event),
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
@@ -290,7 +301,7 @@ private fun ExpensesPaneLocalEvents(
                         .weight(1f)
                         .fillMaxHeight(),
                     onClick = onJoinEventClick,
-                    text = "Присоединиться",
+                    text = stringResource(Res.string.expenses_join),
                     minHeight = ButtonDefaults.MediumContainerHeight,
                 )
                 ButtonWithIconAndText(
@@ -298,14 +309,14 @@ private fun ExpensesPaneLocalEvents(
                         .weight(1f)
                         .fillMaxHeight(),
                     onClick = onCreateEventClick,
-                    text = "Создать",
+                    text = stringResource(Res.string.expenses_create),
                     imageVector = Icons.Outlined.Add,
                     minHeight = ButtonDefaults.MediumContainerHeight,
                 )
             }
 
             Text(
-                text = "Ваше",
+                text = stringResource(Res.string.expenses_your),
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
@@ -376,7 +387,7 @@ private fun ExpensesPaneEmpty(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Вы можете создать новое событие или присоединиться к существующему",
+                text = stringResource(Res.string.expenses_create_join_description),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
@@ -387,7 +398,7 @@ private fun ExpensesPaneEmpty(
                 modifier = modifier
                     .fillMaxWidth(0.7f),
                 onClick = onCreateEventClick,
-                text = "Создать",
+                text = stringResource(Res.string.expenses_create),
                 imageVector = Icons.Outlined.Add,
                 minHeight = ButtonDefaults.MediumContainerHeight,
             )
@@ -396,7 +407,7 @@ private fun ExpensesPaneEmpty(
                 modifier = modifier
                     .fillMaxWidth(0.7f),
                 onClick = onJoinEventClick,
-                text = "Присоединиться",
+                text = stringResource(Res.string.expenses_join),
                 minHeight = ButtonDefaults.MediumContainerHeight,
             )
         }

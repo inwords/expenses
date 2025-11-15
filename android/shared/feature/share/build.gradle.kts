@@ -2,6 +2,8 @@ import com.inwords.expenses.plugins.SharedKmmLibraryPlugin.Companion.applyKmmDef
 
 plugins {
     id("shared-kmm-library-plugin")
+    alias(shared.plugins.compose.compiler)
+    alias(shared.plugins.compose.multiplatform.compiler)
 }
 
 android {
@@ -19,6 +21,10 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(project(":shared:core:utils"))
+                implementation(project(":shared:core:ui-utils"))
+
+                implementation(shared.compose.runtime.multiplatform)
+                implementation(shared.compose.components.resources.multiplatform)
             }
         }
     }

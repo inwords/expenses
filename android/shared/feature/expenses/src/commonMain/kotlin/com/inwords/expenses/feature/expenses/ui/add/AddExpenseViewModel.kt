@@ -30,6 +30,9 @@ import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
+import expenses.shared.feature.expenses.generated.resources.Res
+import expenses.shared.feature.expenses.generated.resources.expenses_no_description
+import expenses.shared.feature.expenses.generated.resources.expenses_repayment_from
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +42,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import org.jetbrains.compose.resources.getString
 
 internal class AddExpenseViewModel(
     private val navigationController: NavigationController,
@@ -145,7 +149,7 @@ internal class AddExpenseViewModel(
             event = eventDetails.event,
             description = inputDescription ?: run {
                 val currentPerson = persons.first { it.selected }
-                "Возврат от ${currentPerson.person.name}"
+                getString(Res.string.expenses_repayment_from, currentPerson.person.name)
             },
             currencies = eventDetails.currencies.map { currency ->
                 AddExpenseScreenModel.CurrencyInfoModel(
@@ -302,12 +306,13 @@ internal class AddExpenseViewModel(
         viewModelScope.launch {
             val selectedCurrency = state.currencies.firstOrNull { it.selected }?.currency ?: return@launch
             val selectedPerson = state.persons.firstOrNull { it.selected }?.person ?: return@launch
+            val description = state.description.trim().ifEmpty { getString(Res.string.expenses_no_description) }
             if (state.equalSplit) {
                 expensesInteractor.addExpenseEqualSplit(
                     event = state.event,
                     wholeAmount = state.wholeAmount.amount ?: return@launch,
                     expenseType = state.expenseType,
-                    description = state.description,
+                    description = description,
                     selectedSubjectPersons = state.subjectPersons.filter { it.selected }.map { it.person },
                     selectedCurrency = selectedCurrency,
                     selectedPerson = selectedPerson,
@@ -319,7 +324,7 @@ internal class AddExpenseViewModel(
                 expensesInteractor.addExpenseCustomSplit(
                     event = state.event,
                     expenseType = state.expenseType,
-                    description = state.description,
+                    description = description,
                     selectedCurrency = selectedCurrency,
                     selectedPerson = selectedPerson,
                     personWithAmountSplit = personWithAmountSplit
