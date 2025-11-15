@@ -3,6 +3,8 @@ package com.inwords.expenses.feature.expenses.ui.list.dialog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inwords.expenses.core.navigation.NavigationController
+import com.inwords.expenses.core.ui.utils.DefaultStringProvider
+import com.inwords.expenses.core.ui.utils.StringProvider
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
@@ -13,7 +15,6 @@ import expenses.shared.feature.expenses.generated.resources.expenses_revert_desc
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.getString
 
 internal class ExpenseItemDialogViewModel(
     private val navigationController: NavigationController,
@@ -21,6 +22,7 @@ internal class ExpenseItemDialogViewModel(
     private val expensesInteractor: ExpensesInteractor,
     private val expensesLocalStore: ExpensesLocalStore,
     private val expenseId: Long,
+    private val stringProvider: StringProvider = DefaultStringProvider,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
     private var expenseRevertJob: kotlinx.coroutines.Job? = null
@@ -34,7 +36,7 @@ internal class ExpenseItemDialogViewModel(
             expensesInteractor.revertExpense(
                 event = event,
                 originalExpense = originalExpense,
-                description = getString(Res.string.expenses_revert_description, originalExpense.description)
+                description = stringProvider.getString(Res.string.expenses_revert_description, originalExpense.description)
             )
 
             navigationController.popBackStack(

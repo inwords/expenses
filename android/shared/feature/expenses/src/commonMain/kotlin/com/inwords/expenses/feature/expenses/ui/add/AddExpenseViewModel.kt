@@ -3,7 +3,9 @@ package com.inwords.expenses.feature.expenses.ui.add
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inwords.expenses.core.navigation.NavigationController
+import com.inwords.expenses.core.ui.utils.DefaultStringProvider
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
+import com.inwords.expenses.core.ui.utils.StringProvider
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.core.utils.asImmutableListAdapter
@@ -42,7 +44,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import org.jetbrains.compose.resources.getString
 
 internal class AddExpenseViewModel(
     private val navigationController: NavigationController,
@@ -50,6 +51,7 @@ internal class AddExpenseViewModel(
     private val expensesInteractor: ExpensesInteractor,
     settingsRepository: SettingsRepository,
     private val replenishment: Replenishment?,
+    private val stringProvider: StringProvider = DefaultStringProvider,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
     private data class AddExpenseScreenModel(
@@ -149,7 +151,7 @@ internal class AddExpenseViewModel(
             event = eventDetails.event,
             description = inputDescription ?: run {
                 val currentPerson = persons.first { it.selected }
-                getString(Res.string.expenses_repayment_from, currentPerson.person.name)
+                stringProvider.getString(Res.string.expenses_repayment_from, currentPerson.person.name)
             },
             currencies = eventDetails.currencies.map { currency ->
                 AddExpenseScreenModel.CurrencyInfoModel(
@@ -306,7 +308,7 @@ internal class AddExpenseViewModel(
         viewModelScope.launch {
             val selectedCurrency = state.currencies.firstOrNull { it.selected }?.currency ?: return@launch
             val selectedPerson = state.persons.firstOrNull { it.selected }?.person ?: return@launch
-            val description = state.description.trim().ifEmpty { getString(Res.string.expenses_no_description) }
+            val description = state.description.trim().ifEmpty { stringProvider.getString(Res.string.expenses_no_description) }
             if (state.equalSplit) {
                 expensesInteractor.addExpenseEqualSplit(
                     event = state.event,
