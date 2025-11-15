@@ -1,7 +1,14 @@
 package ru.commonex
 
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.ExperimentalTestApi
+import de.mannodermaus.junit5.compose.AndroidComposeExtension
+import de.mannodermaus.junit5.compose.ComposeContext
 import de.mannodermaus.junit5.compose.createAndroidComposeExtension
+import expenses.shared.feature.expenses.generated.resources.Res
+import expenses.shared.feature.expenses.generated.resources.expenses_revert_description
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.compose.resources.getString
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import ru.commonex.screens.EmptyEventsScreen
@@ -18,7 +25,7 @@ class BasicInstrumentedTest {
 
     @Test
     fun testBasicNewEventAndExpensesFlow() {
-        extension.use {
+        extension.runTest {
             // Create event and add participants
             val expensesScreen = EmptyEventsScreen()
                 .clickCreateEvent()
@@ -51,7 +58,7 @@ class BasicInstrumentedTest {
             expensesScreen
                 .clickOnExpense("Булка")
                 .clickCancelExpense()
-                .verifyExpenseExists("[ОТМЕНА] Булка")
+                .verifyExpenseExists(getString(Res.string.expenses_revert_description, "Булка"))
 
             // Verify debts details
             expensesScreen
@@ -62,7 +69,7 @@ class BasicInstrumentedTest {
 
     @Test
     fun testCreateEmptyEvent() {
-        extension.use {
+        extension.runTest {
             EmptyEventsScreen()
                 .clickCreateEvent()
                 .enterEventName("UI Test Event")
@@ -77,13 +84,21 @@ class BasicInstrumentedTest {
     @OptIn(ExperimentalEncodingApi::class)
     @Test
     fun testJoinExistingEvent() {
-        extension.use {
+        extension.runTest {
             EmptyEventsScreen()
                 .clickJoinEvent()
                 .joinEvent("01JYC8BX30EKQYWBRTPKVX6S26", Base64.decode("NTc=").decodeToString() + Base64.decode("NTQ=").decodeToString()) // FIXME: costyl
                 .waitUntilLoaded("Test User 2")
                 .selectPerson("Test User 2")
                 .waitUntilLoaded()
+        }
+    }
+
+    private inline fun <reified A : ComponentActivity> AndroidComposeExtension<A>.runTest(crossinline block: suspend ComposeContext.() -> Unit) {
+        use {
+            runBlocking {
+                block()
+            }
         }
     }
 

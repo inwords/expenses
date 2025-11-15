@@ -3,17 +3,24 @@ package ru.commonex.screens
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import de.mannodermaus.junit5.compose.ComposeContext
+import expenses.shared.feature.expenses.generated.resources.Res
+import expenses.shared.feature.expenses.generated.resources.expenses_details
+import expenses.shared.feature.expenses.generated.resources.expenses_none
+import expenses.shared.feature.expenses.generated.resources.expenses_operation
+import org.jetbrains.compose.resources.getString
 
 internal class ExpensesScreen : BaseScreen() {
     context(extension: ComposeContext)
-    fun waitUntilLoaded(): ExpensesScreen {
-        waitForElementWithText("Отсутствуют")
+    suspend fun waitUntilLoaded(): ExpensesScreen {
+        val noneLabel = getString(Res.string.expenses_none)
+        waitForElementWithText(noneLabel)
         return this
     }
 
     context(extension: ComposeContext)
-    fun clickAddExpense(): AddExpenseScreen {
-        extension.onNodeWithText("Операция").performClick()
+    suspend fun clickAddExpense(): AddExpenseScreen {
+        val operationLabel = getString(Res.string.expenses_operation)
+        extension.onNodeWithText(operationLabel).performClick()
         return AddExpenseScreen()
     }
 
@@ -25,8 +32,9 @@ internal class ExpensesScreen : BaseScreen() {
     }
 
     context(extension: ComposeContext)
-    fun clickDebtDetails(): DebtsListScreen {
-        extension.onNodeWithText("детали").performClick()
+    suspend fun clickDebtDetails(): DebtsListScreen {
+        val detailsLabel = getString(Res.string.expenses_details)
+        extension.onNodeWithText(detailsLabel).performClick()
         return DebtsListScreen()
     }
 

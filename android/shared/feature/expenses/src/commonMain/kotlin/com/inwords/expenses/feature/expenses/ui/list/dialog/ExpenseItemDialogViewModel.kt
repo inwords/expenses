@@ -9,7 +9,7 @@ import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.expenses.domain.store.ExpensesLocalStore
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneDestination
 import expenses.shared.feature.expenses.generated.resources.Res
-import expenses.shared.feature.expenses.generated.resources.expenses_cancelled_description
+import expenses.shared.feature.expenses.generated.resources.expenses_revert_description
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -34,7 +34,7 @@ internal class ExpenseItemDialogViewModel(
             expensesInteractor.revertExpense(
                 event = event,
                 originalExpense = originalExpense,
-                description = getString(Res.string.expenses_cancelled_description, originalExpense.description)
+                description = getString(Res.string.expenses_revert_description, originalExpense.description)
             )
 
             navigationController.popBackStack(

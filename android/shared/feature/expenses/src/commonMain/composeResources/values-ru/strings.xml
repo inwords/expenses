@@ -4,7 +4,7 @@
     <string name="common_error">Ошибка</string>
     <string name="expenses_app_name">CommonEx</string>
     <string name="expenses_between">между:</string>
-    <string name="expenses_cancelled_description">[ОТМЕНА] %1$s</string>
+    <string name="expenses_revert_description">[ОТМЕНА] %1$s</string>
     <string name="expenses_create">Создать</string>
     <string name="expenses_create_join_description">Вы можете создать новое событие или присоединиться к существующему</string>
     <string name="expenses_currency">Валюта</string>

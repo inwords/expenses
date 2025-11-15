@@ -4,7 +4,7 @@
     <string name="common_error">Error</string>
     <string name="expenses_app_name">CommonEx</string>
     <string name="expenses_between">between:</string>
-    <string name="expenses_cancelled_description">[REVERT] %1$s</string>
+    <string name="expenses_revert_description">[REVERT] %1$s</string>
     <string name="expenses_create">Create</string>
     <string name="expenses_create_join_description">You can create a new event or join an existing one</string>
     <string name="expenses_currency">Currency</string>

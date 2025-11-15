@@ -34,3 +34,8 @@ kotlin {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 }
+
+compose.resources {
+    // FIXME: use textFixtures ScreenObjects for tests
+    publicResClass = true
+}

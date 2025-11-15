@@ -86,3 +86,8 @@ kotlin {
         freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
     }
 }
+
+compose.resources {
+    // FIXME: use textFixtures ScreenObjects for tests
+    publicResClass = true
+}
