@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.utils.IO
+import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneDestination
@@ -65,7 +66,9 @@ internal class MenuViewModel(
         val state = state.value
         val eventName = state.eventName.ifEmpty { return }
         val shareUrl = state.shareUrl ?: return
-        shareManagerLazy.value.shareUrl(eventName, shareUrl)
+        viewModelScope.launch(UI) {
+            shareManagerLazy.value.shareUrl(eventName, shareUrl)
+        }
     }
 
 }

@@ -40,7 +40,7 @@ jobs:
         run: echo $KEYSTORE_JKS_BASE64 | base64 --decode > ./app/keystore.jks
 
       - name: Build :app with Gradle
-        run: ./gradlew :app:assembleDebug :app:assembleRelease :app:bundleRelease --no-daemon --continue
+        run: ./gradlew testDebugUnitTest :app:assembleDebug :app:assembleRelease :app:bundleRelease --no-daemon --continue
         env:
           CI: true
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}

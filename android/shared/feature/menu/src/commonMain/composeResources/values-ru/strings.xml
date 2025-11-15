@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="menu_choose_person_action">Выбрать участника</string>
+    <string name="menu_copy_action">Копировать</string>
+    <string name="menu_join_other_event">Войти в другое событие</string>
+    <string name="menu_open_events_list">К списку событий</string>
+    <string name="menu_share_action">Поделиться</string>
+</resources>

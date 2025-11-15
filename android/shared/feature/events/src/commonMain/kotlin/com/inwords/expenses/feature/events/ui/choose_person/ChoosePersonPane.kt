@@ -43,7 +43,14 @@ import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneUiModel.PersonUiModel
 import com.inwords.expenses.feature.events.ui.common.EventInfoBlock
+import expenses.shared.feature.events.generated.resources.Res
+import expenses.shared.feature.events.generated.resources.common_back
+import expenses.shared.feature.events.generated.resources.events_choose_person_title
+import expenses.shared.feature.events.generated.resources.events_empty_state
+import expenses.shared.feature.events.generated.resources.events_error_state
+import expenses.shared.feature.events.generated.resources.events_your_name_label
 import kotlinx.collections.immutable.persistentListOf
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun ChoosePersonPane(
@@ -64,14 +71,14 @@ internal fun ChoosePersonPane(
 
         is SimpleScreenState.Empty -> Box(modifier = modifier.fillMaxSize()) {
             Text(
-                text = "No persons available",
+                text = stringResource(Res.string.events_empty_state),
                 modifier = Modifier.align(Alignment.Center)
             )
         }
 
         is SimpleScreenState.Error -> Box(modifier = modifier.fillMaxSize()) {
             Text(
-                text = "An error occurred",
+                text = stringResource(Res.string.events_error_state),
                 modifier = Modifier.align(Alignment.Center)
             )
         }
@@ -91,9 +98,9 @@ internal fun ChoosePersonContent(
         topBar = {
             TopAppBarWithNavIconAndText(
                 onNavIconClicked = onNavIconClicked,
-                title = "Выбор участника",
+                title = stringResource(Res.string.events_choose_person_title),
                 imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                contentDescription = "Назад",
+                contentDescription = stringResource(Res.string.common_back),
             )
         },
     ) { paddingValues ->
@@ -116,7 +123,7 @@ internal fun ChoosePersonContent(
             Spacer(modifier = Modifier.weight(1f))
 
             Text(
-                text = "Ваше имя",
+                text = stringResource(Res.string.events_your_name_label),
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 4.dp)
             )

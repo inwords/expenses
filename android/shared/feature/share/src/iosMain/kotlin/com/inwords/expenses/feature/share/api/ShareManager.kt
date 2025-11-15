@@ -9,14 +9,14 @@ import platform.UIKit.UIApplication
 actual class ShareManager internal constructor() {
 
     @OptIn(BetaInteropApi::class)
-    actual fun shareUrl(title: String, url: String) {
+    actual suspend fun shareUrl(title: String, url: String) {
         val activityItems = listOf(
-            NSString.Companion.create(string = "$title\n$url")
+            NSString.create(string = "$title\n$url")
         )
         val activityViewController = UIActivityViewController(activityItems = activityItems, applicationActivities = null)
 
         // Get the top-most view controller to present the activity view controller
-        val rootViewController = UIApplication.Companion.sharedApplication.keyWindow?.rootViewController
+        val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
         rootViewController?.presentViewController(activityViewController, animated = true, completion = null)
     }
 

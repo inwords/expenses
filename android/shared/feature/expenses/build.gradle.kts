@@ -53,6 +53,7 @@ kotlin {
                 implementation(shared.compose.ui.multiplatform)
                 implementation(shared.compose.material3.multiplatform)
                 implementation(shared.compose.ui.tooling.preview.multiplatform)
+                implementation(shared.compose.components.resources.multiplatform)
 
                 implementation(shared.navigation3.ui.multiplatform)
                 implementation(shared.compose.material.icons.core)
@@ -84,4 +85,9 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
     }
+}
+
+compose.resources {
+    // FIXME: use textFixtures ScreenObjects for tests
+    publicResClass = true
 }

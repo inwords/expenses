@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_back">Back</string>
+    <string name="events_access_code_placeholder">Access code</string>
+    <string name="events_add_participant">Add participant</string>
+    <string name="events_choose_person_title">Choose participant</string>
+    <string name="events_continue_button">To event</string>
+    <string name="events_create_title">Create event</string>
+    <string name="events_currency_section_title">Currency</string>
+    <string name="events_empty_state">No participants available</string>
+    <string name="events_error_state">Failed to load event data</string>
+    <string name="events_id_placeholder">Event ID</string>
+    <string name="events_info_with_person">%1$s — %2$s</string>
+    <string name="events_join_description">Enter the event ID and access code to join</string>
+    <string name="events_name_placeholder">Title</string>
+    <string name="events_owner_label">My name is</string>
+    <string name="events_participants_label">Also participate</string>
+    <string name="events_participants_title">Participants</string>
+    <string name="events_person_name_placeholder">Name</string>
+    <string name="events_section_title">Event</string>
+    <string name="events_your_name_label">Your name</string>
+</resources>

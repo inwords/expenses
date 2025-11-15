@@ -4,29 +4,37 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import de.mannodermaus.junit5.compose.ComposeContext
+import expenses.shared.feature.events.generated.resources.Res
+import expenses.shared.feature.events.generated.resources.events_access_code_placeholder
+import expenses.shared.feature.events.generated.resources.events_id_placeholder
+import expenses.shared.feature.events.generated.resources.events_participants_title
+import org.jetbrains.compose.resources.getString
 
 internal class JoinEventScreen : BaseScreen() {
 
     context(extension: ComposeContext)
-    fun enterEventId(eventId: String): JoinEventScreen {
-        extension.onNodeWithText("ID события").performTextInput(eventId)
+    suspend fun enterEventId(eventId: String): JoinEventScreen {
+        val idLabel = getString(Res.string.events_id_placeholder)
+        extension.onNodeWithText(idLabel).performTextInput(eventId)
         return this
     }
 
     context(extension: ComposeContext)
-    fun enterAccessCode(accessCode: String): JoinEventScreen {
-        extension.onNodeWithText("Код доступа").performTextInput(accessCode)
+    suspend fun enterAccessCode(accessCode: String): JoinEventScreen {
+        val accessCodeLabel = getString(Res.string.events_access_code_placeholder)
+        extension.onNodeWithText(accessCodeLabel).performTextInput(accessCode)
         return this
     }
 
     context(extension: ComposeContext)
-    fun clickConfirmButton(): ChoosePersonScreen {
-        extension.onNodeWithText("Участники").performClick()
+    suspend fun clickConfirmButton(): ChoosePersonScreen {
+        val participantsLabel = getString(Res.string.events_participants_title)
+        extension.onNodeWithText(participantsLabel).performClick()
         return ChoosePersonScreen()
     }
 
     context(extension: ComposeContext)
-    fun joinEvent(eventId: String, accessCode: String): ChoosePersonScreen {
+    suspend fun joinEvent(eventId: String, accessCode: String): ChoosePersonScreen {
         enterEventId(eventId)
         enterAccessCode(accessCode)
         return clickConfirmButton()

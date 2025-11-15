@@ -31,6 +31,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.jetbrains.compose.resources.StringResource
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -382,7 +383,7 @@ internal class AddExpenseViewModelTest {
             assertEquals(ExpenseType.Replenishment, ui.expenseType)
             assertTrue(ui.currencies.byCode("EUR").selected)
             assertTrue(ui.persons.byId(Fixtures.person2.id).selected)
-            assertEquals("Возврат от ${Fixtures.person2.name}", ui.description)
+            assertEquals("expenses_repayment_from${Fixtures.person2.name}", ui.description)
             assertEquals(false, ui.equalSplit)
             assertEquals(1, ui.split.size)
             assertEquals(Fixtures.person3.id, ui.split.first().person.personId)
@@ -604,7 +605,16 @@ internal class AddExpenseViewModelTest {
             eventsInteractor = eventsInteractor,
             expensesInteractor = expensesInteractor,
             settingsRepository = settingsRepository,
-            replenishment = replenishment
+            replenishment = replenishment,
+            stringProvider = object : com.inwords.expenses.core.ui.utils.StringProvider {
+                override suspend fun getString(stringResource: StringResource): String {
+                    return stringResource.key
+                }
+
+                override suspend fun getString(stringResource: StringResource, vararg formatArgs: Any): String {
+                    return stringResource.key + formatArgs.joinToString()
+                }
+            }
         )
     }
 

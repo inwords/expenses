@@ -51,6 +51,7 @@ kotlin {
                 implementation(shared.compose.ui.multiplatform)
                 implementation(shared.compose.material3.multiplatform)
                 implementation(shared.compose.ui.tooling.preview.multiplatform)
+                implementation(shared.compose.components.resources.multiplatform)
 
                 implementation(shared.compose.material.icons.core)
             }
@@ -67,4 +68,9 @@ kotlin {
         // Common compiler options applied to all Kotlin source sets
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
+}
+
+compose.resources {
+    // FIXME: use textFixtures ScreenObjects for tests
+    publicResClass = true
 }

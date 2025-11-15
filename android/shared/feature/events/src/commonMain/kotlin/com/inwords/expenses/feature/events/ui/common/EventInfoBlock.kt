@@ -7,6 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import expenses.shared.feature.events.generated.resources.Res
+import expenses.shared.feature.events.generated.resources.events_info_with_person
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun EventInfoBlock(
@@ -20,7 +23,7 @@ fun EventInfoBlock(
         text = if (currentPersonName == null) {
             eventName
         } else {
-            "$eventName — $currentPersonName"
+            stringResource(Res.string.events_info_with_person, eventName, currentPersonName)
         },
         style = MaterialTheme.typography.headlineMedium,
         textAlign = TextAlign.Center

@@ -28,7 +28,14 @@ import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.core.ui.utils.clipEntryOf
 import com.inwords.expenses.core.utils.IO
+import expenses.shared.feature.menu.generated.resources.Res
+import expenses.shared.feature.menu.generated.resources.menu_choose_person_action
+import expenses.shared.feature.menu.generated.resources.menu_copy_action
+import expenses.shared.feature.menu.generated.resources.menu_join_other_event
+import expenses.shared.feature.menu.generated.resources.menu_open_events_list
+import expenses.shared.feature.menu.generated.resources.menu_share_action
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun MenuDialog(
@@ -62,7 +69,7 @@ internal fun MenuDialog(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .weight(1f),
-                text = "Поделиться",
+                text = stringResource(Res.string.menu_share_action),
                 style = MaterialTheme.typography.bodyLarge
             )
 
@@ -87,7 +94,7 @@ internal fun MenuDialog(
                         }
                     }
                     .padding(8.dp),
-                text = "Копировать",
+                text = stringResource(Res.string.menu_copy_action),
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodyLarge
             )
@@ -110,7 +117,7 @@ internal fun MenuDialog(
             )
             Text(
                 modifier = Modifier.align(Alignment.CenterVertically),
-                text = "Выбрать участника",
+                text = stringResource(Res.string.menu_choose_person_action),
                 style = MaterialTheme.typography.bodyLarge
             )
         }
@@ -130,7 +137,7 @@ internal fun MenuDialog(
             )
             Text(
                 modifier = Modifier.align(Alignment.CenterVertically),
-                text = "Войти в другое событие",
+                text = stringResource(Res.string.menu_join_other_event),
                 style = MaterialTheme.typography.bodyLarge
             )
         }
@@ -150,7 +157,7 @@ internal fun MenuDialog(
             )
             Text(
                 modifier = Modifier.align(Alignment.CenterVertically),
-                text = "К списку событий",
+                text = stringResource(Res.string.menu_open_events_list),
                 style = MaterialTheme.typography.bodyLarge
             )
         }

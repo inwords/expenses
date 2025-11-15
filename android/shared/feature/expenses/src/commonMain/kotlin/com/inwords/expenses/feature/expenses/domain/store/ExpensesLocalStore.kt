@@ -5,7 +5,7 @@ import com.inwords.expenses.feature.expenses.domain.model.Expense
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.flow.Flow
 
-internal interface ExpensesLocalStore {
+interface ExpensesLocalStore {
 
     fun getExpensesFlow(eventId: Long): Flow<List<Expense>>
 

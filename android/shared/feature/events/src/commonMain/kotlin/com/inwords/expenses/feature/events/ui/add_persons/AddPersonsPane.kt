@@ -35,6 +35,14 @@ import com.inwords.expenses.core.ui.design.button.ButtonWithIconAndText
 import com.inwords.expenses.core.ui.design.button.OutlinedButtonWithIconAndText
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.feature.events.ui.common.PersonNameField
+import expenses.shared.feature.events.generated.resources.Res
+import expenses.shared.feature.events.generated.resources.common_back
+import expenses.shared.feature.events.generated.resources.events_add_participant
+import expenses.shared.feature.events.generated.resources.events_continue_button
+import expenses.shared.feature.events.generated.resources.events_owner_label
+import expenses.shared.feature.events.generated.resources.events_participants_label
+import expenses.shared.feature.events.generated.resources.events_participants_title
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -54,9 +62,9 @@ internal fun AddPersonsPane(
         topBar = {
             TopAppBarWithNavIconAndText(
                 onNavIconClicked = onNavIconClicked,
-                title = "Участники",
+                title = stringResource(Res.string.events_participants_title),
                 imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                contentDescription = "Назад",
+                contentDescription = stringResource(Res.string.common_back),
             )
         },
     ) { paddingValues ->
@@ -74,7 +82,7 @@ internal fun AddPersonsPane(
             val requestFocus = remember { mutableStateOf(false) }
             Text(
                 modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 4.dp),
-                text = "Меня зовут",
+                text = stringResource(Res.string.events_owner_label),
                 style = MaterialTheme.typography.headlineMedium
             )
             PersonNameField(
@@ -92,7 +100,7 @@ internal fun AddPersonsPane(
 
             Text(
                 modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 4.dp),
-                text = "Ещё участвуют",
+                text = stringResource(Res.string.events_participants_label),
                 style = MaterialTheme.typography.headlineMedium
             )
             Column(
@@ -132,7 +140,7 @@ internal fun AddPersonsPane(
                 modifier = Modifier
                     .fillMaxWidth(),
                 onClick = onAddParticipantClicked,
-                text = "Добавить участника",
+                text = stringResource(Res.string.events_add_participant),
                 imageVector = Icons.Outlined.Add,
             )
 
@@ -143,7 +151,7 @@ internal fun AddPersonsPane(
                     .align(Alignment.End)
                     .padding(vertical = 16.dp),
                 onClick = onConfirmClicked,
-                text = "К событию",
+                text = stringResource(Res.string.events_continue_button),
                 imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
                 minHeight = ButtonDefaults.MediumContainerHeight,
             )

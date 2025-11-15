@@ -24,6 +24,11 @@ import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.button.OutlinedButtonWithIconAndText
 import com.inwords.expenses.feature.expenses.ui.common.DebtReplenishmentButton
 import com.inwords.expenses.feature.expenses.ui.common.DebtShortUiModel
+import expenses.shared.feature.expenses.generated.resources.Res
+import expenses.shared.feature.expenses.generated.resources.expenses_debts
+import expenses.shared.feature.expenses.generated.resources.expenses_details
+import expenses.shared.feature.expenses.generated.resources.expenses_none
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -42,12 +47,12 @@ internal fun DebtsBlock(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Долги",
+                text = stringResource(Res.string.expenses_debts),
                 style = MaterialTheme.typography.headlineMedium
             )
             OutlinedButtonWithIconAndText(
                 onClick = onDebtsDetailsClick,
-                text = "детали",
+                text = stringResource(Res.string.expenses_details),
                 imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
             )
         }
@@ -63,7 +68,7 @@ internal fun DebtsBlock(
 
                 Text(
                     modifier = Modifier.padding(start = 16.dp),
-                    text = "Отсутствуют",
+                    text = stringResource(Res.string.expenses_none),
                     style = MaterialTheme.typography.bodyLarge,
                     fontStyle = FontStyle.Italic,
                     fontWeight = FontWeight.Light,

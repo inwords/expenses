@@ -29,6 +29,12 @@ import com.inwords.expenses.core.ui.design.button.ButtonWithIconAndText
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.feature.events.ui.common.EventAccessCodeField
 import com.inwords.expenses.feature.events.ui.common.EventIdField
+import expenses.shared.feature.events.generated.resources.Res
+import expenses.shared.feature.events.generated.resources.common_back
+import expenses.shared.feature.events.generated.resources.events_join_description
+import expenses.shared.feature.events.generated.resources.events_participants_title
+import expenses.shared.feature.events.generated.resources.events_section_title
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -47,9 +53,9 @@ internal fun JoinEventPane(
         topBar = {
             TopAppBarWithNavIconAndText(
                 onNavIconClicked = onNavIconClicked,
-                title = "Событие",
+                title = stringResource(Res.string.events_section_title),
                 imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                contentDescription = "Назад",
+                contentDescription = stringResource(Res.string.common_back),
             )
         },
     ) { paddingValues ->
@@ -64,7 +70,7 @@ internal fun JoinEventPane(
             Spacer(modifier = Modifier.weight(1f))
 
             Text(
-                text = "Введите ID события и код доступа, чтобы присоединиться",
+                text = stringResource(Res.string.events_join_description),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
@@ -98,7 +104,7 @@ internal fun JoinEventPane(
                     .padding(vertical = 16.dp),
                 onClick = onConfirmClicked,
                 enabled = state.eventId.isNotBlank() && state.eventAccessCode.isNotBlank(),
-                text = "Участники",
+                text = stringResource(Res.string.events_participants_title),
                 imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
                 minHeight = ButtonDefaults.MediumContainerHeight,
             )

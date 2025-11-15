@@ -85,7 +85,7 @@ class ExpensesInteractor internal constructor(
             person = selectedPerson,
             subjectExpenseSplitWithPersons = subjectExpenseSplitWithPersons,
             timestamp = Clock.System.now(),
-            description = description.trim().ifEmpty { "Без описания" },
+            description = description,
         )
 
         expensesLocalStore.upsert(event, expense)
@@ -119,16 +119,18 @@ class ExpensesInteractor internal constructor(
             person = selectedPerson,
             subjectExpenseSplitWithPersons = subjectExpenseSplitWithPersons,
             timestamp = Clock.System.now(),
-            description = description.trim().ifEmpty { "Без описания" },
+            description = description,
         )
 
         expensesLocalStore.upsert(event, expense)
     }
 
     // reverts expense by adding new expense
-    internal suspend fun revertExpense(event: Event, expenseId: Long) {
-        val originalExpense = expensesLocalStore.getExpense(expenseId) ?: return
-
+    internal suspend fun revertExpense(
+        event: Event,
+        originalExpense: Expense,
+        description: String
+    ) {
         val revertedSplits = originalExpense.subjectExpenseSplitWithPersons.map { split ->
             ExpenseSplitWithPerson(
                 expenseSplitId = 0,
@@ -150,7 +152,7 @@ class ExpensesInteractor internal constructor(
             person = originalExpense.person,
             subjectExpenseSplitWithPersons = revertedSplits,
             timestamp = Clock.System.now(),
-            description = "[ОТМЕНА] ${originalExpense.description}"
+            description = description,
         )
 
         expensesLocalStore.upsert(event, revertedExpense)
