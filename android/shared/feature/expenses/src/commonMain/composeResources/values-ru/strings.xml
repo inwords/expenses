@@ -16,7 +16,7 @@
     <string name="expenses_expense">Трата</string>
     <string name="expenses_join">Присоединиться</string>
     <string name="expenses_no_description">Без описания</string>
-    <string name="expenses_no_expenses">Нет расходов</string>
+    <string name="expenses_no_expenses">Нет операций</string>
     <string name="expenses_none">Отсутствуют</string>
     <string name="expenses_operation">Операция</string>
     <string name="expenses_operations">Операции</string>
