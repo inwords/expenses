@@ -5,10 +5,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import de.mannodermaus.junit5.compose.AndroidComposeExtension
 import de.mannodermaus.junit5.compose.ComposeContext
 import de.mannodermaus.junit5.compose.createAndroidComposeExtension
-import expenses.shared.feature.expenses.generated.resources.Res
-import expenses.shared.feature.expenses.generated.resources.expenses_revert_description
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import ru.commonex.screens.EmptyEventsScreen
@@ -58,7 +55,7 @@ class BasicInstrumentedTest {
             expensesScreen
                 .clickOnExpense("Булка")
                 .clickCancelExpense()
-                .verifyExpenseExists(getString(Res.string.expenses_revert_description, "Булка"))
+                .verifyRevertedExpenseExists("Булка")
 
             // Verify debts details
             expensesScreen
