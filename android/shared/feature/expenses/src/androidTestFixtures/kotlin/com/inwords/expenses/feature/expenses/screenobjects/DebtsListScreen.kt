@@ -1,8 +1,8 @@
-package ru.commonex.screens
+package com.inwords.expenses.feature.expenses.screenobjects
 
 import de.mannodermaus.junit5.compose.ComposeContext
 
-internal class DebtsListScreen : BaseScreen() {
+class DebtsListScreen : BaseScreen() {
 
     context(extension: ComposeContext)
     fun verifyDebtAmount(amount: String, personName: String, count: Int = 1): DebtsListScreen {
@@ -11,5 +11,4 @@ internal class DebtsListScreen : BaseScreen() {
         assertElementsWithTextCount(debtText, count)
         return this
     }
-
 }

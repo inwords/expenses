@@ -17,6 +17,10 @@ android {
     buildFeatures {
         compose = true
     }
+
+    testFixtures {
+        enable = true
+    }
 }
 
 kotlin {
@@ -70,7 +74,7 @@ kotlin {
     }
 }
 
-compose.resources {
-    // FIXME: use textFixtures ScreenObjects for tests
-    publicResClass = true
+dependencies {
+    testFixturesImplementation(shared.androidx.compose.ui.test.android)
+    testFixturesImplementation(testFixtures(project(":shared:feature:expenses")))
 }

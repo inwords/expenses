@@ -1,4 +1,4 @@
-package ru.commonex.screens
+package com.inwords.expenses.feature.expenses.screenobjects
 
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
@@ -7,12 +7,12 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import de.mannodermaus.junit5.compose.ComposeContext
 
-internal abstract class BaseScreen {
+open class BaseScreen {
 
     context(extension: ComposeContext)
     fun waitForElementWithText(
         text: String,
-        timeout: Long = 5000
+        timeout: Long = 5_000
     ) {
         extension.waitUntilAtLeastOneExists(hasText(text), timeout)
     }

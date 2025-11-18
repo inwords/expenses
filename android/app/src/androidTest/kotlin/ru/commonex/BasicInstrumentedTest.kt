@@ -2,16 +2,14 @@ package ru.commonex
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.ExperimentalTestApi
+import com.inwords.expenses.feature.events.screenobjects.EmptyEventsScreen
+import com.inwords.expenses.feature.expenses.screenobjects.ExpensesScreen
 import de.mannodermaus.junit5.compose.AndroidComposeExtension
 import de.mannodermaus.junit5.compose.ComposeContext
 import de.mannodermaus.junit5.compose.createAndroidComposeExtension
-import expenses.shared.feature.expenses.generated.resources.Res
-import expenses.shared.feature.expenses.generated.resources.expenses_revert_description
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.getString
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import ru.commonex.screens.EmptyEventsScreen
 import ru.commonex.ui.MainActivity
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -27,7 +25,7 @@ class BasicInstrumentedTest {
     fun testBasicNewEventAndExpensesFlow() {
         extension.runTest {
             // Create event and add participants
-            val expensesScreen = EmptyEventsScreen()
+            val expensesScreen: ExpensesScreen = EmptyEventsScreen()
                 .clickCreateEvent()
                 .enterEventName("UI Test Event")
                 .selectCurrency("Euro")
@@ -58,7 +56,7 @@ class BasicInstrumentedTest {
             expensesScreen
                 .clickOnExpense("Булка")
                 .clickCancelExpense()
-                .verifyExpenseExists(getString(Res.string.expenses_revert_description, "Булка"))
+                .verifyExpenseReverted("Булка")
 
             // Verify debts details
             expensesScreen

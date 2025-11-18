@@ -1,4 +1,4 @@
-package ru.commonex.screens
+package com.inwords.expenses.feature.expenses.screenobjects
 
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.state.ToggleableState
@@ -14,7 +14,7 @@ import expenses.shared.feature.expenses.generated.resources.expenses_save
 import expenses.shared.feature.expenses.generated.resources.expenses_total_amount
 import org.jetbrains.compose.resources.getString
 
-internal class AddExpenseScreen : BaseScreen() {
+class AddExpenseScreen : BaseScreen() {
 
     context(extension: ComposeContext)
     suspend fun enterDescription(description: String): AddExpenseScreen {

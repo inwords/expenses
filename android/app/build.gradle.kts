@@ -113,10 +113,8 @@ dependencies {
     androidTestUtil(shared.androidx.test.orchestrator)
     androidTestImplementation(shared.androidx.compose.ui.test.android)
 
-    androidTestImplementation(project(":shared:feature:events")) // FIXME: use textFixtures ScreenObjects for tests
-    androidTestImplementation(project(":shared:feature:expenses"))
-    androidTestImplementation(project(":shared:feature:menu"))
-    androidTestImplementation(shared.compose.components.resources.multiplatform)
+    androidTestImplementation(testFixtures(project(":shared:feature:events")))
+    androidTestImplementation(testFixtures(project(":shared:feature:expenses")))
 
     baselineProfile(project(":baselineprofile"))
 }
