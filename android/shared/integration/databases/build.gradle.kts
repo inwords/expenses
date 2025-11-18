@@ -6,15 +6,16 @@ plugins {
     alias(shared.plugins.room)
 }
 
-android {
-    namespace = "com.inwords.expenses.integration.databases"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
-}
-
 kotlin {
+    android {
+        namespace = "com.inwords.expenses.integration.databases"
+
+        @Suppress("UnstableApiUsage")
+        optimization {
+            consumerKeepRules.files.add(file("consumer-rules.pro"))
+        }
+    }
+
     applyKmmDefaults("shared-integration-databases")
 
     sourceSets {

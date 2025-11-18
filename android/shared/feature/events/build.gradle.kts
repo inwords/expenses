@@ -7,19 +7,18 @@ plugins {
     alias(shared.plugins.compose.multiplatform.compiler)
 }
 
-android {
-    namespace = "com.inwords.expenses.feature.events"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
-
-    buildFeatures {
-        compose = true
-    }
-}
-
 kotlin {
+    android {
+        namespace = "com.inwords.expenses.feature.events"
+
+        @Suppress("UnstableApiUsage")
+        optimization {
+            consumerKeepRules.files.add(file("consumer-rules.pro"))
+        }
+
+        experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
+    }
+
     applyKmmDefaults("shared-events")
 
     sourceSets {

@@ -7,19 +7,20 @@ plugins {
     alias(shared.plugins.compose.multiplatform.compiler)
 }
 
-android {
-    namespace = "com.inwords.expenses.feature.expenses"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
-
-    buildFeatures {
-        compose = true
-    }
-}
-
 kotlin {
+    android {
+        namespace = "com.inwords.expenses.feature.expenses"
+
+        @Suppress("UnstableApiUsage")
+        optimization {
+            consumerKeepRules.files.add(file("consumer-rules.pro"))
+        }
+
+        withHostTest {}
+
+        experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
+    }
+
     applyKmmDefaults("shared-expenses")
 
     sourceSets {
@@ -66,15 +67,6 @@ kotlin {
                 implementation(shared.compose.ui.tooling)
             }
         }
-        androidUnitTest {
-            dependencies {
-                implementation(shared.kotlin.test)
-                implementation(shared.coroutines.test)
-                implementation(shared.junit.jupiter.api)
-                implementation(shared.mockk)
-                implementation(shared.turbine)
-            }
-        }
         commonTest {
             dependencies {
                 implementation(shared.kotlin.test)
@@ -90,4 +82,12 @@ kotlin {
 compose.resources {
     // FIXME: use textFixtures ScreenObjects for tests
     publicResClass = true
+}
+
+dependencies {
+    add("androidHostTestImplementation", shared.kotlin.test)
+    add("androidHostTestImplementation", shared.coroutines.test)
+    add("androidHostTestImplementation", shared.junit.jupiter.api)
+    add("androidHostTestImplementation", shared.mockk)
+    add("androidHostTestImplementation", shared.turbine)
 }

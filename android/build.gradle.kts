@@ -9,17 +9,19 @@ buildscript {
 
 plugins {
     id("shared-library-plugin") apply false
+    id("shared-kmm-library-plugin") apply false
     alias(buildSrc.plugins.android.application) apply false
     alias(buildSrc.plugins.android.test) apply false
     alias(buildSrc.plugins.android.library) apply false
+    alias(buildSrc.plugins.android.kotlin.multiplatform.library) apply false
     alias(buildSrc.plugins.kotlin.android) apply false
+    alias(buildSrc.plugins.kotlin.multiplatform) apply false
     alias(shared.plugins.compose.compiler) apply false
     alias(shared.plugins.compose.multiplatform.compiler) apply false
     alias(shared.plugins.kotlin.serialization) apply false
     alias(shared.plugins.ksp) apply false
     alias(shared.plugins.room) apply false
     alias(shared.plugins.wire) apply false
-    alias(shared.plugins.atomicfu) apply false
     alias(shared.plugins.android.junit5) apply false
     alias(shared.plugins.sentry.kotlin.multiplatform) apply false
     alias(shared.plugins.sentry.android.gradle) apply false
