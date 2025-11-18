@@ -1,8 +1,9 @@
-package ru.commonex.screens
+package com.inwords.expenses.feature.events.screenobjects
 
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import com.inwords.expenses.feature.expenses.screenobjects.BaseScreen
 import de.mannodermaus.junit5.compose.ComposeContext
 import expenses.shared.feature.events.generated.resources.Res
 import expenses.shared.feature.events.generated.resources.events_access_code_placeholder
@@ -10,7 +11,7 @@ import expenses.shared.feature.events.generated.resources.events_id_placeholder
 import expenses.shared.feature.events.generated.resources.events_participants_title
 import org.jetbrains.compose.resources.getString
 
-internal class JoinEventScreen : BaseScreen() {
+class JoinEventScreen : BaseScreen() {
 
     context(extension: ComposeContext)
     suspend fun enterEventId(eventId: String): JoinEventScreen {

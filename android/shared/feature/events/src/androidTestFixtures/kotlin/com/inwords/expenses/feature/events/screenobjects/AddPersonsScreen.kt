@@ -1,10 +1,12 @@
-package ru.commonex.screens
+package com.inwords.expenses.feature.events.screenobjects
 
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import com.inwords.expenses.feature.expenses.screenobjects.BaseScreen
+import com.inwords.expenses.feature.expenses.screenobjects.ExpensesScreen
 import de.mannodermaus.junit5.compose.ComposeContext
 import expenses.shared.feature.events.generated.resources.Res
 import expenses.shared.feature.events.generated.resources.events_add_participant
@@ -12,7 +14,8 @@ import expenses.shared.feature.events.generated.resources.events_continue_button
 import expenses.shared.feature.events.generated.resources.events_person_name_placeholder
 import org.jetbrains.compose.resources.getString
 
-internal class AddPersonsScreen : BaseScreen() {
+class AddPersonsScreen : BaseScreen() {
+
     context(extension: ComposeContext)
     suspend fun enterOwnerName(name: String): AddPersonsScreen {
         val nameLabel = getString(Res.string.events_person_name_placeholder)

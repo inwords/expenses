@@ -1,4 +1,4 @@
-package ru.commonex.screens
+package com.inwords.expenses.feature.expenses.screenobjects
 
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -7,9 +7,11 @@ import expenses.shared.feature.expenses.generated.resources.Res
 import expenses.shared.feature.expenses.generated.resources.expenses_details
 import expenses.shared.feature.expenses.generated.resources.expenses_none
 import expenses.shared.feature.expenses.generated.resources.expenses_operation
+import expenses.shared.feature.expenses.generated.resources.expenses_revert_description
 import org.jetbrains.compose.resources.getString
 
-internal class ExpensesScreen : BaseScreen() {
+class ExpensesScreen : BaseScreen() {
+
     context(extension: ComposeContext)
     suspend fun waitUntilLoaded(): ExpensesScreen {
         val noneLabel = getString(Res.string.expenses_none)
@@ -57,5 +59,11 @@ internal class ExpensesScreen : BaseScreen() {
         waitForElementWithText(description)
         assertElementWithTextExists(description)
         return this
+    }
+
+    context(extension: ComposeContext)
+    suspend fun verifyExpenseReverted(description: String): ExpensesScreen {
+        val revertedText = getString(Res.string.expenses_revert_description, description)
+        return verifyExpenseExists(revertedText)
     }
 }

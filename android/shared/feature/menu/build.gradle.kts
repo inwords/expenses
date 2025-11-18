@@ -60,7 +60,3 @@ kotlin {
     }
 }
 
-compose.resources {
-    // FIXME: use textFixtures ScreenObjects for tests
-    publicResClass = true
-}

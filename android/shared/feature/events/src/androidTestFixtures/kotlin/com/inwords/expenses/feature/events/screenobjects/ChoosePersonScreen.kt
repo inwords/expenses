@@ -1,10 +1,12 @@
-package ru.commonex.screens
+package com.inwords.expenses.feature.events.screenobjects
 
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.inwords.expenses.feature.expenses.screenobjects.BaseScreen
+import com.inwords.expenses.feature.expenses.screenobjects.ExpensesScreen
 import de.mannodermaus.junit5.compose.ComposeContext
 
-internal class ChoosePersonScreen : BaseScreen() {
+class ChoosePersonScreen : BaseScreen() {
 
     context(extension: ComposeContext)
     fun waitUntilLoaded(name: String): ChoosePersonScreen {
@@ -17,5 +19,4 @@ internal class ChoosePersonScreen : BaseScreen() {
         extension.onNodeWithText(name).performClick()
         return ExpensesScreen()
     }
-
 }

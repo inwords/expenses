@@ -1,4 +1,4 @@
-package ru.commonex.screens
+package com.inwords.expenses.feature.events.screenobjects
 
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -8,8 +8,10 @@ import expenses.shared.feature.events.generated.resources.Res
 import expenses.shared.feature.events.generated.resources.events_name_placeholder
 import expenses.shared.feature.events.generated.resources.events_participants_title
 import org.jetbrains.compose.resources.getString
+import com.inwords.expenses.feature.expenses.screenobjects.BaseScreen
 
-internal class CreateEventScreen : BaseScreen() {
+class CreateEventScreen : BaseScreen() {
+
     context(extension: ComposeContext)
     suspend fun enterEventName(name: String): CreateEventScreen {
         val nameLabel = getString(Res.string.events_name_placeholder)

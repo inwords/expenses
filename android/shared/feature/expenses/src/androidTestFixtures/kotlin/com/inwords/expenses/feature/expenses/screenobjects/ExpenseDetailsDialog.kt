@@ -1,4 +1,4 @@
-package ru.commonex.screens
+package com.inwords.expenses.feature.expenses.screenobjects
 
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -7,7 +7,7 @@ import expenses.shared.feature.expenses.generated.resources.Res
 import expenses.shared.feature.expenses.generated.resources.expenses_revert_operation
 import org.jetbrains.compose.resources.getString
 
-internal class ExpenseDetailsDialog : BaseScreen() {
+class ExpenseDetailsDialog : BaseScreen() {
 
     context(extension: ComposeContext)
     suspend fun clickCancelExpense(): ExpensesScreen {
