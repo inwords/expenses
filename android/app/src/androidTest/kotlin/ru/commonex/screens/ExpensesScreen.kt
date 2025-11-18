@@ -7,6 +7,7 @@ import expenses.shared.feature.expenses.generated.resources.Res
 import expenses.shared.feature.expenses.generated.resources.expenses_details
 import expenses.shared.feature.expenses.generated.resources.expenses_none
 import expenses.shared.feature.expenses.generated.resources.expenses_operation
+import expenses.shared.feature.expenses.generated.resources.expenses_revert_description
 import org.jetbrains.compose.resources.getString
 
 internal class ExpensesScreen : BaseScreen() {
@@ -46,16 +47,16 @@ internal class ExpensesScreen : BaseScreen() {
     }
 
     context(extension: ComposeContext)
-    fun verifyExpenseDescription(description: String): ExpensesScreen {
+    fun verifyExpenseExists(description: String): ExpensesScreen {
         waitForElementWithText(description)
         assertElementWithTextExists(description)
         return this
     }
 
     context(extension: ComposeContext)
-    fun verifyExpenseExists(description: String): ExpensesScreen {
-        waitForElementWithText(description)
-        assertElementWithTextExists(description)
-        return this
+    suspend fun verifyRevertedExpenseExists(originalExpenseDescription: String): ExpensesScreen {
+        val description = getString(Res.string.expenses_revert_description, originalExpenseDescription)
+        return verifyExpenseExists(description)
     }
+
 }

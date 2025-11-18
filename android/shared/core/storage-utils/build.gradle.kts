@@ -2,18 +2,18 @@ import com.inwords.expenses.plugins.SharedKmmLibraryPlugin.Companion.applyKmmDef
 
 plugins {
     id("shared-kmm-library-plugin")
-    alias(shared.plugins.atomicfu)
-}
-
-android {
-    namespace = "com.inwords.expenses.core.storage.utils"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 
 kotlin {
+    android {
+        namespace = "com.inwords.expenses.core.storage.utils"
+
+        @Suppress("UnstableApiUsage")
+        optimization {
+            consumerKeepRules.files.add(file("consumer-rules.pro"))
+        }
+    }
+
     applyKmmDefaults("shared-core-storage-utils")
 
     sourceSets {

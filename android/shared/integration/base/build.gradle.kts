@@ -7,19 +7,16 @@ plugins {
     alias(shared.plugins.sentry.kotlin.multiplatform)
 }
 
-android {
-    namespace = "com.inwords.expenses.integration.base"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
-
-    buildFeatures {
-        compose = true
-    }
-}
-
 kotlin {
+    android {
+        namespace = "com.inwords.expenses.integration.base"
+
+        @Suppress("UnstableApiUsage")
+        optimization {
+            consumerKeepRules.files.add(file("consumer-rules.pro"))
+        }
+    }
+
     applyKmmDefaults("shared-integration-base")
 
     sourceSets {

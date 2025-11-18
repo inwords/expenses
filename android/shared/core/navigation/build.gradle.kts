@@ -7,19 +7,16 @@ plugins {
     alias(shared.plugins.compose.multiplatform.compiler)
 }
 
-android {
-    namespace = "com.inwords.expenses.core.navigation"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
-
-    buildFeatures {
-        compose = true
-    }
-}
-
 kotlin {
+    android {
+        namespace = "com.inwords.expenses.core.navigation"
+
+        @Suppress("UnstableApiUsage")
+        optimization {
+            consumerKeepRules.files.add(file("consumer-rules.pro"))
+        }
+    }
+
     applyKmmDefaults("shared-core-navigation")
 
     sourceSets {

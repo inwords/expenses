@@ -7,19 +7,18 @@ plugins {
     alias(shared.plugins.compose.multiplatform.compiler)
 }
 
-android {
-    namespace = "com.inwords.expenses.feature.menu"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
-
-    buildFeatures {
-        compose = true
-    }
-}
-
 kotlin {
+    android {
+        namespace = "com.inwords.expenses.feature.menu"
+
+        @Suppress("UnstableApiUsage")
+        optimization {
+            consumerKeepRules.files.add(file("consumer-rules.pro"))
+        }
+
+        experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
+    }
+
     applyKmmDefaults("shared-menu")
 
     sourceSets {

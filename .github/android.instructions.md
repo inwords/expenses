@@ -1,3 +1,6 @@
+---
+applyTo: "android/**"
+---
 # Copilot Instructions for Expenses (CommonEx) Android Project
 
 ## Project Overview
@@ -25,7 +28,7 @@ This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application 
 ## Build Instructions
 
 ### Prerequisites
-- JDK 11+ (Project uses JVM target 11)
+- JDK 11+ (Project uses JVM target 11, daemon configured for JDK 22/Temurin)
 - Android SDK with API 36
 - Gradle 8.14.3 (use wrapper)
 
@@ -38,7 +41,7 @@ This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application 
 # Clean project (7 seconds)
 .\gradlew.bat clean
 
-# Build debug APK (28 seconds from clean)
+# Build debug APK (28 seconds from clean, 5 seconds incremental)
 .\gradlew.bat assembleDebug
 
 # Build release APK (longer, includes obfuscation)
@@ -50,21 +53,36 @@ This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application 
 # Run all unit tests (25 seconds)
 .\gradlew.bat test
 
-# Run specific variant tests
-.\gradlew.bat testDebugUnitTest
-.\gradlew.bat testReleaseUnitTest
+# Run all tests across all targets with aggregated report (includes KMM)
+.\gradlew.bat allTests
+
+# Run KMM host tests (~15 seconds)
+.\gradlew.bat testHostTest
 
 # Run instrumented tests (requires device/emulator)
 .\gradlew.bat connectedAndroidTest
+.\gradlew.bat connectedDebugAndroidTest
+
+# Run tests on managed devices (cloud/emulator testing)
+.\gradlew.bat allDevicesCheck
+.\gradlew.bat pixel6Api34Check
 ```
 
 #### Code Quality
 ```powershell
-# Run lint analysis (48 seconds)
+# Run lint analysis (40 seconds)
 .\gradlew.bat lint --continue
+
+# Run lint on specific build variants
+.\gradlew.bat lintDebug
+.\gradlew.bat lintRelease
+.\gradlew.bat lintBenchmarkRelease
 
 # Apply lint auto-fixes
 .\gradlew.bat lintFix
+
+# Update lint baseline (if using lint baseline files)
+.\gradlew.bat updateLintBaseline
 
 # Generate lint reports at: app/build/reports/lint-results-debug.html
 ```
@@ -81,10 +99,12 @@ This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application 
 
 **Expected Warnings (safe to ignore):**
 - `WARNING: The option setting 'android.r8.optimizedResourceShrinking=true' is experimental`
+- `Calculating task graph as configuration cache cannot be reused because file 'gradle\buildSrc.versions.toml' has changed`
 - Cronet namespace warnings in manifest merger
 - Redundant visibility modifier warnings from generated Room code
 - Native library stripping warnings for specific .so files
 - `OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes` during unit tests
+- `Parallel Configuration Cache is an incubating feature` warnings
 
 **Build Process Notes:**
 - Configuration cache is enabled and may show "incubating feature" warnings
@@ -92,6 +112,7 @@ This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application 
 - Incremental builds are much faster due to Gradle caching
 - KSP generates code for Room DAOs and may show redundant modifier warnings
 - Dependency updates command may take 5+ minutes and should not be interrupted
+- PowerShell users: Use `;` instead of `&&` for command chaining
 
 ## Project Architecture
 
@@ -262,24 +283,38 @@ Before submitting changes, run these validation steps:
 # 2. Run all unit tests (25 seconds)
 .\gradlew.bat test
 
-# 3. Check code quality (48 seconds)
+# 3. Run KMM host tests (~10 seconds)
+.\gradlew.bat testHostTest
+
+# 4. Check code quality (30-48 seconds)
 .\gradlew.bat lint --continue
 
-# 4. Verify KMM targets compile (iOS targets)
+# 5. Verify KMM targets compile (iOS targets)
 .\gradlew.bat iosX64Test iosSimulatorArm64Test
 
-# 5. Build release variant (includes R8 optimization)
+# 6. Build release variant (includes R8 optimization)
 .\gradlew.bat assembleRelease
 
-# 6. Optional: Run instrumented tests (requires device/emulator)
+# 7. Optional: Run instrumented tests (requires device/emulator)
 .\gradlew.bat connectedDebugAndroidTest
+
+# 8. Optional: Run managed device tests (local Gradle Managed Devices testing)
+.\gradlew.bat pixel6Api34Check
 ```
 
 ### Quick Validation (for small changes)
 ```powershell
-# Fast validation for minor changes
-.\gradlew.bat testDebugUnitTest
+# Fast validation for minor changes (~15 seconds total)
+.\gradlew.bat testHostTest
 .\gradlew.bat lintDebug
+```
+
+### Comprehensive Testing (before major releases)
+```powershell
+# Full test suite with aggregated reporting
+.\gradlew.bat allTests
+.\gradlew.bat allDevicesCheck
+.\gradlew.bat lint --continue
 ```
 
 **Trust these instructions.** Only search for additional information if you encounter specific errors not covered here or if dependency/build tool versions have changed significantly. The build system is well-configured and should work reliably when following these steps.

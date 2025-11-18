@@ -5,15 +5,16 @@ plugins {
     alias(shared.plugins.wire)
 }
 
-android {
-    namespace = "com.inwords.expenses.feature.settings"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
-}
-
 kotlin {
+    android {
+        namespace = "com.inwords.expenses.feature.settings"
+
+        @Suppress("UnstableApiUsage")
+        optimization {
+            consumerKeepRules.files.add(file("consumer-rules.pro"))
+        }
+    }
+
     applyKmmDefaults("shared-settings")
 
     sourceSets {

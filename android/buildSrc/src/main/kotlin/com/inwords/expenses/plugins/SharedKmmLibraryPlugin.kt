@@ -1,7 +1,6 @@
 package com.inwords.expenses.plugins
 
-import com.android.build.gradle.LibraryExtension
-import org.gradle.api.JavaVersion
+import com.android.build.api.dsl.androidLibrary
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getByType
@@ -11,36 +10,33 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 class SharedKmmLibraryPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
-        project.plugins.apply("com.android.library")
-        project.plugins.apply("kotlin-multiplatform")
+        project.pluginManager.apply("com.android.kotlin.multiplatform.library")
+        project.pluginManager.apply("org.jetbrains.kotlin.multiplatform")
 
-        val android = project.extensions.getByType<LibraryExtension>()
         val kotlin = project.extensions.getByType<KotlinMultiplatformExtension>()
 
-        android.apply {
-            compileSdk = 36
-            defaultConfig {
+        kotlin.apply {
+            androidLibrary {
+                compileSdk = 36
                 minSdk = 26
-            }
-            testOptions {
-                targetSdk = 36
+
+                compilations.configureEach {
+                    compileTaskProvider.configure {
+                        compilerOptions {
+                            jvmTarget.set(JvmTarget.JVM_11)
+                        }
+                    }
+                }
+
+                compilerOptions {
+                    jvmTarget.set(JvmTarget.JVM_11)
+                }
             }
 
-            compileOptions {
-                sourceCompatibility = JavaVersion.VERSION_11
-                targetCompatibility = JavaVersion.VERSION_11
-            }
-        }
-
-        kotlin.androidTarget {
             compilerOptions {
-                jvmTarget.set(JvmTarget.JVM_11)
+                extraWarnings.set(true)
+                freeCompilerArgs.add("-Xdata-flow-based-exhaustiveness")
             }
-        }
-
-        kotlin.compilerOptions {
-            extraWarnings.set(true)
-            freeCompilerArgs.add("-Xdata-flow-based-exhaustiveness")
         }
     }
 

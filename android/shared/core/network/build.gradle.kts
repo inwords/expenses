@@ -4,15 +4,16 @@ plugins {
     id("shared-kmm-library-plugin")
 }
 
-android {
-    namespace = "com.inwords.expenses.core.network"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
-}
-
 kotlin {
+    android {
+        namespace = "com.inwords.expenses.core.network"
+
+        @Suppress("UnstableApiUsage")
+        optimization {
+            consumerKeepRules.files.add(file("consumer-rules.pro"))
+        }
+    }
+
     applyKmmDefaults("shared-core-network")
 
     sourceSets {

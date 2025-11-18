@@ -6,15 +6,16 @@ plugins {
     alias(shared.plugins.compose.multiplatform.compiler)
 }
 
-android {
-    namespace = "com.inwords.expenses.core.ui.utils"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
-}
-
 kotlin {
+    android {
+        namespace = "com.inwords.expenses.core.ui.utils"
+
+        @Suppress("UnstableApiUsage")
+        optimization {
+            consumerKeepRules.files.add(file("consumer-rules.pro"))
+        }
+    }
+
     applyKmmDefaults("shared-core-ui-utils")
 
     sourceSets {
