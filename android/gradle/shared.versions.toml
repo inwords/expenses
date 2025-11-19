@@ -1,8 +1,8 @@
 [versions]
-kotlin = "2.2.20" # https://github.com/jetbrains/kotlin/releases https://kotlinlang.org/docs/releases.html#release-details
-ksp = "2.2.20-2.0.3" # https://github.com/google/ksp/releases
+kotlin = "2.2.21" # https://github.com/jetbrains/kotlin/releases https://kotlinlang.org/docs/releases.html#release-details
+ksp = "2.3.2" # https://github.com/google/ksp/releases
 
-room = "2.8.3" # https://developer.android.com/jetpack/androidx/releases/room
+room = "2.8.4" # https://developer.android.com/jetpack/androidx/releases/room
 datastore = "1.1.7" # https://developer.android.com/jetpack/androidx/releases/datastore
 
 ktor = "3.3.2" # https://github.com/ktorio/ktor/releases

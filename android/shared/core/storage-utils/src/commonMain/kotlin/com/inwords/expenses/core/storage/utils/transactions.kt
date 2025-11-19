@@ -12,7 +12,6 @@ class TransactionHelper(dbLazy: Lazy<RoomDatabase>) {
         val result = db.useWriterConnection { transactor ->
             transactor.immediateTransaction { block() }
         }
-        db.invalidationTracker.refreshAsync() // FIXME: remove when Room is fixed
         return result
     }
 }

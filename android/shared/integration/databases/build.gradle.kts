@@ -41,7 +41,7 @@ kotlin {
         }
         androidMain {
             dependencies {
-                // FIXME: remove
+                // FIXME: remove https://github.com/google/ksp/issues/1896
                 val composeBom = project.dependencies.platform(shared.compose.bom)
                 implementation(composeBom)
                 implementation(shared.compose.runtime)
