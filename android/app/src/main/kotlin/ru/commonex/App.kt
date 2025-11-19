@@ -1,6 +1,7 @@
 package ru.commonex
 
 import android.app.Application
+import android.os.StrictMode
 import android.util.Log
 import androidx.work.Configuration
 import com.inwords.expenses.core.utils.IO
@@ -15,6 +16,23 @@ class App : Application(), Configuration.Provider {
         super.onCreate()
 
         initializeSentry(production = !BuildConfig.DEBUG)
+
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(
+                StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .penaltyDialog()
+                    .build()
+            )
+
+            StrictMode.setVmPolicy(
+                StrictMode.VmPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build()
+            )
+        }
 
         registerComponents(this)
 
