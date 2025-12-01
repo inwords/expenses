@@ -25,7 +25,7 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
+import com.inwords.expenses.core.ui.design.theme.CommonExTheme
 import com.inwords.expenses.core.ui.utils.clipEntryOf
 import com.inwords.expenses.core.utils.IO
 import expenses.shared.feature.menu.generated.resources.Res
@@ -167,7 +167,7 @@ internal fun MenuDialog(
 @Preview
 @Composable
 private fun MenuDialogPreview() {
-    ExpensesTheme {
+    CommonExTheme {
         MenuDialog(
             state = MenuDialogUiModel(
                 eventName = "Пример события",
@@ -184,7 +184,7 @@ private fun MenuDialogPreview() {
 @Preview
 @Composable
 private fun MenuDialogEmptyShareUrlPreview() {
-    ExpensesTheme {
+    CommonExTheme {
         MenuDialog(
             state = MenuDialogUiModel(
                 eventName = "Пример события",

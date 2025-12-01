@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
-import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
+import com.inwords.expenses.core.ui.design.theme.CommonExTheme
 
 @Composable
 fun BasicFloatingActionButton(
@@ -34,7 +34,7 @@ fun BasicFloatingActionButton(
 @Preview
 @Composable
 private fun BasicFloatingActionButtonPreview() {
-    ExpensesTheme {
+    CommonExTheme {
         BasicFloatingActionButton(
             text = "Add Expense",
             imageVector = Icons.Outlined.Add,

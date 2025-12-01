@@ -13,7 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
+import com.inwords.expenses.core.ui.design.theme.CommonExTheme
 
 internal data class DebtShortUiModel(
     val personId: Long,
@@ -45,7 +45,7 @@ internal fun DebtReplenishmentButton(
 @Preview
 @Composable
 private fun DebtReplenishmentButtonPreview() {
-    ExpensesTheme {
+    CommonExTheme {
         Surface {
             DebtReplenishmentButton(
                 debt = DebtShortUiModel(

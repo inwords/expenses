@@ -56,7 +56,7 @@ import com.inwords.expenses.core.ui.design.button.BasicFloatingActionButton
 import com.inwords.expenses.core.ui.design.button.ButtonWithIconAndText
 import com.inwords.expenses.core.ui.design.button.OutlinedButtonWithText
 import com.inwords.expenses.core.ui.design.loading.DefaultProgressIndicator
-import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
+import com.inwords.expenses.core.ui.design.theme.CommonExTheme
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Person
@@ -523,7 +523,7 @@ private fun LocalEventItem(
 @Preview
 @Composable
 private fun ExpensesPanePreviewSuccessWithCreditors() {
-    ExpensesTheme {
+    CommonExTheme {
         ExpensesPane(
             onMenuClick = {},
             onAddExpenseClick = {},
@@ -542,7 +542,7 @@ private fun ExpensesPanePreviewSuccessWithCreditors() {
 @Preview
 @Composable
 private fun ExpensesPanePreviewSuccessWithoutCreditors() {
-    ExpensesTheme {
+    CommonExTheme {
         ExpensesPane(
             onMenuClick = {},
             onAddExpenseClick = {},
@@ -561,7 +561,7 @@ private fun ExpensesPanePreviewSuccessWithoutCreditors() {
 @Composable
 @Preview
 private fun ExpensesPaneLocalEventsPreview() {
-    ExpensesTheme {
+    CommonExTheme {
         ExpensesPaneLocalEvents(
             onCreateEventClick = {},
             onJoinEventClick = {},
@@ -585,7 +585,7 @@ private fun ExpensesPaneLocalEventsPreview() {
 @Composable
 @Preview
 private fun ExpensesPanePreviewEmpty() {
-    ExpensesTheme {
+    CommonExTheme {
         ExpensesPane(
             onMenuClick = {},
             onAddExpenseClick = {},
@@ -604,7 +604,7 @@ private fun ExpensesPanePreviewEmpty() {
 @Composable
 @Preview
 private fun ExpensesPanePreviewLoading() {
-    ExpensesTheme {
+    CommonExTheme {
         ExpensesPane(
             onMenuClick = {},
             onAddExpenseClick = {},

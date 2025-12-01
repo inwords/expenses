@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.appbar.TopAppBarWithNavIconAndText
 import com.inwords.expenses.core.ui.design.button.ButtonWithIconAndText
 import com.inwords.expenses.core.ui.design.button.OutlinedButtonWithIconAndText
-import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
+import com.inwords.expenses.core.ui.design.theme.CommonExTheme
 import com.inwords.expenses.feature.events.ui.common.PersonNameField
 import expenses.shared.feature.events.generated.resources.Res
 import expenses.shared.feature.events.generated.resources.common_back
@@ -162,7 +162,7 @@ internal fun AddPersonsPane(
 @Preview
 @Composable
 private fun AddPersonsPanePreview() {
-    ExpensesTheme {
+    CommonExTheme {
         AddPersonsPane(
             state = AddPersonsPaneUiModel(
                 ownerName = "",

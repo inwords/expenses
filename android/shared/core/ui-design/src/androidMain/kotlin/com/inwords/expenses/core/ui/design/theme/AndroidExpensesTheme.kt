@@ -33,7 +33,7 @@ fun AndroidExpensesTheme(
         null
     }
 
-    ExpensesTheme(
+    CommonExTheme(
         dynamicColorScheme = dynamicColorScheme,
         content = content
     )

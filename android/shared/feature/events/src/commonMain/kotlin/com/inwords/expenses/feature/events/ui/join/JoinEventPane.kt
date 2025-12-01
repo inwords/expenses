@@ -32,7 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.appbar.TopAppBarWithNavIconAndText
 import com.inwords.expenses.core.ui.design.button.ButtonWithIconAndText
-import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
+import com.inwords.expenses.core.ui.design.theme.CommonExTheme
 import com.inwords.expenses.feature.events.ui.common.EventAccessCodeField
 import com.inwords.expenses.feature.events.ui.common.EventIdField
 import com.inwords.expenses.feature.events.ui.join.JoinEventPaneUiModel.EventJoiningState
@@ -162,7 +162,7 @@ internal fun JoinEventPane(
 @Preview
 @Composable
 private fun EventsPanePreview() {
-    ExpensesTheme {
+    CommonExTheme {
         JoinEventPane(
             state = JoinEventPaneUiModel(
                 eventId = "",

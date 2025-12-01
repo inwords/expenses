@@ -30,7 +30,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun ExpensesTheme(
+fun CommonExTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColorScheme: ColorScheme? = null,
     content: @Composable () -> Unit

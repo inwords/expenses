@@ -39,7 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.appbar.TopAppBarWithNavIconAndText
 import com.inwords.expenses.core.ui.design.loading.DefaultProgressIndicator
-import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
+import com.inwords.expenses.core.ui.design.theme.CommonExTheme
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneUiModel.PersonUiModel
 import com.inwords.expenses.feature.events.ui.common.EventInfoBlock
@@ -224,7 +224,7 @@ private fun PersonSelectionItem(
 @Preview
 @Composable
 private fun ChoosePersonPanePreview() {
-    ExpensesTheme {
+    CommonExTheme {
         ChoosePersonPane(
             state = SimpleScreenState.Success(
                 ChoosePersonPaneUiModel(

@@ -39,7 +39,7 @@ import com.inwords.expenses.core.ui.design.button.ButtonWithIconAndText
 import com.inwords.expenses.core.ui.design.group.MultiSelectConnectedButtonGroupWithFlowLayout
 import com.inwords.expenses.core.ui.design.group.ToggleButtonOption
 import com.inwords.expenses.core.ui.design.loading.DefaultProgressIndicator
-import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
+import com.inwords.expenses.core.ui.design.theme.CommonExTheme
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
@@ -366,7 +366,7 @@ private fun SplitCustomPartInput(
 @Preview(showBackground = true)
 @Composable
 private fun AddExpensePaneSuccessEqualSplitPreview() {
-    ExpensesTheme {
+    CommonExTheme {
         AddExpensePane(
             onCurrencyClicked = {},
             onExpenseTypeClicked = {},
@@ -385,7 +385,7 @@ private fun AddExpensePaneSuccessEqualSplitPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun AddExpensePaneSuccessPreview() {
-    ExpensesTheme {
+    CommonExTheme {
         AddExpensePane(
             onCurrencyClicked = {},
             onExpenseTypeClicked = {},

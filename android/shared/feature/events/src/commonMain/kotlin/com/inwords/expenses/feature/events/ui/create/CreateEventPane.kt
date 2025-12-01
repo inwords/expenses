@@ -27,7 +27,7 @@ import com.inwords.expenses.core.ui.design.appbar.TopAppBarWithNavIconAndText
 import com.inwords.expenses.core.ui.design.button.ButtonWithIconAndText
 import com.inwords.expenses.core.ui.design.group.MultiSelectConnectedButtonGroupWithFlowLayout
 import com.inwords.expenses.core.ui.design.group.ToggleButtonOption
-import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
+import com.inwords.expenses.core.ui.design.theme.CommonExTheme
 import com.inwords.expenses.feature.events.ui.common.EventNameField
 import com.inwords.expenses.feature.events.ui.create.CreateEventPaneUiModel.CurrencyInfoUiModel
 import expenses.shared.feature.events.generated.resources.Res
@@ -122,7 +122,7 @@ internal fun CreateEventPane(
 @Preview
 @Composable
 private fun CreateEventPanePreview() {
-    ExpensesTheme {
+    CommonExTheme {
         CreateEventPane(
             state = CreateEventPaneUiModel(
                 eventName = "",
