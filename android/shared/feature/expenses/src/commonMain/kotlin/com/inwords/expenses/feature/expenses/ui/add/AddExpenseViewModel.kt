@@ -10,7 +10,6 @@ import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.core.utils.asImmutableListAdapter
 import com.inwords.expenses.core.utils.combine
-import com.inwords.expenses.core.utils.divide
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.core.utils.toBigDecimalOrNull
@@ -31,7 +30,6 @@ import com.inwords.expenses.feature.expenses.ui.add.AddExpenseViewModel.AddExpen
 import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
-import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import expenses.shared.feature.expenses.generated.resources.Res
 import expenses.shared.feature.expenses.generated.resources.expenses_no_description
 import expenses.shared.feature.expenses.generated.resources.expenses_repayment_from
@@ -243,10 +241,12 @@ internal class AddExpenseViewModel(
             val selectedSubjectPersons = subjectPersons.filter { it.selected }
 
             val newSplit = split.ifEmpty {
-                val amount = wholeAmount?.amount?.divide(
-                    other = selectedSubjectPersons.size.coerceAtLeast(1).toBigDecimal(),
-                    scale = 2,
-                )
+                val amount = wholeAmount?.amount?.let { amount ->
+                    ExpensesInteractor.calculateEqualSplit(
+                        amount = amount,
+                        selectedSubjectPersonsSize = selectedSubjectPersons.size
+                    )
+                }
                 selectedSubjectPersons.map { personInfoModel ->
                     ExpenseSplitWithPersonModel(
                         person = personInfoModel,

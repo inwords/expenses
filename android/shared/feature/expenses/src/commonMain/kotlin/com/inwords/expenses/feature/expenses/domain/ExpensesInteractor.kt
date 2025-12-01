@@ -174,4 +174,17 @@ class ExpensesInteractor internal constructor(
         return { currencyExchanger.exchange(it, originalCurrency.code, primaryCurrencyCode) }
     }
 
+    internal companion object {
+
+        internal fun calculateEqualSplit(
+            amount: BigDecimal,
+            selectedSubjectPersonsSize: Int,
+        ): BigDecimal {
+            return amount.divide(
+                other = selectedSubjectPersonsSize.coerceAtLeast(1).toBigDecimal(),
+                scale = 2,
+            )
+        }
+    }
+
 }
