@@ -39,6 +39,8 @@
                 <data android:scheme="https" />
 
                 <data android:host="commonex.ru" />
+
+                <data android:pathPattern="/event/.*" />
             </intent-filter>
         </activity>
 

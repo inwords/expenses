@@ -2,6 +2,7 @@ package com.inwords.expenses.feature.menu.ui
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -25,6 +26,7 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.inwords.expenses.core.ui.design.legal.LegalBlock
 import com.inwords.expenses.core.ui.design.theme.CommonExTheme
 import com.inwords.expenses.core.ui.utils.clipEntryOf
 import com.inwords.expenses.core.utils.IO
@@ -37,13 +39,16 @@ import expenses.shared.feature.menu.generated.resources.menu_share_action
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun MenuDialog(
     state: MenuDialogUiModel,
     onJoinEventClicked: () -> Unit,
     onLeaveEventClicked: () -> Unit,
     onChoosePersonClicked: () -> Unit,
-    onShareClicked: () -> Unit = {},
+    onShareClicked: () -> Unit,
+    onPrivacyPolicyClicked: () -> Unit,
+    onTermsOfUseClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -161,6 +166,16 @@ internal fun MenuDialog(
                 style = MaterialTheme.typography.bodyLarge
             )
         }
+
+        HorizontalDivider()
+
+        LegalBlock(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            onPrivacyPolicyClicked = onPrivacyPolicyClicked,
+            onTermsOfUseClicked = onTermsOfUseClicked
+        )
     }
 }
 
@@ -177,6 +192,8 @@ private fun MenuDialogPreview() {
             onLeaveEventClicked = {},
             onChoosePersonClicked = {},
             onShareClicked = {},
+            onPrivacyPolicyClicked = {},
+            onTermsOfUseClicked = {},
         )
     }
 }
@@ -194,6 +211,8 @@ private fun MenuDialogEmptyShareUrlPreview() {
             onLeaveEventClicked = {},
             onChoosePersonClicked = {},
             onShareClicked = {},
+            onPrivacyPolicyClicked = {},
+            onTermsOfUseClicked = {},
         )
     }
 }

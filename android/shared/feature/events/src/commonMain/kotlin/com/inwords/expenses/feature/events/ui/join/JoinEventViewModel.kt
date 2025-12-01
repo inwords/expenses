@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
-import expenses.shared.core.ui_design.generated.resources.Res as designRes
+import expenses.shared.core.ui_design.generated.resources.Res as DesignRes
 
 internal class JoinEventViewModel(
     private val navigationController: NavigationController,
@@ -83,7 +83,7 @@ internal class JoinEventViewModel(
                         JoinEventResult.Error.EventNotFound,
                         JoinEventResult.Error.InvalidAccessCode -> stringProvider.getString(Res.string.events_join_error_invalid_credentials)
 
-                        JoinEventResult.Error.OtherError -> stringProvider.getString(designRes.string.error_other)
+                        JoinEventResult.Error.OtherError -> stringProvider.getString(DesignRes.string.error_other)
                     }
                     _state.update { currentState ->
                         currentState.copy(joining = EventJoiningState.Error(errorMessage))
