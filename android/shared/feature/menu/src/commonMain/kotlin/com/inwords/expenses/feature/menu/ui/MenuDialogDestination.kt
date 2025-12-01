@@ -21,7 +21,7 @@ fun getMenuDialogNavModule(
     shareManagerLazy: Lazy<ShareManager>
 ): NavModule {
     return NavModule(MenuDialogDestination.serializer()) {
-        entry<MenuDialogDestination>(metadata = dialog()) { key ->
+        entry<MenuDialogDestination>(metadata = dialog()) {
             val viewModel = viewModel<MenuViewModel>(factory = viewModelFactory {
                 initializer {
                     MenuViewModel(
@@ -37,6 +37,8 @@ fun getMenuDialogNavModule(
                 onLeaveEventClicked = viewModel::onLeaveEventClicked,
                 onChoosePersonClicked = viewModel::onChoosePersonClicked,
                 onShareClicked = viewModel::onShareClicked,
+                onPrivacyPolicyClicked = viewModel::onPrivacyPolicyClicked,
+                onTermsOfUseClicked = viewModel::onTermsOfUseClicked,
             )
         }
     }

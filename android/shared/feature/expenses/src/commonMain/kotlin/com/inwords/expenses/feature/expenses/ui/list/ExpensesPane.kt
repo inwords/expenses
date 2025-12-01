@@ -47,7 +47,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,6 +54,7 @@ import com.inwords.expenses.core.ui.design.appbar.TopAppBarWithText
 import com.inwords.expenses.core.ui.design.button.BasicFloatingActionButton
 import com.inwords.expenses.core.ui.design.button.ButtonWithIconAndText
 import com.inwords.expenses.core.ui.design.button.OutlinedButtonWithText
+import com.inwords.expenses.core.ui.design.legal.LegalBlock
 import com.inwords.expenses.core.ui.design.loading.DefaultProgressIndicator
 import com.inwords.expenses.core.ui.design.theme.CommonExTheme
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
@@ -70,6 +70,7 @@ import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.Expense
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents.LocalEventUiModel
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
+import expenses.shared.core.ui_design.generated.resources.agree_by_continuing
 import expenses.shared.feature.expenses.generated.resources.Res
 import expenses.shared.feature.expenses.generated.resources.common_error
 import expenses.shared.feature.expenses.generated.resources.expenses_app_name
@@ -83,6 +84,8 @@ import expenses.shared.feature.expenses.generated.resources.expenses_your
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Clock
+import expenses.shared.core.ui_design.generated.resources.Res as DesignRes
+
 
 @Composable
 internal fun ExpensesPane(
@@ -328,7 +331,7 @@ private fun ExpensesPaneLocalEvents(
                     .consumeWindowInsets(PaddingValues(bottom = bottomPadding))
                     .padding(horizontal = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(bottom = 88.dp + bottomPadding),
+                contentPadding = PaddingValues(bottom = 16.dp + bottomPadding),
             ) {
                 items(
                     count = localEvents.events.size,
@@ -377,39 +380,61 @@ private fun ExpensesPaneEmpty(
         modifier = modifier.fillMaxSize(),
         topBar = { TopAppBarWithText() },
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
                 .consumeWindowInsets(paddingValues)
                 .padding(paddingValues),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(
-                text = stringResource(Res.string.expenses_create_join_description),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyLarge,
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .padding(bottom = 32.dp),
-            )
-            ButtonWithIconAndText(
-                modifier = modifier
-                    .fillMaxWidth(0.7f),
-                onClick = onCreateEventClick,
-                text = stringResource(Res.string.expenses_create),
-                imageVector = Icons.Outlined.Add,
-                minHeight = ButtonDefaults.MediumContainerHeight,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedButtonWithText(
-                modifier = modifier
-                    .fillMaxWidth(0.7f),
-                onClick = onJoinEventClick,
-                text = stringResource(Res.string.expenses_join),
-                minHeight = ButtonDefaults.MediumContainerHeight,
-            )
+                    .align(Alignment.Center),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(Res.string.expenses_create_join_description),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                ButtonWithIconAndText(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    onClick = onCreateEventClick,
+                    text = stringResource(Res.string.expenses_create),
+                    imageVector = Icons.Outlined.Add,
+                    minHeight = ButtonDefaults.MediumContainerHeight,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedButtonWithText(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    onClick = onJoinEventClick,
+                    text = stringResource(Res.string.expenses_join),
+                    minHeight = ButtonDefaults.MediumContainerHeight,
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally),
+                    text = stringResource(DesignRes.string.agree_by_continuing),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                LegalBlock(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally),
+                    onPrivacyPolicyClicked = { /* No additional action needed - URL opening handled by component */ },
+                    onTermsOfUseClicked = { /* No additional action needed - URL opening handled by component */ }
+                )
+            }
         }
     }
 }

@@ -161,7 +161,7 @@ internal fun JoinEventPane(
 
 @Preview
 @Composable
-private fun EventsPanePreview() {
+private fun JoinEventPanePreview() {
     CommonExTheme {
         JoinEventPane(
             state = JoinEventPaneUiModel(

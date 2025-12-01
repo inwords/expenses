@@ -71,4 +71,14 @@ internal class MenuViewModel(
         }
     }
 
+    fun onPrivacyPolicyClicked() {
+        // URL opening is handled in the composable using openUriSafe
+        navigationController.popBackStack()
+    }
+
+    fun onTermsOfUseClicked() {
+        // URL opening is handled in the composable using openUriSafe
+        navigationController.popBackStack()
+    }
+
 }
