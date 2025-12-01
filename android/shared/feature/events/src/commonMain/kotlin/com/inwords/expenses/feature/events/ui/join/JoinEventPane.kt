@@ -1,6 +1,11 @@
 package com.inwords.expenses.feature.events.ui.join
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +20,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,6 +35,7 @@ import com.inwords.expenses.core.ui.design.button.ButtonWithIconAndText
 import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
 import com.inwords.expenses.feature.events.ui.common.EventAccessCodeField
 import com.inwords.expenses.feature.events.ui.common.EventIdField
+import com.inwords.expenses.feature.events.ui.join.JoinEventPaneUiModel.EventJoiningState
 import expenses.shared.feature.events.generated.resources.Res
 import expenses.shared.feature.events.generated.resources.common_back
 import expenses.shared.feature.events.generated.resources.events_join_description
@@ -79,35 +86,75 @@ internal fun JoinEventPane(
                     .padding(bottom = 32.dp),
             )
 
+            val joining = state.joining == EventJoiningState.Joining
+            val joiningError = state.joining as? EventJoiningState.Error
             EventIdField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
                 eventId = state.eventId,
-                onEventIdChanged = onEventIdChanged
+                onEventIdChanged = onEventIdChanged,
+                enabled = !joining,
+                isError = joiningError != null,
             )
 
-            EventAccessCodeField(
+            Row(
                 modifier = Modifier
-                    .align(Alignment.End)
-                    .fillMaxWidth(0.5f),
-                eventAccessCode = state.eventAccessCode,
-                onDone = onConfirmClicked,
-                onEventAccessCodeChanged = onEventAccessCodeChanged,
-            )
+                    .align(Alignment.End),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                AnimatedVisibility(
+                    modifier = Modifier
+                        .weight(1f),
+                    visible = joiningError != null,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Text(
+                        text = joiningError?.message.orEmpty(),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+
+                EventAccessCodeField(
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f),
+                    eventAccessCode = state.eventAccessCode,
+                    onDone = onConfirmClicked,
+                    onEventAccessCodeChanged = onEventAccessCodeChanged,
+                    enabled = !joining,
+                    isError = joiningError != null,
+                )
+            }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            ButtonWithIconAndText(
+            Row(
                 modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(vertical = 16.dp),
-                onClick = onConfirmClicked,
-                enabled = state.eventId.isNotBlank() && state.eventAccessCode.isNotBlank(),
-                text = stringResource(Res.string.events_participants_title),
-                imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
-                minHeight = ButtonDefaults.MediumContainerHeight,
-            )
+                    .align(Alignment.End),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                AnimatedVisibility(
+                    visible = joining,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    LoadingIndicator()
+                }
+
+                ButtonWithIconAndText(
+                    modifier = Modifier
+                        .padding(vertical = 16.dp),
+                    onClick = onConfirmClicked,
+                    enabled = !joining && state.eventId.isNotBlank() && state.eventAccessCode.isNotBlank(),
+                    text = stringResource(Res.string.events_participants_title),
+                    imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
+                    minHeight = ButtonDefaults.MediumContainerHeight,
+                )
+            }
         }
     }
 }
@@ -119,7 +166,8 @@ private fun EventsPanePreview() {
         JoinEventPane(
             state = JoinEventPaneUiModel(
                 eventId = "",
-                eventAccessCode = ""
+                eventAccessCode = "",
+                joining = EventJoiningState.None
             ),
             onEventIdChanged = {},
             onEventAccessCodeChanged = {},
