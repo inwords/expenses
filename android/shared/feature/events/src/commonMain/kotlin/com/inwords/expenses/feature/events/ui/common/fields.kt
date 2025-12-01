@@ -28,7 +28,7 @@ internal fun EventNameField(
         modifier = modifier,
         value = eventName,
         onValueChange = onEventNameChanged,
-        placeholder = { Text(stringResource(Res.string.events_name_placeholder)) },
+        label = { Text(stringResource(Res.string.events_name_placeholder)) },
         singleLine = true,
         textStyle = MaterialTheme.typography.headlineMedium,
         keyboardActions = KeyboardActions(onDone = { onDone() }),
@@ -44,17 +44,22 @@ internal fun EventNameField(
 internal fun EventIdField(
     eventId: String,
     onEventIdChanged: (String) -> Unit,
+    enabled: Boolean,
     modifier: Modifier = Modifier,
+    isError: Boolean = false,
 ) {
     OutlinedTextField(
         modifier = modifier,
         value = eventId,
         onValueChange = onEventIdChanged,
-        placeholder = { Text(stringResource(Res.string.events_id_placeholder)) },
+        label = { Text(stringResource(Res.string.events_id_placeholder)) },
+        enabled = enabled,
+        isError = isError,
         singleLine = true,
         textStyle = MaterialTheme.typography.headlineMedium,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
+            capitalization = KeyboardCapitalization.Characters,
             imeAction = ImeAction.Next
         )
     )
@@ -65,13 +70,17 @@ internal fun EventAccessCodeField(
     eventAccessCode: String,
     onEventAccessCodeChanged: (String) -> Unit,
     onDone: () -> Unit,
-    modifier: Modifier = Modifier
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+    isError: Boolean = false
 ) {
     OutlinedTextField(
         modifier = modifier,
         value = eventAccessCode,
         onValueChange = onEventAccessCodeChanged,
-        placeholder = { Text(stringResource(Res.string.events_access_code_placeholder)) },
+        label = { Text(stringResource(Res.string.events_access_code_placeholder)) },
+        enabled = enabled,
+        isError = isError,
         singleLine = true,
         textStyle = MaterialTheme.typography.headlineMedium,
         keyboardActions = KeyboardActions(onDone = { onDone.invoke() }),
@@ -94,7 +103,7 @@ internal fun PersonNameField(
         modifier = modifier,
         value = participantName,
         onValueChange = onParticipantNameChanged,
-        placeholder = { Text(stringResource(Res.string.events_person_name_placeholder)) },
+        label = { Text(stringResource(Res.string.events_person_name_placeholder)) },
         singleLine = true,
         textStyle = MaterialTheme.typography.headlineMedium,
         keyboardActions = KeyboardActions(onAny = { onImeAction.invoke() }),

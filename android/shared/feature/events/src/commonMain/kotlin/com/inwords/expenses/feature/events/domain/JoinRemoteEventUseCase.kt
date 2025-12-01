@@ -32,7 +32,7 @@ internal class JoinRemoteEventUseCase(
         val currencies = if (currenciesBeforeSync.isEmpty() || currenciesBeforeSync.any { it.serverId == null }) {
             when (val currencies = currenciesPullTask.pullCurrencies()) {
                 is IoResult.Success<List<Currency>> -> currencies.data
-                is IoResult.Error -> return JoinEventResult.OtherError
+                is IoResult.Error -> return JoinEventResult.Error.OtherError
             }
         } else {
             currenciesBeforeSync
@@ -41,9 +41,9 @@ internal class JoinRemoteEventUseCase(
         val remoteEvent = when (val eventResult = eventsRemoteStore.getEvent(event, currencies, localPersons = null)) {
             is EventsRemoteStore.GetEventResult.Event -> eventResult.event
 
-            EventsRemoteStore.GetEventResult.EventNotFound -> return JoinEventResult.EventNotFound
-            EventsRemoteStore.GetEventResult.InvalidAccessCode -> return JoinEventResult.InvalidAccessCode
-            EventsRemoteStore.GetEventResult.OtherError -> return JoinEventResult.OtherError
+            EventsRemoteStore.GetEventResult.EventNotFound -> return JoinEventResult.Error.EventNotFound
+            EventsRemoteStore.GetEventResult.InvalidAccessCode -> return JoinEventResult.Error.InvalidAccessCode
+            EventsRemoteStore.GetEventResult.OtherError -> return JoinEventResult.Error.OtherError
         }
 
         val eventDetails = transactionHelper.immediateWriteTransaction {

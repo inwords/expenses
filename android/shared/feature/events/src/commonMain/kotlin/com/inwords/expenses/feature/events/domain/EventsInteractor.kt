@@ -33,9 +33,12 @@ class EventsInteractor internal constructor(
 
     internal sealed interface JoinEventResult {
         data class NewCurrentEvent(val event: EventDetails) : JoinEventResult
-        data object InvalidAccessCode : JoinEventResult
-        data object EventNotFound : JoinEventResult
-        data object OtherError : JoinEventResult
+
+        sealed interface Error : JoinEventResult {
+            data object InvalidAccessCode : Error
+            data object EventNotFound : Error
+            data object OtherError : Error
+        }
     }
 
     private val draft = Draft()
@@ -89,9 +92,9 @@ class EventsInteractor internal constructor(
                 settingsRepository.setCurrentEventId(joinEventResult.event.event.id)
             }
 
-            JoinEventResult.EventNotFound,
-            JoinEventResult.InvalidAccessCode,
-            JoinEventResult.OtherError -> Unit
+            JoinEventResult.Error.EventNotFound,
+            JoinEventResult.Error.InvalidAccessCode,
+            JoinEventResult.Error.OtherError -> Unit
         }
 
         return joinEventResult

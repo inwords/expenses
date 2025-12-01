@@ -14,6 +14,8 @@ kotlin {
         optimization {
             consumerKeepRules.files.add(file("consumer-rules.pro"))
         }
+
+        experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
     }
 
     applyKmmDefaults("shared-core-ui-design")
@@ -25,6 +27,7 @@ kotlin {
                 implementation(shared.compose.foundation.multiplatform)
                 implementation(shared.compose.material3.multiplatform)
                 implementation(shared.compose.ui.tooling.preview.multiplatform)
+                implementation(shared.compose.components.resources.multiplatform)
 
                 implementation(shared.compose.material.icons.core)
             }
@@ -37,4 +40,8 @@ kotlin {
             }
         }
     }
+}
+
+compose.resources {
+    publicResClass = true
 }

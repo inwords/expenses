@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import com.inwords.expenses.core.ui.design.theme.ExpensesTheme
+import com.inwords.expenses.core.ui.design.theme.CommonExTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -48,7 +48,7 @@ fun OutlinedButtonWithIconAndText(
 @Preview
 @Composable
 private fun ButtonWithIconAndTextDisabledPreview() {
-    ExpensesTheme {
+    CommonExTheme {
         Surface {
             OutlinedButtonWithIconAndText(
                 onClick = {},
@@ -64,7 +64,7 @@ private fun ButtonWithIconAndTextDisabledPreview() {
 @Preview
 @Composable
 private fun ButtonWithIconAndTextEnabledPreview() {
-    ExpensesTheme {
+    CommonExTheme {
         Surface {
             OutlinedButtonWithIconAndText(
                 onClick = {},
@@ -80,7 +80,7 @@ private fun ButtonWithIconAndTextEnabledPreview() {
 @Preview
 @Composable
 private fun ButtonWithIconAndTextMediumEnabledPreview() {
-    ExpensesTheme {
+    CommonExTheme {
         Surface {
             OutlinedButtonWithIconAndText(
                 onClick = {},
