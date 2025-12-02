@@ -69,6 +69,29 @@ export class EventRepository extends BaseRepository implements EventRepositoryAb
     return [undefined, queryDetails];
   };
 
+  readonly findSoftDeleted: EventRepositoryAbstract['findSoftDeleted'] = async (
+    trx,
+  ): Promise<[result: IEvent[], queryDetails: IQueryDetails]> => {
+    const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
+
+    let query = this.getRepository(ctx).createQueryBuilder(this.queryName);
+
+    query = query.where(`${this.queryName}.deletedAt IS NOT NULL`);
+
+    if (trx?.lock) {
+      query = query.setLock(trx.lock);
+
+      if (trx.onLocked) {
+        query = query.setOnLocked(trx.onLocked);
+      }
+    }
+
+    const queryDetails = this.getQueryDetails(query);
+    const result = await query.getMany();
+
+    return [result, queryDetails];
+  };
+
   readonly setDeletedAt: EventRepositoryAbstract['setDeletedAt'] = async (
     id: IEvent['id'],
     deletedAt: IEvent['deletedAt'],

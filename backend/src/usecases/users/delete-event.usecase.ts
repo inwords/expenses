@@ -1,4 +1,11 @@
-import {HttpException, HttpStatus, Injectable, Logger, OnModuleDestroy} from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import {SchedulerRegistry} from '@nestjs/schedule';
 import {UseCase} from '#packages/use-case';
 import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-service/relational-data-service';
@@ -18,13 +25,43 @@ interface Input {
 type Output = void;
 
 @Injectable()
-export class DeleteEventUseCase implements UseCase<Input, Output>, OnModuleDestroy {
+export class DeleteEventUseCase
+  implements UseCase<Input, Output>, OnModuleDestroy, OnModuleInit
+{
   private readonly logger = new Logger(DeleteEventUseCase.name);
 
   constructor(
     private readonly rDataService: RelationalDataServiceAbstract,
     private readonly schedulerRegistry: SchedulerRegistry,
   ) {}
+
+  public async onModuleInit() {
+    try {
+      const [softDeletedEvents] = await this.rDataService.event.findSoftDeleted();
+
+      for (const event of softDeletedEvents) {
+        if (!event.deletedAt) {
+          continue;
+        }
+
+        if (isDeletionGracePeriodElapsed(event.deletedAt)) {
+          try {
+            await this.finalizeDeletion(event.id);
+          } catch (error) {
+            this.logger.error(
+              `Failed to finalize deletion for event ${event.id} during initialization`,
+              error,
+            );
+          }
+          continue;
+        }
+
+        this.scheduleFinalDeletion(event.id, event.deletedAt);
+      }
+    } catch (error) {
+      this.logger.error('Failed to reschedule pending deletions on startup', error);
+    }
+  }
 
   public async execute({eventId, pinCode}: Input) {
     let deletedAt: Date | null = null;

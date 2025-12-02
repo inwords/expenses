@@ -11,6 +11,9 @@ export abstract class EventRepositoryAbstract {
     id: IEvent['id'],
     trx?: ITransaction,
   ) => Promise<[result: undefined, queryDetails: IQueryDetails]>;
+  abstract findSoftDeleted: (
+    trx?: ITransactionWithLock,
+  ) => Promise<[result: IEvent[], queryDetails: IQueryDetails]>;
   abstract setDeletedAt: (
     id: IEvent['id'],
     deletedAt: IEvent['deletedAt'],
