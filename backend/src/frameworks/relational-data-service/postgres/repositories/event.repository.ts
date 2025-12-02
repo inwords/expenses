@@ -27,6 +27,14 @@ export class EventRepository extends BaseRepository implements EventRepositoryAb
       id,
     });
 
+    if (trx?.lock) {
+      query = query.setLock(trx.lock);
+
+      if (trx.onLocked) {
+        query = query.setOnLocked(trx.onLocked);
+      }
+    }
+
     const queryDetails = this.getQueryDetails(query);
     const result = await query.getOne();
 
@@ -40,6 +48,63 @@ export class EventRepository extends BaseRepository implements EventRepositoryAb
     const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
 
     const query = this.getRepository(ctx).createQueryBuilder().insert().values(input);
+    const queryDetails = this.getQueryDetails(query);
+
+    await query.execute();
+
+    return [undefined, queryDetails];
+  };
+
+  readonly deleteById: EventRepositoryAbstract['deleteById'] = async (
+    id: IEvent['id'],
+    trx,
+  ): Promise<[result: undefined, queryDetails: IQueryDetails]> => {
+    const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
+
+    const query = this.getRepository(ctx).createQueryBuilder().delete().from(EventEntity).where('id = :id', {id});
+    const queryDetails = this.getQueryDetails(query);
+
+    await query.execute();
+
+    return [undefined, queryDetails];
+  };
+
+  readonly findSoftDeleted: EventRepositoryAbstract['findSoftDeleted'] = async (
+    trx,
+  ): Promise<[result: IEvent[], queryDetails: IQueryDetails]> => {
+    const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
+
+    let query = this.getRepository(ctx).createQueryBuilder(this.queryName);
+
+    query = query.where(`${this.queryName}.deletedAt IS NOT NULL`);
+
+    if (trx?.lock) {
+      query = query.setLock(trx.lock);
+
+      if (trx.onLocked) {
+        query = query.setOnLocked(trx.onLocked);
+      }
+    }
+
+    const queryDetails = this.getQueryDetails(query);
+    const result = await query.getMany();
+
+    return [result, queryDetails];
+  };
+
+  readonly setDeletedAt: EventRepositoryAbstract['setDeletedAt'] = async (
+    id: IEvent['id'],
+    deletedAt: IEvent['deletedAt'],
+    trx,
+  ): Promise<[result: undefined, queryDetails: IQueryDetails]> => {
+    const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
+
+    const query = this.getRepository(ctx)
+      .createQueryBuilder()
+      .update(EventEntity)
+      .set({deletedAt})
+      .where('id = :id', {id});
+
     const queryDetails = this.getQueryDetails(query);
 
     await query.execute();

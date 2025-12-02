@@ -47,6 +47,20 @@ export class UserRepository extends BaseRepository implements UserRepositoryAbst
     return [undefined, queryDetails];
   };
 
+  readonly deleteByEventId: UserRepositoryAbstract['deleteByEventId'] = async (
+    eventId: IUser['eventId'],
+    trx,
+  ): Promise<[result: undefined, queryDetails: IQueryDetails]> => {
+    const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
+
+    const query = this.getRepository(ctx).createQueryBuilder().delete().from(UserEntity).where('event_id = :eventId', {eventId});
+    const queryDetails = this.getQueryDetails(query);
+
+    await query.execute();
+
+    return [undefined, queryDetails];
+  };
+
   private readonly getRepository = (manager?: EntityManager): Repository<UserEntity> => {
     return manager != null ? manager.getRepository(UserEntity) : this.dataSource.getRepository(UserEntity);
   };

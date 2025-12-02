@@ -7,4 +7,8 @@ export abstract class ExpenseRepositoryAbstract {
     trx?: ITransactionWithLock,
   ) => Promise<[result: IExpense[], queryDetails: IQueryDetails]>;
   abstract insert: (expense: IExpense, trx?: ITransaction) => Promise<[result: undefined, queryDetails: IQueryDetails]>;
+  abstract deleteByEventId: (
+    eventId: IExpense['eventId'],
+    trx?: ITransaction,
+  ) => Promise<[result: undefined, queryDetails: IQueryDetails]>;
 }

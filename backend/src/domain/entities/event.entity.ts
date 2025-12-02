@@ -3,6 +3,7 @@ export interface IEvent {
   name: string;
   currencyId: string;
   pinCode: string;
+  deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -47,6 +47,22 @@ export class ExpenseRepository extends BaseRepository implements ExpenseReposito
     return [undefined, queryDetails];
   };
 
+  readonly deleteByEventId: ExpenseRepositoryAbstract['deleteByEventId'] = async (
+    eventId: IExpense['eventId'],
+    trx,
+  ): Promise<[result: undefined, queryDetails: IQueryDetails]> => {
+    const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
+
+    const query = this.getRepository(ctx).createQueryBuilder().delete().from(ExpenseEntity).where('event_id = :eventId', {
+      eventId,
+    });
+    const queryDetails = this.getQueryDetails(query);
+
+    await query.execute();
+
+    return [undefined, queryDetails];
+  };
+
   private readonly getRepository = (manager?: EntityManager): Repository<ExpenseEntity> => {
     return manager != null ? manager.getRepository(ExpenseEntity) : this.dataSource.getRepository(ExpenseEntity);
   };

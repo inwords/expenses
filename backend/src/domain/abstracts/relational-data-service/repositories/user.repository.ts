@@ -10,4 +10,8 @@ export abstract class UserRepositoryAbstract {
     user: IUser | IUser[],
     trx?: ITransaction,
   ) => Promise<[result: undefined, queryDetails: IQueryDetails]>;
+  abstract deleteByEventId: (
+    eventId: IUser['eventId'],
+    trx?: ITransaction,
+  ) => Promise<[result: undefined, queryDetails: IQueryDetails]>;
 }
