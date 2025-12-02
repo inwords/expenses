@@ -23,12 +23,13 @@ import com.inwords.expenses.feature.events.api.EventsComponent
 import com.inwords.expenses.feature.events.ui.add_persons.getAddPersonsPaneNavModule
 import com.inwords.expenses.feature.events.ui.choose_person.getChoosePersonPaneNavModule
 import com.inwords.expenses.feature.events.ui.create.getCreateEventPaneNavModule
+import com.inwords.expenses.feature.events.ui.dialog.delete.getDeleteEventDialogNavModule
 import com.inwords.expenses.feature.events.ui.join.getJoinEventPaneNavModule
 import com.inwords.expenses.feature.expenses.api.ExpensesComponent
 import com.inwords.expenses.feature.expenses.ui.add.getAddExpensePaneNavModule
 import com.inwords.expenses.feature.expenses.ui.debts_list.getDebtsListPaneNavModule
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneDestination
-import com.inwords.expenses.feature.expenses.ui.list.dialog.getExpenseItemDialogNavModule
+import com.inwords.expenses.feature.expenses.ui.list.dialog.item.getExpenseItemDialogNavModule
 import com.inwords.expenses.feature.expenses.ui.list.getExpensesPaneNavModule
 import com.inwords.expenses.feature.menu.api.MenuComponent
 import com.inwords.expenses.feature.menu.ui.getMenuDialogNavModule
@@ -61,6 +62,11 @@ fun MainNavHost(
                 eventsInteractor = eventsComponent.eventsInteractor,
                 expensesScreenDestination = ExpensesPaneDestination,
             ),
+            getDeleteEventDialogNavModule(
+                navigationController = navigationController,
+                eventsInteractor = eventsComponent.eventsInteractor,
+                deleteEventUseCase = eventsComponent.deleteEventUseCase,
+            ),
             getAddPersonsPaneNavModule(
                 navigationController = navigationController,
                 eventsInteractor = eventsComponent.eventsInteractor,
@@ -82,6 +88,7 @@ fun MainNavHost(
             getExpensesPaneNavModule(
                 navigationController = navigationController,
                 eventsInteractor = eventsComponent.eventsInteractor,
+                deleteEventUseCase = eventsComponent.deleteEventUseCase,
                 expensesInteractor = expensesComponent.expensesInteractor,
                 settingsRepository = settingsComponent.settingsRepository,
             ),

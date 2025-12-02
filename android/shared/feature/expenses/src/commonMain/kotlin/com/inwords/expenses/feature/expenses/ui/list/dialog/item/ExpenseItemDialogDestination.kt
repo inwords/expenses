@@ -1,4 +1,4 @@
-package com.inwords.expenses.feature.expenses.ui.list.dialog
+package com.inwords.expenses.feature.expenses.ui.list.dialog.item
 
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer

@@ -6,6 +6,7 @@ import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
+import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore.EventNetworkError
 import kotlinx.coroutines.withContext
 
 
@@ -25,23 +26,26 @@ class EventPullPersonsTask internal constructor(
      * 2. Currencies are already pulled
      */
     suspend fun pullEventPersons(eventId: Long): IoResult<*> = withContext(IO) {
-        val localEvent = eventsLocalStore.getEventWithDetails(eventId)
-            ?.takeIf { it.event.serverId != null }
-            ?: return@withContext IoResult.Error.Failure
+        val localEvent = eventsLocalStore.getEventWithDetails(eventId) ?: return@withContext IoResult.Error.Failure
+        if (localEvent.event.serverId == null) return@withContext IoResult.Error.Failure
 
         val remoteResult = eventsRemoteStore.getEvent(
-            event = localEvent.event,
+            localId = localEvent.event.id,
+            serverId = localEvent.event.serverId,
+            pinCode = localEvent.event.pinCode,
             currencies = localEvent.currencies,
             localPersons = localEvent.persons
         )
 
         val remoteEventDetails = when (remoteResult) {
             is EventsRemoteStore.GetEventResult.Event -> remoteResult.event
+            is EventsRemoteStore.GetEventResult.Error -> when (remoteResult.error) {
+                EventNetworkError.NotFound,
+                EventNetworkError.Gone,
+                EventNetworkError.InvalidAccessCode -> return@withContext IoResult.Error.Failure
 
-            EventsRemoteStore.GetEventResult.EventNotFound,
-            EventsRemoteStore.GetEventResult.InvalidAccessCode -> return@withContext IoResult.Error.Failure
-
-            EventsRemoteStore.GetEventResult.OtherError -> return@withContext IoResult.Error.Retry
+                EventNetworkError.OtherError -> return@withContext IoResult.Error.Retry
+            }
         }
 
         transactionHelper.immediateWriteTransaction {
