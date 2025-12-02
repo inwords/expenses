@@ -2,7 +2,7 @@ import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import {UseCase} from '#packages/use-case';
 import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-service/relational-data-service';
 import {IEvent} from '#domain/entities/event.entity';
-import {DELETION_GRACE_PERIOD_MS, ensureEventAvailable} from './utils/event-availability';
+import {ensureEventAvailable, isDeletionGracePeriodElapsed} from './utils/event-availability';
 
 interface Input {
   eventId: IEvent['id'];
@@ -37,16 +37,12 @@ export class DeleteEventUseCase implements UseCase<Input, Output> {
         );
       }
 
-      const now = new Date();
-
       if (!event.deletedAt) {
-        await this.rDataService.event.setDeletedAt(eventId, now, {ctx});
+        await this.rDataService.event.setDeletedAt(eventId, new Date(), {ctx});
         return;
       }
 
-      const elapsed = now.getTime() - new Date(event.deletedAt).getTime();
-
-      if (elapsed < DELETION_GRACE_PERIOD_MS) {
+      if (!isDeletionGracePeriodElapsed(event.deletedAt)) {
         throw new HttpException(
           {
             status: HttpStatus.GONE,

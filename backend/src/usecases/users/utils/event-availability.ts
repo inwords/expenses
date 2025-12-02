@@ -5,6 +5,14 @@ import {ITransactionWithLock} from '#domain/abstracts/relational-data-service/ty
 
 export const DELETION_GRACE_PERIOD_MS = 5 * 60 * 1000;
 
+export const isDeletionGracePeriodElapsed = (deletedAt?: Date | null): boolean => {
+  if (!deletedAt) {
+    return false;
+  }
+
+  return Date.now() - new Date(deletedAt).getTime() >= DELETION_GRACE_PERIOD_MS;
+};
+
 export const ensureEventAvailable = async (
   rDataService: RelationalDataServiceAbstract,
   eventId: IEvent['id'],
@@ -15,10 +23,14 @@ export const ensureEventAvailable = async (
 
   if (event) {
     if (event.deletedAt && !options.allowPendingDeletion) {
+      const isGraceElapsed = isDeletionGracePeriodElapsed(event.deletedAt);
+
       throw new HttpException(
         {
           status: HttpStatus.GONE,
-          error: `Event with id ${eventId} is scheduled for deletion`,
+          error: isGraceElapsed
+            ? `Event with id ${eventId} is no longer available`
+            : `Event with id ${eventId} is scheduled for deletion`,
         },
         HttpStatus.GONE,
       );
