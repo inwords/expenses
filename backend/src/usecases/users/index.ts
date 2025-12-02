@@ -4,6 +4,7 @@ import {SaveEventUseCase} from './save-event.usecase';
 import {GetEventExpensesUseCase} from './get-event-expenses.usecase';
 import {SaveEventExpenseUseCase} from './save-event-expense.usecase';
 import {SaveUsersToEventUseCase} from './save-users-to-event.usecase';
+import {DeleteEventUseCase} from './delete-event.usecase';
 
 export const allUsersUseCases = [
   GetAllCurrenciesUseCase,
@@ -12,4 +13,5 @@ export const allUsersUseCases = [
   GetEventExpensesUseCase,
   SaveEventExpenseUseCase,
   SaveUsersToEventUseCase,
+  DeleteEventUseCase,
 ];

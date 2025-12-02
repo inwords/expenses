@@ -6,6 +6,7 @@ import {UserRepository} from '#frameworks/relational-data-service/postgres/repos
 import {CurrencyRepository} from '#frameworks/relational-data-service/postgres/repositories/currency.repository';
 import {ExpenseRepository} from '#frameworks/relational-data-service/postgres/repositories/expense.repository';
 import {CurrencyRateRepository} from '#frameworks/relational-data-service/postgres/repositories/currency-rate.repository';
+import {DeletedEventRepository} from '#frameworks/relational-data-service/postgres/repositories/deleted-event.repository';
 
 export class RelationalDataService implements RelationalDataServiceAbstract {
   readonly dbConfig;
@@ -18,6 +19,7 @@ export class RelationalDataService implements RelationalDataServiceAbstract {
   readonly currency: CurrencyRepository;
   readonly expense: ExpenseRepository;
   readonly currencyRate: CurrencyRateRepository;
+  readonly deletedEvent: DeletedEventRepository;
 
   constructor({dbConfig, showQueryDetails}) {
     this.dbConfig = dbConfig;
@@ -30,6 +32,7 @@ export class RelationalDataService implements RelationalDataServiceAbstract {
     this.currency = new CurrencyRepository({dataSource: this.dataSource, showQueryDetails});
     this.expense = new ExpenseRepository({dataSource: this.dataSource, showQueryDetails});
     this.currencyRate = new CurrencyRateRepository({dataSource: this.dataSource, showQueryDetails});
+    this.deletedEvent = new DeletedEventRepository({dataSource: this.dataSource, showQueryDetails});
   }
 
   async initialize(): Promise<void> {

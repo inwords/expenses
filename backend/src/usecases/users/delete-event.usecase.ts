@@ -1,20 +1,21 @@
+import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import {UseCase} from '#packages/use-case';
-
 import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-service/relational-data-service';
 import {IEvent} from '#domain/entities/event.entity';
-import {IUser} from '#domain/entities/user.enitity';
-import {UserValueObject} from '#domain/value-objects/user.value-object';
-import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import {ensureEventAvailable} from './utils/event-availability';
 
-type Input = {users: Array<Omit<IUser, 'id' | 'eventId'>>} & {pinCode: IEvent['pinCode']; eventId: IEvent['id']};
-type Output = Array<IUser>;
+interface Input {
+  eventId: IEvent['id'];
+  pinCode: IEvent['pinCode'];
+}
+
+type Output = void;
 
 @Injectable()
-export class SaveUsersToEventUseCase implements UseCase<Input, Output> {
+export class DeleteEventUseCase implements UseCase<Input, Output> {
   constructor(private readonly rDataService: RelationalDataServiceAbstract) {}
 
-  public async execute({eventId, users, pinCode}: Input) {
+  public async execute({eventId, pinCode}: Input) {
     const event = await ensureEventAvailable(this.rDataService, eventId);
 
     if (event.pinCode !== pinCode) {
@@ -27,10 +28,11 @@ export class SaveUsersToEventUseCase implements UseCase<Input, Output> {
       );
     }
 
-    const usersValue = users.map((u) => new UserValueObject({...u, eventId}).value);
-
-    await this.rDataService.user.insert(usersValue);
-
-    return usersValue;
+    await this.rDataService.transaction(async (ctx) => {
+      await this.rDataService.expense.deleteByEventId(eventId, {ctx});
+      await this.rDataService.user.deleteByEventId(eventId, {ctx});
+      await this.rDataService.event.deleteById(eventId, {ctx});
+      await this.rDataService.deletedEvent.insert({eventId, deletedAt: new Date()}, {ctx});
+    });
   }
 }
