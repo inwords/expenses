@@ -69,6 +69,26 @@ export class EventRepository extends BaseRepository implements EventRepositoryAb
     return [undefined, queryDetails];
   };
 
+  readonly setDeletedAt: EventRepositoryAbstract['setDeletedAt'] = async (
+    id: IEvent['id'],
+    deletedAt: IEvent['deletedAt'],
+    trx,
+  ): Promise<[result: undefined, queryDetails: IQueryDetails]> => {
+    const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
+
+    const query = this.getRepository(ctx)
+      .createQueryBuilder()
+      .update(EventEntity)
+      .set({deletedAt})
+      .where('id = :id', {id});
+
+    const queryDetails = this.getQueryDetails(query);
+
+    await query.execute();
+
+    return [undefined, queryDetails];
+  };
+
   private readonly getRepository = (manager?: EntityManager): Repository<EventEntity> => {
     return manager != null ? manager.getRepository(EventEntity) : this.dataSource.getRepository(EventEntity);
   };

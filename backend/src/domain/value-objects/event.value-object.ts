@@ -3,12 +3,13 @@ import {IEvent} from '#domain/entities/event.entity';
 import {PartialByKeys} from '#packages/types';
 import {ulid} from 'ulid';
 
-export type TEventDefaultKeys = keyof Pick<IEvent, 'id' | 'createdAt' | 'updatedAt'>;
+export type TEventDefaultKeys = keyof Pick<IEvent, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>;
 
 export const eventDefaultValues: {
   [K in TEventDefaultKeys]: () => IEvent[K];
 } = {
   id: () => ulid(),
+  deletedAt: () => null,
   createdAt: () => new Date(),
   updatedAt: () => new Date(),
 } as const;
@@ -24,6 +25,10 @@ export class EventValueObject extends ValueObject<IEvent> {
       // сначала выполняется деструктуризация объекта requitedObjectValues.
       ...objectValues,
       id: ValueObject.getValueOrDefault(objectValues.id, eventDefaultValues.id),
+      deletedAt: ValueObject.getValueOrDefault(
+        objectValues.deletedAt,
+        eventDefaultValues.deletedAt,
+      ),
       createdAt: ValueObject.getValueOrDefault(objectValues.createdAt, eventDefaultValues.createdAt),
       updatedAt: ValueObject.getValueOrDefault(objectValues.updatedAt, eventDefaultValues.updatedAt),
     };

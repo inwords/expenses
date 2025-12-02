@@ -3,14 +3,27 @@ import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-s
 import {IEvent} from '#domain/entities/event.entity';
 import {ITransactionWithLock} from '#domain/abstracts/relational-data-service/types';
 
+export const DELETION_GRACE_PERIOD_MS = 5 * 60 * 1000;
+
 export const ensureEventAvailable = async (
   rDataService: RelationalDataServiceAbstract,
   eventId: IEvent['id'],
   trx?: ITransactionWithLock,
+  options: {allowPendingDeletion?: boolean} = {},
 ): Promise<IEvent> => {
   const [event] = await rDataService.event.findById(eventId, trx);
 
   if (event) {
+    if (event.deletedAt && !options.allowPendingDeletion) {
+      throw new HttpException(
+        {
+          status: HttpStatus.GONE,
+          error: `Event with id ${eventId} is scheduled for deletion`,
+        },
+        HttpStatus.GONE,
+      );
+    }
+
     return event;
   }
 
