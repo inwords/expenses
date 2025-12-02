@@ -16,19 +16,22 @@ export class DeleteEventUseCase implements UseCase<Input, Output> {
   constructor(private readonly rDataService: RelationalDataServiceAbstract) {}
 
   public async execute({eventId, pinCode}: Input) {
-    const event = await ensureEventAvailable(this.rDataService, eventId);
-
-    if (event.pinCode !== pinCode) {
-      throw new HttpException(
-        {
-          status: HttpStatus.FORBIDDEN,
-          error: 'Invalid event pin code',
-        },
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
     await this.rDataService.transaction(async (ctx) => {
+      const event = await ensureEventAvailable(this.rDataService, eventId, {
+        ctx,
+        lock: 'pessimistic_write',
+      });
+
+      if (event.pinCode !== pinCode) {
+        throw new HttpException(
+          {
+            status: HttpStatus.FORBIDDEN,
+            error: 'Invalid event pin code',
+          },
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
       await this.rDataService.expense.deleteByEventId(eventId, {ctx});
       await this.rDataService.user.deleteByEventId(eventId, {ctx});
       await this.rDataService.event.deleteById(eventId, {ctx});

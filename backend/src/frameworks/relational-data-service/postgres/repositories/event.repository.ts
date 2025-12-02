@@ -27,6 +27,14 @@ export class EventRepository extends BaseRepository implements EventRepositoryAb
       id,
     });
 
+    if (trx?.lock) {
+      query = query.setLock(trx.lock);
+
+      if (trx.onLocked) {
+        query = query.setOnLocked(trx.onLocked);
+      }
+    }
+
     const queryDetails = this.getQueryDetails(query);
     const result = await query.getOne();
 

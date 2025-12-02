@@ -25,6 +25,14 @@ export class DeletedEventRepository extends BaseRepository implements DeletedEve
 
     query = query.where(`${this.queryName}.eventId = :eventId`, {eventId});
 
+    if (trx?.lock) {
+      query = query.setLock(trx.lock);
+
+      if (trx.onLocked) {
+        query = query.setOnLocked(trx.onLocked);
+      }
+    }
+
     const queryDetails = this.getQueryDetails(query);
     const result = await query.getOne();
 

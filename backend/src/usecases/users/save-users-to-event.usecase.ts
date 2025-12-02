@@ -15,22 +15,27 @@ export class SaveUsersToEventUseCase implements UseCase<Input, Output> {
   constructor(private readonly rDataService: RelationalDataServiceAbstract) {}
 
   public async execute({eventId, users, pinCode}: Input) {
-    const event = await ensureEventAvailable(this.rDataService, eventId);
+    return this.rDataService.transaction(async (ctx) => {
+      const event = await ensureEventAvailable(this.rDataService, eventId, {
+        ctx,
+        lock: 'pessimistic_write',
+      });
 
-    if (event.pinCode !== pinCode) {
-      throw new HttpException(
-        {
-          status: HttpStatus.FORBIDDEN,
-          error: 'Invalid event pin code',
-        },
-        HttpStatus.FORBIDDEN,
-      );
-    }
+      if (event.pinCode !== pinCode) {
+        throw new HttpException(
+          {
+            status: HttpStatus.FORBIDDEN,
+            error: 'Invalid event pin code',
+          },
+          HttpStatus.FORBIDDEN,
+        );
+      }
 
-    const usersValue = users.map((u) => new UserValueObject({...u, eventId}).value);
+      const usersValue = users.map((u) => new UserValueObject({...u, eventId}).value);
 
-    await this.rDataService.user.insert(usersValue);
+      await this.rDataService.user.insert(usersValue, {ctx});
 
-    return usersValue;
+      return usersValue;
+    });
   }
 }

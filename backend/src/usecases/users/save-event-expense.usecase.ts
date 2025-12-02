@@ -21,9 +21,12 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
   ) {}
 
   public async execute(input: Input) {
-    const event = await ensureEventAvailable(this.rDataService, input.eventId);
-
     return this.rDataService.transaction(async (ctx) => {
+      const event = await ensureEventAvailable(this.rDataService, input.eventId, {
+        ctx,
+        lock: 'pessimistic_write',
+      });
+
       if (event.currencyId === input.currencyId) {
         let splitInformation: ISplitInfo[] = [];
 
