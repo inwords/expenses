@@ -1,4 +1,5 @@
 import {HttpException, HttpStatus, Injectable, Logger, OnModuleDestroy} from '@nestjs/common';
+import {SchedulerRegistry} from '@nestjs/schedule';
 import {UseCase} from '#packages/use-case';
 import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-service/relational-data-service';
 import {IEvent} from '#domain/entities/event.entity';
@@ -19,9 +20,11 @@ type Output = void;
 @Injectable()
 export class DeleteEventUseCase implements UseCase<Input, Output>, OnModuleDestroy {
   private readonly logger = new Logger(DeleteEventUseCase.name);
-  private readonly finalizationTimers = new Map<string, NodeJS.Timeout>();
 
-  constructor(private readonly rDataService: RelationalDataServiceAbstract) {}
+  constructor(
+    private readonly rDataService: RelationalDataServiceAbstract,
+    private readonly schedulerRegistry: SchedulerRegistry,
+  ) {}
 
   public async execute({eventId, pinCode}: Input) {
     let deletedAt: Date | null = null;
@@ -68,31 +71,48 @@ export class DeleteEventUseCase implements UseCase<Input, Output>, OnModuleDestr
   }
 
   public onModuleDestroy() {
-    this.finalizationTimers.forEach((timer) => clearTimeout(timer));
-    this.finalizationTimers.clear();
+    for (const timeoutName of this.schedulerRegistry.getTimeouts()) {
+      const timeout = this.schedulerRegistry.getTimeout(timeoutName);
+      clearTimeout(timeout);
+      this.schedulerRegistry.deleteTimeout(timeoutName);
+    }
   }
 
   private scheduleFinalDeletion(eventId: IEvent['id'], deletedAt: Date) {
     const elapsed = Date.now() - new Date(deletedAt).getTime();
     const delay = Math.max(DELETION_GRACE_PERIOD_MS - elapsed, 0);
 
-    const existingTimer = this.finalizationTimers.get(eventId);
-    if (existingTimer) {
-      clearTimeout(existingTimer);
+    const timeoutName = this.getTimeoutName(eventId);
+
+    try {
+      this.schedulerRegistry.deleteTimeout(timeoutName);
+    } catch (error) {
+      this.logger.debug(`No existing timeout to clear for ${timeoutName}`);
     }
 
-    const timer = setTimeout(() => {
-      this.finalizationTimers.delete(eventId);
-      this.finalizeDeletion(eventId).catch((error) =>
-        this.logger.error(`Failed to finalize deletion for event ${eventId}`, error),
-      );
+    const timer = setTimeout(async () => {
+      try {
+        await this.finalizeDeletion(eventId);
+      } catch (error) {
+        this.logger.error(`Failed to finalize deletion for event ${eventId}`, error);
+      } finally {
+        try {
+          this.schedulerRegistry.deleteTimeout(timeoutName);
+        } catch (cleanupError) {
+          this.logger.warn(`Failed to delete timeout ${timeoutName}`, cleanupError as Error);
+        }
+      }
     }, delay);
 
     if (timer.unref) {
       timer.unref();
     }
 
-    this.finalizationTimers.set(eventId, timer);
+    this.schedulerRegistry.addTimeout(timeoutName, timer);
+  }
+
+  private getTimeoutName(eventId: IEvent['id']): string {
+    return `delete-event-${eventId}`;
   }
 
   private async finalizeDeletion(
