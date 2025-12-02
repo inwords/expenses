@@ -12,6 +12,7 @@ internal data class AddExpensePaneUiModel(
     val equalSplit: Boolean,
     val wholeAmount: String,
     val split: ImmutableList<ExpenseSplitWithPersonUiModel>,
+    val canSave: Boolean,
 ) {
 
     data class CurrencyInfoUiModel(

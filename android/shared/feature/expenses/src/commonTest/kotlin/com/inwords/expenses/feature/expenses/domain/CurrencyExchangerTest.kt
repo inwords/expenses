@@ -218,9 +218,9 @@ internal class CurrencyExchangerTest {
     @Test
     fun `exchange with very small amounts`() {
         val amount = BigDecimal.fromDouble(0.01)
-
+        
         val result = currencyExchanger.exchange(amount, "USD", "EUR")
-
+        
         // 0.01 USD * 0.85 = 0.0085 EUR
         val expected = amount * BigDecimal.fromDouble(0.85)
         assertEquals(expected, result)
@@ -229,9 +229,9 @@ internal class CurrencyExchangerTest {
     @Test
     fun `exchange with negative amounts`() {
         val amount = BigDecimal.fromDouble(-100.0)
-
+        
         val result = currencyExchanger.exchange(amount, "USD", "EUR")
-
+        
         // -100 USD * 0.85 = -85 EUR
         val expected = amount * BigDecimal.fromDouble(0.85)
         assertEquals(expected, result)
@@ -241,7 +241,7 @@ internal class CurrencyExchangerTest {
     fun `verify all currency pairs work with test rates`() {
         val testCurrencies = listOf("USD", "EUR", "GBP", "JPY", "CAD")
         val testAmount = BigDecimal.fromDouble(100.0)
-
+        
         // Test every currency pair (except same-to-same)
         for (from in testCurrencies) {
             for (to in testCurrencies) {
@@ -261,13 +261,13 @@ internal class CurrencyExchangerTest {
     fun `verify rate calculation matches implementation logic`() {
         // Test that our manual rate calculation matches what the implementation does
         val amount = BigDecimal.fromDouble(100.0)
-
+        
         // For EUR to GBP: implementation does GBP_rate.divide(EUR_rate, 4)
-        // Which is: 0.75.divide(0.85, 4)
+        // Which is: 0.75.divide(0.85, 4) 
         val expectedRate = BigDecimal.fromDouble(0.75).divide(BigDecimal.fromDouble(0.85), 4L)
         val actualResult = currencyExchanger.exchange(amount, "EUR", "GBP")
         val expectedResult = amount * expectedRate
-
+        
         assertEquals(expectedResult, actualResult)
     }
 }

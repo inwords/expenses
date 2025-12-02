@@ -62,6 +62,7 @@ internal class AddExpenseViewModel(
         val equalSplit: Boolean,
         val wholeAmount: AmountModel,
         val split: List<ExpenseSplitWithPersonModel>?,
+        val canSave: Boolean,
     ) {
 
         data class CurrencyInfoModel(
@@ -128,10 +129,12 @@ internal class AddExpenseViewModel(
         eventDetails ?: return@combine SimpleScreenState.Error // can't work without event
         selectedPersonId ?: return@combine SimpleScreenState.Error // it's current person if not selected, can't work without current person
 
+        val selectedPerson = eventDetails.persons.firstOrNull { it.id == selectedPersonId }
+            ?: return@combine SimpleScreenState.Error // selected person must be in event
         val persons = eventDetails.persons.map { person ->
             PersonInfoModel(
                 person = person,
-                selected = person.id == selectedPersonId
+                selected = person == selectedPerson
             )
         }
         val subjectPersons = eventDetails.persons.map { person ->
@@ -145,11 +148,29 @@ internal class AddExpenseViewModel(
             .firstOrNull { it.code == selectedCurrencyCode }
             ?: eventDetails.primaryCurrency
 
+        val split = ensureSplitCalculated(
+            equalSplit = inputEqualSplit,
+            wholeAmount = inputWholeAmount,
+            split = inputSplit ?: if (replenishment == null) {
+                emptyList()
+            } else {
+                listOf(
+                    ExpenseSplitWithPersonModel(
+                        person = subjectPersons.first { it.selected },
+                        amount = AmountModel(
+                            amount = replenishment.amount.toBigDecimalOrNull(),
+                            amountRaw = replenishment.amount
+                        )
+                    )
+                )
+            },
+            subjectPersons = subjectPersons
+        )
+
         val model = AddExpenseScreenModel(
             event = eventDetails.event,
             description = inputDescription ?: run {
-                val currentPerson = persons.first { it.selected }
-                stringProvider.getString(Res.string.expenses_repayment_from, currentPerson.person.name)
+                stringProvider.getString(Res.string.expenses_repayment_from, selectedPerson.name)
             },
             currencies = eventDetails.currencies.map { currency ->
                 AddExpenseScreenModel.CurrencyInfoModel(
@@ -162,23 +183,11 @@ internal class AddExpenseViewModel(
             subjectPersons = subjectPersons,
             equalSplit = inputEqualSplit,
             wholeAmount = inputWholeAmount,
-            split = ensureSplitCalculated(
+            split = split,
+            canSave = calculateCanSave(
                 equalSplit = inputEqualSplit,
                 wholeAmount = inputWholeAmount,
-                split = inputSplit ?: if (replenishment == null) {
-                    emptyList()
-                } else {
-                    listOf(
-                        ExpenseSplitWithPersonModel(
-                            person = subjectPersons.first { it.selected },
-                            amount = AmountModel(
-                                amount = replenishment.amount.toBigDecimalOrNull(),
-                                amountRaw = replenishment.amount
-                            )
-                        )
-                    )
-                },
-                subjectPersons = subjectPersons
+                split = split
             )
         )
         SimpleScreenState.Success(model)
@@ -373,8 +382,21 @@ internal class AddExpenseViewModel(
                     ),
                     amount = expenseSplitWithPersonModel.amount.amountRaw,
                 )
-            }.asImmutableListAdapter()
+            }.asImmutableListAdapter(),
+            canSave = this.canSave,
         )
+    }
+
+    private fun calculateCanSave(
+        equalSplit: Boolean,
+        wholeAmount: AmountModel,
+        split: List<ExpenseSplitWithPersonModel>,
+    ): Boolean {
+        return if (equalSplit) {
+            wholeAmount.amount != null
+        } else {
+            split.isNotEmpty() && split.all { it.amount.amount != null }
+        }
     }
 
 }

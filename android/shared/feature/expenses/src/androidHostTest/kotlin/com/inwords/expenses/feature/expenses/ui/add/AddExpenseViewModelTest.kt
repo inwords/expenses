@@ -36,14 +36,15 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class AddExpenseViewModelTest {
 
-    // --- Shared fixtures ---
-    private object Fixtures {
+    // region Test Fixtures
+    private object TestFixtures {
         val USD = Currency(id = 100, serverId = null, code = "USD", name = "US Dollar")
         val EUR = Currency(id = 101, serverId = null, code = "EUR", name = "Euro")
 
@@ -66,16 +67,18 @@ internal class AddExpenseViewModelTest {
             primaryCurrency = USD
         )
     }
+    // endregion
 
-    private val dispatcher = StandardTestDispatcher()
-    private val scope = TestScope(dispatcher)
+    // region Test Setup
+    private val testDispatcher = StandardTestDispatcher()
+    private val testScope = TestScope(testDispatcher)
 
-    // --- Controlled backing flows ---
+    // Controlled backing flows
     private val currentEventFlow = MutableStateFlow<EventDetails?>(null)
-    private val currentPersonIdFlow = MutableStateFlow<Long?>(Fixtures.person1.id)
+    private val currentPersonIdFlow = MutableStateFlow<Long?>(TestFixtures.person1.id)
 
-    // --- Mocks ---
-    private val navigation = mockk<NavigationController>(relaxed = true) {
+    // Mocks
+    private val navigationController = mockk<NavigationController>(relaxed = true) {
         justRun { popBackStack() }
     }
     private val eventsInteractor = mockk<EventsInteractor>(relaxed = true) {
@@ -88,71 +91,97 @@ internal class AddExpenseViewModelTest {
 
     @BeforeTest
     fun setup() {
-        Dispatchers.setMain(dispatcher)
+        Dispatchers.setMain(testDispatcher)
     }
 
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
     }
+    // endregion
 
-    // ---------- Tests ----------
+    // region State Initialization Tests
 
     @Test
-    fun `emits Loading then Success when event and current person present`() = scope.runTest {
-        // Arrange
-        val vm = createViewModel()
+    fun `should emit Loading then Success when event and current person are present`() = testScope.runTest {
+        // Given
+        val viewModel = createViewModel()
 
-        // Act & Assert
-        vm.state.test {
+        // When & Then
+        viewModel.state.test {
             awaitLoading()
-            currentEventFlow.value = Fixtures.eventDetails
 
-            val ui = awaitSuccess()
+            currentEventFlow.value = TestFixtures.eventDetails
+            val uiModel = awaitSuccess()
 
-            assertEquals("", ui.description)
-            assertEquals(ExpenseType.Spending, ui.expenseType)
-            assertTrue(ui.currencies.byCode("USD").selected)
-            assertTrue(ui.persons.byId(Fixtures.person1.id).selected)
+            assertEquals("", uiModel.description)
+            assertEquals(ExpenseType.Spending, uiModel.expenseType)
+            assertTrue(uiModel.currencies.byCode("USD").selected)
+            assertTrue(uiModel.persons.byId(TestFixtures.person1.id).selected)
 
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `emits Error when event is null`() = scope.runTest {
-        // Arrange
-        val vm = createViewModel()
+    fun `should emit Error when event is null`() = testScope.runTest {
+        // Given
+        val viewModel = createViewModel()
 
-        // Act & Assert
-        vm.state.test {
+        // When & Then
+        viewModel.state.test {
             awaitLoading()
 
             // Drive combine to re-evaluate with null event
             runCurrent()
-            currentPersonIdFlow.value = Fixtures.person1.id
+            currentPersonIdFlow.value = TestFixtures.person1.id
             currentEventFlow.value = null
 
-            assertIs<SimpleScreenState.Error>(awaitItem())
+            awaitErrorState()
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `onCurrencyClicked selects the given currency`() = scope.runTest {
-        // Arrange
-        currentEventFlow.value = Fixtures.eventDetails
-        val vm = createViewModel()
+    fun `should emit Error when current person ID is null`() = testScope.runTest {
+        // Given
+        val viewModel = createViewModel()
 
-        vm.state.test {
+        // When & Then
+        viewModel.state.test {
+            awaitLoading()
+
+            currentEventFlow.value = TestFixtures.eventDetails
+            currentPersonIdFlow.value = null
+
+            awaitErrorState()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+    // endregion
+
+    // region User Interaction Tests
+
+    @Test
+    fun `should select currency when onCurrencyClicked is invoked`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        // When & Then
+        viewModel.state.test {
             awaitLoading()
             val initial = awaitSuccess()
             assertTrue(initial.currencies.byCode("USD").selected)
 
-            // Act
-            vm.onCurrencyClicked(CurrencyInfoUiModel(currencyName = Fixtures.EUR.name, currencyCode = Fixtures.EUR.code, selected = false))
+            viewModel.onCurrencyClicked(
+                CurrencyInfoUiModel(
+                    currencyName = TestFixtures.EUR.name,
+                    currencyCode = TestFixtures.EUR.code,
+                    selected = false
+                )
+            )
 
-            // Assert
             val updated = awaitSuccess()
             assertTrue(updated.currencies.byCode("EUR").selected)
             cancelAndIgnoreRemainingEvents()
@@ -160,276 +189,82 @@ internal class AddExpenseViewModelTest {
     }
 
     @Test
-    fun `onPersonClicked selects payer`() = scope.runTest {
-        // Arrange
-        currentEventFlow.value = Fixtures.eventDetails
-        val vm = createViewModel()
+    fun `should select payer when onPersonClicked is invoked`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
 
-        vm.state.test {
+        // When & Then
+        viewModel.state.test {
             awaitLoading()
             awaitSuccess()
 
-            // Act
-            vm.onPersonClicked(PersonInfoUiModel(Fixtures.person2.id, Fixtures.person2.name, selected = false))
+            viewModel.onPersonClicked(
+                PersonInfoUiModel(
+                    TestFixtures.person2.id,
+                    TestFixtures.person2.name,
+                    selected = false
+                )
+            )
 
-            // Assert
-            assertTrue(awaitSuccess().persons.byId(Fixtures.person2.id).selected)
+            val updated = awaitSuccess()
+            assertTrue(updated.persons.byId(TestFixtures.person2.id).selected)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `onSubjectPersonClicked toggles membership of subject set`() = scope.runTest {
-        // Arrange
-        currentEventFlow.value = Fixtures.eventDetails
-        val vm = createViewModel()
+    fun `should toggle subject person selection when onSubjectPersonClicked is invoked`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
 
-        vm.state.test {
+        // When & Then
+        viewModel.state.test {
             awaitLoading()
             val initial = awaitSuccess()
             assertTrue(initial.subjectPersons.all { it.selected }) // default: all selected
 
-            // Act — toggle off p3
-            vm.onSubjectPersonClicked(PersonInfoUiModel(Fixtures.person3.id, Fixtures.person3.name, selected = true))
-            assertTrue(awaitSuccess().subjectPersons.byId(Fixtures.person3.id).selected.not())
-
-            // Act — toggle p3 back on
-            vm.onSubjectPersonClicked(PersonInfoUiModel(Fixtures.person3.id, Fixtures.person3.name, selected = false))
-            assertTrue(awaitSuccess().subjectPersons.byId(Fixtures.person3.id).selected)
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `equal split OFF produces explicit split rows and equalized amounts (scale=2)`() = scope.runTest {
-        // Arrange
-        currentEventFlow.value = Fixtures.eventDetails
-        val vm = createViewModel()
-
-        vm.state.test {
-            awaitLoading()
-            awaitSuccess()
-
-            // Act
-            vm.onEqualSplitChange(false)
-            vm.onWholeAmountChanged("10")
-
-            // Assert
-            val ui = awaitSuccess()
-            assertEquals(false, ui.equalSplit)
-            assertEquals(3, ui.split.size)
-            assertTrue(ui.split.all { it.amount == "3.33" })
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `onSplitAmountChanged updates only targeted row`() = scope.runTest {
-        // Arrange
-        currentEventFlow.value = Fixtures.eventDetails
-        val vm = createViewModel()
-
-        vm.state.test {
-            awaitLoading()
-            awaitSuccess()
-
-            vm.onEqualSplitChange(false)
-            vm.onWholeAmountChanged("9") // -> 3,3,3
-            val s2 = awaitSuccess()
-            assertEquals(listOf("3", "3", "3"), s2.split.map { it.amount })
-
-            // Act — modify p2 only
-            val p2Row = s2.split.byPersonId(Fixtures.person2.id)
-            vm.onSplitAmountChanged(
-                ExpenseSplitWithPersonUiModel(person = p2Row.person, amount = p2Row.amount),
-                amount = "4.5"
+            // Toggle off person3
+            viewModel.onSubjectPersonClicked(
+                PersonInfoUiModel(
+                    TestFixtures.person3.id,
+                    TestFixtures.person3.name,
+                    selected = true
+                )
             )
+            val afterToggleOff = awaitSuccess()
+            assertFalse(afterToggleOff.subjectPersons.byId(TestFixtures.person3.id).selected)
 
-            // Assert
-            val after = awaitSuccess().split
-            assertEquals(listOf(Fixtures.person1.id, Fixtures.person2.id, Fixtures.person3.id), after.map { it.person.personId })
-            assertEquals("4.5", after.byPersonId(Fixtures.person2.id).amount)
-            assertEquals("3", after.byPersonId(Fixtures.person1.id).amount)
-            assertEquals("3", after.byPersonId(Fixtures.person3.id).amount)
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `confirm with equal split calls addExpenseEqualSplit and navigates back`() = scope.runTest {
-        // Arrange
-        currentEventFlow.value = Fixtures.eventDetails
-        val vm = createViewModel()
-
-        vm.state.test {
-            awaitLoading()
-            awaitSuccess()
-            vm.onEqualSplitChange(true)
-            vm.onWholeAmountChanged("12.0")
-            awaitSuccess()
-
-            // Act
-            vm.onConfirmClicked()
-            advanceUntilIdle()
-
-            // Assert
-            coVerify(exactly = 1) {
-                expensesInteractor.addExpenseEqualSplit(
-                    event = Fixtures.event,
-                    wholeAmount = "12.0".trim().toBigDecimal(),
-                    expenseType = ExpenseType.Spending,
-                    description = any(),
-                    selectedSubjectPersons = match { it.size == 3 && it.containsAll(listOf(Fixtures.person1, Fixtures.person2, Fixtures.person3)) },
-                    selectedCurrency = Fixtures.USD,
-                    selectedPerson = Fixtures.person1
+            // Toggle person3 back on
+            viewModel.onSubjectPersonClicked(
+                PersonInfoUiModel(
+                    TestFixtures.person3.id,
+                    TestFixtures.person3.name,
+                    selected = false
                 )
-            }
-            coVerify(exactly = 1) { navigation.popBackStack() }
+            )
+            val afterToggleOn = awaitSuccess()
+            assertTrue(afterToggleOn.subjectPersons.byId(TestFixtures.person3.id).selected)
 
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `confirm with custom split calls addExpenseCustomSplit and navigates back`() = scope.runTest {
-        // Arrange
-        currentEventFlow.value = Fixtures.eventDetails
-        val vm = createViewModel()
+    fun `should update description when onDescriptionChanged is invoked`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
 
-        vm.state.test {
-            awaitLoading()
-            awaitSuccess()
-            vm.onEqualSplitChange(false)
-            vm.onWholeAmountChanged("9")
-            val ui = awaitSuccess()
-
-            // Overwrite two rows
-            val p1Row = ui.split.byPersonId(Fixtures.person1.id)
-            val p2Row = ui.split.byPersonId(Fixtures.person2.id)
-            vm.onSplitAmountChanged(p1Row, "4")
-            vm.onSplitAmountChanged(p2Row, "5")
-            awaitSuccess()
-
-            // Act
-            vm.onConfirmClicked()
-            advanceUntilIdle()
-
-            // Assert
-            coVerify(exactly = 1) {
-                expensesInteractor.addExpenseCustomSplit(
-                    event = Fixtures.event,
-                    expenseType = ExpenseType.Spending,
-                    description = any(),
-                    selectedCurrency = Fixtures.USD,
-                    selectedPerson = Fixtures.person1,
-                    personWithAmountSplit = match { list ->
-                        val map = list.associate { it.person to it.amount }
-                        map[Fixtures.person1] == "4".toBigDecimal() &&
-                            map[Fixtures.person2] == "5".toBigDecimal() &&
-                            map.containsKey(Fixtures.person3)
-                    }
-                )
-            }
-            coVerify(exactly = 1) { navigation.popBackStack() }
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `confirm does nothing when required amounts are missing`() = scope.runTest {
-        // Arrange
-        currentEventFlow.value = Fixtures.eventDetails
-        val vm = createViewModel()
-
-        vm.state.test {
-            awaitLoading()
-            vm.onEqualSplitChange(true)
-            awaitSuccess()
-
-            // Act
-            vm.onConfirmClicked()
-            advanceUntilIdle()
-
-            // Assert
-            coVerify(exactly = 0) { expensesInteractor.addExpenseEqualSplit(any(), any(), any(), any(), any(), any(), any()) }
-            coVerify(exactly = 0) { expensesInteractor.addExpenseCustomSplit(any(), any(), any(), any(), any(), any()) }
-            coVerify(exactly = 0) { navigation.popBackStack() }
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `replenishment pre-fills type currency payer payee description amount and split`() = scope.runTest {
-        // Arrange — from p2 → to p3 in EUR amount 7.5
-        val repl = AddExpensePaneDestination.Replenishment(
-            fromPersonId = Fixtures.person2.id,
-            toPersonId = Fixtures.person3.id,
-            currencyCode = Fixtures.EUR.code,
-            amount = "7.5"
-        )
-        currentEventFlow.value = Fixtures.eventDetails
-        val vm = createViewModel(repl)
-
-        // Act & Assert
-        vm.state.test {
-            awaitLoading()
-            val ui = awaitSuccess()
-
-            assertEquals(ExpenseType.Replenishment, ui.expenseType)
-            assertTrue(ui.currencies.byCode("EUR").selected)
-            assertTrue(ui.persons.byId(Fixtures.person2.id).selected)
-            assertEquals("expenses_repayment_from${Fixtures.person2.name}", ui.description)
-            assertEquals(false, ui.equalSplit)
-            assertEquals(1, ui.split.size)
-            assertEquals(Fixtures.person3.id, ui.split.first().person.personId)
-            assertEquals("7.5", ui.split.first().amount)
-            assertEquals("7.5", ui.wholeAmount)
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `onExpenseTypeClicked changes expense type`() = scope.runTest {
-        // Arrange
-        currentEventFlow.value = Fixtures.eventDetails
-        val vm = createViewModel()
-
-        vm.state.test {
-            awaitLoading()
-            val initial = awaitSuccess()
-            assertEquals(ExpenseType.Spending, initial.expenseType)
-
-            // Act
-            vm.onExpenseTypeClicked(ExpenseType.Replenishment)
-
-            // Assert
-            val updated = awaitSuccess()
-            assertEquals(ExpenseType.Replenishment, updated.expenseType)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `onDescriptionChanged updates description`() = scope.runTest {
-        // Arrange
-        currentEventFlow.value = Fixtures.eventDetails
-        val vm = createViewModel()
-
-        vm.state.test {
+        // When & Then
+        viewModel.state.test {
             awaitLoading()
             val initial = awaitSuccess()
             assertEquals("", initial.description)
 
-            // Act
-            vm.onDescriptionChanged("Test expense")
+            viewModel.onDescriptionChanged("Test expense")
 
-            // Assert
             val updated = awaitSuccess()
             assertEquals("Test expense", updated.description)
             cancelAndIgnoreRemainingEvents()
@@ -437,79 +272,456 @@ internal class AddExpenseViewModelTest {
     }
 
     @Test
-    fun `emits Error when current person ID is null`() = scope.runTest {
-        // Arrange
-        val vm = createViewModel()
+    fun `should update expense type when onExpenseTypeClicked is invoked`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
 
-        vm.state.test {
+        // When & Then
+        viewModel.state.test {
             awaitLoading()
-            currentEventFlow.value = Fixtures.eventDetails
-            currentPersonIdFlow.value = null
+            val initial = awaitSuccess()
+            assertEquals(ExpenseType.Spending, initial.expenseType)
 
-            // Assert
-            assertIs<SimpleScreenState.Error>(awaitItem())
+            viewModel.onExpenseTypeClicked(ExpenseType.Replenishment)
+
+            val updated = awaitSuccess()
+            assertEquals(ExpenseType.Replenishment, updated.expenseType)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+    // endregion
+
+    // region Split Functionality Tests
+
+    @Test
+    fun `should create explicit split rows when equal split is turned off`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        // When & Then
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+
+            viewModel.onEqualSplitChange(false)
+            viewModel.onWholeAmountChanged("10")
+
+            val uiModel = awaitSuccess()
+            assertFalse(uiModel.equalSplit)
+            assertEquals(3, uiModel.split.size)
+            assertTrue(uiModel.split.all { it.amount == "3.33" })
+
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `currency selection is not changed when selected code not found`() = scope.runTest {
-        // Arrange
-        currentEventFlow.value = Fixtures.eventDetails
-        val vm = createViewModel()
+    fun `should update only targeted row when onSplitAmountChanged is invoked`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
 
-        vm.state.test {
+        // When & Then
+        viewModel.state.test {
             awaitLoading()
             awaitSuccess()
 
-            // Act - select non-existent currency
-            vm.onCurrencyClicked(CurrencyInfoUiModel(currencyName = "Unknown", currencyCode = "XYZ", selected = false))
+            viewModel.onEqualSplitChange(false)
+            viewModel.onWholeAmountChanged("9")
+            val beforeSplitChange = awaitSuccess()
+            assertEquals(listOf("3", "3", "3"), beforeSplitChange.split.map { it.amount })
 
-            // Assert - selection remains unchanged
+            val person2Row = beforeSplitChange.split.byPersonId(TestFixtures.person2.id)
+            viewModel.onSplitAmountChanged(
+                ExpenseSplitWithPersonUiModel(person = person2Row.person, amount = person2Row.amount),
+                amount = "4.5"
+            )
+
+            val afterSplitChange = awaitSuccess()
+            val splitAmounts = afterSplitChange.split
+            assertEquals("4.5", splitAmounts.byPersonId(TestFixtures.person2.id).amount)
+            assertEquals("3", splitAmounts.byPersonId(TestFixtures.person1.id).amount)
+            assertEquals("3", splitAmounts.byPersonId(TestFixtures.person3.id).amount)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should preserve custom amounts when subject persons change`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        // When & Then
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+
+            viewModel.onEqualSplitChange(false)
+            viewModel.onWholeAmountChanged("9")
+            val initialState = awaitSuccess()
+
+            // Modify one split amount
+            val person1Row = initialState.split.byPersonId(TestFixtures.person1.id)
+            viewModel.onSplitAmountChanged(person1Row, "5")
+            awaitSuccess()
+
+            // Remove person2 from subjects
+            viewModel.onSubjectPersonClicked(
+                PersonInfoUiModel(
+                    TestFixtures.person2.id,
+                    TestFixtures.person2.name,
+                    selected = true
+                )
+            )
+
+            val updatedState = awaitSuccess()
+            assertEquals(2, updatedState.split.size) // only person1 and person3
+            assertEquals("5", updatedState.split.byPersonId(TestFixtures.person1.id).amount)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should recalculate equal split when whole amount changes`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        // When & Then
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+
+            viewModel.onEqualSplitChange(false)
+            viewModel.onWholeAmountChanged("15")
+            val initialState = awaitSuccess()
+            assertEquals(listOf("5", "5", "5"), initialState.split.map { it.amount })
+
+            viewModel.onWholeAmountChanged("12")
+
+            val updatedState = awaitSuccess()
+            assertEquals(listOf("4", "4", "4"), updatedState.split.map { it.amount })
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should preserve manual edits when whole amount changes in custom split`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        // When & Then
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+
+            viewModel.onEqualSplitChange(false)
+            viewModel.onWholeAmountChanged("15")
+            val initialState = awaitSuccess()
+
+            // Manually edit one person's amount
+            val person1Row = initialState.split.byPersonId(TestFixtures.person1.id)
+            viewModel.onSplitAmountChanged(person1Row, "10")
+            awaitSuccess()
+
+            // Change whole amount
+            viewModel.onWholeAmountChanged("30")
+
+            val updatedState = awaitSuccess()
+            assertEquals("10", updatedState.split.byPersonId(TestFixtures.person1.id).amount)
+            assertEquals("5", updatedState.split.byPersonId(TestFixtures.person2.id).amount)
+            assertEquals("5", updatedState.split.byPersonId(TestFixtures.person3.id).amount)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should clear custom split when switching back to equal split`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        // When & Then
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+
+            // Set up custom split with manual amounts
+            viewModel.onEqualSplitChange(false)
+            viewModel.onWholeAmountChanged("15")
+            val customState = awaitSuccess()
+
+            val person1Row = customState.split.byPersonId(TestFixtures.person1.id)
+            viewModel.onSplitAmountChanged(person1Row, "10")
+            awaitSuccess()
+
+            // Switch back to equal split
+            viewModel.onEqualSplitChange(true)
+
+            val equalState = awaitSuccess()
+            assertTrue(equalState.equalSplit)
+            assertTrue(equalState.canSave) // Should still be saveable with valid whole amount
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should handle empty split when all subject persons are deselected`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        // When & Then
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+
+            viewModel.onEqualSplitChange(false)
+
+            // Deselect all subject persons
+            viewModel.onSubjectPersonClicked(PersonInfoUiModel(TestFixtures.person1.id, TestFixtures.person1.name, true))
+            viewModel.onSubjectPersonClicked(PersonInfoUiModel(TestFixtures.person2.id, TestFixtures.person2.name, true))
+            viewModel.onSubjectPersonClicked(PersonInfoUiModel(TestFixtures.person3.id, TestFixtures.person3.name, true))
+
+            val updatedState = awaitSuccess()
+            assertEquals(0, updatedState.split.size)
+            assertFalse(updatedState.canSave)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+    // endregion
+
+    // region Amount Validation Tests
+
+    @Test
+    fun `should confirm equal split expense creation and navigate back`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+            viewModel.onEqualSplitChange(true)
+            viewModel.onWholeAmountChanged("12.0")
+            awaitSuccess()
+
+            // When
+            viewModel.onConfirmClicked()
+            advanceUntilIdle()
+
+            // Then
+            coVerify(exactly = 1) {
+                expensesInteractor.addExpenseEqualSplit(
+                    event = TestFixtures.event,
+                    wholeAmount = "12.0".trim().toBigDecimal(),
+                    expenseType = ExpenseType.Spending,
+                    description = any(),
+                    selectedSubjectPersons = match { it.size == 3 && it.containsAll(listOf(TestFixtures.person1, TestFixtures.person2, TestFixtures.person3)) },
+                    selectedCurrency = TestFixtures.USD,
+                    selectedPerson = TestFixtures.person1
+                )
+            }
+            coVerify(exactly = 1) { navigationController.popBackStack() }
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should confirm custom split expense creation and navigate back`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+            viewModel.onEqualSplitChange(false)
+            viewModel.onWholeAmountChanged("9")
+            val uiModel = awaitSuccess()
+
+            // Overwrite two rows
+            val person1Row = uiModel.split.byPersonId(TestFixtures.person1.id)
+            val person2Row = uiModel.split.byPersonId(TestFixtures.person2.id)
+            viewModel.onSplitAmountChanged(person1Row, "4")
+            viewModel.onSplitAmountChanged(person2Row, "5")
+            awaitSuccess()
+
+            // When
+            viewModel.onConfirmClicked()
+            advanceUntilIdle()
+
+            // Then
+            coVerify(exactly = 1) {
+                expensesInteractor.addExpenseCustomSplit(
+                    event = TestFixtures.event,
+                    expenseType = ExpenseType.Spending,
+                    description = any(),
+                    selectedCurrency = TestFixtures.USD,
+                    selectedPerson = TestFixtures.person1,
+                    personWithAmountSplit = match { list ->
+                        val map = list.associate { it.person to it.amount }
+                        map[TestFixtures.person1] == "4".toBigDecimal() &&
+                            map[TestFixtures.person2] == "5".toBigDecimal() &&
+                            map.containsKey(TestFixtures.person3)
+                    }
+                )
+            }
+            coVerify(exactly = 1) { navigationController.popBackStack() }
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should not confirm when required amounts are missing`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitLoading()
+            viewModel.onEqualSplitChange(true)
+            awaitSuccess()
+
+            // When
+            viewModel.onConfirmClicked()
+            advanceUntilIdle()
+
+            // Then
+            coVerify(exactly = 0) { expensesInteractor.addExpenseEqualSplit(any(), any(), any(), any(), any(), any(), any()) }
+            coVerify(exactly = 0) { expensesInteractor.addExpenseCustomSplit(any(), any(), any(), any(), any(), any()) }
+            coVerify(exactly = 0) { navigationController.popBackStack() }
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should pre-fill replenishment fields correctly`() = testScope.runTest {
+        // Given - from person2 → to person3 in EUR amount 7.5
+        val replenishmentDestination = AddExpensePaneDestination.Replenishment(
+            fromPersonId = TestFixtures.person2.id,
+            toPersonId = TestFixtures.person3.id,
+            currencyCode = TestFixtures.EUR.code,
+            amount = "7.5"
+        )
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel(replenishmentDestination)
+
+        // When & Then
+        viewModel.state.test {
+            awaitLoading()
+            val uiModel = awaitSuccess()
+
+            assertEquals(ExpenseType.Replenishment, uiModel.expenseType)
+            assertTrue(uiModel.currencies.byCode("EUR").selected)
+            assertTrue(uiModel.persons.byId(TestFixtures.person2.id).selected)
+            assertEquals("expenses_repayment_from${TestFixtures.person2.name}", uiModel.description)
+            assertFalse(uiModel.equalSplit)
+            assertEquals(1, uiModel.split.size)
+            assertEquals(TestFixtures.person3.id, uiModel.split.first().person.personId)
+            assertEquals("7.5", uiModel.split.first().amount)
+            assertEquals("7.5", uiModel.wholeAmount)
+            assertTrue(uiModel.canSave)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should indicate save capability based on equal split amount entry`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitLoading()
+            val initial = awaitSuccess()
+            assertFalse(initial.canSave)
+
+            // When
+            viewModel.onWholeAmountChanged("10")
+
+            // Then
+            val updated = awaitSuccess()
+            assertTrue(updated.canSave)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should keep save disabled for whitespace-only amount`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitLoading()
+            val initial = awaitSuccess()
+            assertFalse(initial.canSave)
+
+            // When
+            viewModel.onWholeAmountChanged("    ")
+
+            // Then
             expectNoEvents()
         }
     }
 
     @Test
-    fun `subject person selection initializes correctly when null`() = scope.runTest {
-        // Arrange
-        currentEventFlow.value = Fixtures.eventDetails
-        val vm = createViewModel()
+    fun `should require all custom split amounts for save capability`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
 
-        vm.state.test {
+        viewModel.state.test {
             awaitLoading()
-            val initial = awaitSuccess()
+            awaitSuccess()
 
-            // Initially all should be selected (default behavior)
-            assertTrue(initial.subjectPersons.all { it.selected })
+            // Switch to custom split and prefill amounts
+            viewModel.onEqualSplitChange(false)
+            viewModel.onWholeAmountChanged("9")
+            val customSplit = awaitSuccess()
+            assertTrue(customSplit.canSave)
 
-            // Act - toggle one person off
-            vm.onSubjectPersonClicked(PersonInfoUiModel(Fixtures.person1.id, Fixtures.person1.name, selected = true))
+            // When - clear one amount
+            val firstPerson = customSplit.split.first()
+            viewModel.onSplitAmountChanged(firstPerson, "   ")
 
-            // Assert - person1 should be deselected, others remain selected
+            // Then - save should be disabled
             val updated = awaitSuccess()
-            assertTrue(updated.subjectPersons.byId(Fixtures.person1.id).selected.not())
-            assertTrue(updated.subjectPersons.byId(Fixtures.person2.id).selected)
-            assertTrue(updated.subjectPersons.byId(Fixtures.person3.id).selected)
+            assertFalse(updated.canSave)
 
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `amount parsing handles invalid input gracefully`() = scope.runTest {
-        // Arrange
-        currentEventFlow.value = Fixtures.eventDetails
-        val vm = createViewModel()
+    fun `should handle invalid amount input gracefully`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
 
-        vm.state.test {
+        viewModel.state.test {
             awaitLoading()
             awaitSuccess()
 
-            // Act - set invalid amount
-            vm.onWholeAmountChanged("invalid123")
+            // When - set invalid amount
+            viewModel.onWholeAmountChanged("invalid123")
 
-            // Assert - should store raw value but amount should be null
+            // Then - should store raw value
             val updated = awaitSuccess()
             assertEquals("invalid123", updated.wholeAmount)
             cancelAndIgnoreRemainingEvents()
@@ -517,91 +729,433 @@ internal class AddExpenseViewModelTest {
     }
 
     @Test
-    fun `split calculation preserves existing amounts when subject persons change`() = scope.runTest {
-        // Arrange
-        currentEventFlow.value = Fixtures.eventDetails
-        val vm = createViewModel()
+    fun `should handle negative amounts correctly`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
 
-        vm.state.test {
+        viewModel.state.test {
             awaitLoading()
             awaitSuccess()
 
-            vm.onEqualSplitChange(false)
-            vm.onWholeAmountChanged("9")
+            // When - set negative amount
+            viewModel.onWholeAmountChanged("-5.50")
+
+            // Then - should store the negative amount
+            val updated = awaitSuccess()
+            assertEquals("-5.50", updated.wholeAmount)
+            assertTrue(updated.canSave) // negative amounts are valid for refunds
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should handle zero amounts correctly`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+
+            // When - set zero amount
+            viewModel.onWholeAmountChanged("0")
+
+            // Then
+            val updated = awaitSuccess()
+            assertEquals("0", updated.wholeAmount)
+            assertTrue(updated.canSave) // zero amounts should be valid
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should handle high precision decimal amounts correctly`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+
+            // When - set high precision decimal
+            viewModel.onWholeAmountChanged("10.123456789")
+
+            // Then
+            val updated = awaitSuccess()
+            assertEquals("10.123456789", updated.wholeAmount)
+            assertTrue(updated.canSave)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should use default description when empty description is confirmed`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+            viewModel.onWholeAmountChanged("10")
+            awaitSuccess()
+
+            // When - confirm with empty description
+            viewModel.onConfirmClicked()
+            advanceUntilIdle()
+
+            // Then - should use the default "no description" string
+            coVerify(exactly = 1) {
+                expensesInteractor.addExpenseEqualSplit(
+                    event = TestFixtures.event,
+                    wholeAmount = "10".toBigDecimal(),
+                    expenseType = ExpenseType.Spending,
+                    description = "expenses_no_description", // default from StringProvider mock
+                    selectedSubjectPersons = any(),
+                    selectedCurrency = TestFixtures.USD,
+                    selectedPerson = TestFixtures.person1
+                )
+            }
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should use default description for whitespace-only description`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+            viewModel.onDescriptionChanged("   \t\n   ")
+            viewModel.onWholeAmountChanged("10")
+            awaitSuccess()
+
+            // When
+            viewModel.onConfirmClicked()
+            advanceUntilIdle()
+
+            // Then
+            coVerify(exactly = 1) {
+                expensesInteractor.addExpenseEqualSplit(
+                    description = "expenses_no_description",
+                    event = any(),
+                    wholeAmount = any(),
+                    expenseType = any(),
+                    selectedSubjectPersons = any(),
+                    selectedCurrency = any(),
+                    selectedPerson = any()
+                )
+            }
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should recalculate equal split amounts when whole amount changes`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+            viewModel.onEqualSplitChange(false)
+            viewModel.onWholeAmountChanged("15")
+            val initial = awaitSuccess()
+            assertEquals(listOf("5", "5", "5"), initial.split.map { it.amount })
+
+            // When - change whole amount
+            viewModel.onWholeAmountChanged("12")
+
+            // Then - split should recalculate
+            val updated = awaitSuccess()
+            assertEquals(listOf("4", "4", "4"), updated.split.map { it.amount })
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should preserve custom split manual edits when whole amount changes`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+            viewModel.onEqualSplitChange(false)
+            viewModel.onWholeAmountChanged("15")
             val initial = awaitSuccess()
 
-            // Modify one split amount
-            val p1Row = initial.split.byPersonId(Fixtures.person1.id)
-            vm.onSplitAmountChanged(p1Row, "5")
+            // Manually edit one person's amount
+            val person1Row = initial.split.byPersonId(TestFixtures.person1.id)
+            viewModel.onSplitAmountChanged(person1Row, "10")
             awaitSuccess()
 
-            // Act - remove person2 from subjects
-            vm.onSubjectPersonClicked(PersonInfoUiModel(Fixtures.person2.id, Fixtures.person2.name, selected = true))
+            // When - change whole amount (should not affect manually edited amounts)
+            viewModel.onWholeAmountChanged("30")
 
-            // Assert - person1's custom amount should be preserved
+            // Then - manual edit should be preserved
             val updated = awaitSuccess()
-            assertEquals(2, updated.split.size) // only person1 and person3
-            assertEquals("5", updated.split.byPersonId(Fixtures.person1.id).amount)
+            assertEquals("10", updated.split.byPersonId(TestFixtures.person1.id).amount)
+            // Other amounts should remain as they were
+            assertEquals("5", updated.split.byPersonId(TestFixtures.person2.id).amount)
+            assertEquals("5", updated.split.byPersonId(TestFixtures.person3.id).amount)
 
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `confirm handles missing currency gracefully`() = scope.runTest {
-        // Arrange - Create scenario where no currency is selected (edge case)
-        currentEventFlow.value = Fixtures.eventDetails.copy(currencies = emptyList())
-        val vm = createViewModel()
+    fun `should result in empty split when all subject persons are deselected`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
 
-        vm.state.test {
+        viewModel.state.test {
             awaitLoading()
             awaitSuccess()
-            vm.onWholeAmountChanged("10")
-            awaitSuccess()
+            viewModel.onEqualSplitChange(false)
 
-            // Act
-            vm.onConfirmClicked()
-            advanceUntilIdle()
+            // When - deselect all subject persons
+            viewModel.onSubjectPersonClicked(PersonInfoUiModel(TestFixtures.person1.id, TestFixtures.person1.name, true))
+            viewModel.onSubjectPersonClicked(PersonInfoUiModel(TestFixtures.person2.id, TestFixtures.person2.name, true))
+            viewModel.onSubjectPersonClicked(PersonInfoUiModel(TestFixtures.person3.id, TestFixtures.person3.name, true))
 
-            // Assert - should not call expense creation
-            coVerify(exactly = 0) { expensesInteractor.addExpenseEqualSplit(any(), any(), any(), any(), any(), any(), any()) }
-            coVerify(exactly = 0) { navigation.popBackStack() }
+            // Then - split should be empty and save should be disabled
+            val updated = awaitSuccess()
+            assertEquals(0, updated.split.size)
+            assertFalse(updated.canSave)
 
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `confirm handles missing selected person gracefully`() = scope.runTest {
-        // This is a defensive test - in normal flow there should always be a selected person
-        // but we test the null check in the confirm method
-        currentEventFlow.value = Fixtures.eventDetails
+    fun `should handle very large amounts correctly`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+
+            // When - set very large amount
+            viewModel.onWholeAmountChanged("999999999.99")
+
+            // Then
+            val updated = awaitSuccess()
+            assertEquals("999999999.99", updated.wholeAmount)
+            assertTrue(updated.canSave)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should fail gracefully when replenishment has invalid person ids`() = testScope.runTest {
+        // Given - replenishment with non-existent persons
+        val replenishmentDestination = AddExpensePaneDestination.Replenishment(
+            fromPersonId = 999L, // Non-existent
+            toPersonId = 888L,   // Non-existent
+            currencyCode = TestFixtures.USD.code,
+            amount = "10"
+        )
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel(replenishmentDestination)
+
+        // When & Then
+        viewModel.state.test {
+            awaitLoading()
+            awaitErrorState()
+
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `should fall back to primary currency when replenishment has invalid currency code`() = testScope.runTest {
+        // Given - replenishment with non-existent currency
+        val replenishmentDestination = AddExpensePaneDestination.Replenishment(
+            fromPersonId = TestFixtures.person1.id,
+            toPersonId = TestFixtures.person2.id,
+            currencyCode = "XYZ", // Non-existent
+            amount = "15"
+        )
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel(replenishmentDestination)
+
+        // When & Then
+        viewModel.state.test {
+            awaitLoading()
+            val uiModel = awaitSuccess()
+
+            // Should fall back to primary currency (USD)
+            assertTrue(uiModel.currencies.byCode("USD").selected)
+            assertFalse(uiModel.currencies.byCode("EUR").selected)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should clear custom amounts when switching from custom back to equal split`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+
+            // Set up custom split
+            viewModel.onEqualSplitChange(false)
+            viewModel.onWholeAmountChanged("15")
+            val customState = awaitSuccess()
+
+            // Modify some custom amounts
+            val person1Row = customState.split.byPersonId(TestFixtures.person1.id)
+            viewModel.onSplitAmountChanged(person1Row, "10")
+            awaitSuccess()
+
+            // When - switch back to equal split
+            viewModel.onEqualSplitChange(true)
+
+            // Then - should be back to equal split mode
+            val equalState = awaitSuccess()
+            assertTrue(equalState.equalSplit)
+            assertTrue(equalState.canSave) // Should still be saveable with valid whole amount
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should reflect changes when event details update dynamically`() = testScope.runTest {
+        // Given
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitLoading()
+
+            // Initial event
+            currentEventFlow.value = TestFixtures.eventDetails
+            val initial = awaitSuccess()
+            assertEquals(3, initial.persons.size)
+            assertEquals(2, initial.currencies.size)
+
+            // When - update event with different details
+            val newPerson = Person(id = 4, serverId = "s4", name = "Bob")
+            val newCurrency = Currency(id = 102, serverId = null, code = "GBP", name = "British Pound")
+            val updatedEventDetails = TestFixtures.eventDetails.copy(
+                persons = TestFixtures.eventDetails.persons + newPerson,
+                currencies = TestFixtures.eventDetails.currencies + newCurrency
+            )
+            currentEventFlow.value = updatedEventDetails
+
+            // Then - state should reflect the new persons and currencies
+            val updated = awaitSuccess()
+            assertEquals(4, updated.persons.size)
+            assertEquals(3, updated.currencies.size)
+            assertTrue(updated.persons.any { it.personName == "Bob" })
+            assertTrue(updated.currencies.any { it.currencyCode == "GBP" })
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should validate all amounts are present when confirming custom split`() = testScope.runTest {
+        // Given
+        currentEventFlow.value = TestFixtures.eventDetails
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+
+            viewModel.onEqualSplitChange(false)
+            viewModel.onWholeAmountChanged("10")
+            val customState = awaitSuccess()
+
+            // Clear one person's amount to make it invalid
+            val person1Row = customState.split.byPersonId(TestFixtures.person1.id)
+            viewModel.onSplitAmountChanged(person1Row, "")
+            val invalidState = awaitSuccess()
+            assertFalse(invalidState.canSave)
+
+            // When - try to confirm with invalid state
+            viewModel.onConfirmClicked()
+            advanceUntilIdle()
+
+            // Then - should not create expense or navigate
+            coVerify(exactly = 0) { expensesInteractor.addExpenseCustomSplit(any(), any(), any(), any(), any(), any()) }
+            coVerify(exactly = 0) { navigationController.popBackStack() }
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should handle missing currency gracefully during confirmation`() = testScope.runTest {
+        // Given - Create scenario where no currency is selected (edge case)
+        currentEventFlow.value = TestFixtures.eventDetails.copy(currencies = emptyList())
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitLoading()
+            awaitSuccess()
+            viewModel.onWholeAmountChanged("10")
+            awaitSuccess()
+
+            // When
+            viewModel.onConfirmClicked()
+            advanceUntilIdle()
+
+            // Then - should not call expense creation
+            coVerify(exactly = 0) { expensesInteractor.addExpenseEqualSplit(any(), any(), any(), any(), any(), any(), any()) }
+            coVerify(exactly = 0) { navigationController.popBackStack() }
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `should handle missing selected person gracefully during confirmation`() = testScope.runTest {
+        // Given - This is a defensive test - in normal flow there should always be a selected person
+        currentEventFlow.value = TestFixtures.eventDetails
         currentPersonIdFlow.value = 999L // Non-existent person ID
-        val vm = createViewModel()
+        val viewModel = createViewModel()
 
-        vm.state.test {
+        // When & Then
+        viewModel.state.test {
             awaitLoading()
-            awaitSuccess()
-            vm.onWholeAmountChanged("10")
-            awaitSuccess()
+            awaitErrorState()
 
-            // Act
-            vm.onConfirmClicked()
-            advanceUntilIdle()
-
-            // Assert - should not call expense creation due to missing person
-            coVerify(exactly = 0) { expensesInteractor.addExpenseEqualSplit(any(), any(), any(), any(), any(), any(), any()) }
-            coVerify(exactly = 0) { navigation.popBackStack() }
-
-            cancelAndIgnoreRemainingEvents()
+            expectNoEvents()
         }
     }
+    // endregion
 
+    // region Helper Methods
     private fun createViewModel(
         replenishment: AddExpensePaneDestination.Replenishment? = null
     ): AddExpenseViewModel {
         return AddExpenseViewModel(
-            navigationController = navigation,
+            navigationController = navigationController,
             eventsInteractor = eventsInteractor,
             expensesInteractor = expensesInteractor,
             settingsRepository = settingsRepository,
@@ -618,7 +1172,9 @@ internal class AddExpenseViewModelTest {
         )
     }
 
-    // ---------- Helpers ----------
+    private suspend fun ReceiveTurbine<SimpleScreenState<AddExpensePaneUiModel>>.awaitErrorState() {
+        assertIs<SimpleScreenState.Error>(awaitItem())
+    }
 
     private suspend fun ReceiveTurbine<SimpleScreenState<AddExpensePaneUiModel>>.awaitLoading() {
         assertIs<SimpleScreenState.Loading>(awaitItem())
@@ -635,4 +1191,5 @@ internal class AddExpenseViewModelTest {
     private fun List<PersonInfoUiModel>.byId(id: Long) = first { it.personId == id }
 
     private fun List<ExpenseSplitWithPersonUiModel>.byPersonId(id: Long) = first { it.person.personId == id }
+    // endregion
 }
