@@ -78,7 +78,7 @@ export class DeleteEventUseCase
         {allowPendingDeletion: true},
       );
 
-      if (!event || event.pinCode !== pinCode) {
+      if (event.pinCode !== pinCode) {
         throw new HttpException(
           {
             status: HttpStatus.FORBIDDEN,
