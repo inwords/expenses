@@ -14,11 +14,14 @@ interface EventsLocalStore {
     suspend fun getEvent(eventId: Long): Event?
     suspend fun getEventWithDetails(eventId: Long): EventDetails?
 
+    suspend fun getEventByServerId(eventServerId: String): Event?
     suspend fun getEventWithDetailsByServerId(eventServerId: String): EventDetails?
 
     suspend fun getEventPersons(eventId: Long): List<Person>
 
     suspend fun update(eventId: Long, newServerId: String): Boolean
+
+    suspend fun delete(eventId: Long): Boolean
 
     suspend fun deepInsert(
         eventToInsert: Event,

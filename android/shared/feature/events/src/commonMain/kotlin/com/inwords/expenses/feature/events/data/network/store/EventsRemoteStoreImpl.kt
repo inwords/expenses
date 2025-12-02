@@ -17,9 +17,12 @@ import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
+import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore.DeleteEventResult
+import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore.EventNetworkError
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore.GetEventResult
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -33,33 +36,29 @@ internal class EventsRemoteStoreImpl(
 ) : EventsRemoteStore {
 
     override suspend fun getEvent(
-        event: Event,
+        localId: Long,
+        serverId: String,
+        pinCode: String,
         currencies: List<Currency>,
         localPersons: List<Person>?,
     ): GetEventResult {
-        val serverId = event.serverId ?: return GetEventResult.EventNotFound // FIXME: non-fatal error
         val result = client.requestWithExceptionHandling {
             get {
                 url(hostConfig) {
                     pathSegments = listOf("api", "user", "event", serverId)
-                    parameters.append("pinCode", event.pinCode)
+                    parameters.append("pinCode", pinCode)
                 }
             }.body<EventDto>().toEventDetails(
-                localEventId = event.id,
+                localEventId = localId,
                 localPersons = localPersons,
                 currencies = currencies
             )
         }
+
         return when (result) {
             is NetworkResult.Ok -> GetEventResult.Event(result.data)
-
-            is NetworkResult.Error.Http.Client -> when (result.exception.response.status) {
-                HttpStatusCode.NotFound -> GetEventResult.EventNotFound
-                HttpStatusCode.Forbidden -> GetEventResult.InvalidAccessCode
-                else -> GetEventResult.OtherError
-            }
-
-            is NetworkResult.Error -> GetEventResult.OtherError
+            is NetworkResult.Error.Http.Client -> GetEventResult.Error(result.toEventNetworkError())
+            is NetworkResult.Error -> GetEventResult.Error(EventNetworkError.OtherError)
         }
     }
 
@@ -85,7 +84,23 @@ internal class EventsRemoteStoreImpl(
         }.toIoResult()
     }
 
-    // FIXME check pinCode on backend
+    override suspend fun deleteEvent(serverId: String, pinCode: String): DeleteEventResult {
+        val result = client.requestWithExceptionHandling {
+            delete {
+                url(hostConfig) {
+                    pathSegments = listOf("api", "user", "event", serverId)
+                    parameters.append("pinCode", pinCode)
+                }
+            }.body<Unit>()
+        }
+
+        return when (result) {
+            is NetworkResult.Ok -> DeleteEventResult.Deleted
+            is NetworkResult.Error.Http.Client -> DeleteEventResult.Error(result.toEventNetworkError())
+            is NetworkResult.Error -> DeleteEventResult.Error(EventNetworkError.OtherError)
+        }
+    }
+
     override suspend fun addPersonsToEvent(
         eventServerId: String,
         pinCode: String,
@@ -93,7 +108,10 @@ internal class EventsRemoteStoreImpl(
     ): IoResult<List<Person>> {
         return client.requestWithExceptionHandling {
             post {
-                url(hostConfig) { pathSegments = listOf("api", "user", "event", eventServerId, "users") }
+                url(hostConfig) {
+                    pathSegments = listOf("api", "user", "event", eventServerId, "users")
+                    parameters.append("pinCode", pinCode)
+                }
                 contentType(ContentType.Application.Json)
                 setBody(
                     AddUsersDto(users = localPersons.map { it.toCreateUserDto() })
@@ -122,6 +140,15 @@ internal class EventsRemoteStoreImpl(
 
     private fun UserDto.toPerson(localPersonId: Long?): Person {
         return Person(id = localPersonId ?: 0L, serverId = id, name = name)
+    }
+
+    private fun NetworkResult.Error.Http.Client.toEventNetworkError(): EventNetworkError {
+        return when (exception.response.status) {
+            HttpStatusCode.Forbidden -> EventNetworkError.InvalidAccessCode
+            HttpStatusCode.NotFound -> EventNetworkError.NotFound
+            HttpStatusCode.Gone -> EventNetworkError.Gone
+            else -> EventNetworkError.OtherError
+        }
     }
 
 }

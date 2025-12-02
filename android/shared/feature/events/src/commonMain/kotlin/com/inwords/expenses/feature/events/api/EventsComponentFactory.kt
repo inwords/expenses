@@ -23,6 +23,8 @@ expect class EventsComponentFactory {
         val hostConfig: HostConfig
 
         val settingsRepository: SettingsRepository
+
+        val hooks: EventHooks
     }
 
     fun create(): EventsComponent

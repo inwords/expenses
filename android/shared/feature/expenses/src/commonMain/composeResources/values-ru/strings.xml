@@ -29,5 +29,7 @@
     <string name="expenses_split">Разделить</string>
     <string name="expenses_total_amount">Общая сумма</string>
     <string name="expenses_your">Ваше</string>
+    <string name="expenses_delete_event_offline_message">Не удалось связаться с сервером. Удалить только локальную копию или оставить событие до появления интернета?</string>
+    <string name="expenses_delete_local_only">Удалить локальную копию</string>
+    <string name="expenses_event_deleted">Событие %1$s удалено</string>
 </resources>
-

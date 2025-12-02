@@ -1,5 +1,6 @@
 package ru.commonex.screens
 
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import de.mannodermaus.junit5.compose.ComposeContext
@@ -23,6 +24,12 @@ internal class ExpensesScreen : BaseScreen() {
         val operationLabel = getString(Res.string.expenses_operation)
         extension.onNodeWithText(operationLabel).performClick()
         return AddExpenseScreen()
+    }
+
+    context(extension: ComposeContext)
+    fun openMenu(): MenuDialogScreen {
+        extension.onNodeWithTag("expenses_menu_button").performClick()
+        return MenuDialogScreen()
     }
 
     context(extension: ComposeContext)

@@ -20,4 +20,8 @@
     <string name="events_person_name_placeholder">Имя</string>
     <string name="events_section_title">Событие</string>
     <string name="events_your_name_label">Ваше имя</string>
+    <string name="events_delete_event_title">Удалить событие "%1$s"?</string>
+    <string name="events_delete_event_body">Все данные события будут удалены\nОбратите внимание, что с сервера они будут удалены только если присутствует подключение к интернету</string>
+    <string name="events_delete_event">Удалить событие</string>
+    <string name="events_keep_event">Не удалять событие</string>
 </resources>

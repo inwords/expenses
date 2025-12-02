@@ -4,10 +4,11 @@ import com.inwords.expenses.core.storage.utils.TransactionHelper
 import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.feature.events.domain.EventsInteractor.JoinEventResult
 import com.inwords.expenses.feature.events.domain.model.Currency
-import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
+import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore.EventNetworkError
+import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore.GetEventResult
 import com.inwords.expenses.feature.events.domain.task.CurrenciesPullTask
 import kotlinx.coroutines.flow.first
 
@@ -15,6 +16,7 @@ internal class JoinRemoteEventUseCase(
     transactionHelperLazy: Lazy<TransactionHelper>,
     eventsLocalStoreLazy: Lazy<EventsLocalStore>,
     eventsRemoteStoreLazy: Lazy<EventsRemoteStore>,
+    deleteEventUseCase: Lazy<DeleteEventUseCase>,
     currenciesLocalStoreLazy: Lazy<CurrenciesLocalStore>,
     currenciesPullTaskLazy: Lazy<CurrenciesPullTask>,
 ) {
@@ -22,11 +24,13 @@ internal class JoinRemoteEventUseCase(
     private val transactionHelper by transactionHelperLazy
     private val eventsLocalStore by eventsLocalStoreLazy
     private val eventsRemoteStore by eventsRemoteStoreLazy
+    private val deleteEventUseCase by deleteEventUseCase
     private val currenciesLocalStore by currenciesLocalStoreLazy
     private val currenciesPullTask by currenciesPullTaskLazy
 
     suspend fun joinRemoteEvent(
-        event: Event,
+        serverId: String,
+        pinCode: String,
     ): JoinEventResult {
         val currenciesBeforeSync = currenciesLocalStore.getCurrencies().first()
         val currencies = if (currenciesBeforeSync.isEmpty() || currenciesBeforeSync.any { it.serverId == null }) {
@@ -38,12 +42,24 @@ internal class JoinRemoteEventUseCase(
             currenciesBeforeSync
         }
 
-        val remoteEvent = when (val eventResult = eventsRemoteStore.getEvent(event, currencies, localPersons = null)) {
-            is EventsRemoteStore.GetEventResult.Event -> eventResult.event
+        val remoteEvent = when (val eventResult = eventsRemoteStore.getEvent(
+            localId = 0L,
+            serverId = serverId,
+            pinCode = pinCode,
+            currencies = currencies,
+            localPersons = null
+        )) {
+            is GetEventResult.Event -> eventResult.event
+            is GetEventResult.Error -> return when (eventResult.error) {
+                EventNetworkError.InvalidAccessCode -> JoinEventResult.Error.InvalidAccessCode
+                EventNetworkError.NotFound -> JoinEventResult.Error.EventNotFound
+                EventNetworkError.Gone -> {
+                    deleteEventUseCase.deleteLocalEventByServerId(serverId)
+                    JoinEventResult.Error.EventNotFound
+                }
 
-            EventsRemoteStore.GetEventResult.EventNotFound -> return JoinEventResult.Error.EventNotFound
-            EventsRemoteStore.GetEventResult.InvalidAccessCode -> return JoinEventResult.Error.InvalidAccessCode
-            EventsRemoteStore.GetEventResult.OtherError -> return JoinEventResult.Error.OtherError
+                EventNetworkError.OtherError -> JoinEventResult.Error.OtherError
+            }
         }
 
         val eventDetails = transactionHelper.immediateWriteTransaction {

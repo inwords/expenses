@@ -20,4 +20,8 @@
     <string name="events_person_name_placeholder">Name</string>
     <string name="events_section_title">Event</string>
     <string name="events_your_name_label">Your name</string>
+    <string name="events_delete_event_title">Delete event "%1$s"?</string>
+    <string name="events_delete_event_body">All event's data will be removed.\nNote that the event will only be removed from the server if an internet connection is available</string>
+    <string name="events_delete_event">Delete event</string>
+    <string name="events_keep_event">Keep event</string>
 </resources>

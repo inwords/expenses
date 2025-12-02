@@ -8,15 +8,27 @@ import com.inwords.expenses.feature.events.domain.model.Person
 
 internal interface EventsRemoteStore {
 
+    sealed interface EventNetworkError {
+        data object InvalidAccessCode : EventNetworkError
+        data object NotFound : EventNetworkError
+        data object Gone : EventNetworkError
+        data object OtherError : EventNetworkError
+    }
+
     sealed interface GetEventResult {
         data class Event(val event: EventDetails) : GetEventResult
-        data object InvalidAccessCode : GetEventResult
-        data object EventNotFound : GetEventResult
-        data object OtherError : GetEventResult
+        data class Error(val error: EventNetworkError) : GetEventResult
+    }
+
+    sealed interface DeleteEventResult {
+        data object Deleted : DeleteEventResult
+        data class Error(val error: EventNetworkError) : DeleteEventResult
     }
 
     suspend fun getEvent(
-        event: Event,
+        localId: Long,
+        serverId: String,
+        pinCode: String,
         currencies: List<Currency>,
         localPersons: List<Person>?,
     ): GetEventResult
@@ -27,6 +39,8 @@ internal interface EventsRemoteStore {
         primaryCurrencyServerId: String,
         localPersons: List<Person>,
     ): IoResult<EventDetails>
+
+    suspend fun deleteEvent(serverId: String, pinCode: String): DeleteEventResult
 
     suspend fun addPersonsToEvent(
         eventServerId: String,

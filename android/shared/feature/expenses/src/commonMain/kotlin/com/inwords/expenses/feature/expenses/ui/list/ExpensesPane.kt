@@ -1,5 +1,6 @@
 package com.inwords.expenses.feature.expenses.ui.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,8 +25,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,18 +36,28 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -58,6 +71,7 @@ import com.inwords.expenses.core.ui.design.legal.LegalBlock
 import com.inwords.expenses.core.ui.design.loading.DefaultProgressIndicator
 import com.inwords.expenses.core.ui.design.theme.CommonExTheme
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
+import com.inwords.expenses.feature.events.domain.EventsInteractor.EventDeletionState
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.events.ui.common.EventInfoBlock
@@ -71,20 +85,27 @@ import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEv
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents.LocalEventUiModel
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import expenses.shared.core.ui_design.generated.resources.agree_by_continuing
+import expenses.shared.feature.events.generated.resources.events_delete_event
+import expenses.shared.feature.events.generated.resources.events_keep_event
 import expenses.shared.feature.expenses.generated.resources.Res
 import expenses.shared.feature.expenses.generated.resources.common_error
 import expenses.shared.feature.expenses.generated.resources.expenses_app_name
 import expenses.shared.feature.expenses.generated.resources.expenses_create
 import expenses.shared.feature.expenses.generated.resources.expenses_create_join_description
+import expenses.shared.feature.expenses.generated.resources.expenses_delete_event_offline_message
+import expenses.shared.feature.expenses.generated.resources.expenses_delete_local_only
 import expenses.shared.feature.expenses.generated.resources.expenses_event
+import expenses.shared.feature.expenses.generated.resources.expenses_event_deleted
 import expenses.shared.feature.expenses.generated.resources.expenses_join
 import expenses.shared.feature.expenses.generated.resources.expenses_operation
 import expenses.shared.feature.expenses.generated.resources.expenses_operations
 import expenses.shared.feature.expenses.generated.resources.expenses_your
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Clock
 import expenses.shared.core.ui_design.generated.resources.Res as DesignRes
+import expenses.shared.feature.events.generated.resources.Res as EventsRes
 
 
 @Composable
@@ -98,6 +119,9 @@ internal fun ExpensesPane(
     onCreateEventClick: () -> Unit,
     onJoinEventClick: () -> Unit,
     onJoinLocalEventClick: (event: LocalEventUiModel) -> Unit,
+    onDeleteEventClick: (event: LocalEventUiModel) -> Unit,
+    onDeleteOnlyLocalEventClick: (event: LocalEventUiModel) -> Unit,
+    onKeepLocalEventClick: (event: LocalEventUiModel) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -119,6 +143,9 @@ internal fun ExpensesPane(
                     onCreateEventClick = onCreateEventClick,
                     onJoinEventClick = onJoinEventClick,
                     onJoinLocalEventClick = onJoinLocalEventClick,
+                    onDeleteEventClick = onDeleteEventClick,
+                    onDeleteOnlyLocalEventClick = onDeleteOnlyLocalEventClick,
+                    onKeepLocalEventClick = onKeepLocalEventClick,
                     localEvents = state,
                     modifier = modifier
                 )
@@ -169,7 +196,9 @@ private fun ExpensesPaneSuccess(
                         )
 
                         IconButton(
-                            modifier = Modifier.align(Alignment.CenterEnd),
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .testTag("expenses_menu_button"),
                             onClick = onMenuClick,
                         ) {
                             Icon(
@@ -269,12 +298,25 @@ private fun ExpensesPaneLocalEvents(
     onCreateEventClick: () -> Unit,
     onJoinEventClick: () -> Unit,
     onJoinLocalEventClick: (event: LocalEventUiModel) -> Unit,
+    onDeleteEventClick: (event: LocalEventUiModel) -> Unit,
+    onDeleteOnlyLocalEventClick: (event: LocalEventUiModel) -> Unit,
+    onKeepLocalEventClick: (event: LocalEventUiModel) -> Unit,
     localEvents: LocalEvents,
     modifier: Modifier = Modifier,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    localEvents.recentlyRemovedEventName?.let { eventName ->
+        val message = stringResource(Res.string.expenses_event_deleted, eventName)
+        LaunchedEffect(eventName) {
+            snackbarHostState.showSnackbar(message = message)
+        }
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = { TopAppBarWithText() },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         val topAndHorizontalPaddings = PaddingValues(
             top = paddingValues.calculateTopPadding(),
@@ -340,7 +382,10 @@ private fun ExpensesPaneLocalEvents(
                     val event = localEvents.events[index]
                     LocalEventItem(
                         event = event,
-                        onJoinLocalEventClick = onJoinLocalEventClick
+                        onJoinLocalEventClick = onJoinLocalEventClick,
+                        onDeleteEventClick = onDeleteEventClick,
+                        onDeleteOnlyLocalEventClick = onDeleteOnlyLocalEventClick,
+                        onKeepLocalEventClick = onKeepLocalEventClick,
                     )
                 }
             }
@@ -505,24 +550,101 @@ private fun ExpenseItem(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun LocalEventItem(
     event: LocalEventUiModel,
     onJoinLocalEventClick: (event: LocalEventUiModel) -> Unit,
+    onDeleteEventClick: (event: LocalEventUiModel) -> Unit,
+    onDeleteOnlyLocalEventClick: (event: LocalEventUiModel) -> Unit,
+    onKeepLocalEventClick: (event: LocalEventUiModel) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    when (event.deletionState) {
+        EventDeletionState.None, EventDeletionState.Loading -> {
+            val state = rememberSwipeToDismissBoxState()
+            val scope = rememberCoroutineScope()
+            SwipeToDismissBox(
+                modifier = modifier.fillMaxWidth(),
+                state = state,
+                enableDismissFromStartToEnd = false,
+                onDismiss = {
+                    onDeleteEventClick(event)
+                    scope.launch { state.reset() }
+                },
+                backgroundContent = {
+                    LocalEventDismissBackground(
+                        modifier = modifier.fillMaxSize(),
+                    )
+                },
+                content = {
+                    LocalEventCard(
+                        modifier = modifier.fillMaxWidth(),
+                        event = event,
+                        deletionInProgress = event.deletionState == EventDeletionState.Loading,
+                        onJoinLocalEventClick = onJoinLocalEventClick,
+                    )
+                }
+            )
+        }
+
+        EventDeletionState.RemoteDeletionFailed -> LocalEventDeletionResolution(
+            modifier = modifier.fillMaxWidth(),
+            event = event,
+            onRemoveLocalCopy = onDeleteOnlyLocalEventClick,
+            onKeepLocalEvent = onKeepLocalEventClick,
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun LocalEventDismissBackground(
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .clip(CardDefaults.shape)
+            .background(MaterialTheme.colorScheme.error)
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.CenterEnd,
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = stringResource(EventsRes.string.events_delete_event),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onError,
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                modifier = Modifier.size(ButtonDefaults.LargeIconSize),
+                imageVector = Icons.Outlined.Delete,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onError,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun LocalEventCard(
+    event: LocalEventUiModel,
+    onJoinLocalEventClick: (event: LocalEventUiModel) -> Unit,
+    deletionInProgress: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable { onJoinLocalEventClick(event) },
+        modifier = modifier,
+        onClick = { onJoinLocalEventClick(event) },
+        enabled = !deletionInProgress,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
         ),
     ) {
         Row(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -535,15 +657,66 @@ private fun LocalEventItem(
                 style = MaterialTheme.typography.titleLarge,
             )
 
-            Icon(
-                modifier = Modifier.size(ButtonDefaults.LargeIconSize),
-                imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
-            )
+
+            if (deletionInProgress) {
+                LoadingIndicator(
+                    modifier = Modifier.size(ButtonDefaults.LargeIconSize),
+                )
+            } else {
+                Icon(
+                    modifier = Modifier.size(ButtonDefaults.LargeIconSize),
+                    imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                )
+            }
         }
     }
 }
+
+@Composable
+private fun LocalEventDeletionResolution(
+    event: LocalEventUiModel,
+    onRemoveLocalCopy: (event: LocalEventUiModel) -> Unit,
+    onKeepLocalEvent: (event: LocalEventUiModel) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(
+                text = event.eventName,
+                style = MaterialTheme.typography.titleLarge,
+            )
+            Text(
+                text = stringResource(Res.string.expenses_delete_event_offline_message),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
+            ) {
+                TextButton(onClick = { onKeepLocalEvent(event) }) {
+                    Text(text = stringResource(EventsRes.string.events_keep_event))
+                }
+                Button(onClick = { onRemoveLocalCopy(event) }) {
+                    Text(text = stringResource(Res.string.expenses_delete_local_only))
+                }
+            }
+        }
+    }
+}
+
 
 @Preview
 @Composable
@@ -557,6 +730,9 @@ private fun ExpensesPanePreviewSuccessWithCreditors() {
             onReplenishmentClick = {},
             onJoinEventClick = {},
             onJoinLocalEventClick = {},
+            onDeleteEventClick = {},
+            onDeleteOnlyLocalEventClick = {},
+            onKeepLocalEventClick = {},
             onCreateEventClick = {},
             onRefresh = {},
             state = SimpleScreenState.Success(mockExpensesPaneUiModel(withDebts = true))
@@ -576,6 +752,9 @@ private fun ExpensesPanePreviewSuccessWithoutCreditors() {
             onReplenishmentClick = {},
             onJoinEventClick = {},
             onJoinLocalEventClick = {},
+            onDeleteEventClick = {},
+            onDeleteOnlyLocalEventClick = {},
+            onKeepLocalEventClick = {},
             onCreateEventClick = {},
             onRefresh = {},
             state = SimpleScreenState.Success(mockExpensesPaneUiModel(withDebts = false))
@@ -591,17 +770,23 @@ private fun ExpensesPaneLocalEventsPreview() {
             onCreateEventClick = {},
             onJoinEventClick = {},
             onJoinLocalEventClick = {},
+            onDeleteEventClick = {},
+            onDeleteOnlyLocalEventClick = {},
+            onKeepLocalEventClick = {},
             localEvents = LocalEvents(
                 events = persistentListOf(
                     LocalEventUiModel(
                         eventId = 1,
                         eventName = "Local Event 1",
+                        deletionState = EventDeletionState.None,
                     ),
                     LocalEventUiModel(
                         eventId = 2,
                         eventName = "Local Event 2",
+                        deletionState = EventDeletionState.RemoteDeletionFailed,
                     ),
-                )
+                ),
+                recentlyRemovedEventName = null,
             ),
         )
     }
@@ -621,6 +806,9 @@ private fun ExpensesPanePreviewEmpty() {
             onJoinLocalEventClick = {},
             onCreateEventClick = {},
             onRefresh = {},
+            onDeleteEventClick = {},
+            onDeleteOnlyLocalEventClick = {},
+            onKeepLocalEventClick = {},
             state = SimpleScreenState.Empty
         )
     }
@@ -640,6 +828,9 @@ private fun ExpensesPanePreviewLoading() {
             onJoinLocalEventClick = {},
             onCreateEventClick = {},
             onRefresh = {},
+            onDeleteEventClick = {},
+            onDeleteOnlyLocalEventClick = {},
+            onKeepLocalEventClick = {},
             state = SimpleScreenState.Loading
         )
     }

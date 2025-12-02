@@ -12,10 +12,12 @@ import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlin.random.Random
 
 class EventsInteractor internal constructor(
@@ -41,7 +43,16 @@ class EventsInteractor internal constructor(
         }
     }
 
+    sealed interface EventDeletionState {
+        data object None : EventDeletionState
+        data object Loading : EventDeletionState
+        data object RemoteDeletionFailed : EventDeletionState
+    }
+
     private val draft = Draft()
+
+    private val _eventsFailedToDeleteRemotely = MutableStateFlow<Map<Long, EventDeletionState>>(emptyMap())
+    val eventsDeletionState: StateFlow<Map<Long, EventDeletionState>> = _eventsFailedToDeleteRemotely
 
     val currentEvent: StateFlow<EventDetails?> = settingsRepository.getCurrentEventId()
         .flatMapLatestNoBuffer { currentEventId ->
@@ -83,9 +94,7 @@ class EventsInteractor internal constructor(
             return JoinEventResult.NewCurrentEvent(localEvent)
         }
 
-        val joinEventResult = joinRemoteEventUseCase.joinRemoteEvent(
-            event = Event(0L, eventServerId, "", accessCode, 0L),
-        )
+        val joinEventResult = joinRemoteEventUseCase.joinRemoteEvent(serverId = eventServerId, pinCode = accessCode)
 
         when (joinEventResult) {
             is JoinEventResult.NewCurrentEvent -> {
@@ -142,6 +151,14 @@ class EventsInteractor internal constructor(
         draft.clear()
 
         return eventDetails
+    }
+
+    fun setEventDeletionState(eventId: Long, state: EventDeletionState) {
+        _eventsFailedToDeleteRemotely.update { it + (eventId to state) }
+    }
+
+    fun clearEventDeletionState(eventId: Long) {
+        _eventsFailedToDeleteRemotely.update { it - eventId }
     }
 
     private class Draft(
