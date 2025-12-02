@@ -282,6 +282,7 @@ private fun AddExpensePaneSuccess(
             onClick = onConfirmClicked,
             text = stringResource(Res.string.expenses_save),
             imageVector = Icons.Outlined.Check,
+            enabled = state.canSave,
             minHeight = ButtonDefaults.MediumContainerHeight,
         )
     }
@@ -505,6 +506,7 @@ internal fun mockAddExpenseScreenUiModel(): AddExpensePaneUiModel {
                 ),
                 amount = "34"
             ),
-        )
+        ),
+        canSave = true,
     )
 }
