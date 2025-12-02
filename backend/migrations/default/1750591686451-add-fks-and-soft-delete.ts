@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import {MigrationInterface, QueryRunner} from 'typeorm';
 
 export class AddFksAndSoftDelete1750591686451 implements MigrationInterface {
     name = 'AddFksAndSoftDelete1750591686451'
