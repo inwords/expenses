@@ -9,9 +9,13 @@ import com.inwords.expenses.core.utils.asImmutableListAdapter
 import com.inwords.expenses.core.utils.debounceAfterInitial
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
+import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
 import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.EventsInteractor.EventDeletionState
+import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneDestination
 import com.inwords.expenses.feature.events.ui.create.CreateEventPaneDestination
+import com.inwords.expenses.feature.events.ui.dialog.delete.DeleteEventDialogDestination
 import com.inwords.expenses.feature.events.ui.join.JoinEventPaneDestination
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneDestination
@@ -21,7 +25,7 @@ import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListPaneDestinat
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.Expenses.ExpenseUiModel
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents.LocalEventUiModel
-import com.inwords.expenses.feature.expenses.ui.list.dialog.ExpenseItemDialogDestination
+import com.inwords.expenses.feature.expenses.ui.list.dialog.item.ExpenseItemDialogDestination
 import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
 import com.inwords.expenses.feature.menu.ui.MenuDialogDestination
 import com.inwords.expenses.feature.settings.api.SettingsRepository
@@ -33,22 +37,55 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 internal class ExpensesViewModel(
     private val navigationController: NavigationController,
     private val eventsInteractor: EventsInteractor,
+    private val deleteEventUseCase: DeleteEventUseCase,
     private val expensesInteractor: ExpensesInteractor,
     settingsRepository: SettingsRepository,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
     private var refreshJob: Job? = null
     private var joinEventJob: Job? = null
+    private var recentlyRemovedEventJob: Job? = null
 
     private val isRefreshing = MutableStateFlow(false)
+    private val recentlyRemovedEventName = MutableStateFlow<String?>(null)
+
+    private val localEventsState = flow<SimpleScreenState<ExpensesPaneUiModel>> {
+        var previousEvents = emptyList<Event>()
+        combine(
+            eventsInteractor.getEvents(),
+            eventsInteractor.eventsDeletionState,
+            recentlyRemovedEventName,
+        ) { events, eventsDeletionState, recentlyRemovedEventName ->
+            val result = if (events.isEmpty()) {
+                SimpleScreenState.Empty
+            } else {
+                handleEventRemovalDetection(previousEvents, events)
+                SimpleScreenState.Success(
+                    data = LocalEvents(
+                        events = events.map { event ->
+                            LocalEventUiModel(
+                                eventId = event.id,
+                                eventName = event.name,
+                                deletionState = eventsDeletionState[event.id] ?: EventDeletionState.None
+                            )
+                        }.asImmutableListAdapter(),
+                        recentlyRemovedEventName = recentlyRemovedEventName,
+                    )
+                )
+            }
+            previousEvents = events
+            result
+        }.let { emitAll(it) }
+    }
 
     val state: StateFlow<SimpleScreenState<ExpensesPaneUiModel>> = combine(
         eventsInteractor.currentEvent
@@ -67,22 +104,7 @@ internal class ExpensesViewModel(
         val currentPerson = expensesDetails?.event?.persons?.firstOrNull { it.id == currentPersonId }
         if (expensesDetails == null || currentPerson == null) {
             // local events branch
-            return@flatMapLatestNoBuffer eventsInteractor.getEvents().map { events ->
-                if (events.isEmpty()) {
-                    SimpleScreenState.Empty
-                } else {
-                    SimpleScreenState.Success(
-                        data = LocalEvents(
-                            events = events.map { event ->
-                                LocalEventUiModel(
-                                    eventId = event.id,
-                                    eventName = event.name,
-                                )
-                            }.asImmutableListAdapter()
-                        )
-                    )
-                }
-            }
+            return@flatMapLatestNoBuffer localEventsState
         }
 
         val debts = expensesDetails.debtCalculator.getBarterAccumulatedDebtForPerson(currentPerson)
@@ -199,6 +221,48 @@ internal class ExpensesViewModel(
                 )
             } else {
                 // FIXME: non-fatal error, show a message to the user
+            }
+        }
+    }
+
+    fun onDeleteEventClick(event: LocalEventUiModel) {
+        navigationController.navigateTo(
+            DeleteEventDialogDestination(
+                eventId = event.eventId,
+                eventName = event.eventName
+            )
+        )
+    }
+
+    fun onDeleteOnlyLocalEventClick(event: LocalEventUiModel) {
+        viewModelScope.launch {
+            deleteEventUseCase.deleteLocalEvent(event.eventId)
+        }
+    }
+
+    fun onKeepLocalEventClick(event: LocalEventUiModel) {
+        eventsInteractor.clearEventDeletionState(event.eventId)
+    }
+
+    private fun handleEventRemovalDetection(
+        previousEvents: List<Event>,
+        newEvents: List<Event>
+    ) {
+        if (previousEvents.size - 1 == newEvents.size) {
+            for (i in previousEvents.indices) {
+                if (i >= newEvents.size || previousEvents[i].id != newEvents[i].id) {
+                    recentlyRemovedEventName.value = null
+                    recentlyRemovedEventJob?.cancel()
+
+                    val removedEvent = previousEvents[i]
+
+                    recentlyRemovedEventJob = viewModelScope.launch {
+                        recentlyRemovedEventName.value = removedEvent.name
+                        delay(3000)
+                        recentlyRemovedEventName.value = null
+                    }
+                    break
+                }
             }
         }
     }

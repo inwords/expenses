@@ -1,5 +1,6 @@
 package com.inwords.expenses.feature.expenses.ui.list
 
+import com.inwords.expenses.feature.events.domain.EventsInteractor.EventDeletionState
 import com.inwords.expenses.feature.expenses.domain.model.ExpenseType
 import com.inwords.expenses.feature.expenses.ui.common.DebtShortUiModel
 import kotlinx.collections.immutable.ImmutableList
@@ -27,12 +28,14 @@ internal sealed interface ExpensesPaneUiModel {
     }
 
     data class LocalEvents(
-        val events: ImmutableList<LocalEventUiModel>
+        val events: ImmutableList<LocalEventUiModel>,
+        val recentlyRemovedEventName: String?,
     ) : ExpensesPaneUiModel {
 
         data class LocalEventUiModel(
             val eventId: Long,
             val eventName: String,
+            val deletionState: EventDeletionState,
         )
     }
 }
