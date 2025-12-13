@@ -36,6 +36,15 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("keystore.jks")
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
         debug {
             isMinifyEnabled = false
@@ -46,17 +55,21 @@ android {
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = if (System.getenv("CI") == "true") {
-                signingConfigs.create("release") {
-                    storeFile = file("keystore.jks")
-                    storePassword = System.getenv("KEYSTORE_PASSWORD")
-                    keyAlias = System.getenv("KEY_ALIAS")
-                    keyPassword = System.getenv("KEY_PASSWORD")
-                }
+                signingConfigs.getByName("release")
             } else {
                 signingConfigs.getByName("debug")
             }
         }
+        @Suppress("UNUSED")
+        val autotest by creating {
+            initWith(getByName("release"))
+            proguardFile("proguard-rules-autotest.pro")
+            testProguardFile("proguard-test-rules.pro")
+            signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+        }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -66,6 +79,7 @@ android {
         animationsDisabled = true
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
+    testBuildType = "autotest"
 
     buildFeatures {
         compose = true
@@ -107,6 +121,7 @@ dependencies {
     testImplementation(shared.junit.jupiter.api)
     testRuntimeOnly(shared.junit.jupiter.engine)
     androidTestImplementation(shared.junit.jupiter.api)
+    androidTestImplementation(shared.junit.jupiter.params)
     androidTestImplementation(shared.androidx.test.ext.junit)
     androidTestImplementation(shared.androidx.test.runner)
     androidTestImplementation(shared.androidx.test.espresso.core)
@@ -119,6 +134,12 @@ dependencies {
     androidTestImplementation(shared.compose.components.resources.multiplatform)
 
     baselineProfile(project(":baselineprofile"))
+}
+
+androidComponents {
+    beforeVariants(selector().withName("^(benchmarkAutotest|nonMinifiedAutotest)$".toPattern())) { variantBuilder ->
+        variantBuilder.enable = false
+    }
 }
 
 sentry {
@@ -147,4 +168,8 @@ sentry {
 
 baselineProfile {
     dexLayoutOptimization = true
+
+    warnings {
+        disabledVariants = false
+    }
 }

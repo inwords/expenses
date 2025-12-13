@@ -16,7 +16,7 @@ kotlinx-atomicfu = "0.29.0" # https://github.com/Kotlin/kotlinx-atomicfu/release
 compose-bom = "2025.11.01" # https://developer.android.com/jetpack/androidx/releases/compose
 compose-multiplatform = "1.10.0-rc02" # https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
 
-jupiter = "5.14.0" # https://docs.junit.org/current/release-notes/index.html
+jupiter = "5.14.1" # https://docs.junit.org/current/release-notes/index.html
 
 [libraries]
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
@@ -78,6 +78,7 @@ androidx-test-uiautomator = { group = "androidx.test.uiautomator", name = "uiaut
 androidx-test-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version = "1.4.1" }
 androidx-compose-ui-test-android = { group = "androidx.compose.ui", name = "ui-test-android", version = "1.10.0" }
 junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "jupiter" }
+junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "jupiter" }
 junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "jupiter" }
 coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 mockk = { group = "io.mockk", name = "mockk", version = "1.14.7" }
