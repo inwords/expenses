@@ -5,6 +5,7 @@ plugins {
     alias(buildSrc.plugins.kotlin.android)
     alias(buildSrc.plugins.android.test)
     alias(shared.plugins.androidx.baselineprofile)
+    // https://github.com/androidx/androidx/blob/22f430ac409089812ce985bfa303fccff93cd095/benchmark/baseline-profile-gradle-plugin/src/main/kotlin/androidx/baselineprofile/gradle/apptarget/BaselineProfileAppTargetPlugin.kt#L48
 }
 
 kotlin {

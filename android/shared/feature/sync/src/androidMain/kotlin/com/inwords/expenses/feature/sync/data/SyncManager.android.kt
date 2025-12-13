@@ -1,6 +1,7 @@
 package com.inwords.expenses.feature.sync.data
 
 import android.content.Context
+import androidx.concurrent.futures.await
 import androidx.work.WorkManager
 import com.inwords.expenses.core.utils.IO
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -10,8 +11,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
-internal actual class EventsSyncManager(
+actual class EventsSyncManager internal constructor(
     private val context: Context
 ) {
 
@@ -20,7 +22,7 @@ internal actual class EventsSyncManager(
 
     private val mutex = Mutex()
 
-    actual fun pushAllEventInfo(eventId: Long) {
+    internal actual fun pushAllEventInfo(eventId: Long) {
         scope.launch {
             mutex.withLock {
                 val workManager = WorkManager.getInstance(context)
@@ -47,6 +49,15 @@ internal actual class EventsSyncManager(
                         )
                     )
                     .enqueue()
+            }
+        }
+    }
+
+    actual suspend fun cancelEventSync(eventId: Long) {
+        withContext(IO) {
+            mutex.withLock {
+                val workManager = WorkManager.getInstance(context)
+                workManager.cancelAllWorkByTag(getTagForEvent(eventId)).result.await()
             }
         }
     }

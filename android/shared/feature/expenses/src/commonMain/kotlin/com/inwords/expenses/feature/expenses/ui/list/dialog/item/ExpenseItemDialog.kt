@@ -1,4 +1,4 @@
-package com.inwords.expenses.feature.expenses.ui.list.dialog
+package com.inwords.expenses.feature.expenses.ui.list.dialog.item
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row

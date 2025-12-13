@@ -6,7 +6,7 @@ import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.expenses.domain.model.Expense
-import com.inwords.expenses.feature.sync.data.EventsSyncManagerFactory
+import com.inwords.expenses.feature.sync.data.EventsSyncManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.conflate
@@ -18,11 +18,11 @@ import kotlinx.coroutines.flow.merge
 class EventsSyncObserver internal constructor(
     eventsInteractorLazy: Lazy<EventsInteractor>,
     expensesInteractorLazy: Lazy<ExpensesInteractor>,
-    private val eventsSyncManagerFactory: EventsSyncManagerFactory
+    eventsSyncManagerLazy: Lazy<EventsSyncManager>
 ) {
     private val eventsInteractor by eventsInteractorLazy
     private val expensesInteractor by expensesInteractorLazy
-    private val eventsSyncManager by lazy { eventsSyncManagerFactory.create() }
+    private val eventsSyncManager by eventsSyncManagerLazy
 
     /**
      * Should be called only once per process lifecycle
@@ -30,11 +30,11 @@ class EventsSyncObserver internal constructor(
     fun observeNewEventsIn(scope: CoroutineScope) {
         merge(
             eventsInteractor.currentEvent
-                .filterNotNull()
                 .distinctUntilChanged { old, new ->
-                    old.event.id == new.event.id &&
-                        old.persons.personsToIdsSet() == new.persons.personsToIdsSet()
+                    old?.event?.id == new?.event?.id &&
+                        old?.persons?.personsToIdsSet() == new?.persons?.personsToIdsSet()
                 }
+                .filterNotNull()
                 .flatMapLatestNoBuffer { currentEvent ->
                     expensesInteractor.getExpensesFlow(currentEvent.event.id).map { currentEvent to it }
                 }
@@ -47,7 +47,7 @@ class EventsSyncObserver internal constructor(
             .conflate()
             .collectIn(scope) { event ->
                 eventsSyncManager.pushAllEventInfo(event.id)
-                delay(5000) // do not launch sync more often than every 5 seconds
+                delay(3000) // do not launch sync more often than every 3 seconds
             }
     }
 

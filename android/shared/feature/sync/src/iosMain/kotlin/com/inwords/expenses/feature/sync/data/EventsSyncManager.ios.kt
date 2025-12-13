@@ -8,12 +8,16 @@ import com.inwords.expenses.feature.events.api.EventsComponent
 import com.inwords.expenses.feature.expenses.api.ExpensesComponent
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
-internal actual class EventsSyncManager {
+@OptIn(ExperimentalAtomicApi::class)
+actual class EventsSyncManager internal constructor() {
 
     @OptIn(DelicateCoroutinesApi::class)
     private val scope = GlobalScope + IO
@@ -26,7 +30,9 @@ internal actual class EventsSyncManager {
 
     private val mutex = Mutex()
 
-    actual fun pushAllEventInfo(eventId: Long) {
+    private var job = AtomicReference<Job?>(null)
+
+    internal actual fun pushAllEventInfo(eventId: Long) {
         scope.launch {
             mutex.withLock {
                 eventsComponent.currenciesPullTask.value.pullCurrencies() is IoResult.Success &&
@@ -36,7 +42,13 @@ internal actual class EventsSyncManager {
                     (expensesComponent.eventExpensesPushTask.value.pushEventExpenses(eventId) is IoResult.Success ||
                         expensesComponent.eventExpensesPullTask.value.pullEventExpenses(eventId) is IoResult.Success)
             }
+        }.also {
+            job.store(it)
         }
+    }
+
+    actual suspend fun cancelEventSync(eventId: Long) {
+        job.exchange(null)?.cancel()
     }
 
 }

@@ -7,6 +7,7 @@ import com.inwords.expenses.feature.events.data.db.store.EventsLocalStoreImpl
 import com.inwords.expenses.feature.events.data.db.store.PersonsLocalStoreImpl
 import com.inwords.expenses.feature.events.data.network.store.CurrenciesRemoteStoreImpl
 import com.inwords.expenses.feature.events.data.network.store.EventsRemoteStoreImpl
+import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.domain.JoinRemoteEventUseCase
 import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
@@ -88,11 +89,21 @@ class EventsComponent internal constructor(
         )
     }
 
+    val deleteEventUseCase: DeleteEventUseCase by lazy {
+        DeleteEventUseCase(
+            eventsLocalStoreLazy = eventsLocalStore,
+            eventsRemoteStoreLazy = eventsRemoteStore,
+            settingsRepositoryLazy = lazy { deps.settingsRepository },
+            hooksLazy = lazy { deps.hooks },
+        )
+    }
+
     private val joinRemoteEventUseCase: Lazy<JoinRemoteEventUseCase> = lazy {
         JoinRemoteEventUseCase(
             transactionHelperLazy = transactionHelper,
             eventsLocalStoreLazy = eventsLocalStore,
             eventsRemoteStoreLazy = eventsRemoteStore,
+            deleteEventUseCase = lazy { deleteEventUseCase },
             currenciesLocalStoreLazy = currenciesLocalStore,
             currenciesPullTaskLazy = currenciesPullTask,
         )

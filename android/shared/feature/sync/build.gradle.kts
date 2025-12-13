@@ -30,6 +30,7 @@ kotlin {
         androidMain {
             dependencies {
                 implementation(shared.work.runtime.ktx)
+                implementation(shared.concurrent.futures.ktx)
             }
         }
     }

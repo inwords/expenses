@@ -52,6 +52,7 @@ kotlin {
                 implementation(shared.compose.ui.tooling.preview.multiplatform)
                 implementation(shared.compose.components.resources.multiplatform)
 
+                implementation(shared.navigation3.ui.multiplatform)
                 implementation(shared.compose.material.icons.core)
             }
         }

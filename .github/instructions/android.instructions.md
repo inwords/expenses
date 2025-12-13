@@ -8,12 +8,12 @@ applyTo: "android/**"
 This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application that targets both Android and iOS platforms. The project uses **Jetpack Compose** for UI, **Ktor** for networking, **Room** for local database storage, and follows a modular architecture with feature-based organization.
 
 **Key Technologies:**
-- Kotlin 2.2.20 with Compose compiler plugin
+- Kotlin 2.2.21 with Compose compiler plugin
 - Jetpack Compose with Material3 design system
 - Ktor client for networking with Cronet backend (Android) and Darwin backend (iOS)
 - Room database with KSP for code generation
 - Gradle 8.14.3 with Kotlin DSL and version catalogs
-- Android Gradle Plugin 8.13.0
+- Android Gradle Plugin 8.13.1
 - Target: Android API 36, Min API 26
 
 **Project Size:** ~50 modules across shared core libraries, feature modules, and platform-specific implementations.
@@ -60,8 +60,7 @@ This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application 
 .\gradlew.bat testHostTest
 
 # Run instrumented tests (requires device/emulator)
-.\gradlew.bat connectedAndroidTest
-.\gradlew.bat connectedDebugAndroidTest
+.\gradlew.bat :app:connectedAutotestAndroidTest
 
 # Run tests on managed devices (cloud/emulator testing)
 .\gradlew.bat allDevicesCheck
@@ -162,6 +161,8 @@ gradle/                       # Version catalogs and properties
 - **iOS App:** `iosApp/iosApp/iOSApp.swift`
 - **Manifest:** `app/src/main/AndroidManifest.xml` (includes deep linking config)
 - **ProGuard:** `app/proguard-rules.pro` (minimal rules for Cronet and protobuf)
+- **ProGuard:** `app/proguard-rules-autotest.pro` (rules for android tests)
+- **ProGuard:** `app/proguard-test-rules.pro` (rules for android tests)
 
 ### Version Catalog Structure
 - **shared.versions.toml:** Main dependencies (Kotlin, Compose, Room, Ktor, etc.)
@@ -276,8 +277,7 @@ gradle/                       # Version catalogs and properties
 
 Before submitting changes, run these validation steps:
 ```powershell
-# 1. Clean and build (essential after any dependency changes)
-.\gradlew.bat clean
+# 1. Build
 .\gradlew.bat assembleDebug
 
 # 2. Run all unit tests (25 seconds)
@@ -295,10 +295,13 @@ Before submitting changes, run these validation steps:
 # 6. Build release variant (includes R8 optimization)
 .\gradlew.bat assembleRelease
 
-# 7. Optional: Run instrumented tests (requires device/emulator)
-.\gradlew.bat connectedDebugAndroidTest
+# 7. Build autotest variant (includes R8 optimization, but no shrinking and no obfuscation)
+.\gradlew.bat assembleAutotest
 
-# 8. Optional: Run managed device tests (local Gradle Managed Devices testing)
+# 8. Optional: Run instrumented tests (requires device/emulator)
+.\gradlew.bat :app:connectedAutotestAndroidTest
+
+# 9. Optional: Run managed device tests (local Gradle Managed Devices testing)
 .\gradlew.bat pixel6Api34Check
 ```
 
