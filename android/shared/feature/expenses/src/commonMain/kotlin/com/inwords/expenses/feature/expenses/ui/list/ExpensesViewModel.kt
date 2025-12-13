@@ -17,6 +17,8 @@ import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneDest
 import com.inwords.expenses.feature.events.ui.create.CreateEventPaneDestination
 import com.inwords.expenses.feature.events.ui.dialog.delete.DeleteEventDialogDestination
 import com.inwords.expenses.feature.events.ui.join.JoinEventPaneDestination
+import com.inwords.expenses.feature.events.ui.local.LocalEventsUiModel
+import com.inwords.expenses.feature.events.ui.local.LocalEventsUiModel.LocalEventUiModel
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneDestination
 import com.inwords.expenses.feature.expenses.ui.common.DebtShortUiModel
@@ -24,7 +26,6 @@ import com.inwords.expenses.feature.expenses.ui.converter.toUiModel
 import com.inwords.expenses.feature.expenses.ui.debts_list.DebtsListPaneDestination
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.Expenses.ExpenseUiModel
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents
-import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneUiModel.LocalEvents.LocalEventUiModel
 import com.inwords.expenses.feature.expenses.ui.list.dialog.item.ExpenseItemDialogDestination
 import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
 import com.inwords.expenses.feature.menu.ui.MenuDialogDestination
@@ -71,14 +72,16 @@ internal class ExpensesViewModel(
                 handleEventRemovalDetection(previousEvents, events)
                 SimpleScreenState.Success(
                     data = LocalEvents(
-                        events = events.map { event ->
-                            LocalEventUiModel(
-                                eventId = event.id,
-                                eventName = event.name,
-                                deletionState = eventsDeletionState[event.id] ?: EventDeletionState.None
-                            )
-                        }.asImmutableListAdapter(),
-                        recentlyRemovedEventName = recentlyRemovedEventName,
+                        localEvents = LocalEventsUiModel(
+                            events = events.map { event ->
+                                LocalEventUiModel(
+                                    eventId = event.id,
+                                    eventName = event.name,
+                                    deletionState = eventsDeletionState[event.id] ?: EventDeletionState.None
+                                )
+                            }.asImmutableListAdapter(),
+                            recentlyRemovedEventName = recentlyRemovedEventName,
+                        )
                     )
                 )
             }

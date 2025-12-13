@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="common_back">Back</string>
+    <string name="events_event">Event</string>
     <string name="events_access_code_placeholder">Access code</string>
     <string name="events_add_participant">Add participant</string>
     <string name="events_choose_person_title">Choose participant</string>
     <string name="events_continue_button">To event</string>
     <string name="events_create_title">Create event</string>
+    <string name="events_create">Create</string>
+    <string name="events_join">Join</string>
+    <string name="events_create_join_description">You can create a new event or join an existing one</string>
     <string name="events_currency_section_title">Currency</string>
     <string name="events_empty_state">No participants available</string>
     <string name="events_error_state">Failed to load event data</string>
@@ -24,4 +28,8 @@
     <string name="events_delete_event_body">All event's data will be removed.\nNote that the event will only be removed from the server if an internet connection is available</string>
     <string name="events_delete_event">Delete event</string>
     <string name="events_keep_event">Keep event</string>
+    <string name="events_your">Yours</string>
+    <string name="events_delete_event_offline_message">We couldn't reach the server. Remove the local copy or keep the event until you're online.</string>
+    <string name="events_delete_local_only">Remove local copy</string>
+    <string name="events_event_deleted">Event "%1$s" was deleted</string>
 </resources>
