@@ -6,17 +6,15 @@ import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.feature.events.api.EventsComponent
 import com.inwords.expenses.feature.expenses.api.ExpensesComponent
+import kotlinx.atomicfu.locks.ReentrantLock
+import kotlinx.atomicfu.locks.withLock
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlin.concurrent.atomics.AtomicReference
-import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
-@OptIn(ExperimentalAtomicApi::class)
 actual class EventsSyncManager internal constructor() {
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -28,27 +26,42 @@ actual class EventsSyncManager internal constructor() {
     private val expensesComponent: ExpensesComponent
         get() = ComponentsMap.getComponent<ExpensesComponent>()
 
-    private val mutex = Mutex()
+    private val lock = ReentrantLock()
 
-    private var job = AtomicReference<Job?>(null)
+    private val jobs = hashMapOf<Long, Job>()
 
     internal actual fun pushAllEventInfo(eventId: Long) {
         scope.launch {
-            mutex.withLock {
-                eventsComponent.currenciesPullTask.value.pullCurrencies() is IoResult.Success &&
-                    eventsComponent.eventPushTask.value.pushEvent(eventId) is IoResult.Success &&
-                    (eventsComponent.eventPersonsPushTask.value.pushEventPersons(eventId) is IoResult.Success ||
-                        eventsComponent.eventPullPersonsTask.value.pullEventPersons(eventId) is IoResult.Success) &&
-                    (expensesComponent.eventExpensesPushTask.value.pushEventExpenses(eventId) is IoResult.Success ||
-                        expensesComponent.eventExpensesPullTask.value.pullEventExpenses(eventId) is IoResult.Success)
+            lock.withLock {
+                if (jobs[eventId]?.isActive == true) return@launch
+
+                val newJob = launch {
+                    eventsComponent.currenciesPullTask.value.pullCurrencies() is IoResult.Success &&
+                        eventsComponent.eventPushTask.value.pushEvent(eventId) is IoResult.Success &&
+                        (eventsComponent.eventPersonsPushTask.value.pushEventPersons(eventId) is IoResult.Success ||
+                            eventsComponent.eventPullPersonsTask.value.pullEventPersons(eventId) is IoResult.Success) &&
+                        (expensesComponent.eventExpensesPushTask.value.pushEventExpenses(eventId) is IoResult.Success ||
+                            expensesComponent.eventExpensesPullTask.value.pullEventExpenses(eventId) is IoResult.Success)
+                }
+
+                jobs[eventId] = newJob
+
+                // Clean up completed jobs
+                newJob.invokeOnCompletion {
+                    lock.withLock {
+                        if (jobs[eventId] == newJob) {
+                            jobs.remove(eventId)
+                        }
+                    }
+                }
             }
-        }.also {
-            job.store(it)
         }
     }
 
     actual suspend fun cancelEventSync(eventId: Long) {
-        job.exchange(null)?.cancel()
+        lock.withLock {
+            jobs.remove(eventId)
+        }?.cancelAndJoin()
     }
 
 }

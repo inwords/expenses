@@ -65,7 +65,7 @@ android {
             initWith(getByName("release"))
             proguardFile("proguard-rules-autotest.pro")
             testProguardFile("proguard-test-rules.pro")
-            signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("debug")
             matchingFallbacks += listOf("release")
         }
     }
