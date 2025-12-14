@@ -1,4 +1,4 @@
-package com.inwords.expenses.feature.expenses.ui.list.dialog
+package com.inwords.expenses.feature.expenses.ui.list.dialog.item
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,6 +13,7 @@ import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneDestination
 import expenses.shared.feature.expenses.generated.resources.Res
 import expenses.shared.feature.expenses.generated.resources.expenses_revert_description
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
@@ -25,7 +26,7 @@ internal class ExpenseItemDialogViewModel(
     private val stringProvider: StringProvider = DefaultStringProvider,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
-    private var expenseRevertJob: kotlinx.coroutines.Job? = null
+    private var expenseRevertJob: Job? = null
 
     fun onRevertExpenseClick() {
         val event = eventsInteractor.currentEvent.value?.event ?: return

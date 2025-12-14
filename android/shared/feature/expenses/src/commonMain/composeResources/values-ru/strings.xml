@@ -5,16 +5,12 @@
     <string name="expenses_app_name">CommonEx</string>
     <string name="expenses_between">между:</string>
     <string name="expenses_revert_description">[ОТМЕНА] %1$s</string>
-    <string name="expenses_create">Создать</string>
-    <string name="expenses_create_join_description">Вы можете создать новое событие или присоединиться к существующему</string>
     <string name="expenses_currency">Валюта</string>
     <string name="expenses_debts">Долги</string>
     <string name="expenses_description">Описание</string>
     <string name="expenses_details">детали</string>
     <string name="expenses_equally">Поровну</string>
-    <string name="expenses_event">Событие</string>
     <string name="expenses_expense">Трата</string>
-    <string name="expenses_join">Присоединиться</string>
     <string name="expenses_no_description">Без описания</string>
     <string name="expenses_no_expenses">Нет операций</string>
     <string name="expenses_none">Отсутствуют</string>
@@ -28,6 +24,4 @@
     <string name="expenses_save">Сохранить</string>
     <string name="expenses_split">Разделить</string>
     <string name="expenses_total_amount">Общая сумма</string>
-    <string name="expenses_your">Ваше</string>
 </resources>
-

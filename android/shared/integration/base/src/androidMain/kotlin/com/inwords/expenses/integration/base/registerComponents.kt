@@ -7,6 +7,7 @@ import com.inwords.expenses.core.network.HostConfig
 import com.inwords.expenses.core.network.NetworkComponentFactory
 import com.inwords.expenses.core.storage.utils.TransactionHelper
 import com.inwords.expenses.core.utils.SuspendLazy
+import com.inwords.expenses.feature.events.api.EventHooks
 import com.inwords.expenses.feature.events.api.EventsComponentFactory
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
@@ -22,6 +23,7 @@ import com.inwords.expenses.feature.settings.api.SettingsComponentFactory
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import com.inwords.expenses.feature.share.api.ShareComponentFactory
 import com.inwords.expenses.feature.share.api.ShareManager
+import com.inwords.expenses.feature.sync.api.SyncComponent
 import com.inwords.expenses.feature.sync.api.SyncComponentFactory
 import com.inwords.expenses.integration.databases.api.DatabasesComponentFactory
 import io.ktor.client.HttpClient
@@ -52,6 +54,8 @@ fun registerComponents(appContext: Context) {
         }).create()
     }
 
+    var syncComponent: Lazy<SyncComponent>? = null
+
     val eventsComponent = lazy {
         EventsComponentFactory(
             deps = object : EventsComponentFactory.Deps {
@@ -72,6 +76,13 @@ fun registerComponents(appContext: Context) {
 
                 override val settingsRepository: SettingsRepository
                     get() = settingsComponent.value.settingsRepository
+
+                override val hooks: EventHooks
+                    get() = object : EventHooks {
+                        override suspend fun onBeforeEventDeletion(eventId: Long) {
+                            syncComponent!!.value.eventsSyncManager.cancelEventSync(eventId)
+                        }
+                    }
             }
         ).create()
     }
@@ -109,7 +120,7 @@ fun registerComponents(appContext: Context) {
         )
     }
 
-    val syncComponent = lazy {
+    syncComponent = lazy {
         SyncComponentFactory(
             deps = object : SyncComponentFactory.Deps {
                 override val context: Context get() = appContext

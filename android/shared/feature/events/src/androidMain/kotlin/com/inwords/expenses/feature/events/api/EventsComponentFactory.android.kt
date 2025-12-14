@@ -23,6 +23,8 @@ actual class EventsComponentFactory(private val deps: Deps) {
         actual val hostConfig: HostConfig
 
         actual val settingsRepository: SettingsRepository
+
+        actual val hooks: EventHooks
     }
 
     actual fun create(): EventsComponent {

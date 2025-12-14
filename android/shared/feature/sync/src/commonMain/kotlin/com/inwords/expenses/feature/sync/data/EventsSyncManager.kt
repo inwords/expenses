@@ -1,8 +1,10 @@
 package com.inwords.expenses.feature.sync.data
 
-internal expect class EventsSyncManager {
+expect class EventsSyncManager {
 
-    fun pushAllEventInfo(eventId: Long)
+    internal fun pushAllEventInfo(eventId: Long)
+
+    suspend fun cancelEventSync(eventId: Long)
 }
 
 internal expect class EventsSyncManagerFactory {

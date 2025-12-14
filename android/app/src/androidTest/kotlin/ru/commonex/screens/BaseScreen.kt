@@ -18,6 +18,14 @@ internal abstract class BaseScreen {
     }
 
     context(extension: ComposeContext)
+    fun waitForElementWithTextDoesNotExist(
+        text: String,
+        timeout: Long = 5000
+    ) {
+        extension.waitUntilDoesNotExist(hasText(text), timeout)
+    }
+
+    context(extension: ComposeContext)
     fun assertElementWithTextExists(text: String) {
         extension.onNodeWithText(text).assertIsDisplayed()
     }

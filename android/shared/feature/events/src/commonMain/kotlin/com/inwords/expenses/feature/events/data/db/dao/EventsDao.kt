@@ -37,11 +37,14 @@ interface EventsDao {
     @Query("SELECT * FROM ${EventEntity.TABLE_NAME} WHERE ${EventEntity.ColumnNames.ID} = :eventId LIMIT 1")
     suspend fun queryEventWithDetailsById(eventId: Long): EventWithDetailsQuery?
 
-    @Query("SELECT * FROM ${EventEntity.TABLE_NAME} WHERE ${EventEntity.ColumnNames.ID} = :eventId")
+    @Query("SELECT * FROM ${EventEntity.TABLE_NAME} WHERE ${EventEntity.ColumnNames.ID} = :eventId LIMIT 1")
     suspend fun queryEventById(eventId: Long): EventEntity?
 
+    @Query("SELECT * FROM ${EventEntity.TABLE_NAME} WHERE ${EventEntity.ColumnNames.SERVER_ID} = :eventServerId LIMIT 1")
+    suspend fun queryEventByServerId(eventServerId: String): EventEntity?
+
     @Transaction
-    @Query("SELECT * FROM ${EventEntity.TABLE_NAME} WHERE ${EventEntity.ColumnNames.SERVER_ID} = :eventServerId")
+    @Query("SELECT * FROM ${EventEntity.TABLE_NAME} WHERE ${EventEntity.ColumnNames.SERVER_ID} = :eventServerId LIMIT 1")
     suspend fun queryEventWithDetailsByServerId(eventServerId: String): EventWithDetailsQuery?
 
     @Query(
@@ -49,5 +52,9 @@ interface EventsDao {
             "(SELECT ${PersonEntity.ColumnNames.ID} FROM ${EventPersonCrossRef.TABLE_NAME} WHERE ${EventEntity.ColumnNames.ID} = :eventId)"
     )
     suspend fun queryEventPersonsById(eventId: Long): List<PersonEntity>
+
+    @Transaction
+    @Query("DELETE FROM ${EventEntity.TABLE_NAME} WHERE ${EventEntity.ColumnNames.ID} = :eventId")
+    suspend fun delete(eventId: Long): Int
 
 }
