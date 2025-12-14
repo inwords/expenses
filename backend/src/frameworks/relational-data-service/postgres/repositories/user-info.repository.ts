@@ -10,7 +10,7 @@ export class UserInfoRepository extends BaseRepository implements UserInfoReposi
 
   private readonly queryName = 'user_info';
 
-  constructor({dataSource, showQueryDetails}: {dataSource: DataSource; showQueryDetails: boolean}) {
+  constructor({dataSource, showQueryDetails}: { dataSource: DataSource; showQueryDetails: boolean }) {
     super(showQueryDetails);
     this.dataSource = dataSource;
   }
@@ -40,6 +40,20 @@ export class UserInfoRepository extends BaseRepository implements UserInfoReposi
     const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
 
     const query = this.getRepository(ctx).createQueryBuilder().insert().values(input);
+    const queryDetails = this.getQueryDetails(query);
+
+    await query.execute();
+
+    return [undefined, queryDetails];
+  };
+
+  readonly deleteByEventId: UserInfoRepositoryAbstract['deleteByEventId'] = async (
+    eventId: IUserInfo['eventId'],
+    trx,
+  ): Promise<[result: undefined, queryDetails: IQueryDetails]> => {
+    const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
+
+    const query = this.getRepository(ctx).createQueryBuilder().delete().from(UserInfoEntity).where('event_id = :eventId', {eventId});
     const queryDetails = this.getQueryDetails(query);
 
     await query.execute();

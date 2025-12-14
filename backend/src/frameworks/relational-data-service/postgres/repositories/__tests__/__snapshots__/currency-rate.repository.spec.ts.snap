@@ -8,7 +8,16 @@ exports[`CurrencyRateRepository findByDate should find currency rate by date 1`]
     },
     "queryString": "SELECT "currency_rate"."date" AS "currency_rate_date", "currency_rate"."rate" AS "currency_rate_rate", "currency_rate"."created_at" AS "currency_rate_created_at", "currency_rate"."updated_at" AS "currency_rate_updated_at" FROM "currency_rate" "currency_rate" WHERE "currency_rate"."date" = :date",
   },
-  "result": null,
+  "result": CurrencyRateEntity {
+    "createdAt": 2023-01-01T00:00:00.000Z,
+    "date": "2023-01-01",
+    "rate": {
+      "EUR": 1,
+      "RUB": 80.5,
+      "USD": 1.05,
+    },
+    "updatedAt": 2023-01-01T00:00:00.000Z,
+  },
 }
 `;
 

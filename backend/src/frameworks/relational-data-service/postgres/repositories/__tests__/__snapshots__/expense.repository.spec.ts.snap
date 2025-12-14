@@ -1,5 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ExpenseRepository deleteByEventId should delete all expenses for event 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "eventId": "event-1",
+    },
+    "queryString": "DELETE FROM "expense" WHERE "event_id" = :eventId",
+  },
+  "result": undefined,
+}
+`;
+
 exports[`ExpenseRepository findByEventId should find expenses by event id 1`] = `
 {
   "queryDetails": {
@@ -8,7 +20,30 @@ exports[`ExpenseRepository findByEventId should find expenses by event id 1`] = 
     },
     "queryString": "SELECT "expense"."id" AS "expense_id", "expense"."description" AS "expense_description", "expense"."user_who_paid_id" AS "expense_user_who_paid_id", "expense"."currency_id" AS "expense_currency_id", "expense"."event_id" AS "expense_event_id", "expense"."expense_type" AS "expense_expense_type", "expense"."split_information" AS "expense_split_information", "expense"."created_at" AS "expense_created_at", "expense"."updated_at" AS "expense_updated_at" FROM "expense" "expense" WHERE "expense"."event_id" = :eventId",
   },
-  "result": [],
+  "result": [
+    ExpenseEntity {
+      "createdAt": 2023-01-01T00:00:00.000Z,
+      "currencyId": "currency-1",
+      "description": "Dinner",
+      "eventId": "event-1",
+      "expenseType": "expense",
+      "id": "expense-1",
+      "splitInformation": [
+        {
+          "amount": 50,
+          "exchangedAmount": 50,
+          "userId": "user-1",
+        },
+        {
+          "amount": 50,
+          "exchangedAmount": 50,
+          "userId": "user-2",
+        },
+      ],
+      "updatedAt": 2023-01-01T00:00:00.000Z,
+      "userWhoPaidId": "user-1",
+    },
+  ],
 }
 `;
 

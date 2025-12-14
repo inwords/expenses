@@ -10,7 +10,7 @@ export class EventRepository extends BaseRepository implements EventRepositoryAb
 
   private readonly queryName = 'event';
 
-  constructor({dataSource, showQueryDetails}: {dataSource: DataSource; showQueryDetails: boolean}) {
+  constructor({dataSource, showQueryDetails}: { dataSource: DataSource; showQueryDetails: boolean }) {
     super(showQueryDetails);
     this.dataSource = dataSource;
   }
@@ -23,9 +23,41 @@ export class EventRepository extends BaseRepository implements EventRepositoryAb
 
     let query = this.getRepository(ctx).createQueryBuilder(this.queryName);
 
-    query = query.where(`${this.queryName}.id = :id`, {
-      id,
-    });
+    query = query
+      .where(`${this.queryName}.id = :id`, {id})
+      .andWhere(`${this.queryName}.deleted_at IS NULL`);
+
+    if (trx?.lock) {
+      query = query.setLock(trx.lock);
+
+      if (trx.onLocked) {
+        query = query.setOnLocked(trx.onLocked);
+      }
+    }
+
+    const queryDetails = this.getQueryDetails(query);
+    const result = await query.getOne();
+
+    return [result, queryDetails];
+  };
+
+  readonly findByIdIncludingDeleted: EventRepositoryAbstract['findByIdIncludingDeleted'] = async (
+    id: IEvent['id'],
+    trx,
+  ): Promise<[result: IEvent | null, queryDetails: IQueryDetails]> => {
+    const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
+
+    let query = this.getRepository(ctx).createQueryBuilder(this.queryName);
+
+    query = query.where(`${this.queryName}.id = :id`, {id});
+
+    if (trx?.lock) {
+      query = query.setLock(trx.lock);
+
+      if (trx.onLocked) {
+        query = query.setOnLocked(trx.onLocked);
+      }
+    }
 
     const queryDetails = this.getQueryDetails(query);
     const result = await query.getOne();
@@ -40,6 +72,25 @@ export class EventRepository extends BaseRepository implements EventRepositoryAb
     const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
 
     const query = this.getRepository(ctx).createQueryBuilder().insert().values(input);
+    const queryDetails = this.getQueryDetails(query);
+
+    await query.execute();
+
+    return [undefined, queryDetails];
+  };
+
+  readonly softDeleteById: EventRepositoryAbstract['softDeleteById'] = async (
+    id: IEvent['id'],
+    deletedAt: Date,
+    trx,
+  ): Promise<[result: undefined, queryDetails: IQueryDetails]> => {
+    const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
+
+    const query = this.getRepository(ctx)
+      .createQueryBuilder()
+      .update(EventEntity)
+      .set({deletedAt})
+      .where('id = :id', {id});
     const queryDetails = this.getQueryDetails(query);
 
     await query.execute();

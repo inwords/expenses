@@ -97,4 +97,82 @@ describe('ExpenseRepository', () => {
       expect({result, queryDetails}).toMatchSnapshot();
     });
   });
+
+  describe('deleteByEventId', () => {
+    it('should delete all expenses for event', async () => {
+      // Вставляем несколько расходов для одного события
+      const expense1 = {
+        id: 'expense-1',
+        description: 'Dinner',
+        userWhoPaidId: 'user-1',
+        currencyId: 'currency-1',
+        eventId: 'event-1',
+        expenseType: ExpenseType.Expense,
+        splitInformation: [{userId: 'user-1', amount: 50, exchangedAmount: 50}],
+        createdAt: new Date('2023-01-01T00:00:00Z'),
+        updatedAt: new Date('2023-01-01T00:00:00Z'),
+      };
+
+      const expense2 = {
+        id: 'expense-2',
+        description: 'Lunch',
+        userWhoPaidId: 'user-2',
+        currencyId: 'currency-1',
+        eventId: 'event-1',
+        expenseType: ExpenseType.Expense,
+        splitInformation: [{userId: 'user-2', amount: 30, exchangedAmount: 30}],
+        createdAt: new Date('2023-01-01T00:00:00Z'),
+        updatedAt: new Date('2023-01-01T00:00:00Z'),
+      };
+
+      await relationalDataService.expense.insert(expense1);
+      await relationalDataService.expense.insert(expense2);
+
+      // Удаляем все расходы для события
+      const [result, queryDetails] = await relationalDataService.expense.deleteByEventId('event-1');
+
+      expect({result, queryDetails}).toMatchSnapshot();
+
+      // Проверяем, что расходы удалены
+      const [expenses] = await relationalDataService.expense.findByEventId('event-1');
+      expect(expenses).toHaveLength(0);
+    });
+
+    it('should not affect expenses from other events', async () => {
+      // Вставляем расходы для двух разных событий
+      const expense1 = {
+        id: 'expense-1',
+        description: 'Dinner',
+        userWhoPaidId: 'user-1',
+        currencyId: 'currency-1',
+        eventId: 'event-1',
+        expenseType: ExpenseType.Expense,
+        splitInformation: [{userId: 'user-1', amount: 50, exchangedAmount: 50}],
+        createdAt: new Date('2023-01-01T00:00:00Z'),
+        updatedAt: new Date('2023-01-01T00:00:00Z'),
+      };
+
+      const expense2 = {
+        id: 'expense-2',
+        description: 'Lunch',
+        userWhoPaidId: 'user-2',
+        currencyId: 'currency-1',
+        eventId: 'event-2',
+        expenseType: ExpenseType.Expense,
+        splitInformation: [{userId: 'user-2', amount: 30, exchangedAmount: 30}],
+        createdAt: new Date('2023-01-01T00:00:00Z'),
+        updatedAt: new Date('2023-01-01T00:00:00Z'),
+      };
+
+      await relationalDataService.expense.insert(expense1);
+      await relationalDataService.expense.insert(expense2);
+
+      // Удаляем расходы только для event-1
+      await relationalDataService.expense.deleteByEventId('event-1');
+
+      // Проверяем, что расходы event-2 остались
+      const [expenses] = await relationalDataService.expense.findByEventId('event-2');
+      expect(expenses).toHaveLength(1);
+    });
+  });
 });

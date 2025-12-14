@@ -67,5 +67,98 @@ describe('EventRepository', () => {
       // Объединяем результат и детали запроса для snapshot теста
       expect({result, queryDetails}).toMatchSnapshot();
     });
+
+    it('should not return soft-deleted event', async () => {
+      // Вставляем событие
+      const event = {
+        id: 'event-1',
+        name: 'Test Event',
+        currencyId: 'currency-1',
+        pinCode: '1234',
+        createdAt: new Date('2023-01-01T00:00:00Z'),
+        updatedAt: new Date('2023-01-01T00:00:00Z'),
+      };
+
+      await relationalDataService.event.insert(event);
+
+      // Мягко удаляем событие
+      await relationalDataService.event.softDeleteById('event-1', new Date('2023-06-01T00:00:00Z'));
+
+      // findById не должен вернуть удаленное событие
+      const [result, queryDetails] = await relationalDataService.event.findById('event-1');
+
+      expect({result, queryDetails}).toMatchSnapshot();
+    });
+  });
+
+  describe('findByIdIncludingDeleted', () => {
+    it('should find event by id including deleted', async () => {
+      // Вставляем событие
+      const event = {
+        id: 'event-1',
+        name: 'Test Event',
+        currencyId: 'currency-1',
+        pinCode: '1234',
+        createdAt: new Date('2023-01-01T00:00:00Z'),
+        updatedAt: new Date('2023-01-01T00:00:00Z'),
+      };
+
+      await relationalDataService.event.insert(event);
+
+      // Ищем события (не удаленное)
+      const [result, queryDetails] = await relationalDataService.event.findByIdIncludingDeleted('event-1');
+
+      expect({result, queryDetails}).toMatchSnapshot();
+    });
+
+    it('should find soft-deleted event', async () => {
+      // Вставляем событие
+      const event = {
+        id: 'event-1',
+        name: 'Test Event',
+        currencyId: 'currency-1',
+        pinCode: '1234',
+        createdAt: new Date('2023-01-01T00:00:00Z'),
+        updatedAt: new Date('2023-01-01T00:00:00Z'),
+      };
+
+      await relationalDataService.event.insert(event);
+
+      // Мягко удаляем событие
+      await relationalDataService.event.softDeleteById('event-1', new Date('2023-06-01T00:00:00Z'));
+
+      // findByIdIncludingDeleted должен вернуть удаленное событие
+      const [result, queryDetails] = await relationalDataService.event.findByIdIncludingDeleted('event-1');
+
+      expect({result, queryDetails}).toMatchSnapshot();
+    });
+
+    it('should return null for non-existent event', async () => {
+      const [result, queryDetails] = await relationalDataService.event.findByIdIncludingDeleted('non-existent');
+
+      expect({result, queryDetails}).toMatchSnapshot();
+    });
+  });
+
+  describe('softDeleteById', () => {
+    it('should soft delete event by setting deletedAt', async () => {
+      // Вставляем событие
+      const event = {
+        id: 'event-1',
+        name: 'Test Event',
+        currencyId: 'currency-1',
+        pinCode: '1234',
+        createdAt: new Date('2023-01-01T00:00:00Z'),
+        updatedAt: new Date('2023-01-01T00:00:00Z'),
+      };
+
+      await relationalDataService.event.insert(event);
+
+      // Мягко удаляем событие
+      const deletedAt = new Date('2023-06-01T00:00:00Z');
+      const [result, queryDetails] = await relationalDataService.event.softDeleteById('event-1', deletedAt);
+
+      expect({result, queryDetails}).toMatchSnapshot();
+    });
   });
 });

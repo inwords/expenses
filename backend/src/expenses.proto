@@ -13,6 +13,7 @@ service UserService {
   rpc AddUsersToEvent (AddUsersToEventRequest) returns (AddUsersToEventResponse);
   rpc GetAllEventExpenses (EventIdRequest) returns (ExpensesResponse);
   rpc CreateExpense (CreateExpenseRequest) returns (ExpenseResponse);
+  rpc DeleteEvent (DeleteEventRequest) returns (google.protobuf.Empty);
 }
 
 // Define the messages
@@ -47,8 +48,8 @@ message User {
 
 message UserResponse {
   string name = 1;
-   string id = 2;
-   int32 eventId = 3;
+  string id = 2;
+  int32 eventId = 3;
 }
 
 message EventResponse {
@@ -102,8 +103,8 @@ message SplitInfo {
 }
 
 enum ExpenseType {
- expense = 0;
- refund = 1;
+  expense = 0;
+  refund = 1;
 }
 
 message ExpensesResponse {
@@ -128,4 +129,9 @@ message ExpenseResponse {
   ExpenseType expenseType = 5;
   repeated SplitInfo splitInformation = 6;
   string createdAt = 7;
+}
+
+message DeleteEventRequest {
+  string eventId = 1;
+  string pinCode = 2;
 }

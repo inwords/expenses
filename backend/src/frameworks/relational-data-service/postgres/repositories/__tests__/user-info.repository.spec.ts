@@ -99,4 +99,66 @@ describe('UserInfoRepository', () => {
       expect({result, queryDetails}).toMatchSnapshot();
     });
   });
+
+  describe('deleteByEventId', () => {
+    it('should delete all user infos for event', async () => {
+      // Вставляем пользователей для события
+      const userInfos = [
+        {
+          id: 'user-info-1',
+          name: 'John Doe',
+          eventId: 'event-1',
+          createdAt: new Date('2023-01-01T00:00:00Z'),
+          updatedAt: new Date('2023-01-01T00:00:00Z'),
+        },
+        {
+          id: 'user-info-2',
+          name: 'Jane Smith',
+          eventId: 'event-1',
+          createdAt: new Date('2023-01-01T00:00:00Z'),
+          updatedAt: new Date('2023-01-01T00:00:00Z'),
+        },
+      ];
+
+      await relationalDataService.userInfo.insert(userInfos);
+
+      // Удаляем всех пользователей для события
+      const [result, queryDetails] = await relationalDataService.userInfo.deleteByEventId('event-1');
+
+      expect({result, queryDetails}).toMatchSnapshot();
+
+      // Проверяем, что пользователи удалены
+      const [users] = await relationalDataService.userInfo.findByEventId('event-1');
+      expect(users).toHaveLength(0);
+    });
+
+    it('should not affect user infos from other events', async () => {
+      // Вставляем пользователей для двух разных событий
+      const userInfo1 = {
+        id: 'user-info-1',
+        name: 'John Doe',
+        eventId: 'event-1',
+        createdAt: new Date('2023-01-01T00:00:00Z'),
+        updatedAt: new Date('2023-01-01T00:00:00Z'),
+      };
+
+      const userInfo2 = {
+        id: 'user-info-2',
+        name: 'Jane Smith',
+        eventId: 'event-2',
+        createdAt: new Date('2023-01-01T00:00:00Z'),
+        updatedAt: new Date('2023-01-01T00:00:00Z'),
+      };
+
+      await relationalDataService.userInfo.insert(userInfo1);
+      await relationalDataService.userInfo.insert(userInfo2);
+
+      // Удаляем пользователей только для event-1
+      await relationalDataService.userInfo.deleteByEventId('event-1');
+
+      // Проверяем, что пользователи event-2 остались
+      const [users] = await relationalDataService.userInfo.findByEventId('event-2');
+      expect(users).toHaveLength(1);
+    });
+  });
 });

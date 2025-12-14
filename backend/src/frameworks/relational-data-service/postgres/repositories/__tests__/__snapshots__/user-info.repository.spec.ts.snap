@@ -1,5 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`UserInfoRepository deleteByEventId should delete all user infos for event 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "eventId": "event-1",
+    },
+    "queryString": "DELETE FROM "user_info" WHERE "event_id" = :eventId",
+  },
+  "result": undefined,
+}
+`;
+
 exports[`UserInfoRepository findByEventId should find user infos by event id 1`] = `
 {
   "queryDetails": {
@@ -8,7 +20,22 @@ exports[`UserInfoRepository findByEventId should find user infos by event id 1`]
     },
     "queryString": "SELECT "user_info"."id" AS "user_info_id", "user_info"."name" AS "user_info_name", "user_info"."event_id" AS "user_info_event_id", "user_info"."created_at" AS "user_info_created_at", "user_info"."updated_at" AS "user_info_updated_at" FROM "user_info" "user_info" WHERE "user_info"."event_id" = :eventId",
   },
-  "result": [],
+  "result": [
+    UserInfoEntity {
+      "createdAt": 2023-01-01T00:00:00.000Z,
+      "eventId": "event-1",
+      "id": "user-info-1",
+      "name": "John Doe",
+      "updatedAt": 2023-01-01T00:00:00.000Z,
+    },
+    UserInfoEntity {
+      "createdAt": 2023-01-01T00:00:00.000Z,
+      "eventId": "event-1",
+      "id": "user-info-2",
+      "name": "Jane Smith",
+      "updatedAt": 2023-01-01T00:00:00.000Z,
+    },
+  ],
 }
 `;
 

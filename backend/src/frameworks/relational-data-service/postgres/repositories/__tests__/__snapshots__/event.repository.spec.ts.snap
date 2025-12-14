@@ -6,7 +6,27 @@ exports[`EventRepository findById should find event by id 1`] = `
     "queryParameters": {
       "id": "event-1",
     },
-    "queryString": "SELECT "event"."id" AS "event_id", "event"."name" AS "event_name", "event"."currency_id" AS "event_currency_id", "event"."pin_code" AS "event_pin_code", "event"."created_at" AS "event_created_at", "event"."updated_at" AS "event_updated_at" FROM "event" "event" WHERE "event"."id" = :id",
+    "queryString": "SELECT "event"."id" AS "event_id", "event"."name" AS "event_name", "event"."currency_id" AS "event_currency_id", "event"."pin_code" AS "event_pin_code", "event"."created_at" AS "event_created_at", "event"."updated_at" AS "event_updated_at", "event"."deleted_at" AS "event_deleted_at" FROM "event" "event" WHERE "event"."id" = :id AND "event"."deleted_at" IS NULL",
+  },
+  "result": EventEntity {
+    "createdAt": 2023-01-01T00:00:00.000Z,
+    "currencyId": "currency-1",
+    "deletedAt": null,
+    "id": "event-1",
+    "name": "Test Event",
+    "pinCode": "1234",
+    "updatedAt": 2023-01-01T00:00:00.000Z,
+  },
+}
+`;
+
+exports[`EventRepository findById should not return soft-deleted event 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "id": "event-1",
+    },
+    "queryString": "SELECT "event"."id" AS "event_id", "event"."name" AS "event_name", "event"."currency_id" AS "event_currency_id", "event"."pin_code" AS "event_pin_code", "event"."created_at" AS "event_created_at", "event"."updated_at" AS "event_updated_at", "event"."deleted_at" AS "event_deleted_at" FROM "event" "event" WHERE "event"."id" = :id AND "event"."deleted_at" IS NULL",
   },
   "result": null,
 }
@@ -18,7 +38,59 @@ exports[`EventRepository findById should return null for non-existent event 1`] 
     "queryParameters": {
       "id": "non-existent",
     },
-    "queryString": "SELECT "event"."id" AS "event_id", "event"."name" AS "event_name", "event"."currency_id" AS "event_currency_id", "event"."pin_code" AS "event_pin_code", "event"."created_at" AS "event_created_at", "event"."updated_at" AS "event_updated_at" FROM "event" "event" WHERE "event"."id" = :id",
+    "queryString": "SELECT "event"."id" AS "event_id", "event"."name" AS "event_name", "event"."currency_id" AS "event_currency_id", "event"."pin_code" AS "event_pin_code", "event"."created_at" AS "event_created_at", "event"."updated_at" AS "event_updated_at", "event"."deleted_at" AS "event_deleted_at" FROM "event" "event" WHERE "event"."id" = :id AND "event"."deleted_at" IS NULL",
+  },
+  "result": null,
+}
+`;
+
+exports[`EventRepository findByIdIncludingDeleted should find event by id including deleted 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "id": "event-1",
+    },
+    "queryString": "SELECT "event"."id" AS "event_id", "event"."name" AS "event_name", "event"."currency_id" AS "event_currency_id", "event"."pin_code" AS "event_pin_code", "event"."created_at" AS "event_created_at", "event"."updated_at" AS "event_updated_at", "event"."deleted_at" AS "event_deleted_at" FROM "event" "event" WHERE "event"."id" = :id",
+  },
+  "result": EventEntity {
+    "createdAt": 2023-01-01T00:00:00.000Z,
+    "currencyId": "currency-1",
+    "deletedAt": null,
+    "id": "event-1",
+    "name": "Test Event",
+    "pinCode": "1234",
+    "updatedAt": 2023-01-01T00:00:00.000Z,
+  },
+}
+`;
+
+exports[`EventRepository findByIdIncludingDeleted should find soft-deleted event 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "id": "event-1",
+    },
+    "queryString": "SELECT "event"."id" AS "event_id", "event"."name" AS "event_name", "event"."currency_id" AS "event_currency_id", "event"."pin_code" AS "event_pin_code", "event"."created_at" AS "event_created_at", "event"."updated_at" AS "event_updated_at", "event"."deleted_at" AS "event_deleted_at" FROM "event" "event" WHERE "event"."id" = :id",
+  },
+  "result": EventEntity {
+    "createdAt": 2023-01-01T00:00:00.000Z,
+    "currencyId": "currency-1",
+    "deletedAt": 2023-06-01T00:00:00.000Z,
+    "id": "event-1",
+    "name": "Test Event",
+    "pinCode": "1234",
+    "updatedAt": 2023-01-01T00:00:00.000Z,
+  },
+}
+`;
+
+exports[`EventRepository findByIdIncludingDeleted should return null for non-existent event 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "id": "non-existent",
+    },
+    "queryString": "SELECT "event"."id" AS "event_id", "event"."name" AS "event_name", "event"."currency_id" AS "event_currency_id", "event"."pin_code" AS "event_pin_code", "event"."created_at" AS "event_created_at", "event"."updated_at" AS "event_updated_at", "event"."deleted_at" AS "event_deleted_at" FROM "event" "event" WHERE "event"."id" = :id",
   },
   "result": null,
 }
@@ -35,7 +107,20 @@ exports[`EventRepository insert should insert event correctly 1`] = `
       "orm_param_4": 2023-01-01T00:00:00.000Z,
       "orm_param_5": 2023-01-01T00:00:00.000Z,
     },
-    "queryString": "INSERT INTO "event" AS "EventEntity"("id", "name", "currency_id", "pin_code", "created_at", "updated_at") VALUES (:orm_param_0, :orm_param_1, :orm_param_2, :orm_param_3, :orm_param_4, :orm_param_5)",
+    "queryString": "INSERT INTO "event" AS "EventEntity"("id", "name", "currency_id", "pin_code", "created_at", "updated_at", "deleted_at") VALUES (:orm_param_0, :orm_param_1, :orm_param_2, :orm_param_3, :orm_param_4, :orm_param_5, DEFAULT)",
+  },
+  "result": undefined,
+}
+`;
+
+exports[`EventRepository softDeleteById should soft delete event by setting deletedAt 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "id": "event-1",
+      "orm_param_0": 2023-06-01T00:00:00.000Z,
+    },
+    "queryString": "UPDATE "event" SET "deleted_at" = :orm_param_0 WHERE "id" = :id",
   },
   "result": undefined,
 }

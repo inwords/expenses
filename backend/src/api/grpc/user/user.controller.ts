@@ -5,12 +5,14 @@ import {EventIdDto} from '#api/http/user/dto/event-id.dto';
 import {GetEventInfoQueryDto} from '#api/http/user/dto/get-event-info.dto';
 import {AddUsersToEventDto} from '#api/http/user/dto/add-users-to-event.dto';
 import {CreatedExpenseDto} from '#api/http/user/dto/create-expense.dto';
+import {DeleteEventDto} from '#api/http/user/dto/delete-event.dto';
 import {GetEventExpensesUseCase} from '#usecases/users/get-event-expenses.usecase';
 import {SaveEventExpenseUseCase} from '#usecases/users/save-event-expense.usecase';
 import {GetAllCurrenciesUseCase} from '#usecases/users/get-all-currencies.usecase';
 import {SaveEventUseCase} from '#usecases/users/save-event.usecase';
 import {GetEventInfoUseCase} from '#usecases/users/get-event-info.usecase';
 import {SaveUsersToEventUseCase} from '#usecases/users/save-users-to-event.usecase';
+import {DeleteEventUseCase} from '#usecases/users/delete-event.usecase';
 
 @Controller()
 export class UserController {
@@ -21,6 +23,7 @@ export class UserController {
     private readonly saveEventUseCase: SaveEventUseCase,
     private readonly getEventInfoUseCase: GetEventInfoUseCase,
     private readonly saveUsersToEventUseCase: SaveUsersToEventUseCase,
+    private readonly deleteEventUseCase: DeleteEventUseCase,
   ) {}
 
   @GrpcMethod('UserService', 'GetAllCurrencies')
@@ -49,13 +52,18 @@ export class UserController {
 
   @GrpcMethod('UserService', 'GetAllEventExpenses')
   async getAllEventExpenses(@Body() {eventId}: EventIdDto) {
-    const resp = {expenses: await this.getEventExpensesUseCase.execute({eventId})};
-
-    return resp;
+    return {expenses: await this.getEventExpensesUseCase.execute({eventId})};
   }
 
   @GrpcMethod('UserService', 'CreateExpense')
   async createExpense(@Body() expense: CreatedExpenseDto & EventIdDto) {
     return this.saveEventExpenseUseCase.execute(expense);
+  }
+
+  @GrpcMethod('UserService', 'DeleteEvent')
+  async deleteEvent(@Body() {eventId, pinCode}: DeleteEventDto & EventIdDto) {
+    await this.deleteEventUseCase.execute({eventId, pinCode});
+
+    return {};
   }
 }

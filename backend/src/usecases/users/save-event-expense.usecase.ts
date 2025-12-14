@@ -8,6 +8,7 @@ import {IExpense, ISplitInfo} from '#domain/entities/expense.entity';
 import {CurrencyRateServiceAbstract} from '#domain/abstracts/currency-rate-service/currency-rate-service';
 import {ExpenseValueObject} from '#domain/value-objects/expense.value-object';
 import {CurrencyRateValueObject} from '#domain/value-objects/currency-rate.value-object';
+import {ensureEventAvailable} from './utils/event-availability';
 
 type Input = Omit<IExpense, 'createdAt' | 'id' | 'updatedAt'> & Partial<Pick<IExpense, 'createdAt'>>;
 type Output = IExpense;
@@ -20,19 +21,13 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
   ) {}
 
   public async execute(input: Input) {
-    const [event] = await this.rDataService.event.findById(input.eventId);
-
-    if (!event) {
-      throw new HttpException(
-        {
-          status: HttpStatus.NOT_FOUND,
-          error: `Event with id ${input.eventId} not found`,
-        },
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
     return this.rDataService.transaction(async (ctx) => {
+      const event = await ensureEventAvailable(this.rDataService, input.eventId, undefined, {
+        ctx,
+        lock: 'pessimistic_write',
+        onLocked: 'nowait',
+      });
+
       if (event.currencyId === input.currencyId) {
         let splitInformation: ISplitInfo[] = [];
 

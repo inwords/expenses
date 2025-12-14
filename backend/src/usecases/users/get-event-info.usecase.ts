@@ -4,21 +4,20 @@ import {IEvent} from '#domain/entities/event.entity';
 import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-service/relational-data-service';
 import {IUserInfo} from '#domain/entities/user-info.entity';
 import {Injectable} from '@nestjs/common';
+import {ensureEventAvailable} from './utils/event-availability';
 
-type Input = {eventId: string; pinCode: string};
-type Output = IEvent & {users: Array<IUserInfo>};
+type Input = { eventId: string; pinCode: string };
+type Output = IEvent & { users: Array<IUserInfo> };
 
 @Injectable()
 export class GetEventInfoUseCase implements UseCase<Input, Output> {
   constructor(private readonly rDataService: RelationalDataServiceAbstract) {}
 
   public async execute({eventId, pinCode}: Input) {
-    const [event] = await this.rDataService.event.findById(eventId);
+    const event = await ensureEventAvailable(this.rDataService, eventId, pinCode);
 
-    if (pinCode === event.pinCode) {
-      const [users] = await this.rDataService.userInfo.findByEventId(eventId);
+    const [users] = await this.rDataService.userInfo.findByEventId(eventId);
 
-      return {...event, users};
-    }
+    return {...event, users};
   }
 }

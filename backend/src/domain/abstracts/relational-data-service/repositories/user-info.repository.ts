@@ -10,4 +10,9 @@ export abstract class UserInfoRepositoryAbstract {
     userInfo: IUserInfo | IUserInfo[],
     trx?: ITransaction,
   ) => Promise<[result: undefined, queryDetails: IQueryDetails]>;
+
+  abstract deleteByEventId: (
+    eventId: IUserInfo['eventId'],
+    trx?: ITransaction,
+  ) => Promise<[result: undefined, queryDetails: IQueryDetails]>;
 }

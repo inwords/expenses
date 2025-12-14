@@ -74,6 +74,19 @@ CommonEx is a multi-platform expense sharing application built with:
    - Migrations for schema changes
    - PostgreSQL naming convention: snake_case for tables/columns
 
+5. **Deletion Patterns**:
+   - **Soft Delete for Events**: Events use soft delete via `deletedAt` column to distinguish HTTP 404 (never existed) from HTTP 410 (was deleted)
+   - **Hard Delete for Related Data**: Expenses and user info are hard-deleted for legal/privacy compliance
+   - Use `ensureEventAvailable()` utility for consistent event availability checks with proper HTTP status codes:
+     - `404 NOT FOUND`: Event never existed
+     - `403 FORBIDDEN`: Invalid pin code
+     - `410 GONE`: Event was deleted (only after pin code validation)
+     - `409 CONFLICT`: Event is currently being modified (pessimistic lock)
+
+6. **Concurrency Control**:
+   - Use pessimistic locking with `NOWAIT` for operations that modify shared state
+   - Handle PostgreSQL error code `55P03` (lock not available) gracefully
+
 ### Web Frontend
 1. **Folder Structure**:
    - Strict adherence to feature-sliced design methodology
@@ -123,6 +136,7 @@ CommonEx is a multi-platform expense sharing application built with:
    - Unit tests for use cases and domain logic
    - Integration tests for API endpoints
    - E2E tests for critical flows
+   - Repository snapshot tests (require running database)
 
 ### Web Development
 1. **Component Creation**:
@@ -158,10 +172,16 @@ CommonEx is a multi-platform expense sharing application built with:
 ### Backend
 - **Unit Tests**: Jest for use cases and domain logic
 - **Integration Tests**: Supertest for API endpoints
+- **Repository Snapshot Tests**: Located in `frameworks/relational-data-service/postgres/repositories/__tests__/`
+  - Test SQL queries and results against snapshots
+  - Require running PostgreSQL database (use `docker-compose -f infra/docker-compose-prod.yml up -d db`)
+  - Must run with `--runInBand` flag to prevent database interference between parallel tests
+  - Update snapshots with `--updateSnapshot` flag after schema changes
 - **Test Commands**:
   - `npm run test` - run all tests
   - `npm run test:watch` - watch mode
   - `npm run test:e2e` - end-to-end tests
+  - `npm test -- --testPathPattern="repository.spec" --runInBand` - run repository tests sequentially
 
 ### Web
 - **Unit Tests**: Jest for utility functions and services
@@ -215,6 +235,27 @@ CommonEx is a multi-platform expense sharing application built with:
 3. Review generated migration file
 4. Apply migration: `npm run db:migrate`
 5. Update frontend models if needed
+
+### Event Deletion Flow
+The event deletion implements a hybrid approach for legal compliance and client UX:
+
+1. **Backend Use Case** (`delete-event.usecase.ts`):
+   - Validates event availability and pin code via `ensureEventAvailable()`
+   - Uses pessimistic locking to prevent concurrent modifications
+   - Hard deletes expenses and user info (privacy/legal compliance)
+   - Soft deletes event by setting `deletedAt` timestamp
+
+2. **HTTP Response Behavior**:
+   - Clients without valid pin code receive `404` for deleted events (no information leakage)
+   - Clients with valid pin code receive `410 GONE` for deleted events
+   - This allows mobile/web apps to show appropriate "event was deleted" UI
+
+3. **Repository Methods**:
+   - `event.findById()` - excludes soft-deleted events (`deleted_at IS NULL`)
+   - `event.findByIdIncludingDeleted()` - includes soft-deleted events
+   - `event.softDeleteById()` - sets `deletedAt` timestamp
+   - `expense.deleteByEventId()` - hard deletes all expenses
+   - `userInfo.deleteByEventId()` - hard deletes all user info
 
 ## Troubleshooting
 

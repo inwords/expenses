@@ -10,7 +10,7 @@ export class ExpenseRepository extends BaseRepository implements ExpenseReposito
 
   private readonly queryName = 'expense';
 
-  constructor({dataSource, showQueryDetails}: {dataSource: DataSource; showQueryDetails: boolean}) {
+  constructor({dataSource, showQueryDetails}: { dataSource: DataSource; showQueryDetails: boolean }) {
     super(showQueryDetails);
     this.dataSource = dataSource;
   }
@@ -40,6 +40,20 @@ export class ExpenseRepository extends BaseRepository implements ExpenseReposito
     const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
 
     const query = this.getRepository(ctx).createQueryBuilder().insert().values(input);
+    const queryDetails = this.getQueryDetails(query);
+
+    await query.execute();
+
+    return [undefined, queryDetails];
+  };
+
+  readonly deleteByEventId: ExpenseRepositoryAbstract['deleteByEventId'] = async (
+    eventId: IExpense['eventId'],
+    trx,
+  ): Promise<[result: undefined, queryDetails: IQueryDetails]> => {
+    const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
+
+    const query = this.getRepository(ctx).createQueryBuilder().delete().from(ExpenseEntity).where('event_id = :eventId', {eventId});
     const queryDetails = this.getQueryDetails(query);
 
     await query.execute();
