@@ -18,7 +18,7 @@ export class ExpenseRepository extends BaseRepository implements ExpenseReposito
   readonly findByEventId: ExpenseRepositoryAbstract['findByEventId'] = async (
     eventId: IExpense['eventId'],
     trx,
-  ): Promise<[result: IExpense[], queryDetails: IQueryDetails]> => {
+  ): Promise<[result: IExpense[] | null, queryDetails: IQueryDetails]> => {
     const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
 
     let query = this.getRepository(ctx).createQueryBuilder(this.queryName);

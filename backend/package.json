@@ -95,6 +95,13 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "#api/(.*)": "<rootDir>/api/$1",
+      "#domain/(.*)": "<rootDir>/domain/$1",
+      "#usecases/(.*)": "<rootDir>/usecases/$1",
+      "#frameworks/(.*)": "<rootDir>/frameworks/$1",
+      "#packages/(.*)": "<rootDir>/packages/$1"
+    }
   }
 }

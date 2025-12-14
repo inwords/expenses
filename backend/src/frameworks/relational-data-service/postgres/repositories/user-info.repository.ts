@@ -1,24 +1,24 @@
 import {BaseRepository} from '#frameworks/relational-data-service/postgres/repositories/base.repository';
-import {UserRepositoryAbstract} from '#domain/abstracts/relational-data-service/repositories/user.repository';
+import {UserInfoRepositoryAbstract} from '#domain/abstracts/relational-data-service/repositories/user-info.repository';
 import {DataSource, EntityManager, Repository} from 'typeorm';
 import {IQueryDetails} from '#domain/abstracts/relational-data-service/types';
-import {IUser} from '#domain/entities/user.enitity';
-import {UserEntity} from '#frameworks/relational-data-service/postgres/entities/user.entity';
+import {IUserInfo} from '#domain/entities/user-info.entity';
+import {UserInfoEntity} from '#frameworks/relational-data-service/postgres/entities/user-info.entity';
 
-export class UserRepository extends BaseRepository implements UserRepositoryAbstract {
+export class UserInfoRepository extends BaseRepository implements UserInfoRepositoryAbstract {
   readonly dataSource: DataSource;
 
-  private readonly queryName = 'user';
+  private readonly queryName = 'user_info';
 
   constructor({dataSource, showQueryDetails}: {dataSource: DataSource; showQueryDetails: boolean}) {
     super(showQueryDetails);
     this.dataSource = dataSource;
   }
 
-  readonly findByEventId: UserRepositoryAbstract['findByEventId'] = async (
-    eventId: IUser['eventId'],
+  readonly findByEventId: UserInfoRepositoryAbstract['findByEventId'] = async (
+    eventId: IUserInfo['eventId'],
     trx,
-  ): Promise<[result: IUser[], queryDetails: IQueryDetails]> => {
+  ): Promise<[result: IUserInfo[], queryDetails: IQueryDetails]> => {
     const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
 
     let query = this.getRepository(ctx).createQueryBuilder(this.queryName);
@@ -33,8 +33,8 @@ export class UserRepository extends BaseRepository implements UserRepositoryAbst
     return [result, queryDetails];
   };
 
-  readonly insert: UserRepositoryAbstract['insert'] = async (
-    input: IUser | IUser[],
+  readonly insert: UserInfoRepositoryAbstract['insert'] = async (
+    input: IUserInfo | IUserInfo[],
     trx,
   ): Promise<[result: undefined, queryDetails: IQueryDetails]> => {
     const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
@@ -47,7 +47,7 @@ export class UserRepository extends BaseRepository implements UserRepositoryAbst
     return [undefined, queryDetails];
   };
 
-  private readonly getRepository = (manager?: EntityManager): Repository<UserEntity> => {
-    return manager != null ? manager.getRepository(UserEntity) : this.dataSource.getRepository(UserEntity);
+  private readonly getRepository = (manager?: EntityManager): Repository<UserInfoEntity> => {
+    return manager != null ? manager.getRepository(UserInfoEntity) : this.dataSource.getRepository(UserInfoEntity);
   };
 }

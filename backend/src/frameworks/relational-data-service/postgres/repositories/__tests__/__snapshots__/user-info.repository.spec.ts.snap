@@ -1,0 +1,62 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UserInfoRepository findByEventId should find user infos by event id 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "eventId": "event-1",
+    },
+    "queryString": "SELECT "user_info"."id" AS "user_info_id", "user_info"."name" AS "user_info_name", "user_info"."event_id" AS "user_info_event_id", "user_info"."created_at" AS "user_info_created_at", "user_info"."updated_at" AS "user_info_updated_at" FROM "user_info" "user_info" WHERE "user_info"."event_id" = :eventId",
+  },
+  "result": [],
+}
+`;
+
+exports[`UserInfoRepository findByEventId should return empty array for non-existent event 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "eventId": "non-existent",
+    },
+    "queryString": "SELECT "user_info"."id" AS "user_info_id", "user_info"."name" AS "user_info_name", "user_info"."event_id" AS "user_info_event_id", "user_info"."created_at" AS "user_info_created_at", "user_info"."updated_at" AS "user_info_updated_at" FROM "user_info" "user_info" WHERE "user_info"."event_id" = :eventId",
+  },
+  "result": [],
+}
+`;
+
+exports[`UserInfoRepository insert should insert multiple user infos correctly 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "orm_param_0": "user-info-1",
+      "orm_param_1": "John Doe",
+      "orm_param_2": "event-1",
+      "orm_param_3": 2023-01-01T00:00:00.000Z,
+      "orm_param_4": 2023-01-01T00:00:00.000Z,
+      "orm_param_5": "user-info-2",
+      "orm_param_6": "Jane Smith",
+      "orm_param_7": "event-1",
+      "orm_param_8": 2023-01-01T00:00:00.000Z,
+      "orm_param_9": 2023-01-01T00:00:00.000Z,
+    },
+    "queryString": "INSERT INTO "user_info" AS "UserInfoEntity"("id", "name", "event_id", "created_at", "updated_at") VALUES (:orm_param_0, :orm_param_1, :orm_param_2, :orm_param_3, :orm_param_4), (:orm_param_5, :orm_param_6, :orm_param_7, :orm_param_8, :orm_param_9)",
+  },
+  "result": undefined,
+}
+`;
+
+exports[`UserInfoRepository insert should insert single user info correctly 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "orm_param_0": "user-info-1",
+      "orm_param_1": "John Doe",
+      "orm_param_2": "event-1",
+      "orm_param_3": 2023-01-01T00:00:00.000Z,
+      "orm_param_4": 2023-01-01T00:00:00.000Z,
+    },
+    "queryString": "INSERT INTO "user_info" AS "UserInfoEntity"("id", "name", "event_id", "created_at", "updated_at") VALUES (:orm_param_0, :orm_param_1, :orm_param_2, :orm_param_3, :orm_param_4)",
+  },
+  "result": undefined,
+}
+`;

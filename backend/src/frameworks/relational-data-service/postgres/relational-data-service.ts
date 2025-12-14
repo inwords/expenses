@@ -2,7 +2,7 @@ import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-s
 import {DataSource} from 'typeorm';
 import {createTypeormConfigDefault} from './config';
 import {EventRepository} from '#frameworks/relational-data-service/postgres/repositories/event.repository';
-import {UserRepository} from '#frameworks/relational-data-service/postgres/repositories/user.repository';
+import {UserInfoRepository} from '#frameworks/relational-data-service/postgres/repositories/user-info.repository';
 import {CurrencyRepository} from '#frameworks/relational-data-service/postgres/repositories/currency.repository';
 import {ExpenseRepository} from '#frameworks/relational-data-service/postgres/repositories/expense.repository';
 import {CurrencyRateRepository} from '#frameworks/relational-data-service/postgres/repositories/currency-rate.repository';
@@ -14,7 +14,7 @@ export class RelationalDataService implements RelationalDataServiceAbstract {
   readonly transaction;
 
   readonly event: EventRepository;
-  readonly user: UserRepository;
+  readonly userInfo: UserInfoRepository;
   readonly currency: CurrencyRepository;
   readonly expense: ExpenseRepository;
   readonly currencyRate: CurrencyRateRepository;
@@ -26,7 +26,7 @@ export class RelationalDataService implements RelationalDataServiceAbstract {
     this.showQueryDetails = showQueryDetails;
 
     this.event = new EventRepository({dataSource: this.dataSource, showQueryDetails});
-    this.user = new UserRepository({dataSource: this.dataSource, showQueryDetails});
+    this.userInfo = new UserInfoRepository({dataSource: this.dataSource, showQueryDetails});
     this.currency = new CurrencyRepository({dataSource: this.dataSource, showQueryDetails});
     this.expense = new ExpenseRepository({dataSource: this.dataSource, showQueryDetails});
     this.currencyRate = new CurrencyRateRepository({dataSource: this.dataSource, showQueryDetails});

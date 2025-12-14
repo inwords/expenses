@@ -1,0 +1,87 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CurrencyRepository findAll should find all currencies with limit 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {},
+    "queryString": "SELECT "currency"."id" AS "currency_id", "currency"."code" AS "currency_code", "currency"."created_at" AS "currency_created_at", "currency"."updated_at" AS "currency_updated_at" FROM "currency" "currency" LIMIT 2",
+  },
+  "result": [
+    CurrencyEntity {
+      "code": "EUR",
+      "createdAt": 2023-01-01T00:00:00.000Z,
+      "id": "currency-1",
+      "updatedAt": 2023-01-01T00:00:00.000Z,
+    },
+    CurrencyEntity {
+      "code": "USD",
+      "createdAt": 2023-01-01T00:00:00.000Z,
+      "id": "currency-2",
+      "updatedAt": 2023-01-01T00:00:00.000Z,
+    },
+  ],
+}
+`;
+
+exports[`CurrencyRepository findById should find currency by id 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "id": "currency-1",
+    },
+    "queryString": "SELECT "currency"."id" AS "currency_id", "currency"."code" AS "currency_code", "currency"."created_at" AS "currency_created_at", "currency"."updated_at" AS "currency_updated_at" FROM "currency" "currency" WHERE "currency"."id" = :id",
+  },
+  "result": CurrencyEntity {
+    "code": "EUR",
+    "createdAt": 2023-01-01T00:00:00.000Z,
+    "id": "currency-1",
+    "updatedAt": 2023-01-01T00:00:00.000Z,
+  },
+}
+`;
+
+exports[`CurrencyRepository findById should return null for non-existent currency 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "id": "non-existent",
+    },
+    "queryString": "SELECT "currency"."id" AS "currency_id", "currency"."code" AS "currency_code", "currency"."created_at" AS "currency_created_at", "currency"."updated_at" AS "currency_updated_at" FROM "currency" "currency" WHERE "currency"."id" = :id",
+  },
+  "result": null,
+}
+`;
+
+exports[`CurrencyRepository insert should insert multiple currencies correctly 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "orm_param_0": "currency-1",
+      "orm_param_1": "EUR",
+      "orm_param_2": 2023-01-01T00:00:00.000Z,
+      "orm_param_3": 2023-01-01T00:00:00.000Z,
+      "orm_param_4": "currency-2",
+      "orm_param_5": "USD",
+      "orm_param_6": 2023-01-01T00:00:00.000Z,
+      "orm_param_7": 2023-01-01T00:00:00.000Z,
+    },
+    "queryString": "INSERT INTO "currency" AS "CurrencyEntity"("id", "code", "created_at", "updated_at") VALUES (:orm_param_0, :orm_param_1, :orm_param_2, :orm_param_3), (:orm_param_4, :orm_param_5, :orm_param_6, :orm_param_7)",
+  },
+  "result": undefined,
+}
+`;
+
+exports[`CurrencyRepository insert should insert single currency correctly 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "orm_param_0": "currency-1",
+      "orm_param_1": "EUR",
+      "orm_param_2": 2023-01-01T00:00:00.000Z,
+      "orm_param_3": 2023-01-01T00:00:00.000Z,
+    },
+    "queryString": "INSERT INTO "currency" AS "CurrencyEntity"("id", "code", "created_at", "updated_at") VALUES (:orm_param_0, :orm_param_1, :orm_param_2, :orm_param_3)",
+  },
+  "result": undefined,
+}
+`;
