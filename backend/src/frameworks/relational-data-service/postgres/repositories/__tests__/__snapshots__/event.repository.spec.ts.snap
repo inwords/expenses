@@ -1,0 +1,42 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EventRepository findById should find event by id 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "id": "event-1",
+    },
+    "queryString": "SELECT "event"."id" AS "event_id", "event"."name" AS "event_name", "event"."currency_id" AS "event_currency_id", "event"."pin_code" AS "event_pin_code", "event"."created_at" AS "event_created_at", "event"."updated_at" AS "event_updated_at" FROM "event" "event" WHERE "event"."id" = :id",
+  },
+  "result": null,
+}
+`;
+
+exports[`EventRepository findById should return null for non-existent event 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "id": "non-existent",
+    },
+    "queryString": "SELECT "event"."id" AS "event_id", "event"."name" AS "event_name", "event"."currency_id" AS "event_currency_id", "event"."pin_code" AS "event_pin_code", "event"."created_at" AS "event_created_at", "event"."updated_at" AS "event_updated_at" FROM "event" "event" WHERE "event"."id" = :id",
+  },
+  "result": null,
+}
+`;
+
+exports[`EventRepository insert should insert event correctly 1`] = `
+{
+  "queryDetails": {
+    "queryParameters": {
+      "orm_param_0": "event-1",
+      "orm_param_1": "Test Event",
+      "orm_param_2": "currency-1",
+      "orm_param_3": "1234",
+      "orm_param_4": 2023-01-01T00:00:00.000Z,
+      "orm_param_5": 2023-01-01T00:00:00.000Z,
+    },
+    "queryString": "INSERT INTO "event" AS "EventEntity"("id", "name", "currency_id", "pin_code", "created_at", "updated_at") VALUES (:orm_param_0, :orm_param_1, :orm_param_2, :orm_param_3, :orm_param_4, :orm_param_5)",
+  },
+  "result": undefined,
+}
+`;

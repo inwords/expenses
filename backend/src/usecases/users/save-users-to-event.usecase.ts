@@ -2,12 +2,12 @@ import {UseCase} from '#packages/use-case';
 
 import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-service/relational-data-service';
 import {IEvent} from '#domain/entities/event.entity';
-import {IUser} from '#domain/entities/user.enitity';
-import {UserValueObject} from '#domain/value-objects/user.value-object';
+import {IUserInfo} from '#domain/entities/user-info.entity';
+import {UserInfoValueObject} from '#domain/value-objects/user-info.value-object';
 import {Injectable} from '@nestjs/common';
 
-type Input = {users: Array<Omit<IUser, 'id' | 'eventId'>>} & {pinCode: IEvent['pinCode']; eventId: IEvent['id']};
-type Output = Array<IUser>;
+type Input = {users: Array<Omit<IUserInfo, 'id' | 'eventId'>>} & {pinCode: IEvent['pinCode']; eventId: IEvent['id']};
+type Output = Array<IUserInfo>;
 
 @Injectable()
 export class SaveUsersToEventUseCase implements UseCase<Input, Output> {
@@ -17,9 +17,9 @@ export class SaveUsersToEventUseCase implements UseCase<Input, Output> {
     const [event] = await this.rDataService.event.findById(eventId);
 
     if (event.pinCode === pinCode) {
-      const usersValue = users.map((u) => new UserValueObject({...u, eventId}).value);
+      const usersValue = users.map((u) => new UserInfoValueObject({...u, eventId}).value);
 
-      await this.rDataService.user.insert(usersValue);
+      await this.rDataService.userInfo.insert(usersValue);
 
       return usersValue;
     }

@@ -2,11 +2,11 @@ import {UseCase} from '#packages/use-case';
 
 import {IEvent} from '#domain/entities/event.entity';
 import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-service/relational-data-service';
-import {IUser} from '#domain/entities/user.enitity';
+import {IUserInfo} from '#domain/entities/user-info.entity';
 import {Injectable} from '@nestjs/common';
 
 type Input = {eventId: string; pinCode: string};
-type Output = IEvent & {users: Array<IUser>};
+type Output = IEvent & {users: Array<IUserInfo>};
 
 @Injectable()
 export class GetEventInfoUseCase implements UseCase<Input, Output> {
@@ -16,7 +16,7 @@ export class GetEventInfoUseCase implements UseCase<Input, Output> {
     const [event] = await this.rDataService.event.findById(eventId);
 
     if (pinCode === event.pinCode) {
-      const [users] = await this.rDataService.user.findByEventId(eventId);
+      const [users] = await this.rDataService.userInfo.findByEventId(eventId);
 
       return {...event, users};
     }
