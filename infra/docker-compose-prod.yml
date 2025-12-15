@@ -6,12 +6,22 @@ services:
         limits:
           memory: 300M
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_USER_NAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - db-network
 
   nest-backend-green:
     image: ruggedbl/commonex-nest-backend
@@ -20,6 +30,8 @@ services:
         limits:
           memory: 300M
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
@@ -28,8 +40,18 @@ services:
       - POSTGRES_DATABASE=${POSTGRES_DATABASE}
       - POSTGRES_SCHEMA=${POSTGRES_SCHEMA}
       - OPEN_EXCHANGE_RATES_API_ID=${OPEN_EXCHANGE_RATES_API_ID}
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', r => r.statusCode === 200 ? process.exit(0) : process.exit(1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    networks:
+      - db-network
+      - app-network
 
   nest-backend-blue:
     image: ruggedbl/commonex-nest-backend
@@ -38,6 +60,8 @@ services:
         limits:
           memory: 300M
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
@@ -46,8 +70,18 @@ services:
       - POSTGRES_DATABASE=${POSTGRES_DATABASE}
       - POSTGRES_SCHEMA=${POSTGRES_SCHEMA}
       - OPEN_EXCHANGE_RATES_API_ID=${OPEN_EXCHANGE_RATES_API_ID}
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', r => r.statusCode === 200 ? process.exit(0) : process.exit(1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    networks:
+      - db-network
+      - app-network
 
   next-web:
     image: ruggedbl/commonex-next-web
@@ -56,6 +90,21 @@ services:
         limits:
           memory: 200M
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx:size=50m
+      - /var/run:size=10m
+      - /tmp:size=10m
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4001/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - app-network
 
   nginx:
     image: ruggedbl/nginx-http3
@@ -64,6 +113,13 @@ services:
         limits:
           memory: 150M
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx:size=50m
+      - /var/run:size=10m
+      - /tmp:size=10m
     ports:
       - "80:80/tcp"
       - "443:443/tcp"
@@ -81,9 +137,14 @@ services:
       - /etc/commonex/www/certbot/:/var/www/certbot/:ro
       - /etc/commonex/www/assetlinks.json:/var/www/assetlinks.json:ro
     depends_on:
-      - nest-backend-green
-      - nest-backend-blue
-      - next-web
+      nest-backend-green:
+        condition: service_healthy
+      nest-backend-blue:
+        condition: service_healthy
+      next-web:
+        condition: service_healthy
+    networks:
+      - app-network
 
   otel-collector:
     image: ruggedbl/opentelemetry-collector-custom
@@ -93,10 +154,15 @@ services:
         limits:
           memory: 200M
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     command: [ "--config=/etc/otel-collector-config.yaml" ]
     volumes:
       - ./otel-collector/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - app-network
+      - monitoring-network
 
   victoriametrics:
     image: victoriametrics/victoria-metrics:v1.127.0
@@ -110,10 +176,14 @@ services:
           memory: 230M
     memswap_limit: 2048M
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     command:
       - "--storageDataPath=/victoria-metrics-data"
     volumes:
       - victoriametrics_data:/victoria-metrics-data
+    networks:
+      - monitoring-network
 
   victoriatraces:
     image: victoriametrics/victoria-traces:v0.3.0
@@ -127,10 +197,14 @@ services:
           memory: 230M
     memswap_limit: 2048M
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     command:
       - "--storageDataPath=/victoria-traces-data"
     volumes:
       - victoriatraces_data:/victoria-traces-data
+    networks:
+      - monitoring-network
 
   grafana:
     image: grafana/grafana:12.2
@@ -143,6 +217,8 @@ services:
         reservations:
           memory: 250M
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     depends_on:
       - victoriametrics
       - victoriatraces
@@ -153,6 +229,9 @@ services:
       - GF_SERVER_PROTOCOL=http
     volumes:
       - grafana_data:/var/lib/grafana
+    networks:
+      - app-network
+      - monitoring-network
 
   certbot:
     image: certbot/certbot:v5.0.0
@@ -169,3 +248,10 @@ volumes:
   victoriametrics_data:
   victoriatraces_data:
   grafana_data:
+
+networks:
+  db-network:
+    internal: true
+  app-network:
+  monitoring-network:
+    internal: true

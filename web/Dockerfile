@@ -1,28 +1,26 @@
-# Base image
+# Build stage
 FROM node:24-alpine3.22 AS build-stage
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package files first for better cache
 COPY package.json package-lock.json ./
-
-COPY --chown=node:node . .
 
 # Install dependencies
 RUN npm ci
 
-# Copy the source code
+# Copy source code and build
 COPY . ./
-
 ENV NODE_ENV=production
-# Build the Next.js app with static export
 RUN npm run build
 
-USER nginx
+# Production stage with Nginx (unprivileged for security)
+FROM nginxinc/nginx-unprivileged:1.29.1-alpine3.22
 
-# Intermediate image for Nginx
-FROM nginx:1.29.1-alpine3.22
+# Install curl for health checks (as root, then switch back)
+USER root
+RUN apk add --no-cache curl
+USER nginx
 
 # Copy the static files from the build-stage
 COPY --from=build-stage /app/build /usr/share/nginx/html
@@ -30,8 +28,6 @@ COPY --from=build-stage /app/build /usr/share/nginx/html
 # Copy custom Nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose port 4001
 EXPOSE 4001
 
-# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]

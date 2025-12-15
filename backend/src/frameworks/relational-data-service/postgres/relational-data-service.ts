@@ -1,6 +1,6 @@
 import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-service/relational-data-service';
 import {DataSource} from 'typeorm';
-import {createTypeormConfigDefault} from './config';
+import {createTypeormConfigDefault, DbConfig} from './config';
 import {EventRepository} from '#frameworks/relational-data-service/postgres/repositories/event.repository';
 import {UserInfoRepository} from '#frameworks/relational-data-service/postgres/repositories/user-info.repository';
 import {CurrencyRepository} from '#frameworks/relational-data-service/postgres/repositories/currency.repository';
@@ -8,9 +8,9 @@ import {ExpenseRepository} from '#frameworks/relational-data-service/postgres/re
 import {CurrencyRateRepository} from '#frameworks/relational-data-service/postgres/repositories/currency-rate.repository';
 
 export class RelationalDataService implements RelationalDataServiceAbstract {
-  readonly dbConfig;
-  readonly dataSource;
-  readonly showQueryDetails;
+  readonly dbConfig: DbConfig;
+  readonly dataSource: DataSource;
+  readonly showQueryDetails: boolean;
   readonly transaction;
 
   readonly event: EventRepository;
@@ -19,7 +19,7 @@ export class RelationalDataService implements RelationalDataServiceAbstract {
   readonly expense: ExpenseRepository;
   readonly currencyRate: CurrencyRateRepository;
 
-  constructor({dbConfig, showQueryDetails}) {
+  constructor({dbConfig, showQueryDetails}: { dbConfig: DbConfig; showQueryDetails: boolean }) {
     this.dbConfig = dbConfig;
     this.dataSource = new DataSource(createTypeormConfigDefault(dbConfig));
     this.transaction = this.dataSource.transaction.bind(this.dataSource);
@@ -50,6 +50,15 @@ export class RelationalDataService implements RelationalDataServiceAbstract {
     const tableNamesJoined = tableNames.join(', ');
     const truncateSql = `TRUNCATE ${tableNamesJoined} RESTART IDENTITY CASCADE;`;
     await this.dataSource.query(truncateSql);
+  }
+
+  async healthCheck(): Promise<void> {
+    if (!this.dataSource || !this.dataSource.isInitialized) {
+      throw new Error('Database is not initialized');
+    }
+
+    // Simple query to verify database connectivity
+    await this.dataSource.query('SELECT 1');
   }
 
   private async setupSearchPathAndValidate(): Promise<void | never> {

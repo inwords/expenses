@@ -16,4 +16,6 @@ export abstract class RelationalDataServiceAbstract implements IRelationalDataSe
   abstract transaction: IRelationalDataService['transaction'];
   abstract destroy: IRelationalDataService['destroy'];
   abstract flush: IRelationalDataService['flush'];
+
+  abstract healthCheck: IRelationalDataService['healthCheck'];
 }
