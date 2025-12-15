@@ -92,11 +92,6 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    read_only: true
-    tmpfs:
-      - /var/cache/nginx:size=50m
-      - /var/run:size=10m
-      - /tmp:size=10m
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:4001/ || exit 1"]
       interval: 30s
@@ -115,11 +110,6 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    read_only: true
-    tmpfs:
-      - /var/cache/nginx:size=50m
-      - /var/run:size=10m
-      - /tmp:size=10m
     ports:
       - "80:80/tcp"
       - "443:443/tcp"
