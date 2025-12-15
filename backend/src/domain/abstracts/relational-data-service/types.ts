@@ -22,4 +22,5 @@ export interface IRelationalDataService {
     ) => Promise<T>);
   destroy: () => Promise<void>;
   flush: () => unknown;
+  healthCheck: () => Promise<void>;
 }

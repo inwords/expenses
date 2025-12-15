@@ -1,5 +1,5 @@
 import {Module, Provider} from '@nestjs/common';
-import {FrameworksLayer} from '../frameworks/frameworks.layer';
+import {FrameworksLayer} from '#frameworks/frameworks.layer';
 import {allUsersUseCases} from './users';
 
 const allUseCases: Provider[] = [...allUsersUseCases];
