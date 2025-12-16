@@ -20,9 +20,9 @@ internal data class ExpenseItemDialogDestination(
 
 fun getExpenseItemDialogNavModule(
     navigationController: NavigationController,
-    eventsInteractor: EventsInteractor,
-    expensesInteractor: ExpensesInteractor,
-    expensesLocalStore: ExpensesLocalStore,
+    eventsInteractorLazy: Lazy<EventsInteractor>,
+    expensesInteractorLazy: Lazy<ExpensesInteractor>,
+    expensesLocalStoreLazy: Lazy<ExpensesLocalStore>,
 ): NavModule {
     return NavModule(ExpenseItemDialogDestination.serializer()) {
         entry<ExpenseItemDialogDestination>(metadata = dialog()) { key ->
@@ -30,9 +30,9 @@ fun getExpenseItemDialogNavModule(
                 initializer {
                     ExpenseItemDialogViewModel(
                         navigationController = navigationController,
-                        eventsInteractor = eventsInteractor,
-                        expensesInteractor = expensesInteractor,
-                        expensesLocalStore = expensesLocalStore,
+                        eventsInteractor = eventsInteractorLazy.value,
+                        expensesInteractor = expensesInteractorLazy.value,
+                        expensesLocalStore = expensesLocalStoreLazy.value,
                         expenseId = key.expenseId
                     )
                 }

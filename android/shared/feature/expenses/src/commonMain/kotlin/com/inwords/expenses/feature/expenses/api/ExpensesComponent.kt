@@ -59,7 +59,7 @@ class ExpensesComponent(private val deps: Deps) : Component {
         )
     }
 
-    val expensesInteractor: ExpensesInteractor by lazy {
+    val expensesInteractorLazy: Lazy<ExpensesInteractor> = lazy {
         ExpensesInteractor(expensesLocalStore, lazy { deps.currenciesLocalStore })
     }
 }

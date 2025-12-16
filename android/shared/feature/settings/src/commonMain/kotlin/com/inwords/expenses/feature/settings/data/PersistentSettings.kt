@@ -11,10 +11,6 @@ internal class SettingsRepositoryImpl(
         settingsLocalDataSource.setCurrentEventId(eventId)
     }
 
-    override suspend fun clearCurrentEventId() {
-        settingsLocalDataSource.setCurrentEventId(-1)
-    }
-
     override fun getCurrentEventId(): Flow<Long?> {
         return settingsLocalDataSource.getCurrentEventId()
     }
@@ -23,11 +19,12 @@ internal class SettingsRepositoryImpl(
         settingsLocalDataSource.setCurrentPersonId(userId)
     }
 
-    override suspend fun clearCurrentPersonId() {
-        settingsLocalDataSource.setCurrentPersonId(-1)
-    }
-
     override fun getCurrentPersonId(): Flow<Long?> {
         return settingsLocalDataSource.getCurrentPersonId()
     }
+
+    override suspend fun clearCurrentEventAndPerson() {
+        settingsLocalDataSource.setCurrentEventAndPerson(eventId = -1, personId = -1)
+    }
+
 }

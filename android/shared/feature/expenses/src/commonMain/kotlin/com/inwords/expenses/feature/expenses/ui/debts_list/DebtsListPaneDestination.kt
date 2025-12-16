@@ -16,8 +16,8 @@ object DebtsListPaneDestination : Destination
 
 fun getDebtsListPaneNavModule(
     navigationController: NavigationController,
-    eventsInteractor: EventsInteractor,
-    expensesInteractor: ExpensesInteractor,
+    eventsInteractorLazy: Lazy<EventsInteractor>,
+    expensesInteractorLazy: Lazy<ExpensesInteractor>,
 ): NavModule {
     return NavModule(DebtsListPaneDestination.serializer()) {
         entry<DebtsListPaneDestination> {
@@ -25,8 +25,8 @@ fun getDebtsListPaneNavModule(
                 initializer {
                     DebtsListViewModel(
                         navigationController = navigationController,
-                        eventsInteractor = eventsInteractor,
-                        expensesInteractor = expensesInteractor,
+                        eventsInteractor = eventsInteractorLazy.value,
+                        expensesInteractor = expensesInteractorLazy.value,
                     )
                 }
             })

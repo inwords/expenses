@@ -38,6 +38,16 @@ internal class SettingsLocalDataSource(settingsDataStoreLazy: Lazy<DataStore<Set
             .map { settings -> settings.current_person_id.takeIf { it != -1L } }
             .distinctUntilChanged()
     }
+
+    suspend fun setCurrentEventAndPerson(eventId: Long, personId: Long) {
+        settingsDataStore.updateData { currentSettings ->
+            currentSettings.copy(
+                current_event_id = eventId,
+                current_person_id = personId
+            )
+        }
+    }
+
 }
 
 internal const val settingsDsFileName = "expenses_settings.pb"

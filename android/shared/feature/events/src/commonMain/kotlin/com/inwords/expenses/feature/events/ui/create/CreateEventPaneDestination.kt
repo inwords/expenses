@@ -15,7 +15,7 @@ object CreateEventPaneDestination : Destination
 
 fun getCreateEventPaneNavModule(
     navigationController: NavigationController,
-    eventsInteractor: EventsInteractor,
+    eventsInteractorLazy: Lazy<EventsInteractor>,
     expensesScreenDestination: Destination,
 ): NavModule {
     return NavModule(CreateEventPaneDestination.serializer()) {
@@ -24,7 +24,7 @@ fun getCreateEventPaneNavModule(
                 initializer {
                     CreateEventViewModel(
                         navigationController = navigationController,
-                        eventsInteractor = eventsInteractor,
+                        eventsInteractor = eventsInteractorLazy.value,
                         expensesScreenDestination = expensesScreenDestination,
                     )
                 }

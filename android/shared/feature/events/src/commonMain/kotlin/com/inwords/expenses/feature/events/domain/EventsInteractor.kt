@@ -24,24 +24,12 @@ class EventsInteractor internal constructor(
     eventsLocalStoreLazy: Lazy<EventsLocalStore>,
     currenciesLocalStoreLazy: Lazy<CurrenciesLocalStore>,
     settingsRepositoryLazy: Lazy<SettingsRepository>,
-    joinRemoteEventUseCaseLazy: Lazy<JoinRemoteEventUseCase>,
     scope: CoroutineScope = CoroutineScope(SupervisorJob() + IO)
 ) {
 
     private val eventsLocalStore by eventsLocalStoreLazy
     private val currenciesLocalStore by currenciesLocalStoreLazy
     private val settingsRepository by settingsRepositoryLazy
-    private val joinRemoteEventUseCase by joinRemoteEventUseCaseLazy
-
-    internal sealed interface JoinEventResult {
-        data class NewCurrentEvent(val event: EventDetails) : JoinEventResult
-
-        sealed interface Error : JoinEventResult {
-            data object InvalidAccessCode : Error
-            data object EventNotFound : Error
-            data object OtherError : Error
-        }
-    }
 
     sealed interface EventDeletionState {
         data object None : EventDeletionState
@@ -73,40 +61,7 @@ class EventsInteractor internal constructor(
     }
 
     suspend fun leaveEvent() {
-        settingsRepository.clearCurrentEventId()
-        settingsRepository.clearCurrentPersonId()
-    }
-
-    suspend fun joinLocalEvent(eventId: Long): Boolean {
-        val localEvent = eventsLocalStore.getEvent(eventId)
-        return if (localEvent == null) {
-            false
-        } else {
-            settingsRepository.setCurrentEventId(localEvent.id)
-            true
-        }
-    }
-
-    internal suspend fun joinEvent(eventServerId: String, accessCode: String): JoinEventResult {
-        val localEvent = eventsLocalStore.getEventWithDetailsByServerId(eventServerId)
-        if (localEvent != null) {
-            settingsRepository.setCurrentEventId(localEvent.event.id)
-            return JoinEventResult.NewCurrentEvent(localEvent)
-        }
-
-        val joinEventResult = joinRemoteEventUseCase.joinRemoteEvent(serverId = eventServerId, pinCode = accessCode)
-
-        when (joinEventResult) {
-            is JoinEventResult.NewCurrentEvent -> {
-                settingsRepository.setCurrentEventId(joinEventResult.event.event.id)
-            }
-
-            JoinEventResult.Error.EventNotFound,
-            JoinEventResult.Error.InvalidAccessCode,
-            JoinEventResult.Error.OtherError -> Unit
-        }
-
-        return joinEventResult
+        settingsRepository.clearCurrentEventAndPerson()
     }
 
     internal fun draftEventName(eventName: String) {
@@ -153,7 +108,7 @@ class EventsInteractor internal constructor(
         return eventDetails
     }
 
-    fun setEventDeletionState(eventId: Long, state: EventDeletionState) {
+    internal fun setEventDeletionState(eventId: Long, state: EventDeletionState) {
         _eventsFailedToDeleteRemotely.update { it + (eventId to state) }
     }
 

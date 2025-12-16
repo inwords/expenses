@@ -17,7 +17,7 @@ object MenuDialogDestination : Destination
 
 fun getMenuDialogNavModule(
     navigationController: NavigationController,
-    eventsInteractor: EventsInteractor,
+    eventsInteractorLazy: Lazy<EventsInteractor>,
     shareManagerLazy: Lazy<ShareManager>
 ): NavModule {
     return NavModule(MenuDialogDestination.serializer()) {
@@ -26,7 +26,7 @@ fun getMenuDialogNavModule(
                 initializer {
                     MenuViewModel(
                         navigationController = navigationController,
-                        eventsInteractor = eventsInteractor,
+                        eventsInteractor = eventsInteractorLazy.value,
                         shareManagerLazy = shareManagerLazy
                     )
                 }

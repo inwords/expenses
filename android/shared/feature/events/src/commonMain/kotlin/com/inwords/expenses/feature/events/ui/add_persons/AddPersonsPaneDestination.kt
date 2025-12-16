@@ -15,7 +15,7 @@ object AddPersonsPaneDestination : Destination
 
 fun getAddPersonsPaneNavModule(
     navigationController: NavigationController,
-    eventsInteractor: EventsInteractor,
+    eventsInteractorLazy: Lazy<EventsInteractor>,
     expensesPaneDestination: Destination,
 ): NavModule {
     return NavModule(AddPersonsPaneDestination.serializer()) {
@@ -24,7 +24,7 @@ fun getAddPersonsPaneNavModule(
                 initializer {
                     AddPersonsViewModel(
                         navigationController = navigationController,
-                        eventsInteractor = eventsInteractor,
+                        eventsInteractor = eventsInteractorLazy.value,
                         expensesScreenDestination = expensesPaneDestination
                     )
                 }
