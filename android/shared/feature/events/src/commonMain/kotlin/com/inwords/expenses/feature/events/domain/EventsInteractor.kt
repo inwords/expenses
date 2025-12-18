@@ -6,12 +6,10 @@ import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
 import com.inwords.expenses.feature.events.domain.model.Person
-import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -22,13 +20,11 @@ import kotlin.random.Random
 
 class EventsInteractor internal constructor(
     eventsLocalStoreLazy: Lazy<EventsLocalStore>,
-    currenciesLocalStoreLazy: Lazy<CurrenciesLocalStore>,
     settingsRepositoryLazy: Lazy<SettingsRepository>,
     scope: CoroutineScope = CoroutineScope(SupervisorJob() + IO)
 ) {
 
     private val eventsLocalStore by eventsLocalStoreLazy
-    private val currenciesLocalStore by currenciesLocalStoreLazy
     private val settingsRepository by settingsRepositoryLazy
 
     sealed interface EventDeletionState {
@@ -51,18 +47,6 @@ class EventsInteractor internal constructor(
             }
         }
         .stateIn(scope, started = SharingStarted.WhileSubscribed(), initialValue = null)
-
-    fun getCurrencies(): Flow<List<Currency>> {
-        return currenciesLocalStore.getCurrencies()
-    }
-
-    fun getEvents(): Flow<List<Event>> {
-        return eventsLocalStore.getEventsFlow()
-    }
-
-    suspend fun leaveEvent() {
-        settingsRepository.clearCurrentEventAndPerson()
-    }
 
     internal fun draftEventName(eventName: String) {
         draft.draftEventName = eventName.trim()

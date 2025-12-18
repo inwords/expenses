@@ -9,6 +9,7 @@ import com.inwords.expenses.core.navigation.NavModule
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
 import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.GetEventsUseCase
 import com.inwords.expenses.feature.events.domain.JoinEventUseCase
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.settings.api.SettingsRepository
@@ -20,6 +21,7 @@ object ExpensesPaneDestination : Destination
 fun getExpensesPaneNavModule(
     navigationController: NavigationController,
     eventsInteractorLazy: Lazy<EventsInteractor>,
+    getEventsUseCaseLazy: Lazy<GetEventsUseCase>,
     deleteEventUseCaseLazy: Lazy<DeleteEventUseCase>,
     expensesInteractorLazy: Lazy<ExpensesInteractor>,
     joinEventUseCaseLazy: Lazy<JoinEventUseCase>,
@@ -32,6 +34,7 @@ fun getExpensesPaneNavModule(
                     ExpensesViewModel(
                         navigationController = navigationController,
                         eventsInteractor = eventsInteractorLazy.value,
+                        getEventsUseCase = getEventsUseCaseLazy.value,
                         joinEventUseCase = joinEventUseCaseLazy.value,
                         deleteEventUseCase = deleteEventUseCaseLazy.value,
                         expensesInteractor = expensesInteractorLazy.value,

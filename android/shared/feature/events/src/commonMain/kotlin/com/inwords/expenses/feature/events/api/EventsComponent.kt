@@ -9,7 +9,10 @@ import com.inwords.expenses.feature.events.data.network.store.CurrenciesRemoteSt
 import com.inwords.expenses.feature.events.data.network.store.EventsRemoteStoreImpl
 import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
 import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.GetCurrenciesUseCase
+import com.inwords.expenses.feature.events.domain.GetEventsUseCase
 import com.inwords.expenses.feature.events.domain.JoinEventUseCase
+import com.inwords.expenses.feature.events.domain.LeaveEventUseCase
 import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.PersonsLocalStore
@@ -113,7 +116,24 @@ class EventsComponent internal constructor(
     val eventsInteractorLazy: Lazy<EventsInteractor> = lazy {
         EventsInteractor(
             eventsLocalStoreLazy = eventsLocalStore,
+            settingsRepositoryLazy = deps.settingsRepositoryLazy,
+        )
+    }
+
+    val getCurrenciesUseCaseLazy: Lazy<GetCurrenciesUseCase> = lazy {
+        GetCurrenciesUseCase(
             currenciesLocalStoreLazy = currenciesLocalStore,
+        )
+    }
+
+    val getEventsUseCaseLazy: Lazy<GetEventsUseCase> = lazy {
+        GetEventsUseCase(
+            eventsLocalStoreLazy = eventsLocalStore,
+        )
+    }
+
+    val leaveEventUseCaseLazy: Lazy<LeaveEventUseCase> = lazy {
+        LeaveEventUseCase(
             settingsRepositoryLazy = deps.settingsRepositoryLazy,
         )
     }

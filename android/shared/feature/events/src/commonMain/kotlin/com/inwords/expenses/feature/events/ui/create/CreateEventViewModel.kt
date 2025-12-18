@@ -2,13 +2,13 @@ package com.inwords.expenses.feature.events.ui.create
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.core.utils.asImmutableListAdapter
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.GetCurrenciesUseCase
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.ui.add_persons.AddPersonsPaneDestination
 import com.inwords.expenses.feature.events.ui.create.CreateEventPaneUiModel.CurrencyInfoUiModel
@@ -26,7 +26,7 @@ import kotlinx.coroutines.plus
 internal class CreateEventViewModel(
     private val navigationController: NavigationController,
     private val eventsInteractor: EventsInteractor,
-    private val expensesScreenDestination: Destination,
+    getCurrenciesUseCase: GetCurrenciesUseCase,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
     private data class CreateEventPaneModel(
@@ -46,7 +46,7 @@ internal class CreateEventViewModel(
     private val selectedCurrencyCode = MutableStateFlow<String?>(null)
 
     private val _state: StateFlow<CreateEventPaneModel> = combine(
-        eventsInteractor.getCurrencies(),
+        getCurrenciesUseCase.getCurrencies(),
         inputEventName,
         selectedCurrencyCode
     ) { currencies, inputEventName, selectedCurrencyCode ->

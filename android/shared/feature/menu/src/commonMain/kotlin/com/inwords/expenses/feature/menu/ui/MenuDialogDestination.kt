@@ -9,6 +9,7 @@ import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavModule
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.LeaveEventUseCase
 import com.inwords.expenses.feature.share.api.ShareManager
 import kotlinx.serialization.Serializable
 
@@ -18,6 +19,7 @@ object MenuDialogDestination : Destination
 fun getMenuDialogNavModule(
     navigationController: NavigationController,
     eventsInteractorLazy: Lazy<EventsInteractor>,
+    leaveEventUseCaseLazy: Lazy<LeaveEventUseCase>,
     shareManagerLazy: Lazy<ShareManager>
 ): NavModule {
     return NavModule(MenuDialogDestination.serializer()) {
@@ -27,6 +29,7 @@ fun getMenuDialogNavModule(
                     MenuViewModel(
                         navigationController = navigationController,
                         eventsInteractor = eventsInteractorLazy.value,
+                        leaveEventUseCase = leaveEventUseCaseLazy.value,
                         shareManagerLazy = shareManagerLazy
                     )
                 }

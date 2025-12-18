@@ -60,6 +60,7 @@ fun MainNavHost(
             getCreateEventPaneNavModule(
                 navigationController = navigationController,
                 eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                getCurrenciesUseCaseLazy = eventsComponent.getCurrenciesUseCaseLazy,
                 expensesScreenDestination = ExpensesPaneDestination,
             ),
             getDeleteEventDialogNavModule(
@@ -88,6 +89,7 @@ fun MainNavHost(
             getExpensesPaneNavModule(
                 navigationController = navigationController,
                 eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                getEventsUseCaseLazy = eventsComponent.getEventsUseCaseLazy,
                 deleteEventUseCaseLazy = eventsComponent.deleteEventUseCaseLazy,
                 expensesInteractorLazy = expensesComponent.expensesInteractorLazy,
                 joinEventUseCaseLazy = eventsComponent.joinEventUseCaseLazy,
@@ -108,6 +110,7 @@ fun MainNavHost(
             getMenuDialogNavModule(
                 navigationController = navigationController,
                 eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                leaveEventUseCaseLazy = eventsComponent.leaveEventUseCaseLazy,
                 shareManagerLazy = shareComponent.shareManagerLazy,
             )
         )

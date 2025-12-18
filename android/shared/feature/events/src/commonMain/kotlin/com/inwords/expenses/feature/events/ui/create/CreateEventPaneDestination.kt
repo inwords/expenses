@@ -8,6 +8,7 @@ import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavModule
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.GetCurrenciesUseCase
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -16,6 +17,7 @@ object CreateEventPaneDestination : Destination
 fun getCreateEventPaneNavModule(
     navigationController: NavigationController,
     eventsInteractorLazy: Lazy<EventsInteractor>,
+    getCurrenciesUseCaseLazy: Lazy<GetCurrenciesUseCase>,
     expensesScreenDestination: Destination,
 ): NavModule {
     return NavModule(CreateEventPaneDestination.serializer()) {
@@ -25,7 +27,7 @@ fun getCreateEventPaneNavModule(
                     CreateEventViewModel(
                         navigationController = navigationController,
                         eventsInteractor = eventsInteractorLazy.value,
-                        expensesScreenDestination = expensesScreenDestination,
+                        getCurrenciesUseCase = getCurrenciesUseCaseLazy.value,
                     )
                 }
             })
