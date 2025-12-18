@@ -9,6 +9,8 @@ import com.inwords.expenses.core.navigation.NavModule
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
 import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.GetEventsUseCase
+import com.inwords.expenses.feature.events.domain.JoinEventUseCase
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.serialization.Serializable
@@ -18,10 +20,12 @@ object ExpensesPaneDestination : Destination
 
 fun getExpensesPaneNavModule(
     navigationController: NavigationController,
-    eventsInteractor: EventsInteractor,
-    deleteEventUseCase: DeleteEventUseCase,
-    expensesInteractor: ExpensesInteractor,
-    settingsRepository: SettingsRepository,
+    eventsInteractorLazy: Lazy<EventsInteractor>,
+    getEventsUseCaseLazy: Lazy<GetEventsUseCase>,
+    deleteEventUseCaseLazy: Lazy<DeleteEventUseCase>,
+    expensesInteractorLazy: Lazy<ExpensesInteractor>,
+    joinEventUseCaseLazy: Lazy<JoinEventUseCase>,
+    settingsRepositoryLazy: Lazy<SettingsRepository>,
 ): NavModule {
     return NavModule(ExpensesPaneDestination.serializer()) {
         entry<ExpensesPaneDestination> {
@@ -29,10 +33,12 @@ fun getExpensesPaneNavModule(
                 initializer {
                     ExpensesViewModel(
                         navigationController = navigationController,
-                        eventsInteractor = eventsInteractor,
-                        deleteEventUseCase = deleteEventUseCase,
-                        expensesInteractor = expensesInteractor,
-                        settingsRepository = settingsRepository,
+                        eventsInteractor = eventsInteractorLazy.value,
+                        getEventsUseCase = getEventsUseCaseLazy.value,
+                        joinEventUseCase = joinEventUseCaseLazy.value,
+                        deleteEventUseCase = deleteEventUseCaseLazy.value,
+                        expensesInteractor = expensesInteractorLazy.value,
+                        settingsRepository = settingsRepositoryLazy.value,
                     )
                 }
             })

@@ -19,8 +19,8 @@ data class DeleteEventDialogDestination(
 
 fun getDeleteEventDialogNavModule(
     navigationController: NavigationController,
-    eventsInteractor: EventsInteractor,
-    deleteEventUseCase: DeleteEventUseCase,
+    eventsInteractorLazy: Lazy<EventsInteractor>,
+    deleteEventUseCaseLazy: Lazy<DeleteEventUseCase>,
 ): NavModule {
     return NavModule(DeleteEventDialogDestination.serializer()) {
         entry<DeleteEventDialogDestination>(metadata = dialog()) { key ->
@@ -28,8 +28,8 @@ fun getDeleteEventDialogNavModule(
                 initializer {
                     DeleteEventDialogViewModel(
                         navigationController = navigationController,
-                        eventsInteractor = eventsInteractor,
-                        deleteEventUseCase = deleteEventUseCase,
+                        eventsInteractor = eventsInteractorLazy.value,
+                        deleteEventUseCase = deleteEventUseCaseLazy.value,
                         eventId = key.eventId
                     )
                 }

@@ -9,7 +9,10 @@ import com.inwords.expenses.feature.events.data.network.store.CurrenciesRemoteSt
 import com.inwords.expenses.feature.events.data.network.store.EventsRemoteStoreImpl
 import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
 import com.inwords.expenses.feature.events.domain.EventsInteractor
-import com.inwords.expenses.feature.events.domain.JoinRemoteEventUseCase
+import com.inwords.expenses.feature.events.domain.GetCurrenciesUseCase
+import com.inwords.expenses.feature.events.domain.GetEventsUseCase
+import com.inwords.expenses.feature.events.domain.JoinEventUseCase
+import com.inwords.expenses.feature.events.domain.LeaveEventUseCase
 import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.PersonsLocalStore
@@ -89,32 +92,49 @@ class EventsComponent internal constructor(
         )
     }
 
-    val deleteEventUseCase: DeleteEventUseCase by lazy {
+    val deleteEventUseCaseLazy: Lazy<DeleteEventUseCase> = lazy {
         DeleteEventUseCase(
             eventsLocalStoreLazy = eventsLocalStore,
             eventsRemoteStoreLazy = eventsRemoteStore,
-            settingsRepositoryLazy = lazy { deps.settingsRepository },
+            settingsRepositoryLazy = deps.settingsRepositoryLazy,
             hooksLazy = lazy { deps.hooks },
         )
     }
 
-    private val joinRemoteEventUseCase: Lazy<JoinRemoteEventUseCase> = lazy {
-        JoinRemoteEventUseCase(
+    val joinEventUseCaseLazy: Lazy<JoinEventUseCase> = lazy {
+        JoinEventUseCase(
             transactionHelperLazy = transactionHelper,
             eventsLocalStoreLazy = eventsLocalStore,
             eventsRemoteStoreLazy = eventsRemoteStore,
-            deleteEventUseCase = lazy { deleteEventUseCase },
+            deleteEventUseCase = deleteEventUseCaseLazy,
+            settingsRepositoryLazy = deps.settingsRepositoryLazy,
             currenciesLocalStoreLazy = currenciesLocalStore,
             currenciesPullTaskLazy = currenciesPullTask,
         )
     }
 
-    val eventsInteractor: EventsInteractor by lazy {
+    val eventsInteractorLazy: Lazy<EventsInteractor> = lazy {
         EventsInteractor(
             eventsLocalStoreLazy = eventsLocalStore,
+            settingsRepositoryLazy = deps.settingsRepositoryLazy,
+        )
+    }
+
+    val getCurrenciesUseCaseLazy: Lazy<GetCurrenciesUseCase> = lazy {
+        GetCurrenciesUseCase(
             currenciesLocalStoreLazy = currenciesLocalStore,
-            settingsRepositoryLazy = lazy { deps.settingsRepository },
-            joinRemoteEventUseCaseLazy = joinRemoteEventUseCase
+        )
+    }
+
+    val getEventsUseCaseLazy: Lazy<GetEventsUseCase> = lazy {
+        GetEventsUseCase(
+            eventsLocalStoreLazy = eventsLocalStore,
+        )
+    }
+
+    val leaveEventUseCaseLazy: Lazy<LeaveEventUseCase> = lazy {
+        LeaveEventUseCase(
+            settingsRepositoryLazy = deps.settingsRepositoryLazy,
         )
     }
 

@@ -16,8 +16,8 @@ data object ChoosePersonPaneDestination : Destination
 
 fun getChoosePersonPaneNavModule(
     navigationController: NavigationController,
-    eventsInteractor: EventsInteractor,
-    settingsRepository: SettingsRepository,
+    eventsInteractorLazy: Lazy<EventsInteractor>,
+    settingsRepositoryLazy: Lazy<SettingsRepository>,
     expensesScreenDestination: Destination,
 ): NavModule {
     return NavModule(ChoosePersonPaneDestination.serializer()) {
@@ -26,8 +26,8 @@ fun getChoosePersonPaneNavModule(
                 initializer {
                     ChoosePersonViewModel(
                         navigationController = navigationController,
-                        eventsInteractor = eventsInteractor,
-                        settingsRepository = settingsRepository,
+                        eventsInteractor = eventsInteractorLazy.value,
+                        settingsRepository = settingsRepositoryLazy.value,
                         expensesScreenDestination = expensesScreenDestination,
                     )
                 }

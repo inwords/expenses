@@ -12,6 +12,8 @@ import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
 import com.inwords.expenses.feature.events.domain.EventsInteractor
 import com.inwords.expenses.feature.events.domain.EventsInteractor.EventDeletionState
+import com.inwords.expenses.feature.events.domain.GetEventsUseCase
+import com.inwords.expenses.feature.events.domain.JoinEventUseCase
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneDestination
 import com.inwords.expenses.feature.events.ui.create.CreateEventPaneDestination
@@ -47,6 +49,8 @@ import kotlin.time.Duration.Companion.milliseconds
 internal class ExpensesViewModel(
     private val navigationController: NavigationController,
     private val eventsInteractor: EventsInteractor,
+    private val getEventsUseCase: GetEventsUseCase,
+    private val joinEventUseCase: JoinEventUseCase,
     private val deleteEventUseCase: DeleteEventUseCase,
     private val expensesInteractor: ExpensesInteractor,
     settingsRepository: SettingsRepository,
@@ -62,7 +66,7 @@ internal class ExpensesViewModel(
     private val localEventsState = flow<SimpleScreenState<ExpensesPaneUiModel>> {
         var previousEvents = emptyList<Event>()
         combine(
-            eventsInteractor.getEvents(),
+            getEventsUseCase.getEvents(),
             eventsInteractor.eventsDeletionState,
             recentlyRemovedEventName,
         ) { events, eventsDeletionState, recentlyRemovedEventName ->
@@ -217,7 +221,7 @@ internal class ExpensesViewModel(
     fun onJoinLocalEventClick(event: LocalEventUiModel) {
         joinEventJob?.cancel()
         joinEventJob = viewModelScope.launch {
-            val joined = eventsInteractor.joinLocalEvent(event.eventId)
+            val joined = joinEventUseCase.joinLocalEvent(event.eventId)
             if (joined) {
                 navigationController.navigateTo(
                     destination = ChoosePersonPaneDestination

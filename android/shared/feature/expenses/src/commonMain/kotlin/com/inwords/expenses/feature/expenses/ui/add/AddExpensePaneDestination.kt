@@ -37,9 +37,9 @@ data class AddExpensePaneDestination(
 @OptIn(ExperimentalMaterial3Api::class)
 fun getAddExpensePaneNavModule(
     navigationController: NavigationController,
-    eventsInteractor: EventsInteractor,
-    expensesInteractor: ExpensesInteractor,
-    settingsRepository: SettingsRepository,
+    eventsInteractorLazy: Lazy<EventsInteractor>,
+    expensesInteractorLazy: Lazy<ExpensesInteractor>,
+    settingsRepositoryLazy: Lazy<SettingsRepository>,
 ): NavModule {
     return NavModule(AddExpensePaneDestination.serializer()) {
         entry<AddExpensePaneDestination>(metadata = bottomSheet()) { key ->
@@ -47,9 +47,9 @@ fun getAddExpensePaneNavModule(
                 initializer {
                     AddExpenseViewModel(
                         navigationController = navigationController,
-                        eventsInteractor = eventsInteractor,
-                        expensesInteractor = expensesInteractor,
-                        settingsRepository = settingsRepository,
+                        eventsInteractor = eventsInteractorLazy.value,
+                        expensesInteractor = expensesInteractorLazy.value,
+                        settingsRepository = settingsRepositoryLazy.value,
                         replenishment = key.replenishment,
                     )
                 }

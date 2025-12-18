@@ -8,7 +8,7 @@ class MenuComponent(private val deps: Deps) : Component {
 
     interface Deps {
 
-        val eventsInteractor: EventsInteractor
+        val eventsInteractorLazy: Lazy<EventsInteractor>
         val shareManager: ShareManager
     }
 

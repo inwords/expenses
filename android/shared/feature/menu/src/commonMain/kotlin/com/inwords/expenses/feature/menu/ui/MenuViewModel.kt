@@ -7,6 +7,7 @@ import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.LeaveEventUseCase
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneDestination
 import com.inwords.expenses.feature.events.ui.join.JoinEventPaneDestination
 import com.inwords.expenses.feature.share.api.ShareManager
@@ -19,7 +20,8 @@ import kotlinx.coroutines.launch
 
 internal class MenuViewModel(
     private val navigationController: NavigationController,
-    private val eventsInteractor: EventsInteractor,
+    eventsInteractor: EventsInteractor,
+    private val leaveEventUseCase: LeaveEventUseCase,
     private val shareManagerLazy: Lazy<ShareManager>,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
@@ -51,7 +53,7 @@ internal class MenuViewModel(
     fun onLeaveEventClicked() {
         if (leaveEventJob != null) return
         leaveEventJob = viewModelScope.launch {
-            eventsInteractor.leaveEvent()
+            leaveEventUseCase.leaveEvent()
             navigationController.popBackStack()
             leaveEventJob = null
         }

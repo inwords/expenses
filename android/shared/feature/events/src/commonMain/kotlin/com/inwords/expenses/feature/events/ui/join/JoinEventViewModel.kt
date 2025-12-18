@@ -6,8 +6,8 @@ import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.ui.utils.DefaultStringProvider
 import com.inwords.expenses.core.ui.utils.StringProvider
 import com.inwords.expenses.core.utils.IO
-import com.inwords.expenses.feature.events.domain.EventsInteractor
-import com.inwords.expenses.feature.events.domain.EventsInteractor.JoinEventResult
+import com.inwords.expenses.feature.events.domain.JoinEventUseCase
+import com.inwords.expenses.feature.events.domain.JoinEventUseCase.JoinEventResult
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneDestination
 import com.inwords.expenses.feature.events.ui.join.JoinEventPaneUiModel.EventJoiningState
 import expenses.shared.core.ui_design.generated.resources.error_other
@@ -25,7 +25,7 @@ import expenses.shared.core.ui_design.generated.resources.Res as DesignRes
 
 internal class JoinEventViewModel(
     private val navigationController: NavigationController,
-    private val eventsInteractor: EventsInteractor,
+    private val joinEventUseCase: JoinEventUseCase,
     private val stringProvider: StringProvider = DefaultStringProvider,
     initialEventId: String,
     initialPinCode: String,
@@ -68,7 +68,7 @@ internal class JoinEventViewModel(
             currentState.copy(joining = EventJoiningState.Joining)
         }
         confirmJob = viewModelScope.launch {
-            val result = eventsInteractor.joinEvent(
+            val result = joinEventUseCase.joinEvent(
                 eventServerId = state.eventId,
                 accessCode = state.eventAccessCode
             )

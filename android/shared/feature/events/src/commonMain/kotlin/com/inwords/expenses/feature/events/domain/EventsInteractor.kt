@@ -6,12 +6,10 @@ import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
 import com.inwords.expenses.feature.events.domain.model.Person
-import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -22,26 +20,12 @@ import kotlin.random.Random
 
 class EventsInteractor internal constructor(
     eventsLocalStoreLazy: Lazy<EventsLocalStore>,
-    currenciesLocalStoreLazy: Lazy<CurrenciesLocalStore>,
     settingsRepositoryLazy: Lazy<SettingsRepository>,
-    joinRemoteEventUseCaseLazy: Lazy<JoinRemoteEventUseCase>,
     scope: CoroutineScope = CoroutineScope(SupervisorJob() + IO)
 ) {
 
     private val eventsLocalStore by eventsLocalStoreLazy
-    private val currenciesLocalStore by currenciesLocalStoreLazy
     private val settingsRepository by settingsRepositoryLazy
-    private val joinRemoteEventUseCase by joinRemoteEventUseCaseLazy
-
-    internal sealed interface JoinEventResult {
-        data class NewCurrentEvent(val event: EventDetails) : JoinEventResult
-
-        sealed interface Error : JoinEventResult {
-            data object InvalidAccessCode : Error
-            data object EventNotFound : Error
-            data object OtherError : Error
-        }
-    }
 
     sealed interface EventDeletionState {
         data object None : EventDeletionState
@@ -63,51 +47,6 @@ class EventsInteractor internal constructor(
             }
         }
         .stateIn(scope, started = SharingStarted.WhileSubscribed(), initialValue = null)
-
-    fun getCurrencies(): Flow<List<Currency>> {
-        return currenciesLocalStore.getCurrencies()
-    }
-
-    fun getEvents(): Flow<List<Event>> {
-        return eventsLocalStore.getEventsFlow()
-    }
-
-    suspend fun leaveEvent() {
-        settingsRepository.clearCurrentEventId()
-        settingsRepository.clearCurrentPersonId()
-    }
-
-    suspend fun joinLocalEvent(eventId: Long): Boolean {
-        val localEvent = eventsLocalStore.getEvent(eventId)
-        return if (localEvent == null) {
-            false
-        } else {
-            settingsRepository.setCurrentEventId(localEvent.id)
-            true
-        }
-    }
-
-    internal suspend fun joinEvent(eventServerId: String, accessCode: String): JoinEventResult {
-        val localEvent = eventsLocalStore.getEventWithDetailsByServerId(eventServerId)
-        if (localEvent != null) {
-            settingsRepository.setCurrentEventId(localEvent.event.id)
-            return JoinEventResult.NewCurrentEvent(localEvent)
-        }
-
-        val joinEventResult = joinRemoteEventUseCase.joinRemoteEvent(serverId = eventServerId, pinCode = accessCode)
-
-        when (joinEventResult) {
-            is JoinEventResult.NewCurrentEvent -> {
-                settingsRepository.setCurrentEventId(joinEventResult.event.event.id)
-            }
-
-            JoinEventResult.Error.EventNotFound,
-            JoinEventResult.Error.InvalidAccessCode,
-            JoinEventResult.Error.OtherError -> Unit
-        }
-
-        return joinEventResult
-    }
 
     internal fun draftEventName(eventName: String) {
         draft.draftEventName = eventName.trim()
@@ -153,7 +92,7 @@ class EventsInteractor internal constructor(
         return eventDetails
     }
 
-    fun setEventDeletionState(eventId: Long, state: EventDeletionState) {
+    internal fun setEventDeletionState(eventId: Long, state: EventDeletionState) {
         _eventsFailedToDeleteRemotely.update { it + (eventId to state) }
     }
 

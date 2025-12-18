@@ -21,7 +21,7 @@ actual class EventsComponentFactory(private val deps: Deps) {
         actual val client: SuspendLazy<HttpClient>
         actual val hostConfig: HostConfig
 
-        actual val settingsRepository: SettingsRepository
+        actual val settingsRepositoryLazy: Lazy<SettingsRepository>
 
         actual val hooks: EventHooks
     }

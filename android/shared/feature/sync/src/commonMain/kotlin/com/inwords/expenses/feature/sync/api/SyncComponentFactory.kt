@@ -7,8 +7,8 @@ expect class SyncComponentFactory {
 
     interface Deps {
 
-        val eventsInteractor: EventsInteractor
-        val expensesInteractor: ExpensesInteractor
+        val eventsInteractorLazy: Lazy<EventsInteractor>
+        val expensesInteractorLazy: Lazy<ExpensesInteractor>
 
     }
 

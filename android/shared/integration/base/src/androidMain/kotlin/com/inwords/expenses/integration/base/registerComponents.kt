@@ -74,8 +74,8 @@ fun registerComponents(appContext: Context) {
                 override val hostConfig: HostConfig
                     get() = networkComponent.value.hostConfig
 
-                override val settingsRepository: SettingsRepository
-                    get() = settingsComponent.value.settingsRepository
+                override val settingsRepositoryLazy: Lazy<SettingsRepository>
+                    get() = settingsComponent.value.settingsRepositoryLazy
 
                 override val hooks: EventHooks
                     get() = object : EventHooks {
@@ -90,8 +90,8 @@ fun registerComponents(appContext: Context) {
     val menuComponent = lazy {
         MenuComponent(
             deps = object : MenuComponent.Deps {
-                override val eventsInteractor: EventsInteractor
-                    get() = eventsComponent.value.eventsInteractor
+                override val eventsInteractorLazy: Lazy<EventsInteractor>
+                    get() = eventsComponent.value.eventsInteractorLazy
 
                 override val shareManager: ShareManager
                     get() = shareComponent.value.shareManagerLazy.value
@@ -125,10 +125,10 @@ fun registerComponents(appContext: Context) {
             deps = object : SyncComponentFactory.Deps {
                 override val context: Context get() = appContext
 
-                override val eventsInteractor: EventsInteractor
-                    get() = eventsComponent.value.eventsInteractor
-                override val expensesInteractor: ExpensesInteractor
-                    get() = expensesComponent.value.expensesInteractor
+                override val eventsInteractorLazy: Lazy<EventsInteractor>
+                    get() = eventsComponent.value.eventsInteractorLazy
+                override val expensesInteractorLazy: Lazy<ExpensesInteractor>
+                    get() = expensesComponent.value.expensesInteractorLazy
 
             }
         ).create()

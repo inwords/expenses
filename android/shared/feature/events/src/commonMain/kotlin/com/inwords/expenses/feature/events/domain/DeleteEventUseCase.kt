@@ -57,8 +57,7 @@ class DeleteEventUseCase internal constructor(
     suspend fun deleteLocalEvent(eventId: Long): DeleteEventResult.Deleted {
         val currentEventId = settingsRepository.getCurrentEventId().first()
         if (currentEventId == eventId) {
-            settingsRepository.clearCurrentEventId()
-            settingsRepository.clearCurrentPersonId()
+            settingsRepository.clearCurrentEventAndPerson()
         }
         eventsLocalStore.delete(eventId)
         return DeleteEventResult.Deleted

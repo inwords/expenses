@@ -10,8 +10,8 @@ actual class SyncComponentFactory(private val deps: Deps) {
     actual interface Deps {
         val context: Context
 
-        actual val eventsInteractor: EventsInteractor
-        actual val expensesInteractor: ExpensesInteractor
+        actual val eventsInteractorLazy: Lazy<EventsInteractor>
+        actual val expensesInteractorLazy: Lazy<ExpensesInteractor>
     }
 
     actual fun create(): SyncComponent {

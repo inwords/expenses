@@ -9,7 +9,7 @@ class SettingsComponent internal constructor(
     private val settingsDataStoreFactory: SettingsDataStoreFactory
 ) : Component {
 
-    val settingsRepository: SettingsRepository by lazy {
+    val settingsRepositoryLazy: Lazy<SettingsRepository> = lazy {
         SettingsRepositoryImpl(
             settingsLocalDataSource = SettingsLocalDataSource(
                 lazy { settingsDataStoreFactory.createSettingsDataStore() }

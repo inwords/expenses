@@ -22,7 +22,7 @@ expect class EventsComponentFactory {
         val client: SuspendLazy<HttpClient>
         val hostConfig: HostConfig
 
-        val settingsRepository: SettingsRepository
+        val settingsRepositoryLazy: Lazy<SettingsRepository>
 
         val hooks: EventHooks
     }

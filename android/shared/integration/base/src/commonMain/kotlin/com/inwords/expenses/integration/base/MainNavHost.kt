@@ -55,58 +55,62 @@ fun MainNavHost(
         listOf(
             getJoinEventPaneNavModule(
                 navigationController = navigationController,
-                eventsInteractor = eventsComponent.eventsInteractor,
+                joinEventUseCaseLazy = eventsComponent.joinEventUseCaseLazy,
             ),
             getCreateEventPaneNavModule(
                 navigationController = navigationController,
-                eventsInteractor = eventsComponent.eventsInteractor,
+                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                getCurrenciesUseCaseLazy = eventsComponent.getCurrenciesUseCaseLazy,
                 expensesScreenDestination = ExpensesPaneDestination,
             ),
             getDeleteEventDialogNavModule(
                 navigationController = navigationController,
-                eventsInteractor = eventsComponent.eventsInteractor,
-                deleteEventUseCase = eventsComponent.deleteEventUseCase,
+                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                deleteEventUseCaseLazy = eventsComponent.deleteEventUseCaseLazy,
             ),
             getAddPersonsPaneNavModule(
                 navigationController = navigationController,
-                eventsInteractor = eventsComponent.eventsInteractor,
+                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
                 expensesPaneDestination = ExpensesPaneDestination,
             ),
             getChoosePersonPaneNavModule(
                 navigationController = navigationController,
-                eventsInteractor = eventsComponent.eventsInteractor,
-                settingsRepository = settingsComponent.settingsRepository,
+                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                settingsRepositoryLazy = settingsComponent.settingsRepositoryLazy,
                 expensesScreenDestination = ExpensesPaneDestination,
             ),
 
             getAddExpensePaneNavModule(
                 navigationController = navigationController,
-                eventsInteractor = eventsComponent.eventsInteractor,
-                expensesInteractor = expensesComponent.expensesInteractor,
-                settingsRepository = settingsComponent.settingsRepository,
+                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                expensesInteractorLazy = expensesComponent.expensesInteractorLazy,
+                settingsRepositoryLazy = settingsComponent.settingsRepositoryLazy,
             ),
             getExpensesPaneNavModule(
                 navigationController = navigationController,
-                eventsInteractor = eventsComponent.eventsInteractor,
-                deleteEventUseCase = eventsComponent.deleteEventUseCase,
-                expensesInteractor = expensesComponent.expensesInteractor,
-                settingsRepository = settingsComponent.settingsRepository,
+                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                getEventsUseCaseLazy = eventsComponent.getEventsUseCaseLazy,
+                deleteEventUseCaseLazy = eventsComponent.deleteEventUseCaseLazy,
+                expensesInteractorLazy = expensesComponent.expensesInteractorLazy,
+                joinEventUseCaseLazy = eventsComponent.joinEventUseCaseLazy,
+                settingsRepositoryLazy = settingsComponent.settingsRepositoryLazy,
             ),
             getDebtsListPaneNavModule(
                 navigationController = navigationController,
-                eventsInteractor = eventsComponent.eventsInteractor,
-                expensesInteractor = expensesComponent.expensesInteractor,
+                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                expensesInteractorLazy = expensesComponent.expensesInteractorLazy,
             ),
             getExpenseItemDialogNavModule(
                 navigationController = navigationController,
-                eventsInteractor = eventsComponent.eventsInteractor,
-                expensesInteractor = expensesComponent.expensesInteractor,
-                expensesLocalStore = expensesComponent.expensesLocalStore.value,
+                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                expensesInteractorLazy = expensesComponent.expensesInteractorLazy,
+                expensesLocalStoreLazy = expensesComponent.expensesLocalStore,
             ),
 
             getMenuDialogNavModule(
                 navigationController = navigationController,
-                eventsInteractor = eventsComponent.eventsInteractor,
+                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                leaveEventUseCaseLazy = eventsComponent.leaveEventUseCaseLazy,
                 shareManagerLazy = shareComponent.shareManagerLazy,
             )
         )
