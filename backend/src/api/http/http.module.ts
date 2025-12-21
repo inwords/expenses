@@ -1,10 +1,11 @@
 import {Module} from '@nestjs/common';
+import {TerminusModule} from '@nestjs/terminus';
 import {UserController} from './user/user.controller';
+import {HealthController} from './health/health.controller';
 import {UseCasesModule} from '#usecases/usecases.layer';
-import {HealthModule} from './health/health.module';
 
 @Module({
-  imports: [UseCasesModule, HealthModule],
-  controllers: [UserController],
+  imports: [UseCasesModule, TerminusModule],
+  controllers: [UserController, HealthController],
 })
 export class HttpModule {}

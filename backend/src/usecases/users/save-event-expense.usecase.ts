@@ -1,23 +1,18 @@
 import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import {UseCase} from '#packages/use-case';
 
-import {getCurrentDateWithoutTime, getDateWithoutTimeWithMoscowTimezone} from '#packages/date-utils';
+import {getCurrentDateWithoutTimeUTC, getDateWithoutTimeUTC} from '#packages/date-utils';
 
 import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-service/relational-data-service';
 import {IExpense, ISplitInfo} from '#domain/entities/expense.entity';
-import {CurrencyRateServiceAbstract} from '#domain/abstracts/currency-rate-service/currency-rate-service';
 import {ExpenseValueObject} from '#domain/value-objects/expense.value-object';
-import {CurrencyRateValueObject} from '#domain/value-objects/currency-rate.value-object';
 
 type Input = Omit<IExpense, 'createdAt' | 'id' | 'updatedAt'> & Partial<Pick<IExpense, 'createdAt'>>;
 type Output = IExpense;
 
 @Injectable()
 export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
-  constructor(
-    private readonly rDataService: RelationalDataServiceAbstract,
-    private readonly currencyRateService: CurrencyRateServiceAbstract,
-  ) {}
+  constructor(private readonly rDataService: RelationalDataServiceAbstract) {}
 
   public async execute(input: Input) {
     return this.rDataService.transaction(async (ctx) => {
@@ -49,6 +44,7 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
           HttpStatus.GONE,
         );
       }
+
       if (event.currencyId === input.currencyId) {
         let splitInformation: ISplitInfo[] = [];
 
@@ -80,52 +76,38 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
         }
 
         if (expenseCurrencyCode && eventCurrencyCode) {
-          const date = getCurrentDateWithoutTime();
           const getDateForExchangeRate = input.createdAt
-            ? getDateWithoutTimeWithMoscowTimezone(new Date(input.createdAt))
-            : date;
+            ? getDateWithoutTimeUTC(new Date(input.createdAt))
+            : getCurrentDateWithoutTimeUTC();
 
-          let [currencyRate] = await this.rDataService.currencyRate.findByDate(getDateForExchangeRate, {ctx});
+          const [currencyRate] = await this.rDataService.currencyRate.findByDate(getDateForExchangeRate, {ctx});
 
           if (!currencyRate) {
-            // TODO передалать на крон и ходить раз в сутки
-            currencyRate = new CurrencyRateValueObject({
-              date,
-              rate: await this.currencyRateService.getCurrencyRate(getDateForExchangeRate),
-            }).value;
-
-            await this.rDataService.currencyRate.insert(currencyRate, {ctx});
-          }
-
-          if (currencyRate.rate) {
-            const exchangeRate =
-              currencyRate.rate[eventCurrencyCode.code] / currencyRate.rate[expenseCurrencyCode.code];
-
-            let splitInformation: ISplitInfo[] = [];
-
-            for (let i of input.splitInformation) {
-              splitInformation.push({
-                ...i,
-                exchangedAmount: Number(Number(i.amount * exchangeRate).toFixed(2)),
-              });
-            }
-
-            const expense = new ExpenseValueObject({...input, splitInformation}).value;
-
-            await this.rDataService.expense.insert(expense, {ctx});
-
-            return expense;
-          } else {
-            // если вообще упали то взять старую дату
-            // https://www.youtube.com/watch?v=WR0Uh3-AVNA
             throw new HttpException(
               {
-                status: HttpStatus.INTERNAL_SERVER_ERROR,
-                error: `No currency rate available for ${getDateWithoutTimeWithMoscowTimezone(new Date(input.createdAt))} date`,
+                status: HttpStatus.NOT_FOUND,
+                error: `Currency rate not found for ${getDateForExchangeRate} date. Please try again later or contact support.`,
               },
-              HttpStatus.INTERNAL_SERVER_ERROR,
+              HttpStatus.NOT_FOUND,
             );
           }
+
+          const exchangeRate = currencyRate.rate[eventCurrencyCode.code] / currencyRate.rate[expenseCurrencyCode.code];
+
+          let splitInformation: ISplitInfo[] = [];
+
+          for (let i of input.splitInformation) {
+            splitInformation.push({
+              ...i,
+              exchangedAmount: Number(Number(i.amount * exchangeRate).toFixed(2)),
+            });
+          }
+
+          const expense = new ExpenseValueObject({...input, splitInformation}).value;
+
+          await this.rDataService.expense.insert(expense, {ctx});
+
+          return expense;
         }
       }
     });
