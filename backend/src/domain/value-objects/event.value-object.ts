@@ -3,7 +3,7 @@ import {IEvent} from '#domain/entities/event.entity';
 import {PartialByKeys} from '#packages/types';
 import {ulid} from 'ulid';
 
-export type TEventDefaultKeys = keyof Pick<IEvent, 'id' | 'createdAt' | 'updatedAt'>;
+export type TEventDefaultKeys = keyof Pick<IEvent, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>;
 
 export const eventDefaultValues: {
   [K in TEventDefaultKeys]: () => IEvent[K];
@@ -11,6 +11,7 @@ export const eventDefaultValues: {
   id: () => ulid(),
   createdAt: () => new Date(),
   updatedAt: () => new Date(),
+  deletedAt: () => null,
 } as const;
 Object.freeze(eventDefaultValues);
 
@@ -26,6 +27,7 @@ export class EventValueObject extends ValueObject<IEvent> {
       id: ValueObject.getValueOrDefault(objectValues.id, eventDefaultValues.id),
       createdAt: ValueObject.getValueOrDefault(objectValues.createdAt, eventDefaultValues.createdAt),
       updatedAt: ValueObject.getValueOrDefault(objectValues.updatedAt, eventDefaultValues.updatedAt),
+      deletedAt: ValueObject.getValueOrDefault(objectValues.deletedAt, eventDefaultValues.deletedAt),
     };
     super(valueObject);
     this.value = valueObject;

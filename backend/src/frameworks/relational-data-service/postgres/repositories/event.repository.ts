@@ -27,6 +27,14 @@ export class EventRepository extends BaseRepository implements EventRepositoryAb
       id,
     });
 
+    if (trx?.lock) {
+      query = query.setLock(trx.lock);
+
+      if (trx.onLocked) {
+        query = query.setOnLocked(trx.onLocked);
+      }
+    }
+
     const queryDetails = this.getQueryDetails(query);
     const result = await query.getOne();
 
@@ -40,6 +48,26 @@ export class EventRepository extends BaseRepository implements EventRepositoryAb
     const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
 
     const query = this.getRepository(ctx).createQueryBuilder().insert().values(input);
+    const queryDetails = this.getQueryDetails(query);
+
+    await query.execute();
+
+    return [undefined, queryDetails];
+  };
+
+  readonly update: EventRepositoryAbstract['update'] = async (
+    id: IEvent['id'],
+    data: Partial<Omit<IEvent, 'id'>>,
+    trx,
+  ): Promise<[result: undefined, queryDetails: IQueryDetails]> => {
+    const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
+
+    const query = this.getRepository(ctx)
+      .createQueryBuilder()
+      .update()
+      .set(data)
+      .where('id = :id', {id});
+
     const queryDetails = this.getQueryDetails(query);
 
     await query.execute();

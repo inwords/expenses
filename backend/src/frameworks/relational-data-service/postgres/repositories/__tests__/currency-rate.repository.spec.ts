@@ -35,10 +35,12 @@ describe('CurrencyRateRepository', () => {
         updatedAt: new Date('2023-01-01T00:00:00Z'),
       };
 
-      const [result, queryDetails] = await relationalDataService.currencyRate.insert(currencyRate);
+      const [, queryDetails] = await relationalDataService.currencyRate.insert(currencyRate);
+      const [result] = await relationalDataService.currencyRate.findByDate('2023-01-01');
 
-      // Объединяем результат и детали запроса для snapshot теста
-      expect({result, queryDetails}).toMatchSnapshot();
+      expect(result).toMatchObject(currencyRate);
+
+      expect(queryDetails).toMatchSnapshot();
     });
   });
 
@@ -61,15 +63,15 @@ describe('CurrencyRateRepository', () => {
       // Теперь ищем эти данные
       const [result, queryDetails] = await relationalDataService.currencyRate.findByDate('2023-01-01');
 
-      // Объединяем результат и детали запроса для snapshot теста
-      expect({result, queryDetails}).toMatchSnapshot();
+      expect(result).toMatchObject(currencyRate);
+      expect(queryDetails).toMatchSnapshot();
     });
 
     it('should return null for non-existent date', async () => {
       const [result, queryDetails] = await relationalDataService.currencyRate.findByDate('2023-12-31');
 
-      // Объединяем результат и детали запроса для snapshot теста
-      expect({result, queryDetails}).toMatchSnapshot();
+      expect(result).toBeNull();
+      expect(queryDetails).toMatchSnapshot();
     });
   });
 });

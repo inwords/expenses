@@ -32,10 +32,11 @@ describe('UserInfoRepository', () => {
         updatedAt: new Date('2023-01-01T00:00:00Z'),
       };
 
-      const [result, queryDetails] = await relationalDataService.userInfo.insert(userInfo);
+      const [, queryDetails] = await relationalDataService.userInfo.insert(userInfo);
+      const [foundUserInfos] = await relationalDataService.userInfo.findByEventId('event-1');
 
-      // Объединяем результат и детали запроса для snapshot теста
-      expect({result, queryDetails}).toMatchSnapshot();
+      expect(foundUserInfos).toMatchObject([userInfo]);
+      expect(queryDetails).toMatchSnapshot();
     });
 
     it('should insert multiple user infos correctly', async () => {
@@ -56,10 +57,11 @@ describe('UserInfoRepository', () => {
         },
       ];
 
-      const [result, queryDetails] = await relationalDataService.userInfo.insert(userInfos);
+      const [, queryDetails] = await relationalDataService.userInfo.insert(userInfos);
+      const [foundUserInfos] = await relationalDataService.userInfo.findByEventId('event-1');
 
-      // Объединяем результат и детали запроса для snapshot теста
-      expect({result, queryDetails}).toMatchSnapshot();
+      expect(foundUserInfos).toMatchObject(userInfos);
+      expect(queryDetails).toMatchSnapshot();
     });
   });
 
@@ -88,15 +90,15 @@ describe('UserInfoRepository', () => {
       // Теперь ищем информацию о пользователях по event id
       const [result, queryDetails] = await relationalDataService.userInfo.findByEventId('event-1');
 
-      // Объединяем результат и детали запроса для snapshot теста
-      expect({result, queryDetails}).toMatchSnapshot();
+      expect(result).toMatchObject(userInfos);
+      expect(queryDetails).toMatchSnapshot();
     });
 
     it('should return empty array for non-existent event', async () => {
       const [result, queryDetails] = await relationalDataService.userInfo.findByEventId('non-existent');
 
-      // Объединяем результат и детали запроса для snapshot теста
-      expect({result, queryDetails}).toMatchSnapshot();
+      expect(result).toEqual([]);
+      expect(queryDetails).toMatchSnapshot();
     });
   });
 });

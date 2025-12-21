@@ -48,10 +48,11 @@ describe('ExpenseRepository', () => {
         updatedAt: new Date('2023-01-01T00:00:00Z'),
       };
 
-      const [result, queryDetails] = await relationalDataService.expense.insert(expense);
+      const [, queryDetails] = await relationalDataService.expense.insert(expense);
+      const [foundExpenses] = await relationalDataService.expense.findByEventId('event-1');
 
-      // Объединяем результат и детали запроса для snapshot теста
-      expect({result, queryDetails}).toMatchSnapshot();
+      expect(foundExpenses).toMatchObject([expense]);
+      expect(queryDetails).toMatchSnapshot();
     });
   });
 
@@ -86,15 +87,15 @@ describe('ExpenseRepository', () => {
       // Теперь ищем расходы по event id
       const [result, queryDetails] = await relationalDataService.expense.findByEventId('event-1');
 
-      // Объединяем результат и детали запроса для snapshot теста
-      expect({result, queryDetails}).toMatchSnapshot();
+      expect(result).toMatchObject([expense]);
+      expect(queryDetails).toMatchSnapshot();
     });
 
     it('should return empty array for non-existent event', async () => {
       const [result, queryDetails] = await relationalDataService.expense.findByEventId('non-existent');
 
-      // Объединяем результат и детали запроса для snapshot теста
-      expect({result, queryDetails}).toMatchSnapshot();
+      expect(result).toEqual([]);
+      expect(queryDetails).toMatchSnapshot();
     });
   });
 });

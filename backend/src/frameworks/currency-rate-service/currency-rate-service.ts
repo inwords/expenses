@@ -6,6 +6,7 @@ import {env} from '../../config';
 
 export class CurrencyRateService implements CurrencyRateServiceAbstract {
   constructor(private readonly httpService: HttpService) {}
+
   getCurrencyRate: (date: ICurrencyRate['date']) => Promise<Record<string, number> | null> = async (date) => {
     const result = await retry(
       async () =>

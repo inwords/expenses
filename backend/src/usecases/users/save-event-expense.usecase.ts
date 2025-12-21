@@ -20,19 +20,35 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
   ) {}
 
   public async execute(input: Input) {
-    const [event] = await this.rDataService.event.findById(input.eventId);
-
-    if (!event) {
-      throw new HttpException(
-        {
-          status: HttpStatus.NOT_FOUND,
-          error: `Event with id ${input.eventId} not found`,
-        },
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
     return this.rDataService.transaction(async (ctx) => {
+      // Блокируем event с pessimistic_write для предотвращения race condition
+      // Если кто-то пытается удалить event, мы заблокируем строку и проверим что она не удалена
+      const [event] = await this.rDataService.event.findById(input.eventId, {
+        ctx,
+        lock: 'pessimistic_write',
+        onLocked: 'nowait',
+      });
+
+      if (!event) {
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: `Event with id ${input.eventId} not found`,
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      // Проверяем что event не был soft deleted
+      if (event.deletedAt !== null) {
+        throw new HttpException(
+          {
+            status: HttpStatus.GONE,
+            error: `Event with id ${input.eventId} has been deleted`,
+          },
+          HttpStatus.GONE,
+        );
+      }
       if (event.currencyId === input.currencyId) {
         let splitInformation: ISplitInfo[] = [];
 
@@ -72,6 +88,7 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
           let [currencyRate] = await this.rDataService.currencyRate.findByDate(getDateForExchangeRate, {ctx});
 
           if (!currencyRate) {
+            // TODO передалать на крон и ходить раз в сутки
             currencyRate = new CurrencyRateValueObject({
               date,
               rate: await this.currencyRateService.getCurrencyRate(getDateForExchangeRate),
@@ -99,6 +116,7 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
 
             return expense;
           } else {
+            // если вообще упали то взять старую дату
             // https://www.youtube.com/watch?v=WR0Uh3-AVNA
             throw new HttpException(
               {
