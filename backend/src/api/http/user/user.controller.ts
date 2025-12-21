@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpCode, Param, Post, Query} from '@nestjs/common';
+import {Body, Controller, Delete, Get, HttpCode, Param, Post, Query} from '@nestjs/common';
 import {UserRoutes} from './user.contants';
 import {ApiTags} from '@nestjs/swagger';
 
@@ -7,6 +7,7 @@ import {GetEventInfoQueryDto} from './dto/get-event-info.dto';
 import {EventIdDto} from './dto/event-id.dto';
 import {AddUsersToEventDto} from './dto/add-users-to-event.dto';
 import {CreatedExpenseDto} from './dto/create-expense.dto';
+import {DeleteEventBodyDto} from './dto/delete-event.dto';
 
 import {GetAllCurrenciesUseCase} from '#usecases/users/get-all-currencies.usecase';
 import {GetEventExpensesUseCase} from '#usecases/users/get-event-expenses.usecase';
@@ -14,6 +15,7 @@ import {SaveEventExpenseUseCase} from '#usecases/users/save-event-expense.usecas
 import {SaveEventUseCase} from '#usecases/users/save-event.usecase';
 import {GetEventInfoUseCase} from '#usecases/users/get-event-info.usecase';
 import {SaveUsersToEventUseCase} from '#usecases/users/save-users-to-event.usecase';
+import {DeleteEventUseCase} from '#usecases/users/delete-event.usecase';
 
 @Controller(UserRoutes.root)
 @ApiTags('User')
@@ -25,7 +27,9 @@ export class UserController {
     private readonly saveEventUseCase: SaveEventUseCase,
     private readonly getEventInfoUseCase: GetEventInfoUseCase,
     private readonly saveUsersToEventUseCase: SaveUsersToEventUseCase,
+    private readonly deleteEventUseCase: DeleteEventUseCase,
   ) {}
+
   @Get(UserRoutes.getAllCurrencies)
   @HttpCode(200)
   async getAllCurrencies() {
@@ -43,6 +47,12 @@ export class UserController {
   @Get(UserRoutes.getEventInfo)
   async getEventInfo(@Param() {eventId}: EventIdDto, @Query() query: GetEventInfoQueryDto) {
     return this.getEventInfoUseCase.execute({eventId, pinCode: query.pinCode});
+  }
+
+  @Delete(UserRoutes.deleteEvent)
+  @HttpCode(200)
+  async deleteEvent(@Param() {eventId}: EventIdDto, @Body() body: DeleteEventBodyDto) {
+    return this.deleteEventUseCase.execute({eventId, pinCode: body.pinCode});
   }
 
   @Post(UserRoutes.addUsersToEvent)

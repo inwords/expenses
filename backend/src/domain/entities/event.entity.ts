@@ -5,4 +5,5 @@ export interface IEvent {
   pinCode: string;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date | null;
 }

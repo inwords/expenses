@@ -2,39 +2,30 @@
 
 exports[`CurrencyRateRepository findByDate should find currency rate by date 1`] = `
 {
-  "queryDetails": {
-    "queryParameters": {
-      "date": "2023-01-01",
-    },
-    "queryString": "SELECT "currency_rate"."date" AS "currency_rate_date", "currency_rate"."rate" AS "currency_rate_rate", "currency_rate"."created_at" AS "currency_rate_created_at", "currency_rate"."updated_at" AS "currency_rate_updated_at" FROM "currency_rate" "currency_rate" WHERE "currency_rate"."date" = :date",
+  "queryParameters": {
+    "date": "2023-01-01",
   },
-  "result": null,
+  "queryString": "SELECT "currency_rate"."date" AS "currency_rate_date", "currency_rate"."rate" AS "currency_rate_rate", "currency_rate"."created_at" AS "currency_rate_created_at", "currency_rate"."updated_at" AS "currency_rate_updated_at" FROM "currency_rate" "currency_rate" WHERE "currency_rate"."date" = :date",
 }
 `;
 
 exports[`CurrencyRateRepository findByDate should return null for non-existent date 1`] = `
 {
-  "queryDetails": {
-    "queryParameters": {
-      "date": "2023-12-31",
-    },
-    "queryString": "SELECT "currency_rate"."date" AS "currency_rate_date", "currency_rate"."rate" AS "currency_rate_rate", "currency_rate"."created_at" AS "currency_rate_created_at", "currency_rate"."updated_at" AS "currency_rate_updated_at" FROM "currency_rate" "currency_rate" WHERE "currency_rate"."date" = :date",
+  "queryParameters": {
+    "date": "2023-12-31",
   },
-  "result": null,
+  "queryString": "SELECT "currency_rate"."date" AS "currency_rate_date", "currency_rate"."rate" AS "currency_rate_rate", "currency_rate"."created_at" AS "currency_rate_created_at", "currency_rate"."updated_at" AS "currency_rate_updated_at" FROM "currency_rate" "currency_rate" WHERE "currency_rate"."date" = :date",
 }
 `;
 
 exports[`CurrencyRateRepository insert should insert currency rate correctly 1`] = `
 {
-  "queryDetails": {
-    "queryParameters": {
-      "orm_param_0": "2023-01-01",
-      "orm_param_1": "{"EUR":1,"USD":1.05,"RUB":80.5}",
-      "orm_param_2": 2023-01-01T00:00:00.000Z,
-      "orm_param_3": 2023-01-01T00:00:00.000Z,
-    },
-    "queryString": "INSERT INTO "currency_rate" AS "CurrencyRateEntity"("date", "rate", "created_at", "updated_at") VALUES (:orm_param_0, :orm_param_1, :orm_param_2, :orm_param_3)",
+  "queryParameters": {
+    "orm_param_0": "2023-01-01",
+    "orm_param_1": "{"EUR":1,"USD":1.05,"RUB":80.5}",
+    "orm_param_2": 2023-01-01T00:00:00.000Z,
+    "orm_param_3": 2023-01-01T00:00:00.000Z,
   },
-  "result": undefined,
+  "queryString": "INSERT INTO "currency_rate" AS "CurrencyRateEntity"("date", "rate", "created_at", "updated_at") VALUES (:orm_param_0, :orm_param_1, :orm_param_2, :orm_param_3)",
 }
 `;

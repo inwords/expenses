@@ -10,7 +10,6 @@ describe('CurrencyRepository', () => {
       dbConfig: appDbConfig,
       showQueryDetails: true,
     });
-
     await relationalDataService.initialize();
     // Очищаем базу данных перед запуском тестов
     await relationalDataService.flush();
@@ -24,11 +23,6 @@ describe('CurrencyRepository', () => {
     await relationalDataService.flush();
   });
 
-  afterEach(async () => {
-    // Очищаем таблицы после каждого теста
-    await relationalDataService.flush();
-  });
-
   describe('insert', () => {
     it('should insert single currency correctly', async () => {
       const currency = {
@@ -38,10 +32,11 @@ describe('CurrencyRepository', () => {
         updatedAt: new Date('2023-01-01T00:00:00Z'),
       };
 
-      const [result, queryDetails] = await relationalDataService.currency.insert(currency);
+      const [, queryDetails] = await relationalDataService.currency.insert(currency);
+      const [result] = await relationalDataService.currency.findById('currency-1');
 
-      // Объединяем результат и детали запроса для snapshot теста
-      expect({result, queryDetails}).toMatchSnapshot();
+      expect(result).toMatchObject(currency);
+      expect(queryDetails).toMatchSnapshot();
     });
 
     it('should insert multiple currencies correctly', async () => {
@@ -60,10 +55,13 @@ describe('CurrencyRepository', () => {
         },
       ];
 
-      const [result, queryDetails] = await relationalDataService.currency.insert(currencies);
+      const [, queryDetails] = await relationalDataService.currency.insert(currencies);
+      const [result1] = await relationalDataService.currency.findById('currency-1');
+      const [result2] = await relationalDataService.currency.findById('currency-2');
 
-      // Объединяем результат и детали запроса для snapshot теста
-      expect({result, queryDetails}).toMatchSnapshot();
+      expect(result1).toMatchObject(currencies[0]);
+      expect(result2).toMatchObject(currencies[1]);
+      expect(queryDetails).toMatchSnapshot();
     });
   });
 
@@ -82,15 +80,15 @@ describe('CurrencyRepository', () => {
       // Теперь ищем эти данные
       const [result, queryDetails] = await relationalDataService.currency.findById('currency-1');
 
-      // Объединяем результат и детали запроса для snapshot теста
-      expect({result, queryDetails}).toMatchSnapshot();
+      expect(result).toMatchObject(currency);
+      expect(queryDetails).toMatchSnapshot();
     });
 
     it('should return null for non-existent currency', async () => {
       const [result, queryDetails] = await relationalDataService.currency.findById('non-existent');
 
-      // Объединяем результат и детали запроса для snapshot теста
-      expect({result, queryDetails}).toMatchSnapshot();
+      expect(result).toBeNull();
+      expect(queryDetails).toMatchSnapshot();
     });
   });
 
@@ -123,8 +121,17 @@ describe('CurrencyRepository', () => {
       // Теперь получаем все валюты с лимитом
       const [result, queryDetails] = await relationalDataService.currency.findAll({limit: 2});
 
-      // Объединяем результат и детали запроса для snapshot теста
-      expect({result, queryDetails}).toMatchSnapshot();
+      expect(result).toHaveLength(2);
+      expect(result[0]).toMatchObject(currencies[0]);
+      expect(result[1]).toMatchObject(currencies[1]);
+      expect(queryDetails).toMatchSnapshot();
+    });
+
+    it('should return empty array when no currencies exist', async () => {
+      const [result, queryDetails] = await relationalDataService.currency.findAll({limit: 1});
+
+      expect(result).toEqual([]);
+      expect(queryDetails).toMatchSnapshot();
     });
   });
 });
