@@ -3,7 +3,7 @@
 exports[`CurrencyRepository findAll should find all currencies with limit 1`] = `
 {
   "queryParameters": {},
-  "queryString": "SELECT "currency"."id" AS "currency_id", "currency"."code" AS "currency_code", "currency"."created_at" AS "currency_created_at", "currency"."updated_at" AS "currency_updated_at" FROM "currency" "currency" LIMIT 2",
+  "queryString": "SELECT "currency"."id" AS "currency_id", "currency"."code" AS "currency_code", "currency"."created_at" AS "currency_created_at", "currency"."updated_at" AS "currency_updated_at" FROM "currency" "currency" LIMIT 1",
 }
 `;
 

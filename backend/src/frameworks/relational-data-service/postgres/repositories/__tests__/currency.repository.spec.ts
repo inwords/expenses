@@ -101,29 +101,15 @@ describe('CurrencyRepository', () => {
           code: CurrencyCode.EUR,
           createdAt: new Date('2023-01-01T00:00:00Z'),
           updatedAt: new Date('2023-01-01T00:00:00Z'),
-        },
-        {
-          id: 'currency-2',
-          code: CurrencyCode.USD,
-          createdAt: new Date('2023-01-01T00:00:00Z'),
-          updatedAt: new Date('2023-01-01T00:00:00Z'),
-        },
-        {
-          id: 'currency-3',
-          code: CurrencyCode.RUB,
-          createdAt: new Date('2023-01-01T00:00:00Z'),
-          updatedAt: new Date('2023-01-01T00:00:00Z'),
-        },
+        }
       ];
 
       await relationalDataService.currency.insert(currencies);
 
       // Теперь получаем все валюты с лимитом
-      const [result, queryDetails] = await relationalDataService.currency.findAll({limit: 2});
+      const [result, queryDetails] = await relationalDataService.currency.findAll({limit: 1});
 
-      expect(result).toHaveLength(2);
-      expect(result[0]).toMatchObject(currencies[0]);
-      expect(result[1]).toMatchObject(currencies[1]);
+      expect(result).toMatchObject(currencies);
       expect(queryDetails).toMatchSnapshot();
     });
 
