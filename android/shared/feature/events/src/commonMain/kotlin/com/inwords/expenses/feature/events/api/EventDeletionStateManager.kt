@@ -6,6 +6,7 @@ interface EventDeletionStateManager {
 
     sealed interface EventDeletionState {
         data object None : EventDeletionState
+        data object PendingDeletionChoice : EventDeletionState
         data object Loading : EventDeletionState
         data object RemoteDeletionFailed : EventDeletionState
     }

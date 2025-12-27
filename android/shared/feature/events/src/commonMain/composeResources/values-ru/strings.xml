@@ -29,7 +29,8 @@
     <string name="events_delete_event">Удалить событие</string>
     <string name="events_keep_event">Не удалять событие</string>
     <string name="events_your">Ваше</string>
-    <string name="events_delete_event_offline_message">Не удалось связаться с сервером. Удалить только локальную копию или оставить событие до появления интернета?</string>
+    <string name="events_delete_event_offline_message">Не удалось связаться с сервером</string>
     <string name="events_delete_local_only">Удалить локальную копию</string>
+    <string name="events_delete_everywhere">Удалить везде</string>
     <string name="events_event_deleted">Событие %1$s удалено</string>
 </resources>

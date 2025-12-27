@@ -4,6 +4,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import de.mannodermaus.junit5.compose.ComposeContext
 import de.mannodermaus.junit5.compose.createAndroidComposeExtension
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import ru.commonex.screens.ExpensesScreen
 import ru.commonex.screens.LocalEventsScreen
@@ -13,28 +14,40 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 // .\gradlew.bat :app:connectedAutotestAndroidTest
 @OptIn(ExperimentalTestApi::class)
+@ExtendWith(ConnectivityExtension::class)
 class BasicInstrumentedTest {
 
     @RegisterExtension
     @ExperimentalTestApi
     private val extension = createAndroidComposeExtension<MainActivity>()
 
+    /**
+     * Tests the complete event creation and expenses flow:
+     * - Create event with multiple participants
+     * - Add expense with equal split (default)
+     * - Add expense with non-equal split
+     * - Cancel an expense and verify revert
+     * - Verify debt calculations
+     * - Switch to a different person and verify view updates
+     */
     @Test
     fun testBasicNewEventAndExpensesFlow() {
         extension.runTest {
             // Create event and add participants
+            val eventName = "UI Test Event"
             val expensesScreen = LocalEventsScreen()
                 .clickCreateEvent()
-                .enterEventName("UI Test Event")
+                .enterEventName(eventName)
                 .selectCurrency("Euro")
                 .clickContinueButton()
                 .enterOwnerName("Test User 1")
                 .addParticipant("Test User 2")
                 .addParticipant("Test User 3")
                 .clickContinueButton()
-                .waitUntilLoaded()
+                .waitUntilLoadedEmpty()
+                .verifyCurrentPerson(eventName, "Test User 1")
 
-            // Add first expense
+            // Add first expense (equal split - default)
             expensesScreen
                 .clickAddExpense()
                 .enterDescription("Булка")
@@ -42,11 +55,12 @@ class BasicInstrumentedTest {
                 .clickConfirm()
                 .verifyExpenseAmount("-120")
 
-            // Add second expense
+            // Add second expense with non-equal split
             expensesScreen
                 .clickAddExpense()
                 .enterDescription("Хот-дог")
                 .enterAmount("180")
+                .clickEqualSplitSwitch()
                 .clickConfirm()
                 .verifyExpenseAmount("-180")
 
@@ -56,20 +70,27 @@ class BasicInstrumentedTest {
                 .clickCancelExpense()
                 .verifyRevertedExpenseExists("Булка")
 
-            // Verify debts details
+            // Verify debts details and go back
             expensesScreen
                 .clickDebtDetails()
                 .verifyDebtAmount("60", "Test User 1", 2)
+                .goBack()
+
+            // Switch to a different person via menu and verify title updates
+            ExpensesScreen()
+                .openMenu()
+                .chooseParticipant()
+                .selectPerson("Test User 2")
+                .verifyCurrentPerson(eventName, "Test User 2")
         }
     }
 
-    @Test
-    fun testCreateEmptyEvent() {
-        extension.runTest {
-            createLocalEvent("UI Test Event")
-        }
-    }
-
+    /**
+     * Tests joining an existing remote event:
+     * - Enter event ID and access code
+     * - Select person from participants list
+     * - Verify expenses screen loads
+     */
     @OptIn(ExperimentalEncodingApi::class)
     @Test
     fun testJoinExistingEvent() {
@@ -79,50 +100,145 @@ class BasicInstrumentedTest {
                 .joinEvent("01JYC8BX30EKQYWBRTPKVX6S26", Base64.decode("NTc=").decodeToString() + Base64.decode("NTQ=").decodeToString()) // FIXME: costyl
                 .waitUntilLoaded("Test User 2")
                 .selectPerson("Test User 2")
-                .waitUntilLoaded()
+                .waitUntilLoadedEmpty()
         }
     }
 
+    /**
+     * Tests the complete local event flow:
+     * - Create multiple events
+     * - Switch between events from the events list (with person selection)
+     * - Delete them one by one using "Remove local copy"
+     * - Verify snackbar appears after deletion
+     * - Verify empty state appears after all events deleted
+     */
     @Test
-    fun testLocalEventsDeletion() {
+    fun testLocalEventsDeletionFlow() {
         extension.runTest {
-            // Create two local events
-            val eventName1 = "Test event 1"
-            val eventName2 = "Test event 2"
-            createLocalEvent(eventName1)
-            ExpensesScreen()
-                .openMenu()
-                .openEventsList()
-            createLocalEvent(eventName2)
+            val event1 = "Delete test event 1"
+            val event2 = "Delete test event 2"
 
+            createLocalEvent(event1)
+            ExpensesScreen().openMenu().openEventsList()
+            createLocalEvent(event2)
+
+            // Test switching between events
             ExpensesScreen()
-                // Delete event 1
                 .openMenu()
                 .openEventsList()
-                .swipeToDelete(eventName1)
-                .confirmDeletion()
-                // Verify event 1 is deleted and event 2 still exists
-                .assertEventNotExists(eventName1)
-                .assertEventExists(eventName2)
-                // Delete event 2
-                .swipeToDelete(eventName2)
-                .confirmDeletion()
-                // Verify event 2 is deleted
-                .assertEventNotExists(eventName2)
+                .assertEventExists(event1)
+                .assertEventExists(event2)
+                // Switch to event1
+                .clickEvent(event1)
+                .selectPerson("Test User 1")
+                .waitUntilLoadedEmpty()
+                // Go back and switch to event2
+                .openMenu()
+                .openEventsList()
+                .clickEvent(event2)
+                .selectPerson("Test User 1")
+                .waitUntilLoadedEmpty()
+
+            // Now test deletion
+            ExpensesScreen()
+                .openMenu()
+                .openEventsList()
+                // Delete first event
+                .swipeToRevealActions(event1)
+                .clickDeleteLocalOnly()
+                .assertEventNotExists(event1)
+                .assertEventDeletedSnackbar(event1)
+                .assertEventExists(event2)
+                // Delete second event
+                .swipeToRevealActions(event2)
+                .clickDeleteLocalOnly()
+                .assertEventNotExists(event2)
+                // Verify empty state after all events deleted
+                .assertCreateJoinDescriptionVisible()
         }
     }
 
+    /**
+     * Tests keeping events via both methods:
+     * - Keep event using "Keep event" button
+     * - Keep event by swiping back
+     *
+     * @Offline prevents sync to isolate local-only behavior
+     */
+    @Offline
     @Test
-    fun testLocalEventsDeletionKeep() {
+    fun testLocalEventsKeepEvent() {
         extension.runTest {
-            val eventName = "Test event"
+            val event1 = "Keep via button"
+            val event2 = "Keep via swipe back"
+
+            createLocalEvent(event1)
+            ExpensesScreen().openMenu().openEventsList()
+            createLocalEvent(event2)
+
+            ExpensesScreen()
+                .openMenu()
+                .openEventsList()
+                // Test keeping via button
+                .swipeToRevealActions(event1)
+                .clickKeepEvent()
+                .assertEventExists(event1)
+                // Test keeping via swipe back
+                .swipeToRevealActions(event2)
+                .swipeBack(event2)
+                .assertEventExists(event2)
+                // Both events should still exist
+                .assertEventExists(event1)
+                .assertEventExists(event2)
+        }
+    }
+
+    /**
+     * Tests "Delete everywhere" flow for synced events:
+     * - Create event (automatically syncs)
+     * - Delete using "Delete everywhere" option
+     * - Confirm in dialog
+     */
+    @Test
+    fun testSyncedEventDeleteEverywhere() {
+        extension.runTest {
+            val eventName = "Synced event to delete"
+
             createLocalEvent(eventName)
 
             ExpensesScreen()
                 .openMenu()
                 .openEventsList()
-                .swipeToDelete(eventName)
+                .swipeToRevealActions(eventName)
+                .clickDeleteEverywhere()
+                // Confirm deletion in dialog
+                .confirmDeletion()
+                .assertEventNotExists(eventName)
+                .assertCreateJoinDescriptionVisible()
+        }
+    }
+
+    /**
+     * Tests canceling "Delete everywhere" via dialog:
+     * - Create synced event
+     * - Start delete but cancel in dialog
+     * - Verify event still exists
+     */
+    @Test
+    fun testSyncedEventDeleteEverywhereCanceled() {
+        extension.runTest {
+            val eventName = "Synced event keep"
+
+            createLocalEvent(eventName)
+
+            ExpensesScreen()
+                .openMenu()
+                .openEventsList()
+                .swipeToRevealActions(eventName)
+                .clickDeleteEverywhere()
+                // Cancel deletion in dialog
                 .keepEvent()
+                // Event should still exist
                 .assertEventExists(eventName)
         }
     }
@@ -135,7 +251,7 @@ class BasicInstrumentedTest {
             .clickContinueButton()
             .enterOwnerName("Test User 1")
             .clickContinueButton()
-            .waitUntilLoaded()
+            .waitUntilLoadedEmpty()
     }
 
 }

@@ -4,18 +4,28 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import de.mannodermaus.junit5.compose.ComposeContext
+import expenses.shared.feature.events.generated.resources.events_info_with_person
 import expenses.shared.feature.expenses.generated.resources.Res
 import expenses.shared.feature.expenses.generated.resources.expenses_details
 import expenses.shared.feature.expenses.generated.resources.expenses_none
 import expenses.shared.feature.expenses.generated.resources.expenses_operation
 import expenses.shared.feature.expenses.generated.resources.expenses_revert_description
 import org.jetbrains.compose.resources.getString
+import expenses.shared.feature.events.generated.resources.Res as EventsRes
 
 internal class ExpensesScreen : BaseScreen() {
     context(extension: ComposeContext)
-    suspend fun waitUntilLoaded(): ExpensesScreen {
+    suspend fun waitUntilLoadedEmpty(): ExpensesScreen {
         val noneLabel = getString(Res.string.expenses_none)
         waitForElementWithText(noneLabel)
+        return this
+    }
+
+    context(extension: ComposeContext)
+    suspend fun verifyCurrentPerson(eventName: String, personName: String): ExpensesScreen {
+        val titleText = getString(EventsRes.string.events_info_with_person, eventName, personName)
+        waitForElementWithText(titleText)
+        assertElementWithTextExists(titleText)
         return this
     }
 
