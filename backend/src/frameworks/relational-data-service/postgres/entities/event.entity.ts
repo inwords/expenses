@@ -21,6 +21,6 @@ export class EventEntity implements IEvent {
   @Column({type: 'timestamptz'})
   updatedAt!: IEvent['updatedAt'];
 
-  @Column({type: 'timestamptz', nullable: true, default: null})
+  @Column({type: 'timestamptz', nullable: true})
   deletedAt!: IEvent['deletedAt'];
 }
