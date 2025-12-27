@@ -7,7 +7,7 @@ import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.core.utils.asImmutableListAdapter
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
-import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.EventCreationStateHolder
 import com.inwords.expenses.feature.events.domain.GetCurrenciesUseCase
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.ui.add_persons.AddPersonsPaneDestination
@@ -25,7 +25,7 @@ import kotlinx.coroutines.plus
 
 internal class CreateEventViewModel(
     private val navigationController: NavigationController,
-    private val eventsInteractor: EventsInteractor,
+    private val eventCreationStateHolder: EventCreationStateHolder,
     getCurrenciesUseCase: GetCurrenciesUseCase,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
@@ -86,10 +86,10 @@ internal class CreateEventViewModel(
         confirmJob?.cancel()
         confirmJob = viewModelScope.launch {
             val state = _state.value
-            eventsInteractor.draftEventName(
+            eventCreationStateHolder.draftEventName(
                 eventName = state.eventName.takeIf { it.isNotBlank() } ?: return@launch
             )
-            eventsInteractor.draftEventPrimaryCurrency(
+            eventCreationStateHolder.draftEventPrimaryCurrency(
                 currency = state.currencies.first { it.selected }.currency
             )
             navigationController.navigateTo(

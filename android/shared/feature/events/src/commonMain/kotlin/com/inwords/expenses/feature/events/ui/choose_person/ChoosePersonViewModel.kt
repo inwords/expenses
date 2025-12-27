@@ -9,7 +9,7 @@ import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.asImmutableListAdapter
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
-import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneUiModel.PersonUiModel
@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 
 internal class ChoosePersonViewModel(
     private val navigationController: NavigationController,
-    eventsInteractor: EventsInteractor,
+    getCurrentEventStateUseCase: GetCurrentEventStateUseCase,
     private val settingsRepository: SettingsRepository,
     private val expensesScreenDestination: Destination,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
@@ -41,7 +41,7 @@ internal class ChoosePersonViewModel(
     private val selectedPersonId = MutableStateFlow<Long?>(null)
 
     val state: StateFlow<SimpleScreenState<ChoosePersonPaneUiModel>> = combine(
-        eventsInteractor.currentEvent
+        getCurrentEventStateUseCase.currentEvent
             .filterNotNull() // TODO mvp
             .map { EventWithPersons(event = it.event, persons = it.persons) }
             .distinctUntilChanged(),

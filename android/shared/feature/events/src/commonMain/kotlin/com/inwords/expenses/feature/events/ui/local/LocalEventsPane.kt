@@ -54,7 +54,7 @@ import com.inwords.expenses.core.ui.design.button.ButtonWithIconAndText
 import com.inwords.expenses.core.ui.design.button.OutlinedButtonWithText
 import com.inwords.expenses.core.ui.design.legal.LegalBlock
 import com.inwords.expenses.core.ui.design.theme.CommonExTheme
-import com.inwords.expenses.feature.events.domain.EventsInteractor.EventDeletionState
+import com.inwords.expenses.feature.events.api.EventDeletionStateManager.EventDeletionState
 import com.inwords.expenses.feature.events.ui.local.LocalEventsUiModel.LocalEventUiModel
 import expenses.shared.core.ui_design.generated.resources.agree_by_continuing
 import expenses.shared.feature.events.generated.resources.Res

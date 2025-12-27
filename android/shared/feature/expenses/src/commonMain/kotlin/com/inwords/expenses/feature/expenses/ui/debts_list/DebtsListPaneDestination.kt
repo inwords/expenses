@@ -7,7 +7,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavModule
 import com.inwords.expenses.core.navigation.NavigationController
-import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import kotlinx.serialization.Serializable
 
@@ -16,7 +16,7 @@ object DebtsListPaneDestination : Destination
 
 fun getDebtsListPaneNavModule(
     navigationController: NavigationController,
-    eventsInteractorLazy: Lazy<EventsInteractor>,
+    getCurrentEventStateUseCaseLazy: Lazy<GetCurrentEventStateUseCase>,
     expensesInteractorLazy: Lazy<ExpensesInteractor>,
 ): NavModule {
     return NavModule(DebtsListPaneDestination.serializer()) {
@@ -25,7 +25,7 @@ fun getDebtsListPaneNavModule(
                 initializer {
                     DebtsListViewModel(
                         navigationController = navigationController,
-                        eventsInteractor = eventsInteractorLazy.value,
+                        getCurrentEventStateUseCase = getCurrentEventStateUseCaseLazy.value,
                         expensesInteractor = expensesInteractorLazy.value,
                     )
                 }

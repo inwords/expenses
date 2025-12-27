@@ -7,7 +7,7 @@ import androidx.navigation3.scene.DialogSceneStrategy.Companion.dialog
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavModule
 import com.inwords.expenses.core.navigation.NavigationController
-import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.expenses.domain.store.ExpensesLocalStore
 import kotlinx.serialization.Serializable
@@ -20,7 +20,7 @@ internal data class ExpenseItemDialogDestination(
 
 fun getExpenseItemDialogNavModule(
     navigationController: NavigationController,
-    eventsInteractorLazy: Lazy<EventsInteractor>,
+    getCurrentEventStateUseCaseLazy: Lazy<GetCurrentEventStateUseCase>,
     expensesInteractorLazy: Lazy<ExpensesInteractor>,
     expensesLocalStoreLazy: Lazy<ExpensesLocalStore>,
 ): NavModule {
@@ -30,7 +30,7 @@ fun getExpenseItemDialogNavModule(
                 initializer {
                     ExpenseItemDialogViewModel(
                         navigationController = navigationController,
-                        eventsInteractor = eventsInteractorLazy.value,
+                        getCurrentEventStateUseCase = getCurrentEventStateUseCaseLazy.value,
                         expensesInteractor = expensesInteractorLazy.value,
                         expensesLocalStore = expensesLocalStoreLazy.value,
                         expenseId = key.expenseId

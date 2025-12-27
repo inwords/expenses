@@ -2,7 +2,7 @@ package com.inwords.expenses.feature.sync.domain
 
 import com.inwords.expenses.core.utils.collectIn
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
-import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.expenses.domain.model.Expense
@@ -16,11 +16,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 
 class EventsSyncObserver internal constructor(
-    eventsInteractorLazy: Lazy<EventsInteractor>,
+    getCurrentEventStateUseCaseLazy: Lazy<GetCurrentEventStateUseCase>,
     expensesInteractorLazy: Lazy<ExpensesInteractor>,
     eventsSyncManagerLazy: Lazy<EventsSyncManager>
 ) {
-    private val eventsInteractor by eventsInteractorLazy
+    private val getCurrentEventStateUseCase by getCurrentEventStateUseCaseLazy
     private val expensesInteractor by expensesInteractorLazy
     private val eventsSyncManager by eventsSyncManagerLazy
 
@@ -29,7 +29,7 @@ class EventsSyncObserver internal constructor(
      */
     fun observeNewEventsIn(scope: CoroutineScope) {
         merge(
-            eventsInteractor.currentEvent
+            getCurrentEventStateUseCase.currentEvent
                 .distinctUntilChanged { old, new ->
                     old?.event?.id == new?.event?.id &&
                         old?.persons?.personsToIdsSet() == new?.persons?.personsToIdsSet()

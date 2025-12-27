@@ -9,7 +9,7 @@ import com.inwords.expenses.core.utils.asImmutableListAdapter
 import com.inwords.expenses.core.utils.asImmutableMap
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
-import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.expenses.ui.add.AddExpensePaneDestination
 import com.inwords.expenses.feature.expenses.ui.common.DebtShortUiModel
@@ -25,11 +25,11 @@ import kotlinx.coroutines.flow.map
 
 internal class DebtsListViewModel(
     private val navigationController: NavigationController,
-    eventsInteractor: EventsInteractor,
+    getCurrentEventStateUseCase: GetCurrentEventStateUseCase,
     expensesInteractor: ExpensesInteractor,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
-    val state: StateFlow<SimpleScreenState<DebtsListPaneUiModel>> = eventsInteractor.currentEvent
+    val state: StateFlow<SimpleScreenState<DebtsListPaneUiModel>> = getCurrentEventStateUseCase.currentEvent
         .filterNotNull() // TODO mvp
         .flatMapLatestNoBuffer { expensesInteractor.getExpensesDetails(it) }
         .map { expensesDetails ->

@@ -13,7 +13,7 @@ import com.inwords.expenses.core.utils.combine
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.core.utils.toBigDecimalOrNull
-import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.Person
@@ -45,7 +45,7 @@ import kotlinx.coroutines.plus
 
 internal class AddExpenseViewModel(
     private val navigationController: NavigationController,
-    eventsInteractor: EventsInteractor,
+    getCurrentEventStateUseCase: GetCurrentEventStateUseCase,
     private val expensesInteractor: ExpensesInteractor,
     settingsRepository: SettingsRepository,
     private val replenishment: Replenishment?,
@@ -105,7 +105,7 @@ internal class AddExpenseViewModel(
     private val inputSplit = MutableStateFlow<List<ExpenseSplitWithPersonModel>?>(null)
 
     private val _state: StateFlow<SimpleScreenState<AddExpenseScreenModel>> = combine(
-        eventsInteractor.currentEvent,
+        getCurrentEventStateUseCase.currentEvent,
         selectedExpenseType,
         selectedCurrencyCode,
         selectedPersonId.flatMapLatestNoBuffer {

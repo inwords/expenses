@@ -1,6 +1,6 @@
 package com.inwords.expenses.feature.events.ui.local
 
-import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.api.EventDeletionStateManager
 import kotlinx.collections.immutable.ImmutableList
 
 data class LocalEventsUiModel(
@@ -11,6 +11,6 @@ data class LocalEventsUiModel(
     data class LocalEventUiModel(
         val eventId: Long,
         val eventName: String,
-        val deletionState: EventsInteractor.EventDeletionState,
+        val deletionState: EventDeletionStateManager.EventDeletionState,
     )
 }

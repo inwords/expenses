@@ -4,6 +4,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface SettingsRepository {
 
+    suspend fun setCurrentEventAndPerson(eventId: Long, personId: Long)
+
     suspend fun setCurrentEventId(eventId: Long)
     fun getCurrentEventId(): Flow<Long?>
 
