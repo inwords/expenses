@@ -4,7 +4,7 @@ import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
-import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
@@ -81,8 +81,8 @@ internal class AddExpenseViewModelTest {
     private val navigationController = mockk<NavigationController>(relaxed = true) {
         justRun { popBackStack() }
     }
-    private val eventsInteractor = mockk<EventsInteractor>(relaxed = true) {
-        every { currentEvent } returns currentEventFlow
+    private val getCurrentEventStateUseCase = mockk<GetCurrentEventStateUseCase>(relaxed = true) {
+        every { this@mockk.currentEvent } returns currentEventFlow
     }
     private val expensesInteractor = mockk<ExpensesInteractor>(relaxed = true)
     private val settingsRepository = mockk<SettingsRepository>(relaxed = true) {
@@ -1156,7 +1156,7 @@ internal class AddExpenseViewModelTest {
     ): AddExpenseViewModel {
         return AddExpenseViewModel(
             navigationController = navigationController,
-            eventsInteractor = eventsInteractor,
+            getCurrentEventStateUseCase = getCurrentEventStateUseCase,
             expensesInteractor = expensesInteractor,
             settingsRepository = settingsRepository,
             replenishment = replenishment,

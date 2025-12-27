@@ -7,8 +7,8 @@ import androidx.navigation3.scene.DialogSceneStrategy.Companion.dialog
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavModule
 import com.inwords.expenses.core.navigation.NavigationController
+import com.inwords.expenses.feature.events.api.EventDeletionStateManager
 import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
-import com.inwords.expenses.feature.events.domain.EventsInteractor
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -19,7 +19,7 @@ data class DeleteEventDialogDestination(
 
 fun getDeleteEventDialogNavModule(
     navigationController: NavigationController,
-    eventsInteractorLazy: Lazy<EventsInteractor>,
+    eventDeletionStateManagerLazy: Lazy<EventDeletionStateManager>,
     deleteEventUseCaseLazy: Lazy<DeleteEventUseCase>,
 ): NavModule {
     return NavModule(DeleteEventDialogDestination.serializer()) {
@@ -28,7 +28,7 @@ fun getDeleteEventDialogNavModule(
                 initializer {
                     DeleteEventDialogViewModel(
                         navigationController = navigationController,
-                        eventsInteractor = eventsInteractorLazy.value,
+                        eventDeletionStateManager = eventDeletionStateManagerLazy.value,
                         deleteEventUseCase = deleteEventUseCaseLazy.value,
                         eventId = key.eventId
                     )

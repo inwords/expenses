@@ -5,7 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.utils.IO
-import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.CreateEventUseCase
+import com.inwords.expenses.feature.events.domain.EventCreationStateHolder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -16,7 +17,8 @@ import kotlinx.coroutines.launch
 
 internal class AddPersonsViewModel(
     private val navigationController: NavigationController,
-    private val eventsInteractor: EventsInteractor,
+    private val eventCreationStateHolder: EventCreationStateHolder,
+    private val createEventUseCase: CreateEventUseCase,
     private val expensesScreenDestination: Destination,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
@@ -51,9 +53,9 @@ internal class AddPersonsViewModel(
         confirmJob = viewModelScope.launch {
             val state = _state.value
 
-            eventsInteractor.draftOwner(state.ownerName)
-            eventsInteractor.draftOtherPersons(state.persons)
-            eventsInteractor.createEvent()
+            eventCreationStateHolder.draftOwner(state.ownerName)
+            eventCreationStateHolder.draftOtherPersons(state.persons)
+            createEventUseCase.createEvent()
 
             navigationController.popBackStack(
                 toDestination = expensesScreenDestination,

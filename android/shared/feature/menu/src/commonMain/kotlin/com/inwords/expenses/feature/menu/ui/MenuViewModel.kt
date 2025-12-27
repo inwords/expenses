@@ -6,7 +6,7 @@ import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
-import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.LeaveEventUseCase
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneDestination
 import com.inwords.expenses.feature.events.ui.join.JoinEventPaneDestination
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 
 internal class MenuViewModel(
     private val navigationController: NavigationController,
-    eventsInteractor: EventsInteractor,
+    getCurrentEventStateUseCase: GetCurrentEventStateUseCase,
     private val leaveEventUseCase: LeaveEventUseCase,
     private val shareManagerLazy: Lazy<ShareManager>,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
@@ -29,7 +29,7 @@ internal class MenuViewModel(
 
     private var leaveEventJob: Job? = null
 
-    val state: StateFlow<MenuDialogUiModel> = eventsInteractor.currentEvent
+    val state: StateFlow<MenuDialogUiModel> = getCurrentEventStateUseCase.currentEvent
         .map { event ->
             event ?: return@map emptyState
 

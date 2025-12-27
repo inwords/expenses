@@ -7,9 +7,12 @@ import com.inwords.expenses.feature.events.data.db.store.EventsLocalStoreImpl
 import com.inwords.expenses.feature.events.data.db.store.PersonsLocalStoreImpl
 import com.inwords.expenses.feature.events.data.network.store.CurrenciesRemoteStoreImpl
 import com.inwords.expenses.feature.events.data.network.store.EventsRemoteStoreImpl
+import com.inwords.expenses.feature.events.domain.CreateEventUseCase
 import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
-import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.EventCreationStateHolder
+import com.inwords.expenses.feature.events.domain.EventDeletionStateManagerImpl
 import com.inwords.expenses.feature.events.domain.GetCurrenciesUseCase
+import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.GetEventsUseCase
 import com.inwords.expenses.feature.events.domain.JoinEventUseCase
 import com.inwords.expenses.feature.events.domain.LeaveEventUseCase
@@ -113,10 +116,22 @@ class EventsComponent internal constructor(
         )
     }
 
-    val eventsInteractorLazy: Lazy<EventsInteractor> = lazy {
-        EventsInteractor(
+    val eventCreationStateHolder: Lazy<EventCreationStateHolder> = lazy {
+        EventCreationStateHolder()
+    }
+
+    val getCurrentEventStateUseCaseLazy: Lazy<GetCurrentEventStateUseCase> = lazy {
+        GetCurrentEventStateUseCase(
             eventsLocalStoreLazy = eventsLocalStore,
             settingsRepositoryLazy = deps.settingsRepositoryLazy,
+        )
+    }
+
+    val createEventUseCaseLazy: Lazy<CreateEventUseCase> = lazy {
+        CreateEventUseCase(
+            eventsLocalStoreLazy = eventsLocalStore,
+            settingsRepositoryLazy = deps.settingsRepositoryLazy,
+            eventCreationStateHolderLazy = eventCreationStateHolder,
         )
     }
 
@@ -136,6 +151,10 @@ class EventsComponent internal constructor(
         LeaveEventUseCase(
             settingsRepositoryLazy = deps.settingsRepositoryLazy,
         )
+    }
+
+    val eventDeletionStateManager: Lazy<EventDeletionStateManager> = lazy {
+        EventDeletionStateManagerImpl()
     }
 
 }

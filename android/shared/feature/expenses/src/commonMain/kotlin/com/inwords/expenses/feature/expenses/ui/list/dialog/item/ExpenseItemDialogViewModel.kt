@@ -6,7 +6,7 @@ import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.ui.utils.DefaultStringProvider
 import com.inwords.expenses.core.ui.utils.StringProvider
 import com.inwords.expenses.core.utils.IO
-import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
 import com.inwords.expenses.feature.expenses.domain.store.ExpensesLocalStore
 import com.inwords.expenses.feature.expenses.ui.list.ExpensesPaneDestination
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 
 internal class ExpenseItemDialogViewModel(
     private val navigationController: NavigationController,
-    private val eventsInteractor: EventsInteractor,
+    private val getCurrentEventStateUseCase: GetCurrentEventStateUseCase,
     private val expensesInteractor: ExpensesInteractor,
     private val expensesLocalStore: ExpensesLocalStore,
     private val expenseId: Long,
@@ -29,7 +29,7 @@ internal class ExpenseItemDialogViewModel(
     private var expenseRevertJob: Job? = null
 
     fun onRevertExpenseClick() {
-        val event = eventsInteractor.currentEvent.value?.event ?: return
+        val event = getCurrentEventStateUseCase.currentEvent.value?.event ?: return
 
         if (expenseRevertJob != null) return // no need to cancel this operation
         expenseRevertJob = viewModelScope.launch {

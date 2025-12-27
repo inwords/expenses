@@ -59,36 +59,37 @@ fun MainNavHost(
             ),
             getCreateEventPaneNavModule(
                 navigationController = navigationController,
-                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                eventCreationStateHolderLazy = eventsComponent.eventCreationStateHolder,
                 getCurrenciesUseCaseLazy = eventsComponent.getCurrenciesUseCaseLazy,
-                expensesScreenDestination = ExpensesPaneDestination,
             ),
             getDeleteEventDialogNavModule(
                 navigationController = navigationController,
-                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                eventDeletionStateManagerLazy = eventsComponent.eventDeletionStateManager,
                 deleteEventUseCaseLazy = eventsComponent.deleteEventUseCaseLazy,
             ),
             getAddPersonsPaneNavModule(
                 navigationController = navigationController,
-                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                eventCreationStateHolderLazy = eventsComponent.eventCreationStateHolder,
+                createEventUseCaseLazy = eventsComponent.createEventUseCaseLazy,
                 expensesPaneDestination = ExpensesPaneDestination,
             ),
             getChoosePersonPaneNavModule(
                 navigationController = navigationController,
-                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                getCurrentEventStateUseCaseLazy = eventsComponent.getCurrentEventStateUseCaseLazy,
                 settingsRepositoryLazy = settingsComponent.settingsRepositoryLazy,
                 expensesScreenDestination = ExpensesPaneDestination,
             ),
 
             getAddExpensePaneNavModule(
                 navigationController = navigationController,
-                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                getCurrentEventStateUseCaseLazy = eventsComponent.getCurrentEventStateUseCaseLazy,
                 expensesInteractorLazy = expensesComponent.expensesInteractorLazy,
                 settingsRepositoryLazy = settingsComponent.settingsRepositoryLazy,
             ),
             getExpensesPaneNavModule(
                 navigationController = navigationController,
-                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                getCurrentEventStateUseCaseLazy = eventsComponent.getCurrentEventStateUseCaseLazy,
+                eventDeletionStateManagerLazy = eventsComponent.eventDeletionStateManager,
                 getEventsUseCaseLazy = eventsComponent.getEventsUseCaseLazy,
                 deleteEventUseCaseLazy = eventsComponent.deleteEventUseCaseLazy,
                 expensesInteractorLazy = expensesComponent.expensesInteractorLazy,
@@ -97,19 +98,19 @@ fun MainNavHost(
             ),
             getDebtsListPaneNavModule(
                 navigationController = navigationController,
-                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                getCurrentEventStateUseCaseLazy = eventsComponent.getCurrentEventStateUseCaseLazy,
                 expensesInteractorLazy = expensesComponent.expensesInteractorLazy,
             ),
             getExpenseItemDialogNavModule(
                 navigationController = navigationController,
-                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                getCurrentEventStateUseCaseLazy = eventsComponent.getCurrentEventStateUseCaseLazy,
                 expensesInteractorLazy = expensesComponent.expensesInteractorLazy,
                 expensesLocalStoreLazy = expensesComponent.expensesLocalStore,
             ),
 
             getMenuDialogNavModule(
                 navigationController = navigationController,
-                eventsInteractorLazy = eventsComponent.eventsInteractorLazy,
+                getCurrentEventStateUseCaseLazy = eventsComponent.getCurrentEventStateUseCaseLazy,
                 leaveEventUseCaseLazy = eventsComponent.leaveEventUseCaseLazy,
                 shareManagerLazy = shareComponent.shareManagerLazy,
             )

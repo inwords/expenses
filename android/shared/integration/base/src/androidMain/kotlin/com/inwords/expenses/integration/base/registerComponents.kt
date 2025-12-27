@@ -12,7 +12,7 @@ import com.inwords.expenses.feature.events.api.EventsComponentFactory
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
 import com.inwords.expenses.feature.events.data.db.dao.PersonsDao
-import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
 import com.inwords.expenses.feature.expenses.api.ExpensesComponent
@@ -90,8 +90,8 @@ fun registerComponents(appContext: Context) {
     val menuComponent = lazy {
         MenuComponent(
             deps = object : MenuComponent.Deps {
-                override val eventsInteractorLazy: Lazy<EventsInteractor>
-                    get() = eventsComponent.value.eventsInteractorLazy
+                override val getCurrentEventStateUseCaseLazy: Lazy<GetCurrentEventStateUseCase>
+                    get() = eventsComponent.value.getCurrentEventStateUseCaseLazy
 
                 override val shareManager: ShareManager
                     get() = shareComponent.value.shareManagerLazy.value
@@ -125,8 +125,8 @@ fun registerComponents(appContext: Context) {
             deps = object : SyncComponentFactory.Deps {
                 override val context: Context get() = appContext
 
-                override val eventsInteractorLazy: Lazy<EventsInteractor>
-                    get() = eventsComponent.value.eventsInteractorLazy
+                override val getCurrentEventStateUseCaseLazy: Lazy<GetCurrentEventStateUseCase>
+                    get() = eventsComponent.value.getCurrentEventStateUseCaseLazy
                 override val expensesInteractorLazy: Lazy<ExpensesInteractor>
                     get() = expensesComponent.value.expensesInteractorLazy
 

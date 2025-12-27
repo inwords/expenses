@@ -7,8 +7,9 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavModule
 import com.inwords.expenses.core.navigation.NavigationController
+import com.inwords.expenses.feature.events.api.EventDeletionStateManager
 import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
-import com.inwords.expenses.feature.events.domain.EventsInteractor
+import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.GetEventsUseCase
 import com.inwords.expenses.feature.events.domain.JoinEventUseCase
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
@@ -20,7 +21,8 @@ object ExpensesPaneDestination : Destination
 
 fun getExpensesPaneNavModule(
     navigationController: NavigationController,
-    eventsInteractorLazy: Lazy<EventsInteractor>,
+    getCurrentEventStateUseCaseLazy: Lazy<GetCurrentEventStateUseCase>,
+    eventDeletionStateManagerLazy: Lazy<EventDeletionStateManager>,
     getEventsUseCaseLazy: Lazy<GetEventsUseCase>,
     deleteEventUseCaseLazy: Lazy<DeleteEventUseCase>,
     expensesInteractorLazy: Lazy<ExpensesInteractor>,
@@ -33,7 +35,8 @@ fun getExpensesPaneNavModule(
                 initializer {
                     ExpensesViewModel(
                         navigationController = navigationController,
-                        eventsInteractor = eventsInteractorLazy.value,
+                        getCurrentEventStateUseCase = getCurrentEventStateUseCaseLazy.value,
+                        eventDeletionStateManager = eventDeletionStateManagerLazy.value,
                         getEventsUseCase = getEventsUseCaseLazy.value,
                         joinEventUseCase = joinEventUseCaseLazy.value,
                         deleteEventUseCase = deleteEventUseCaseLazy.value,

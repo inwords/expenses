@@ -9,9 +9,9 @@ import com.inwords.expenses.core.utils.asImmutableListAdapter
 import com.inwords.expenses.core.utils.debounceAfterInitial
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
+import com.inwords.expenses.feature.events.api.EventDeletionStateManager
 import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
-import com.inwords.expenses.feature.events.domain.EventsInteractor
-import com.inwords.expenses.feature.events.domain.EventsInteractor.EventDeletionState
+import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.GetEventsUseCase
 import com.inwords.expenses.feature.events.domain.JoinEventUseCase
 import com.inwords.expenses.feature.events.domain.model.Event
@@ -48,7 +48,8 @@ import kotlin.time.Duration.Companion.milliseconds
 
 internal class ExpensesViewModel(
     private val navigationController: NavigationController,
-    private val eventsInteractor: EventsInteractor,
+    private val getCurrentEventStateUseCase: GetCurrentEventStateUseCase,
+    private val eventDeletionStateManager: EventDeletionStateManager,
     private val getEventsUseCase: GetEventsUseCase,
     private val joinEventUseCase: JoinEventUseCase,
     private val deleteEventUseCase: DeleteEventUseCase,
@@ -67,7 +68,7 @@ internal class ExpensesViewModel(
         var previousEvents = emptyList<Event>()
         combine(
             getEventsUseCase.getEvents(),
-            eventsInteractor.eventsDeletionState,
+            eventDeletionStateManager.eventsDeletionState,
             recentlyRemovedEventName,
         ) { events, eventsDeletionState, recentlyRemovedEventName ->
             val result = if (events.isEmpty()) {
@@ -81,7 +82,7 @@ internal class ExpensesViewModel(
                                 LocalEventUiModel(
                                     eventId = event.id,
                                     eventName = event.name,
-                                    deletionState = eventsDeletionState[event.id] ?: EventDeletionState.None
+                                    deletionState = eventsDeletionState[event.id] ?: EventDeletionStateManager.EventDeletionState.None
                                 )
                             }.asImmutableListAdapter(),
                             recentlyRemovedEventName = recentlyRemovedEventName,
@@ -95,7 +96,7 @@ internal class ExpensesViewModel(
     }
 
     val state: StateFlow<SimpleScreenState<ExpensesPaneUiModel>> = combine(
-        eventsInteractor.currentEvent
+        getCurrentEventStateUseCase.currentEvent
             .flatMapLatestNoBuffer { currentEvent ->
                 if (currentEvent == null) {
                     flowOf(null)
@@ -207,7 +208,7 @@ internal class ExpensesViewModel(
     }
 
     fun onRefresh() {
-        val event = eventsInteractor.currentEvent.value?.event ?: return
+        val event = getCurrentEventStateUseCase.currentEvent.value?.event ?: return
 
         refreshJob?.cancel()
         refreshJob = viewModelScope.launch {
@@ -248,7 +249,7 @@ internal class ExpensesViewModel(
     }
 
     fun onKeepLocalEventClick(event: LocalEventUiModel) {
-        eventsInteractor.clearEventDeletionState(event.eventId)
+        eventDeletionStateManager.clearEventDeletionState(event.eventId)
     }
 
     private fun handleEventRemovalDetection(
