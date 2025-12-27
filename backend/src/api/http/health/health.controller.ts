@@ -1,24 +1,18 @@
 import {Controller, Get} from '@nestjs/common';
-import {HealthCheck, HealthCheckService, HealthIndicatorResult} from '@nestjs/terminus';
-import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-service/relational-data-service';
+import {HealthCheck, HealthCheckService} from '@nestjs/terminus';
+import {HealthCheckUseCase} from '#usecases/health/health-check.usecase';
+import {HealthRoutes} from './health.constants';
 
-@Controller('health')
+@Controller(HealthRoutes.root)
 export class HealthController {
   constructor(
-    private health: HealthCheckService,
-    private relationalDataService: RelationalDataServiceAbstract,
+    private healthCheckService: HealthCheckService,
+    private healthCheckUseCase: HealthCheckUseCase,
   ) {}
 
   @Get()
   @HealthCheck()
   check() {
-    return this.health.check([
-      () => this.databaseHealthCheck(),
-    ]);
-  }
-
-  private async databaseHealthCheck(): Promise<HealthIndicatorResult> {
-    await this.relationalDataService.healthCheck();
-    return {database: {status: 'up'}};
+    return this.healthCheckService.check([() => this.healthCheckUseCase.execute()]);
   }
 }
