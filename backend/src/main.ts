@@ -20,7 +20,19 @@ async function bootstrap() {
     }),
   );
 
-  const config = new DocumentBuilder().setTitle('Expenses Swagger').setVersion('0.0.1').build();
+  const config = new DocumentBuilder()
+    .setTitle('Expenses Swagger')
+    .setVersion('0.0.1')
+    .addApiKey(
+      {
+        type: 'apiKey',
+        name: 'x-devtools-secret',
+        in: 'header',
+        description: 'Devtools secret for accessing devtools endpoints',
+      },
+      'devtools-secret',
+    )
+    .build();
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('swagger/api', app, document);
