@@ -115,6 +115,21 @@ jobs:
           echo "Host *" >> ~/.ssh/config
           echo "    StrictHostKeyChecking no" >> ~/.ssh/config
 
+      - name: Create .env file on server
+        run: |
+          ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} "cd ${{ secrets.APP_PATH }} && cat > .env" << 'ENVEOF'
+          POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
+          POSTGRES_USER_NAME=${{ secrets.POSTGRES_USER_NAME }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DATABASE=${{ secrets.POSTGRES_DATABASE }}
+          POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
+          POSTGRES_SCHEMA=${{ secrets.POSTGRES_SCHEMA }}
+          OPEN_EXCHANGE_RATES_API_ID=${{ secrets.OPEN_EXCHANGE_RATES_API_ID }}
+          DEVTOOLS_SECRET=${{ secrets.DEVTOOLS_SECRET }}
+          GF_SECURITY_ADMIN_USER=${{ secrets.GF_SECURITY_ADMIN_USER }}
+          GF_SECURITY_ADMIN_PASSWORD=${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}
+          ENVEOF
+
       - name: Deploy with Docker Compose
         run: |
           ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} << EOF
