@@ -1,18 +1,25 @@
-import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import {UseCase} from '#packages/use-case';
 
 import {getCurrentDateWithoutTimeUTC, getDateWithoutTimeUTC} from '#packages/date-utils';
 
 import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-service/relational-data-service';
+import {EventServiceAbstract} from '#domain/abstracts/event-service/event-service';
 import {IExpense, ISplitInfo} from '#domain/entities/expense.entity';
 import {ExpenseValueObject} from '#domain/value-objects/expense.value-object';
+import {BusinessError} from '#domain/errors/business.error';
+import {BUSINESS_ERRORS} from '#domain/errors/business-errors.const';
+import {ErrorCode} from '#domain/errors/error-codes.enum';
 
 type Input = Omit<IExpense, 'createdAt' | 'id' | 'updatedAt'> & Partial<Pick<IExpense, 'createdAt'>>;
 type Output = IExpense;
 
 @Injectable()
 export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
-  constructor(private readonly rDataService: RelationalDataServiceAbstract) {}
+  constructor(
+    private readonly rDataService: RelationalDataServiceAbstract,
+    private readonly eventService: EventServiceAbstract,
+  ) {}
 
   public async execute(input: Input) {
     return this.rDataService.transaction(async (ctx) => {
@@ -24,26 +31,8 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
         onLocked: 'nowait',
       });
 
-      if (!event) {
-        throw new HttpException(
-          {
-            status: HttpStatus.NOT_FOUND,
-            error: `Event with id ${input.eventId} not found`,
-          },
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      // Проверяем что event не был soft deleted
-      if (event.deletedAt !== null) {
-        throw new HttpException(
-          {
-            status: HttpStatus.GONE,
-            error: `Event with id ${input.eventId} has been deleted`,
-          },
-          HttpStatus.GONE,
-        );
-      }
+      this.eventService.validateEventExists(event);
+      this.eventService.validateEventIsNotDeleted(event);
 
       if (event.currencyId === input.currencyId) {
         let splitInformation: ISplitInfo[] = [];
@@ -66,12 +55,9 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
         const [eventCurrencyCode] = await this.rDataService.currency.findById(event.currencyId, {ctx});
 
         if (!eventCurrencyCode || !expenseCurrencyCode) {
-          throw new HttpException(
-            {
-              status: HttpStatus.BAD_REQUEST,
-              error: `Wrong Currency Id`,
-            },
-            HttpStatus.BAD_REQUEST,
+          throw new BusinessError(
+            BUSINESS_ERRORS[ErrorCode.CURRENCY_NOT_FOUND],
+            {eventCurrencyId: event.currencyId, expenseCurrencyId: input.currencyId},
           );
         }
 
@@ -83,12 +69,10 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
           const [currencyRate] = await this.rDataService.currencyRate.findByDate(getDateForExchangeRate, {ctx});
 
           if (!currencyRate) {
-            throw new HttpException(
-              {
-                status: HttpStatus.NOT_FOUND,
-                error: `Currency rate not found for ${getDateForExchangeRate} date. Please try again later or contact support.`,
-              },
-              HttpStatus.NOT_FOUND,
+            throw new BusinessError(
+              BUSINESS_ERRORS[ErrorCode.CURRENCY_RATE_NOT_FOUND],
+              {date: getDateForExchangeRate},
+              `Currency rate not found for ${getDateForExchangeRate} date. Please try again later or contact support.`,
             );
           }
 
