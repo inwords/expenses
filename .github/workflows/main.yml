@@ -24,6 +24,7 @@ jobs:
     outputs:
       matrix: ${{ steps.matrix-json.outputs.matrix }}
       has-services: ${{ steps.matrix-json.outputs.has-services }}
+      has-infra-changes: ${{ steps.filter.outputs.infra }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -37,6 +38,7 @@ jobs:
             frontend: 'web/**'
             otel-collector: 'infra/otel-collector/**'
             nginx: 'infra/nginx/**'
+            infra: 'infra/**'
 
       - name: Prepare matrix JSON
         id: matrix-json
@@ -116,10 +118,15 @@ jobs:
     needs: [containers_matrix_prep, build-and-push]
     if: |
       always() &&
-      needs.containers_matrix_prep.outputs.has-services == 'true' &&
-      needs.build-and-push.result == 'success' &&
-      github.ref == 'refs/heads/main'
+      github.ref == 'refs/heads/main' &&
+      (
+        (needs.containers_matrix_prep.outputs.has-services == 'true' && needs.build-and-push.result == 'success') ||
+        (needs.containers_matrix_prep.outputs.has-infra-changes == 'true' && needs.build-and-push.result == 'skipped')
+      )
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
@@ -142,6 +149,13 @@ jobs:
           GF_SECURITY_ADMIN_USER=${{ secrets.GF_SECURITY_ADMIN_USER }}
           GF_SECURITY_ADMIN_PASSWORD=${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}
           ENVEOF
+
+      - name: Copy docker-compose-prod.yml to server
+        run: |
+          scp infra/docker-compose-prod.yml ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }}:${{ secrets.APP_PATH }}/docker-compose-prod.yml
+          ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }} "mkdir -p ${{ secrets.APP_PATH }}/nginx ${{ secrets.APP_PATH }}/otel-collector"
+          scp infra/nginx/nginx-prod.conf ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }}:${{ secrets.APP_PATH }}/nginx/nginx-prod.conf
+          scp infra/otel-collector/otel-collector-config.yaml ${{ secrets.SSH_USERNAME }}@${{ secrets.SERVER_IP }}:${{ secrets.APP_PATH }}/otel-collector/otel-collector-config.yaml
 
       - name: Deploy with Docker Compose
         run: |
