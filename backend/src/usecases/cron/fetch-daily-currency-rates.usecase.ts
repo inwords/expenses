@@ -6,8 +6,6 @@ import {getCurrentDateWithoutTimeUTC} from '#packages/date-utils';
 type Input = void;
 type Output = void;
 
-const s = 0;
-
 @Injectable()
 export class FetchDailyCurrencyRatesUseCase implements UseCase<Input, Output> {
   constructor(private readonly fetchAndSaveCurrencyRateSharedUseCase: FetchAndSaveCurrencyRateSharedUseCase) {}
