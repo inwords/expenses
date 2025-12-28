@@ -1,0 +1,14 @@
+export enum ErrorCode {
+  // Event errors
+  EVENT_NOT_FOUND = 'B4001',
+  EVENT_ALREADY_DELETED = 'B4002',
+  EVENT_INVALID_PIN = 'B4003',
+
+  // Currency errors
+  CURRENCY_NOT_FOUND = 'B4004',
+  CURRENCY_RATE_NOT_FOUND = 'B4005',
+
+  // Generic errors
+  VALIDATION_ERROR = 'B4006',
+  INTERNAL_ERROR = 'B4007',
+}

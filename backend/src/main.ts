@@ -5,6 +5,7 @@ import {ValidationPipe} from '@nestjs/common';
 import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
 import {MicroserviceOptions, Transport} from '@nestjs/microservices';
 import {join} from 'path';
+import {BusinessErrorFilter} from './api/http/filters/business-error.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,9 +21,12 @@ async function bootstrap() {
     }),
   );
 
+  app.useGlobalFilters(new BusinessErrorFilter());
+
   const config = new DocumentBuilder()
     .setTitle('Expenses Swagger')
     .setVersion('0.0.1')
+    .addServer('/api', 'API Server')
     .addApiKey(
       {
         type: 'apiKey',

@@ -1,6 +1,7 @@
-import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import {UseCase} from '#packages/use-case';
 import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-service/relational-data-service';
+import {EventServiceAbstract} from '#domain/abstracts/event-service/event-service';
 import {IEvent} from '#domain/entities/event.entity';
 
 type Input = {
@@ -15,7 +16,10 @@ type Output = {
 
 @Injectable()
 export class DeleteEventUseCase implements UseCase<Input, Output> {
-  constructor(private readonly rDataService: RelationalDataServiceAbstract) {}
+  constructor(
+    private readonly rDataService: RelationalDataServiceAbstract,
+    private readonly eventService: EventServiceAbstract,
+  ) {}
 
   public async execute({eventId, pinCode}: Input): Promise<Output> {
     return this.rDataService.transaction(async (ctx) => {
@@ -27,37 +31,9 @@ export class DeleteEventUseCase implements UseCase<Input, Output> {
         onLocked: 'nowait',
       });
 
-      if (!event) {
-        throw new HttpException(
-          {
-            status: HttpStatus.NOT_FOUND,
-            error: `Event with id ${eventId} not found`,
-          },
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      // Проверяем что event еще не удален
-      if (event.deletedAt !== null) {
-        throw new HttpException(
-          {
-            status: HttpStatus.GONE,
-            error: `Event with id ${eventId} has already been deleted`,
-          },
-          HttpStatus.GONE,
-        );
-      }
-
-      // Проверяем PIN код
-      if (event.pinCode !== pinCode) {
-        throw new HttpException(
-          {
-            status: HttpStatus.FORBIDDEN,
-            error: `Invalid PIN code for event ${eventId}`,
-          },
-          HttpStatus.FORBIDDEN,
-        );
-      }
+      this.eventService.validateEventExists(event);
+      this.eventService.validateEventIsNotDeleted(event);
+      this.eventService.validatePinCode(event, pinCode);
 
       const deletedAt = new Date();
 

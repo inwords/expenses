@@ -5,6 +5,8 @@ import {appDbConfig} from './relational-data-service/postgres/config';
 import {CurrencyRateServiceAbstract} from '#domain/abstracts/currency-rate-service/currency-rate-service';
 import {HttpService} from '@nestjs/axios';
 import {CurrencyRateService} from '#frameworks/currency-rate-service/currency-rate-service';
+import {EventServiceAbstract} from '#domain/abstracts/event-service/event-service';
+import {EventService} from '#frameworks/event-service/event-service';
 import {CurrencyValueObject} from '#domain/value-objects/currency.value-object';
 import {CURRENCIES_LIST} from '../constants';
 
@@ -28,6 +30,10 @@ export const providers: Provider[] = [
     useFactory: () => {
       return new CurrencyRateService(new HttpService());
     },
+  },
+  {
+    provide: EventServiceAbstract,
+    useClass: EventService,
   },
 ];
 
