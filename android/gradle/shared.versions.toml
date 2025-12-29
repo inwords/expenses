@@ -1,11 +1,11 @@
 [versions]
 kotlin = "2.2.21" # https://github.com/jetbrains/kotlin/releases https://kotlinlang.org/docs/releases.html#release-details
-ksp = "2.3.2" # https://github.com/google/ksp/releases
+ksp = "2.3.4" # https://github.com/google/ksp/releases
 
 room = "2.8.4" # https://developer.android.com/jetpack/androidx/releases/room
-datastore = "1.1.7" # https://developer.android.com/jetpack/androidx/releases/datastore
+datastore = "1.2.0" # https://developer.android.com/jetpack/androidx/releases/datastore
 
-ktor = "3.3.2" # https://github.com/ktorio/ktor/releases
+ktor = "3.3.3" # https://github.com/ktorio/ktor/releases
 cronet = "141.7340.3"
 
 coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines/releases
@@ -13,7 +13,7 @@ coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines/releases
 kotlinx-serialization = "1.9.0" # https://github.com/Kotlin/kotlinx.serialization/releases
 kotlinx-atomicfu = "0.29.0" # https://github.com/Kotlin/kotlinx-atomicfu/releases TODO remove when atomicfu plugin is fixed
 
-compose-bom = "2025.11.01" # https://developer.android.com/jetpack/androidx/releases/compose
+compose-bom = "2025.12.01" # https://developer.android.com/jetpack/androidx/releases/compose
 compose-multiplatform = "1.10.0-rc02" # https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
 
 jupiter = "5.14.1" # https://docs.junit.org/current/release-notes/index.html
