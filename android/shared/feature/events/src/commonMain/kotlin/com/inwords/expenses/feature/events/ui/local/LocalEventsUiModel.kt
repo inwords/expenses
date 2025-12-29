@@ -11,6 +11,7 @@ data class LocalEventsUiModel(
     data class LocalEventUiModel(
         val eventId: Long,
         val eventName: String,
+        val isSynced: Boolean,
         val deletionState: EventDeletionStateManager.EventDeletionState,
     )
 }

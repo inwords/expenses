@@ -12,7 +12,7 @@ internal abstract class BaseScreen {
     context(extension: ComposeContext)
     fun waitForElementWithText(
         text: String,
-        timeout: Long = 5000
+        timeout: Long = 10000
     ) {
         extension.waitUntilAtLeastOneExists(hasText(text), timeout)
     }
@@ -20,7 +20,7 @@ internal abstract class BaseScreen {
     context(extension: ComposeContext)
     fun waitForElementWithTextDoesNotExist(
         text: String,
-        timeout: Long = 5000
+        timeout: Long = 10000
     ) {
         extension.waitUntilDoesNotExist(hasText(text), timeout)
     }

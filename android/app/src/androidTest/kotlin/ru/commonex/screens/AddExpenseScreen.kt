@@ -1,7 +1,5 @@
 package ru.commonex.screens
 
-import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -30,14 +28,14 @@ internal class AddExpenseScreen : BaseScreen() {
         return this
     }
 
+    /**
+     * Clicks the equal split switch to toggle its state.
+     * Default state is ON (equal split), so calling this will turn it OFF.
+     */
     context(extension: ComposeContext)
-    fun toggleEqualSplit(equalSplit: Boolean): AddExpenseScreen {
-        val switch = extension.onNodeWithTag("equal_split_switch")
-        val currentIsEqualSplit = switch.fetchSemanticsNode().config[SemanticsProperties.ToggleableState] == ToggleableState.On
-
-        if (currentIsEqualSplit != equalSplit) {
-            switch.performClick()
-        }
+    fun clickEqualSplitSwitch(): AddExpenseScreen {
+        extension.onNodeWithTag("equal_split_switch").performClick()
+        extension.waitForIdle()
         return this
     }
 

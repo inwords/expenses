@@ -10,6 +10,7 @@ import com.inwords.expenses.core.utils.debounceAfterInitial
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.feature.events.api.EventDeletionStateManager
+import com.inwords.expenses.feature.events.api.EventDeletionStateManager.EventDeletionState
 import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
 import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.GetEventsUseCase
@@ -82,7 +83,8 @@ internal class ExpensesViewModel(
                                 LocalEventUiModel(
                                     eventId = event.id,
                                     eventName = event.name,
-                                    deletionState = eventsDeletionState[event.id] ?: EventDeletionStateManager.EventDeletionState.None
+                                    isSynced = event.serverId != null,
+                                    deletionState = eventsDeletionState[event.id] ?: EventDeletionState.None
                                 )
                             }.asImmutableListAdapter(),
                             recentlyRemovedEventName = recentlyRemovedEventName,

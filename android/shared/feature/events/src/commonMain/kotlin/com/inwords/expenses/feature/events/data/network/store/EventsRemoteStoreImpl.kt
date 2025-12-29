@@ -10,6 +10,7 @@ import com.inwords.expenses.core.utils.SuspendLazy
 import com.inwords.expenses.feature.events.data.network.dto.AddUsersDto
 import com.inwords.expenses.feature.events.data.network.dto.CreateEventRequest
 import com.inwords.expenses.feature.events.data.network.dto.CreateUserDto
+import com.inwords.expenses.feature.events.data.network.dto.DeleteEventRequest
 import com.inwords.expenses.feature.events.data.network.dto.EventDto
 import com.inwords.expenses.feature.events.data.network.dto.UserDto
 import com.inwords.expenses.feature.events.domain.model.Currency
@@ -24,9 +25,11 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 
@@ -89,8 +92,9 @@ internal class EventsRemoteStoreImpl(
             delete {
                 url(hostConfig) {
                     pathSegments = listOf("api", "user", "event", serverId)
-                    parameters.append("pinCode", pinCode)
                 }
+                setBody(DeleteEventRequest(pinCode = pinCode))
+                header(HttpHeaders.ContentType, ContentType.Application.Json)
             }.body<Unit>()
         }
 
