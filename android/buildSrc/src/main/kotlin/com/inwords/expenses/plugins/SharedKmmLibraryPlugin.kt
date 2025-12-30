@@ -50,6 +50,7 @@ class SharedKmmLibraryPlugin : Plugin<Project> {
             ).forEach {
                 it.binaries.framework {
                     baseName = iosBaseName
+                    isStatic = true
                 }
             }
 

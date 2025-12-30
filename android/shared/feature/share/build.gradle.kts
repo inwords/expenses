@@ -18,7 +18,7 @@ kotlin {
         experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
     }
 
-    applyKmmDefaults("shared-share")
+    applyKmmDefaults("sharedShare")
 
     sourceSets {
         commonMain {

@@ -15,7 +15,7 @@ kotlin {
         }
     }
 
-    applyKmmDefaults("shared-settings")
+    applyKmmDefaults("sharedSettings")
 
     sourceSets {
         commonMain {

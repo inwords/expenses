@@ -14,7 +14,7 @@ kotlin {
         }
     }
 
-    applyKmmDefaults("shared-core-utils")
+    applyKmmDefaults("sharedCoreUtils")
 
     sourceSets {
         commonMain {

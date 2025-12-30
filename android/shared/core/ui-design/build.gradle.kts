@@ -18,7 +18,7 @@ kotlin {
         experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
     }
 
-    applyKmmDefaults("shared-core-ui-design")
+    applyKmmDefaults("sharedCoreUiDesign")
 
     sourceSets {
         commonMain {

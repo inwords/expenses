@@ -21,7 +21,7 @@ kotlin {
         experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
     }
 
-    applyKmmDefaults("shared-expenses")
+    applyKmmDefaults("sharedExpenses")
 
     sourceSets {
         commonMain {

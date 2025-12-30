@@ -16,7 +16,7 @@ kotlin {
         }
     }
 
-    applyKmmDefaults("shared-core-ui-utils")
+    applyKmmDefaults("sharedCoreUiUtils")
 
     sourceSets {
         commonMain {

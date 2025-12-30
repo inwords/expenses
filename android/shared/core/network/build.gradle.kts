@@ -14,7 +14,7 @@ kotlin {
         }
     }
 
-    applyKmmDefaults("shared-core-network")
+    applyKmmDefaults("sharedCoreNetwork")
 
     sourceSets {
         commonMain {

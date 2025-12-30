@@ -17,7 +17,7 @@ kotlin {
         }
     }
 
-    applyKmmDefaults("shared-integration-base")
+    applyKmmDefaults("sharedIntegrationBase")
 
     sourceSets {
         commonMain {
