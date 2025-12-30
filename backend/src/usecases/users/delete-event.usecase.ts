@@ -31,9 +31,7 @@ export class DeleteEventUseCase implements UseCase<Input, Output> {
         onLocked: 'nowait',
       });
 
-      this.eventService.validateEventExists(event);
-      this.eventService.validateEventIsNotDeleted(event);
-      this.eventService.validatePinCode(event, pinCode);
+      this.eventService.validateEvent(event, pinCode);
 
       const deletedAt = new Date();
 

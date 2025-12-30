@@ -13,6 +13,12 @@ service UserService {
   rpc AddUsersToEvent (AddUsersToEventRequest) returns (AddUsersToEventResponse);
   rpc GetAllEventExpenses (EventIdRequest) returns (ExpensesResponse);
   rpc CreateExpense (CreateExpenseRequest) returns (ExpenseResponse);
+
+  // V2 METHODS
+  rpc GetEventInfoV2 (GetEventInfoRequest) returns (EventInfoResponse);
+  rpc AddUsersToEventV2 (AddUsersToEventRequest) returns (AddUsersToEventResponse);
+  rpc GetAllEventExpensesV2 (GetEventExpensesV2Request) returns (ExpensesResponse);
+  rpc CreateExpenseV2 (CreateExpenseV2Request) returns (ExpenseResponse);
 }
 
 // Define the messages
@@ -128,4 +134,22 @@ message ExpenseResponse {
   ExpenseType expenseType = 5;
   repeated SplitInfo splitInformation = 6;
   string createdAt = 7;
+}
+
+// V2 MESSAGES
+
+message GetEventExpensesV2Request {
+  string eventId = 1;
+  string pinCode = 2;
+}
+
+message CreateExpenseV2Request {
+  string eventId = 1;
+  string pinCode = 2;
+  string description = 3;
+  string userWhoPaidId = 4;
+  string currencyId = 5;
+  ExpenseType expenseType = 6;
+  repeated SplitInfo splitInformation = 7;
+  string createdAt = 8;
 }
