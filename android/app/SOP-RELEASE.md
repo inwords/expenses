@@ -58,7 +58,7 @@ This SOP defines the standardized process for releasing new versions of the Andr
 
 3. **Commit profile updates**:
    ```bash
-   git add app/src/release/generated/baselineProfiles/
+   git add app/src/release/generated/baselineProfiles/ app/src/autotest/generated/baselineProfiles/
    git commit -m "Update baseline profiles for version YYYY.MM.N"
    ```
 
