@@ -9,6 +9,7 @@ import {ErrorCode} from '#domain/errors';
 export class EventService implements EventServiceAbstract {
   validateEvent(event: IEvent | null | undefined, pinCode: string): asserts event is IEvent {
     this.validateEventExists(event);
+    this.validateEventIsNotDeleted(event)
     this.validatePinCode(event, pinCode);
   }
 
