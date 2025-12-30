@@ -36,10 +36,10 @@ export class SaveEventExpenseV2UseCase implements UseCase<Input, Output> {
       if (event.currencyId === input.currencyId) {
         let splitInformation: ISplitInfo[] = [];
 
-        for (let i of input.splitInformation) {
+        for (let splitInfo of input.splitInformation) {
           splitInformation.push({
-            ...i,
-            exchangedAmount: i.amount,
+            ...splitInfo,
+            exchangedAmount: splitInfo.amount,
           });
         }
 
@@ -79,10 +79,10 @@ export class SaveEventExpenseV2UseCase implements UseCase<Input, Output> {
 
           let splitInformation: ISplitInfo[] = [];
 
-          for (let i of input.splitInformation) {
+          for (let splitInfo of input.splitInformation) {
             splitInformation.push({
-              ...i,
-              exchangedAmount: Number(Number(i.amount * exchangeRate).toFixed(2)),
+              ...splitInfo,
+              exchangedAmount: Number(Number(splitInfo.amount * exchangeRate).toFixed(2)),
             });
           }
 

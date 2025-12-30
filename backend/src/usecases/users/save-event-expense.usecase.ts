@@ -37,10 +37,10 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
       if (event.currencyId === input.currencyId) {
         let splitInformation: ISplitInfo[] = [];
 
-        for (let i of input.splitInformation) {
+        for (let splitInfo of input.splitInformation) {
           splitInformation.push({
-            ...i,
-            exchangedAmount: i.amount,
+            ...splitInfo,
+            exchangedAmount: splitInfo.amount,
           });
         }
 
@@ -55,10 +55,10 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
         const [eventCurrencyCode] = await this.rDataService.currency.findById(event.currencyId, {ctx});
 
         if (!eventCurrencyCode || !expenseCurrencyCode) {
-          throw new BusinessError(
-            BUSINESS_ERRORS[ErrorCode.CURRENCY_NOT_FOUND],
-            {eventCurrencyId: event.currencyId, expenseCurrencyId: input.currencyId},
-          );
+          throw new BusinessError(BUSINESS_ERRORS[ErrorCode.CURRENCY_NOT_FOUND], {
+            eventCurrencyId: event.currencyId,
+            expenseCurrencyId: input.currencyId,
+          });
         }
 
         if (expenseCurrencyCode && eventCurrencyCode) {
@@ -80,10 +80,10 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
 
           let splitInformation: ISplitInfo[] = [];
 
-          for (let i of input.splitInformation) {
+          for (let splitInfo of input.splitInformation) {
             splitInformation.push({
-              ...i,
-              exchangedAmount: Number(Number(i.amount * exchangeRate).toFixed(2)),
+              ...splitInfo,
+              exchangedAmount: Number(Number(splitInfo.amount * exchangeRate).toFixed(2)),
             });
           }
 
