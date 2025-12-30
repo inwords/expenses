@@ -17,7 +17,7 @@ kotlin {
         }
     }
 
-    applyKmmDefaults("shared-core-navigation")
+    applyKmmDefaults("sharedCoreNavigation")
 
     sourceSets {
         commonMain {

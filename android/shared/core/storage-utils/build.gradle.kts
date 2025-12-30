@@ -14,7 +14,7 @@ kotlin {
         }
     }
 
-    applyKmmDefaults("shared-core-storage-utils")
+    applyKmmDefaults("sharedCoreStorageUtils")
 
     sourceSets {
         commonMain {

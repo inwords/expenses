@@ -13,7 +13,7 @@ kotlin {
             consumerKeepRules.files.add(file("consumer-rules.pro"))
         }
     }
-    applyKmmDefaults("shared-core-locator")
+    applyKmmDefaults("sharedCoreLocator")
 
     sourceSets {
         commonMain {

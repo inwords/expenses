@@ -19,7 +19,7 @@ kotlin {
         experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
     }
 
-    applyKmmDefaults("shared-menu")
+    applyKmmDefaults("sharedMenu")
 
     sourceSets {
         commonMain {

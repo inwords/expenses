@@ -14,7 +14,7 @@ kotlin {
         }
     }
 
-    applyKmmDefaults("shared-sync")
+    applyKmmDefaults("sharedSync")
 
     sourceSets {
         commonMain {
