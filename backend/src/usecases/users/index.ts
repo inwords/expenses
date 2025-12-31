@@ -20,7 +20,6 @@ export const allUsersUseCases = [
   SaveEventExpenseUseCase,
   SaveUsersToEventUseCase,
   DeleteEventUseCase,
-  // V2 use cases
   GetEventInfoV2UseCase,
   SaveUsersToEventV2UseCase,
   SaveEventExpenseV2UseCase,

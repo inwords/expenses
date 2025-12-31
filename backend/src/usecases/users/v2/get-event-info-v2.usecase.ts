@@ -19,7 +19,6 @@ export class GetEventInfoV2UseCase implements UseCase<Input, Output> {
   public async execute({eventId, pinCode}: Input): Promise<Output> {
     const [event] = await this.rDataService.event.findById(eventId);
 
-    // Use EventService for consistent validation
     this.eventService.validateEvent(event, pinCode);
 
     const [users] = await this.rDataService.userInfo.findByEventId(eventId);

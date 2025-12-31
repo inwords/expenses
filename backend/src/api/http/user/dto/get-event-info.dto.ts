@@ -1,9 +1,9 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {IsString, MaxLength} from 'class-validator';
+import {IsString, Length} from 'class-validator';
 
 export class GetEventInfoQueryDto {
   @ApiProperty()
   @IsString()
-  @MaxLength(4)
+  @Length(4, 4)
   pinCode!: string;
 }

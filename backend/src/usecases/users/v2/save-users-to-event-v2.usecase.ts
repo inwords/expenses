@@ -19,15 +19,12 @@ export class SaveUsersToEventV2UseCase implements UseCase<Input, Output> {
 
   public async execute({eventId, users, pinCode}: Input): Promise<Output> {
     return this.rDataService.transaction(async (ctx) => {
-      // Блокируем event с pessimistic_write для предотвращения race condition
-      // Если кто-то пытается удалить event, мы заблокируемся или получим ошибку (nowait)
       const [event] = await this.rDataService.event.findById(eventId, {
         ctx,
         lock: 'pessimistic_write',
         onLocked: 'nowait',
       });
 
-      // Use EventService for consistent validation
       this.eventService.validateEvent(event, pinCode);
 
       const usersValue = users.map((u) => new UserInfoValueObject({...u, eventId}).value);

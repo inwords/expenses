@@ -23,8 +23,6 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
 
   public async execute(input: Input) {
     return this.rDataService.transaction(async (ctx) => {
-      // Блокируем event с pessimistic_write для предотвращения race condition
-      // Если кто-то пытается удалить event, мы заблокируем строку и проверим что она не удалена
       const [event] = await this.rDataService.event.findById(input.eventId, {
         ctx,
         lock: 'pessimistic_write',

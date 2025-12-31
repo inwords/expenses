@@ -32,7 +32,6 @@ export class UserController {
     private readonly getEventInfoUseCase: GetEventInfoUseCase,
     private readonly saveUsersToEventUseCase: SaveUsersToEventUseCase,
     private readonly deleteEventUseCase: DeleteEventUseCase,
-    // V2 use cases
     private readonly getEventInfoV2UseCase: GetEventInfoV2UseCase,
     private readonly saveUsersToEventV2UseCase: SaveUsersToEventV2UseCase,
     private readonly saveEventExpenseV2UseCase: SaveEventExpenseV2UseCase,
@@ -81,7 +80,6 @@ export class UserController {
     return this.saveEventExpenseUseCase.execute(expense);
   }
 
-  // V2 METHODS
   @GrpcMethod('UserService', 'GetEventInfoV2')
   async getEventInfoV2(@Body() {eventId, pinCode}: EventIdDto & GetEventInfoQueryDto) {
     return await this.getEventInfoV2UseCase.execute({eventId, pinCode});

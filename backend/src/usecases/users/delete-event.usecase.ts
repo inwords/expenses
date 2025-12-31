@@ -23,8 +23,6 @@ export class DeleteEventUseCase implements UseCase<Input, Output> {
 
   public async execute({eventId, pinCode}: Input): Promise<Output> {
     return this.rDataService.transaction(async (ctx) => {
-      // Блокируем event с pessimistic_write для предотвращения race condition
-      // Если кто-то пытается добавить expense, он заблокируется и будет ждать пока мы удалим event
       const [event] = await this.rDataService.event.findById(eventId, {
         ctx,
         lock: 'pessimistic_write',

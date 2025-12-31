@@ -17,7 +17,6 @@ export class GetEventExpensesV2UseCase implements UseCase<Input, Output> {
   public async execute({eventId, pinCode}: Input): Promise<Output> {
     const [event] = await this.rDataService.event.findById(eventId);
 
-    // ADDED: Critical security validations - prevent unauthorized access
     this.eventService.validateEvent(event, pinCode);
 
     const [expenses] = await this.rDataService.expense.findByEventId(eventId);
