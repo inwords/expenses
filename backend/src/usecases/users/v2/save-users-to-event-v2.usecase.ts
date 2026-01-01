@@ -1,27 +1,23 @@
-import {Injectable} from '@nestjs/common';
 import {UseCase} from '#packages/use-case';
+
 import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-service/relational-data-service';
 import {EventServiceAbstract} from '#domain/abstracts/event-service/event-service';
 import {IEvent} from '#domain/entities/event.entity';
+import {IUserInfo} from '#domain/entities/user-info.entity';
+import {UserInfoValueObject} from '#domain/value-objects/user-info.value-object';
+import {Injectable} from '@nestjs/common';
 
-type Input = {
-  eventId: IEvent['id'];
-  pinCode: string;
-};
-
-type Output = {
-  id: IEvent['id'];
-  deletedAt: Date;
-};
+type Input = {users: Array<Omit<IUserInfo, 'id' | 'eventId'>>} & {pinCode: IEvent['pinCode']; eventId: IEvent['id']};
+type Output = Array<IUserInfo>;
 
 @Injectable()
-export class DeleteEventUseCase implements UseCase<Input, Output> {
+export class SaveUsersToEventV2UseCase implements UseCase<Input, Output> {
   constructor(
     private readonly rDataService: RelationalDataServiceAbstract,
     private readonly eventService: EventServiceAbstract,
   ) {}
 
-  public async execute({eventId, pinCode}: Input): Promise<Output> {
+  public async execute({eventId, users, pinCode}: Input): Promise<Output> {
     return this.rDataService.transaction(async (ctx) => {
       const [event] = await this.rDataService.event.findById(eventId, {
         ctx,
@@ -31,22 +27,11 @@ export class DeleteEventUseCase implements UseCase<Input, Output> {
 
       this.eventService.validateEvent(event, pinCode);
 
-      const deletedAt = new Date();
+      const usersValue = users.map((u) => new UserInfoValueObject({...u, eventId}).value);
 
-      // Выполняем soft delete
-      await this.rDataService.event.update(
-        eventId,
-        {
-          deletedAt,
-          updatedAt: new Date(),
-        },
-        {ctx},
-      );
+      await this.rDataService.userInfo.insert(usersValue, {ctx});
 
-      return {
-        id: eventId,
-        deletedAt,
-      };
+      return usersValue;
     });
   }
 }

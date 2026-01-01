@@ -11,11 +11,12 @@ import {BusinessError} from '#domain/errors/business.error';
 import {BUSINESS_ERRORS} from '#domain/errors/business-errors.const';
 import {ErrorCode} from '#domain/errors/error-codes.enum';
 
-type Input = Omit<IExpense, 'createdAt' | 'id' | 'updatedAt'> & Partial<Pick<IExpense, 'createdAt'>>;
+type Input = Omit<IExpense, 'createdAt' | 'id' | 'updatedAt'> &
+  Partial<Pick<IExpense, 'createdAt'>> & {pinCode: string};
 type Output = IExpense;
 
 @Injectable()
-export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
+export class SaveEventExpenseV2UseCase implements UseCase<Input, Output> {
   constructor(
     private readonly rDataService: RelationalDataServiceAbstract,
     private readonly eventService: EventServiceAbstract,
@@ -23,14 +24,14 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
 
   public async execute(input: Input) {
     return this.rDataService.transaction(async (ctx) => {
+      // Блокируем event с pessimistic_write для предотвращения race condition
       const [event] = await this.rDataService.event.findById(input.eventId, {
         ctx,
         lock: 'pessimistic_write',
         onLocked: 'nowait',
       });
 
-      this.eventService.validateEventExists(event);
-      this.eventService.validateEventIsNotDeleted(event);
+      this.eventService.validateEvent(event, input.pinCode);
 
       if (event.currencyId === input.currencyId) {
         let splitInformation: ISplitInfo[] = [];

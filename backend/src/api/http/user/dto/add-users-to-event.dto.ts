@@ -1,5 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {IsString, MaxLength, ValidateNested} from 'class-validator';
+import {IsString, Length, ValidateNested} from 'class-validator';
 import {Type} from 'class-transformer';
 import {UserDto} from './user.dto';
 import {IUserInfo} from '#domain/entities/user-info.entity';
@@ -12,6 +12,6 @@ export class AddUsersToEventDto {
 
   @ApiProperty({type: String})
   @IsString()
-  @MaxLength(4)
+  @Length(4, 4)
   pinCode!: string;
 }
