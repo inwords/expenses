@@ -6,4 +6,5 @@ export const CURRENCIES_LIST: Pick<ICurrency, 'code'>[] = [
   {code: CurrencyCode.RUB},
   {code: CurrencyCode.JPY},
   {code: CurrencyCode.TRY},
+  {code: CurrencyCode.AED},
 ];
