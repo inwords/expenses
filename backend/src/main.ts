@@ -26,6 +26,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Expenses Swagger')
     .setVersion('0.0.1')
+    .addServer('/api', 'API Server')
     .addApiKey(
       {
         type: 'apiKey',
