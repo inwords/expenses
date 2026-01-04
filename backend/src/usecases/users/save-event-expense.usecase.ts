@@ -7,12 +7,11 @@ import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-s
 import {EventServiceAbstract} from '#domain/abstracts/event-service/event-service';
 import {IExpense, ISplitInfo} from '#domain/entities/expense.entity';
 import {ExpenseValueObject} from '#domain/value-objects/expense.value-object';
-import {BusinessError} from '#domain/errors/business.error';
-import {BUSINESS_ERRORS} from '#domain/errors/business-errors.const';
-import {ErrorCode} from '#domain/errors/error-codes.enum';
+import {Result, success, error, isError} from '#packages/result';
+import {EventNotFoundError, EventDeletedError, CurrencyNotFoundError, CurrencyRateNotFoundError} from '#domain/errors/errors';
 
 type Input = Omit<IExpense, 'createdAt' | 'id' | 'updatedAt'> & Partial<Pick<IExpense, 'createdAt'>>;
-type Output = IExpense;
+type Output = Result<IExpense, EventNotFoundError | EventDeletedError | CurrencyNotFoundError | CurrencyRateNotFoundError>;
 
 @Injectable()
 export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
@@ -21,7 +20,7 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
     private readonly eventService: EventServiceAbstract,
   ) {}
 
-  public async execute(input: Input) {
+  public async execute(input: Input): Promise<Output> {
     return this.rDataService.transaction(async (ctx) => {
       const [event] = await this.rDataService.event.findById(input.eventId, {
         ctx,
@@ -29,8 +28,15 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
         onLocked: 'nowait',
       });
 
-      this.eventService.validateEventExists(event);
-      this.eventService.validateEventIsNotDeleted(event);
+      const eventExistsResult = this.eventService.isEventExists(event);
+      if (isError(eventExistsResult)) {
+        return eventExistsResult;
+      }
+
+      const eventNotDeletedResult = this.eventService.isEventNotDeleted(event);
+      if (isError(eventNotDeletedResult)) {
+        return eventNotDeletedResult;
+      }
 
       if (event.currencyId === input.currencyId) {
         let splitInformation: ISplitInfo[] = [];
@@ -46,51 +52,41 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
 
         await this.rDataService.expense.insert(expense, {ctx});
 
-        return expense;
+        return success(expense);
       } else {
-        // TODO cкорее всего стоит переделать на один запрос
         const [expenseCurrencyCode] = await this.rDataService.currency.findById(input.currencyId, {ctx});
         const [eventCurrencyCode] = await this.rDataService.currency.findById(event.currencyId, {ctx});
 
         if (!eventCurrencyCode || !expenseCurrencyCode) {
-          throw new BusinessError(BUSINESS_ERRORS[ErrorCode.CURRENCY_NOT_FOUND], {
-            eventCurrencyId: event.currencyId,
-            expenseCurrencyId: input.currencyId,
+          return error(new CurrencyNotFoundError());
+        }
+
+        const getDateForExchangeRate = input.createdAt
+          ? getDateWithoutTimeUTC(new Date(input.createdAt))
+          : getCurrentDateWithoutTimeUTC();
+
+        const [currencyRate] = await this.rDataService.currencyRate.findByDate(getDateForExchangeRate, {ctx});
+
+        if (!currencyRate) {
+          return error(new CurrencyRateNotFoundError());
+        }
+
+        const exchangeRate = currencyRate.rate[eventCurrencyCode.code] / currencyRate.rate[expenseCurrencyCode.code];
+
+        let splitInformation: ISplitInfo[] = [];
+
+        for (let splitInfo of input.splitInformation) {
+          splitInformation.push({
+            ...splitInfo,
+            exchangedAmount: Number(Number(splitInfo.amount * exchangeRate).toFixed(2)),
           });
         }
 
-        if (expenseCurrencyCode && eventCurrencyCode) {
-          const getDateForExchangeRate = input.createdAt
-            ? getDateWithoutTimeUTC(new Date(input.createdAt))
-            : getCurrentDateWithoutTimeUTC();
+        const expense = new ExpenseValueObject({...input, splitInformation}).value;
 
-          const [currencyRate] = await this.rDataService.currencyRate.findByDate(getDateForExchangeRate, {ctx});
+        await this.rDataService.expense.insert(expense, {ctx});
 
-          if (!currencyRate) {
-            throw new BusinessError(
-              BUSINESS_ERRORS[ErrorCode.CURRENCY_RATE_NOT_FOUND],
-              {date: getDateForExchangeRate},
-              `Currency rate not found for ${getDateForExchangeRate} date. Please try again later or contact support.`,
-            );
-          }
-
-          const exchangeRate = currencyRate.rate[eventCurrencyCode.code] / currencyRate.rate[expenseCurrencyCode.code];
-
-          let splitInformation: ISplitInfo[] = [];
-
-          for (let splitInfo of input.splitInformation) {
-            splitInformation.push({
-              ...splitInfo,
-              exchangedAmount: Number(Number(splitInfo.amount * exchangeRate).toFixed(2)),
-            });
-          }
-
-          const expense = new ExpenseValueObject({...input, splitInformation}).value;
-
-          await this.rDataService.expense.insert(expense, {ctx});
-
-          return expense;
-        }
+        return success(expense);
       }
     });
   }

@@ -1,8 +1,13 @@
 import {IEvent} from '#domain/entities/event.entity';
+import {Result} from '#packages/result';
+import {EventNotFoundError, EventDeletedError, InvalidPinCodeError} from '#domain/errors/errors';
 
 export abstract class EventServiceAbstract {
-  abstract validateEvent(event: IEvent | null | undefined, pinCode: string): asserts event is IEvent;
-  abstract validateEventExists(event: IEvent | null | undefined): asserts event is IEvent;
-  abstract validateEventIsNotDeleted(event: IEvent): void;
-  abstract validatePinCode(event: IEvent, pinCode: string): void;
+  abstract isValidEvent(
+    event: IEvent | null | undefined,
+    pinCode: string,
+  ): Result<boolean, EventNotFoundError | EventDeletedError | InvalidPinCodeError>;
+  abstract isEventExists(event: IEvent | null | undefined): Result<boolean, EventNotFoundError>;
+  abstract isEventNotDeleted(event: IEvent): Result<boolean, EventDeletedError>;
+  abstract isValidPinCode(event: IEvent, pinCode: string): Result<boolean, InvalidPinCodeError>;
 }

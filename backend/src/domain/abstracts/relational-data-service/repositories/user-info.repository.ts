@@ -6,6 +6,10 @@ export abstract class UserInfoRepositoryAbstract {
     eventId: IUserInfo['eventId'],
     trx?: ITransactionWithLock,
   ) => Promise<[result: IUserInfo[], queryDetails: IQueryDetails]>;
+  abstract findAll: (
+    input: {limit: number},
+    trx?: ITransaction,
+  ) => Promise<[result: IUserInfo[], queryDetails: IQueryDetails]>;
   abstract insert: (
     userInfo: IUserInfo | IUserInfo[],
     trx?: ITransaction,

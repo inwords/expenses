@@ -3,16 +3,21 @@ import {UseCase} from '#packages/use-case';
 import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-service/relational-data-service';
 import {EventServiceAbstract} from '#domain/abstracts/event-service/event-service';
 import {IEvent} from '#domain/entities/event.entity';
+import {isError, Result, success} from '#packages/result';
+import {EventDeletedError, EventNotFoundError, InvalidPinCodeError} from '#domain/errors';
 
 type Input = {
   eventId: IEvent['id'];
   pinCode: string;
 };
 
-type Output = {
-  id: IEvent['id'];
-  deletedAt: Date;
-};
+type Output = Result<
+  {
+    id: IEvent['id'];
+    deletedAt: Date;
+  },
+  EventNotFoundError | EventDeletedError | InvalidPinCodeError
+>;
 
 @Injectable()
 export class DeleteEventUseCase implements UseCase<Input, Output> {
@@ -29,11 +34,14 @@ export class DeleteEventUseCase implements UseCase<Input, Output> {
         onLocked: 'nowait',
       });
 
-      this.eventService.validateEvent(event, pinCode);
+      const isValidResult = this.eventService.isValidEvent(event, pinCode);
+
+      if (isError(isValidResult)) {
+        return isValidResult;
+      }
 
       const deletedAt = new Date();
 
-      // Выполняем soft delete
       await this.rDataService.event.update(
         eventId,
         {
@@ -43,10 +51,10 @@ export class DeleteEventUseCase implements UseCase<Input, Output> {
         {ctx},
       );
 
-      return {
+      return success({
         id: eventId,
         deletedAt,
-      };
+      });
     });
   }
 }

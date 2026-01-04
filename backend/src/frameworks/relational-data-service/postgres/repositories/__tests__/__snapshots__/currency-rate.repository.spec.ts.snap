@@ -1,5 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`CurrencyRateRepository findAll should find all currency rates with limit 1`] = `
+{
+  "queryParameters": {},
+  "queryString": "SELECT "currency_rate"."date" AS "currency_rate_date", "currency_rate"."rate" AS "currency_rate_rate", "currency_rate"."created_at" AS "currency_rate_created_at", "currency_rate"."updated_at" AS "currency_rate_updated_at" FROM "currency_rate" "currency_rate" LIMIT 10",
+}
+`;
+
+exports[`CurrencyRateRepository findAll should respect limit parameter 1`] = `
+{
+  "queryParameters": {},
+  "queryString": "SELECT "currency_rate"."date" AS "currency_rate_date", "currency_rate"."rate" AS "currency_rate_rate", "currency_rate"."created_at" AS "currency_rate_created_at", "currency_rate"."updated_at" AS "currency_rate_updated_at" FROM "currency_rate" "currency_rate" LIMIT 2",
+}
+`;
+
 exports[`CurrencyRateRepository findByDate should find currency rate by date 1`] = `
 {
   "queryParameters": {

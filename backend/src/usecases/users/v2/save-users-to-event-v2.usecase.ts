@@ -6,9 +6,11 @@ import {IEvent} from '#domain/entities/event.entity';
 import {IUserInfo} from '#domain/entities/user-info.entity';
 import {UserInfoValueObject} from '#domain/value-objects/user-info.value-object';
 import {Injectable} from '@nestjs/common';
+import {Result, success, isError} from '#packages/result';
+import {EventNotFoundError, EventDeletedError, InvalidPinCodeError} from '#domain/errors/errors';
 
 type Input = {users: Array<Omit<IUserInfo, 'id' | 'eventId'>>} & {pinCode: IEvent['pinCode']; eventId: IEvent['id']};
-type Output = Array<IUserInfo>;
+type Output = Result<Array<IUserInfo>, EventNotFoundError | EventDeletedError | InvalidPinCodeError>;
 
 @Injectable()
 export class SaveUsersToEventV2UseCase implements UseCase<Input, Output> {
@@ -25,13 +27,16 @@ export class SaveUsersToEventV2UseCase implements UseCase<Input, Output> {
         onLocked: 'nowait',
       });
 
-      this.eventService.validateEvent(event, pinCode);
+      const validationResult = this.eventService.isValidEvent(event, pinCode);
+      if (isError(validationResult)) {
+        return validationResult;
+      }
 
       const usersValue = users.map((u) => new UserInfoValueObject({...u, eventId}).value);
 
       await this.rDataService.userInfo.insert(usersValue, {ctx});
 
-      return usersValue;
+      return success(usersValue);
     });
   }
 }

@@ -1,33 +1,51 @@
 import {Injectable} from '@nestjs/common';
 import {EventServiceAbstract} from '#domain/abstracts/event-service/event-service';
 import {IEvent} from '#domain/entities/event.entity';
-import {BusinessError} from '#domain/errors/business.error';
-import {BUSINESS_ERRORS} from '#domain/errors/business-errors.const';
-import {ErrorCode} from '#domain/errors';
+import {Result, success, error, isError} from '#packages/result';
+import {EventNotFoundError, EventDeletedError, InvalidPinCodeError} from '#domain/errors/errors';
 
 @Injectable()
 export class EventService implements EventServiceAbstract {
-  validateEvent(event: IEvent | null | undefined, pinCode: string): asserts event is IEvent {
-    this.validateEventExists(event);
-    this.validateEventIsNotDeleted(event)
-    this.validatePinCode(event, pinCode);
+  isValidEvent(
+    event: IEvent | null | undefined,
+    pinCode: string,
+  ): Result<boolean, EventNotFoundError | EventDeletedError | InvalidPinCodeError> {
+    const existsResult = this.isEventExists(event);
+    if (isError(existsResult)) {
+      return existsResult;
+    }
+
+    const notDeletedResult = this.isEventNotDeleted(event!);
+    if (isError(notDeletedResult)) {
+      return notDeletedResult;
+    }
+
+    const pinCodeResult = this.isValidPinCode(event!, pinCode);
+    if (isError(pinCodeResult)) {
+      return pinCodeResult;
+    }
+
+    return success(true);
   }
 
-  validateEventExists(event: IEvent | null | undefined): asserts event is IEvent {
+  isEventExists(event: IEvent | null | undefined): Result<boolean, EventNotFoundError> {
     if (!event) {
-      throw new BusinessError(BUSINESS_ERRORS[ErrorCode.EVENT_NOT_FOUND], {eventId: event?.id});
+      return error(new EventNotFoundError());
     }
+    return success(true);
   }
 
-  validateEventIsNotDeleted(event: IEvent): void {
+  isEventNotDeleted(event: IEvent): Result<boolean, EventDeletedError> {
     if (event.deletedAt !== null) {
-      throw new BusinessError(BUSINESS_ERRORS[ErrorCode.EVENT_ALREADY_DELETED], {eventId: event.id});
+      return error(new EventDeletedError());
     }
+    return success(true);
   }
 
-  validatePinCode(event: IEvent, pinCode: string): void {
+  isValidPinCode(event: IEvent, pinCode: string): Result<boolean, InvalidPinCodeError> {
     if (event.pinCode !== pinCode) {
-      throw new BusinessError(BUSINESS_ERRORS[ErrorCode.EVENT_INVALID_PIN], {eventId: event.id});
+      return error(new InvalidPinCodeError());
     }
+    return success(true);
   }
 }

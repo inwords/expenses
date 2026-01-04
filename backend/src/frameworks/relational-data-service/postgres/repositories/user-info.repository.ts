@@ -33,6 +33,20 @@ export class UserInfoRepository extends BaseRepository implements UserInfoReposi
     return [result, queryDetails];
   };
 
+  public findAll: UserInfoRepositoryAbstract['findAll'] = async (input, trx) => {
+    const {limit} = input;
+    const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
+
+    let query = this.getRepository(ctx).createQueryBuilder(this.queryName);
+
+    query = query.limit(limit);
+
+    const queryDetails = this.getQueryDetails(query);
+    const result = await query.getMany();
+
+    return [result, queryDetails];
+  };
+
   readonly insert: UserInfoRepositoryAbstract['insert'] = async (
     input: IUserInfo | IUserInfo[],
     trx,

@@ -60,6 +60,8 @@ const initOrUpdateCurrencies = async (rDataService: RelationalDataServiceAbstrac
       },
     );
 
+    console.log(currencies);
+
     if (!currencies.length) {
       const currencies = CURRENCIES_LIST.map((currency) => new CurrencyValueObject(currency).value);
 

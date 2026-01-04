@@ -6,6 +6,10 @@ export abstract class CurrencyRateRepositoryAbstract {
     date: string,
     trx?: ITransactionWithLock,
   ) => Promise<[result: ICurrencyRate | null, queryDetails: IQueryDetails]>;
+  abstract findAll: (
+    input: {limit: number},
+    trx?: ITransaction,
+  ) => Promise<[result: ICurrencyRate[], queryDetails: IQueryDetails]>;
   abstract insert: (
     currencyRate: ICurrencyRate,
     trx?: ITransaction,

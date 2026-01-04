@@ -16,6 +16,7 @@ import {
   GetEventExpensesV2UseCase,
   CreateEventShareTokenV2UseCase,
 } from '#usecases/users/v2';
+import {isError} from '#packages/result';
 
 @Controller(UserV2Routes.root)
 @ApiTags('User V2')
@@ -30,28 +31,58 @@ export class UserV2Controller {
 
   @Post(UserV2Routes.getEventInfo)
   async getEventInfo(@Param() {eventId}: EventIdDto, @Body() body: GetEventInfoBodyDto) {
-    return this.getEventInfoV2UseCase.execute({eventId, pinCode: body.pinCode, token: body.token});
+    const result = await this.getEventInfoV2UseCase.execute({eventId, pinCode: body.pinCode, token: body.token});
+
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return result.value;
   }
 
   @Post(UserV2Routes.addUsersToEvent)
   @HttpCode(201)
   async addUserToEvent(@Param() {eventId}: EventIdDto, @Body() body: AddUsersToEventDto) {
-    return this.saveUsersToEventV2UseCase.execute({eventId, ...body});
+    const result = await this.saveUsersToEventV2UseCase.execute({eventId, ...body});
+
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return result.value;
   }
 
   @Post(UserV2Routes.getAllEventExpenses)
   async getAllEventExpenses(@Param() {eventId}: EventIdDto, @Body() body: GetEventExpensesBodyDto) {
-    return this.getEventExpensesV2UseCase.execute({eventId, pinCode: body.pinCode});
+    const result = await this.getEventExpensesV2UseCase.execute({eventId, pinCode: body.pinCode});
+
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return result.value;
   }
 
   @Post(UserV2Routes.createExpense)
   async createExpense(@Body() expense: CreateExpenseV2Dto, @Param() {eventId}: EventIdDto) {
-    return this.saveEventExpenseV2UseCase.execute({...expense, eventId});
+    const result = await this.saveEventExpenseV2UseCase.execute({...expense, eventId});
+
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return result.value;
   }
 
   @Post(UserV2Routes.createShareToken)
   @HttpCode(201)
   async createShareToken(@Param() {eventId}: EventIdDto, @Body() body: CreateShareTokenBodyDto) {
-    return this.createEventShareTokenV2UseCase.execute({eventId, pinCode: body.pinCode});
+    const result = await this.createEventShareTokenV2UseCase.execute({eventId, pinCode: body.pinCode});
+
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return result.value;
   }
 }

@@ -1,19 +1,42 @@
 import {ExceptionFilter, Catch, ArgumentsHost} from '@nestjs/common';
 import {Response} from 'express';
-import {BusinessError} from '#domain/errors/business.error';
+import {
+  EventNotFoundError,
+  EventDeletedError,
+  InvalidPinCodeError,
+  InvalidTokenError,
+  TokenExpiredError,
+  CurrencyNotFoundError,
+  CurrencyRateNotFoundError,
+} from '#domain/errors/errors';
 
-@Catch(BusinessError)
+type BusinessError =
+  | EventNotFoundError
+  | EventDeletedError
+  | InvalidPinCodeError
+  | InvalidTokenError
+  | TokenExpiredError
+  | CurrencyNotFoundError
+  | CurrencyRateNotFoundError;
+
+@Catch(
+  EventNotFoundError,
+  EventDeletedError,
+  InvalidPinCodeError,
+  InvalidTokenError,
+  TokenExpiredError,
+  CurrencyNotFoundError,
+  CurrencyRateNotFoundError,
+)
 export class BusinessErrorFilter implements ExceptionFilter {
   catch(exception: BusinessError, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const status = exception.getStatus();
 
-    response.status(status).json({
-      statusCode: status,
+    response.status(exception.httpCode).json({
+      statusCode: exception.httpCode,
       code: exception.code,
       message: exception.message,
-      details: exception.details,
     });
   }
 }

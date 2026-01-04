@@ -1,5 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`UserInfoRepository findAll should find all user infos with limit 1`] = `
+{
+  "queryParameters": {},
+  "queryString": "SELECT "user_info"."id" AS "user_info_id", "user_info"."name" AS "user_info_name", "user_info"."event_id" AS "user_info_event_id", "user_info"."created_at" AS "user_info_created_at", "user_info"."updated_at" AS "user_info_updated_at" FROM "user_info" "user_info" LIMIT 10",
+}
+`;
+
+exports[`UserInfoRepository findAll should respect limit parameter 1`] = `
+{
+  "queryParameters": {},
+  "queryString": "SELECT "user_info"."id" AS "user_info_id", "user_info"."name" AS "user_info_name", "user_info"."event_id" AS "user_info_event_id", "user_info"."created_at" AS "user_info_created_at", "user_info"."updated_at" AS "user_info_updated_at" FROM "user_info" "user_info" LIMIT 2",
+}
+`;
+
 exports[`UserInfoRepository findByEventId should find user infos by event id 1`] = `
 {
   "queryParameters": {

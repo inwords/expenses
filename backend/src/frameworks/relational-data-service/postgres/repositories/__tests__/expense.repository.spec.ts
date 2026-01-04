@@ -98,4 +98,128 @@ describe('ExpenseRepository', () => {
       expect(queryDetails).toMatchSnapshot();
     });
   });
+
+  describe('findAll', () => {
+    it('should find all expenses with limit', async () => {
+      const expenses = [
+        {
+          id: 'expense-1',
+          description: 'Dinner',
+          userWhoPaidId: 'user-1',
+          currencyId: 'currency-1',
+          eventId: 'event-1',
+          expenseType: ExpenseType.Expense,
+          splitInformation: [
+            {
+              userId: 'user-1',
+              amount: 50,
+              exchangedAmount: 50,
+            },
+            {
+              userId: 'user-2',
+              amount: 50,
+              exchangedAmount: 50,
+            },
+          ],
+          createdAt: new Date('2023-01-01T00:00:00Z'),
+          updatedAt: new Date('2023-01-01T00:00:00Z'),
+        },
+        {
+          id: 'expense-2',
+          description: 'Lunch',
+          userWhoPaidId: 'user-2',
+          currencyId: 'currency-1',
+          eventId: 'event-1',
+          expenseType: ExpenseType.Expense,
+          splitInformation: [
+            {
+              userId: 'user-1',
+              amount: 30,
+              exchangedAmount: 30,
+            },
+            {
+              userId: 'user-2',
+              amount: 30,
+              exchangedAmount: 30,
+            },
+          ],
+          createdAt: new Date('2023-01-02T00:00:00Z'),
+          updatedAt: new Date('2023-01-02T00:00:00Z'),
+        },
+      ];
+
+      await relationalDataService.expense.insert(expenses[0]);
+      await relationalDataService.expense.insert(expenses[1]);
+
+      const [result, queryDetails] = await relationalDataService.expense.findAll({limit: 10});
+
+      expect(result).toMatchObject(expenses);
+      expect(queryDetails).toMatchSnapshot();
+    });
+
+    it('should respect limit parameter', async () => {
+      const expenses = [
+        {
+          id: 'expense-1',
+          description: 'Dinner',
+          userWhoPaidId: 'user-1',
+          currencyId: 'currency-1',
+          eventId: 'event-1',
+          expenseType: ExpenseType.Expense,
+          splitInformation: [
+            {
+              userId: 'user-1',
+              amount: 50,
+              exchangedAmount: 50,
+            },
+          ],
+          createdAt: new Date('2023-01-01T00:00:00Z'),
+          updatedAt: new Date('2023-01-01T00:00:00Z'),
+        },
+        {
+          id: 'expense-2',
+          description: 'Lunch',
+          userWhoPaidId: 'user-2',
+          currencyId: 'currency-1',
+          eventId: 'event-1',
+          expenseType: ExpenseType.Expense,
+          splitInformation: [
+            {
+              userId: 'user-1',
+              amount: 30,
+              exchangedAmount: 30,
+            },
+          ],
+          createdAt: new Date('2023-01-02T00:00:00Z'),
+          updatedAt: new Date('2023-01-02T00:00:00Z'),
+        },
+        {
+          id: 'expense-3',
+          description: 'Breakfast',
+          userWhoPaidId: 'user-1',
+          currencyId: 'currency-1',
+          eventId: 'event-1',
+          expenseType: ExpenseType.Expense,
+          splitInformation: [
+            {
+              userId: 'user-1',
+              amount: 20,
+              exchangedAmount: 20,
+            },
+          ],
+          createdAt: new Date('2023-01-03T00:00:00Z'),
+          updatedAt: new Date('2023-01-03T00:00:00Z'),
+        },
+      ];
+
+      await relationalDataService.expense.insert(expenses[0]);
+      await relationalDataService.expense.insert(expenses[1]);
+      await relationalDataService.expense.insert(expenses[2]);
+
+      const [result, queryDetails] = await relationalDataService.expense.findAll({limit: 2});
+
+      expect(result).toHaveLength(2);
+      expect(queryDetails).toMatchSnapshot();
+    });
+  });
 });
