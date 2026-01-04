@@ -6,7 +6,7 @@ import {FetchDailyCurrencyRatesUseCase} from '#usecases/cron/fetch-daily-currenc
 export class CurrencyRateSchedulerController {
   constructor(private readonly fetchDailyCurrencyRatesUseCase: FetchDailyCurrencyRatesUseCase) {}
 
-  @Cron('0 0 * * *', {
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, {
     timeZone: 'UTC'
   })
   async handleCron() {

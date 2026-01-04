@@ -15,4 +15,5 @@ export const UserV2Routes = {
   addUsersToEvent: `/event/:eventId/users`,
   getAllEventExpenses: `/event/:eventId/expenses`,
   createExpense: `/event/:eventId/expense`,
+  createShareToken: `/event/:eventId/share-token`,
 };

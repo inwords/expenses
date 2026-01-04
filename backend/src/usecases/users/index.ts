@@ -10,6 +10,7 @@ import {
   SaveUsersToEventV2UseCase,
   SaveEventExpenseV2UseCase,
   GetEventExpensesV2UseCase,
+  CreateEventShareTokenV2UseCase,
 } from './v2';
 
 export const allUsersUseCases = [
@@ -24,4 +25,5 @@ export const allUsersUseCases = [
   SaveUsersToEventV2UseCase,
   SaveEventExpenseV2UseCase,
   GetEventExpensesV2UseCase,
+  CreateEventShareTokenV2UseCase,
 ];

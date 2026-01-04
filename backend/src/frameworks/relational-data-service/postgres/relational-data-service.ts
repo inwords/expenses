@@ -6,6 +6,7 @@ import {UserInfoRepository} from '#frameworks/relational-data-service/postgres/r
 import {CurrencyRepository} from '#frameworks/relational-data-service/postgres/repositories/currency.repository';
 import {ExpenseRepository} from '#frameworks/relational-data-service/postgres/repositories/expense.repository';
 import {CurrencyRateRepository} from '#frameworks/relational-data-service/postgres/repositories/currency-rate.repository';
+import {EventShareTokenRepository} from '#frameworks/relational-data-service/postgres/repositories/event-share-token.repository';
 
 export class RelationalDataService implements RelationalDataServiceAbstract {
   readonly dbConfig: DbConfig;
@@ -18,6 +19,7 @@ export class RelationalDataService implements RelationalDataServiceAbstract {
   readonly currency: CurrencyRepository;
   readonly expense: ExpenseRepository;
   readonly currencyRate: CurrencyRateRepository;
+  readonly eventShareToken: EventShareTokenRepository;
 
   constructor({dbConfig, showQueryDetails}: { dbConfig: DbConfig; showQueryDetails: boolean }) {
     this.dbConfig = dbConfig;
@@ -30,6 +32,7 @@ export class RelationalDataService implements RelationalDataServiceAbstract {
     this.currency = new CurrencyRepository({dataSource: this.dataSource, showQueryDetails});
     this.expense = new ExpenseRepository({dataSource: this.dataSource, showQueryDetails});
     this.currencyRate = new CurrencyRateRepository({dataSource: this.dataSource, showQueryDetails});
+    this.eventShareToken = new EventShareTokenRepository({dataSource: this.dataSource, showQueryDetails});
   }
 
   async initialize(): Promise<void> {

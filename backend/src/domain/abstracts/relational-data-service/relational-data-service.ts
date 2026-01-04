@@ -4,6 +4,7 @@ import {UserInfoRepositoryAbstract} from '#domain/abstracts/relational-data-serv
 import {CurrencyRepositoryAbstract} from '#domain/abstracts/relational-data-service/repositories/currency.repository';
 import {ExpenseRepositoryAbstract} from '#domain/abstracts/relational-data-service/repositories/expense.repository';
 import {CurrencyRateRepositoryAbstract} from '#domain/abstracts/relational-data-service/repositories/currency-rate.repository';
+import {EventShareTokenRepositoryAbstract} from '#domain/abstracts/relational-data-service/repositories/event-share-token.repository';
 
 export abstract class RelationalDataServiceAbstract implements IRelationalDataService {
   abstract event: EventRepositoryAbstract;
@@ -11,6 +12,7 @@ export abstract class RelationalDataServiceAbstract implements IRelationalDataSe
   abstract currency: CurrencyRepositoryAbstract;
   abstract expense: ExpenseRepositoryAbstract;
   abstract currencyRate: CurrencyRateRepositoryAbstract;
+  abstract eventShareToken: EventShareTokenRepositoryAbstract;
 
   abstract initialize: IRelationalDataService['initialize'];
   abstract transaction: IRelationalDataService['transaction'];

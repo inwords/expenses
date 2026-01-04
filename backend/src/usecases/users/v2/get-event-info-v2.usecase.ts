@@ -6,7 +6,7 @@ import {EventServiceAbstract} from '#domain/abstracts/event-service/event-servic
 import {IUserInfo} from '#domain/entities/user-info.entity';
 import {Injectable} from '@nestjs/common';
 
-type Input = {eventId: string; pinCode: string};
+type Input = {eventId: string; pinCode: string; token?: string} | {eventId: string; pinCode?: string; token: string};
 type Output = IEvent & {users: Array<IUserInfo>};
 
 @Injectable()
@@ -16,10 +16,22 @@ export class GetEventInfoV2UseCase implements UseCase<Input, Output> {
     private readonly eventService: EventServiceAbstract,
   ) {}
 
-  public async execute({eventId, pinCode}: Input): Promise<Output> {
+  public async execute({eventId, pinCode, token}: Input): Promise<Output> {
     const [event] = await this.rDataService.event.findById(eventId);
+    this.eventService.validateEventExists(event);
+    this.eventService.validateEventIsNotDeleted(event);
 
-    this.eventService.validateEvent(event, pinCode);
+    if (token) {
+      const [shareToken] = await this.rDataService.eventShareToken.findByToken(token);
+
+      if (shareToken && shareToken.eventId === eventId && shareToken.expiresAt >= new Date()) {
+        const [users] = await this.rDataService.userInfo.findByEventId(eventId);
+
+        return {...event, users};
+      }
+    }
+
+    this.eventService.validatePinCode(event, pinCode);
 
     const [users] = await this.rDataService.userInfo.findByEventId(eventId);
 

@@ -1,5 +1,5 @@
 import {Body, Controller, HttpCode, Param, Post} from '@nestjs/common';
-import {UserV2Routes} from './user.contants';
+import {UserV2Routes} from './user.constants';
 import {ApiTags} from '@nestjs/swagger';
 
 import {EventIdDto} from './dto/event-id.dto';
@@ -7,12 +7,14 @@ import {AddUsersToEventDto} from './dto/add-users-to-event.dto';
 import {GetEventInfoBodyDto} from './dto/get-event-info-body.dto';
 import {GetEventExpensesBodyDto} from './dto/get-event-expenses-body.dto';
 import {CreateExpenseV2Dto} from './dto/create-expense-v2.dto';
+import {CreateShareTokenBodyDto} from './dto/create-share-token-body.dto';
 
 import {
   GetEventInfoV2UseCase,
   SaveUsersToEventV2UseCase,
   SaveEventExpenseV2UseCase,
   GetEventExpensesV2UseCase,
+  CreateEventShareTokenV2UseCase,
 } from '#usecases/users/v2';
 
 @Controller(UserV2Routes.root)
@@ -23,11 +25,12 @@ export class UserV2Controller {
     private readonly saveUsersToEventV2UseCase: SaveUsersToEventV2UseCase,
     private readonly saveEventExpenseV2UseCase: SaveEventExpenseV2UseCase,
     private readonly getEventExpensesV2UseCase: GetEventExpensesV2UseCase,
+    private readonly createEventShareTokenV2UseCase: CreateEventShareTokenV2UseCase,
   ) {}
 
   @Post(UserV2Routes.getEventInfo)
   async getEventInfo(@Param() {eventId}: EventIdDto, @Body() body: GetEventInfoBodyDto) {
-    return this.getEventInfoV2UseCase.execute({eventId, pinCode: body.pinCode});
+    return this.getEventInfoV2UseCase.execute({eventId, pinCode: body.pinCode, token: body.token});
   }
 
   @Post(UserV2Routes.addUsersToEvent)
@@ -44,5 +47,11 @@ export class UserV2Controller {
   @Post(UserV2Routes.createExpense)
   async createExpense(@Body() expense: CreateExpenseV2Dto, @Param() {eventId}: EventIdDto) {
     return this.saveEventExpenseV2UseCase.execute({...expense, eventId});
+  }
+
+  @Post(UserV2Routes.createShareToken)
+  @HttpCode(201)
+  async createShareToken(@Param() {eventId}: EventIdDto, @Body() body: CreateShareTokenBodyDto) {
+    return this.createEventShareTokenV2UseCase.execute({eventId, pinCode: body.pinCode});
   }
 }
