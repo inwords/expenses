@@ -1,5 +1,5 @@
 import {Body, Controller, Delete, Get, HttpCode, Param, Post, Query} from '@nestjs/common';
-import {UserRoutes} from './user.contants';
+import {UserRoutes} from './user.constants';
 import {ApiTags} from '@nestjs/swagger';
 
 import {CrateEventBodyDto} from './dto/create-event.dto';

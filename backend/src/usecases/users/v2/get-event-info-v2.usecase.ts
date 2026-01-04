@@ -31,7 +31,7 @@ export class GetEventInfoV2UseCase implements UseCase<Input, Output> {
       }
     }
 
-    this.eventService.validatePinCode(event, pinCode!);
+    this.eventService.validatePinCode(event, pinCode);
 
     const [users] = await this.rDataService.userInfo.findByEventId(eventId);
 

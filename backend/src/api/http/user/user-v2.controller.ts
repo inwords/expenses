@@ -1,5 +1,5 @@
 import {Body, Controller, HttpCode, Param, Post} from '@nestjs/common';
-import {UserV2Routes} from './user.contants';
+import {UserV2Routes} from './user.constants';
 import {ApiTags} from '@nestjs/swagger';
 
 import {EventIdDto} from './dto/event-id.dto';
