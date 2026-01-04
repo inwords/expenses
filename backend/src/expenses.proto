@@ -17,6 +17,7 @@ service UserService {
   rpc AddUsersToEventV2 (AddUsersToEventRequest) returns (AddUsersToEventResponse);
   rpc GetAllEventExpensesV2 (GetEventExpensesV2Request) returns (ExpensesResponse);
   rpc CreateExpenseV2 (CreateExpenseV2Request) returns (ExpenseResponse);
+  rpc CreateEventShareTokenV2 (CreateEventShareTokenRequest) returns (CreateEventShareTokenResponse);
 }
 
 enum CurrencyCode {
@@ -63,7 +64,8 @@ message EventResponse {
 
 message GetEventInfoRequest {
   string eventId = 1;
-  string pinCode = 2;
+  optional string pinCode = 2;
+  optional string token = 3;
 }
 
 message EventInfoResponse {
@@ -146,4 +148,14 @@ message CreateExpenseV2Request {
   ExpenseType expenseType = 6;
   repeated SplitInfo splitInformation = 7;
   string createdAt = 8;
+}
+
+message CreateEventShareTokenRequest {
+  string eventId = 1;
+  string pinCode = 2;
+}
+
+message CreateEventShareTokenResponse {
+  string token = 1;
+  google.protobuf.Timestamp expiresAt = 2;
 }

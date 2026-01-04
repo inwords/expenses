@@ -5,7 +5,7 @@ import {Injectable} from '@nestjs/common';
 import {EventShareTokenValueObject} from '#domain/value-objects/event-share-token.value-object';
 
 type Input = {eventId: string; pinCode: string};
-type Output = {token: string; expiresAt: Date};
+type Output = {token: string; expiresAt: string};
 
 @Injectable()
 export class CreateEventShareTokenV2UseCase implements UseCase<Input, Output> {
@@ -22,13 +22,13 @@ export class CreateEventShareTokenV2UseCase implements UseCase<Input, Output> {
     const [existingToken] = await this.rDataService.eventShareToken.findOneActiveByEventId(eventId);
 
     if (existingToken) {
-      return {token: existingToken.token, expiresAt: existingToken.expiresAt};
+      return {token: existingToken.token, expiresAt: existingToken.expiresAt.toISOString()};
     }
 
     const shareToken = new EventShareTokenValueObject({eventId});
 
     await this.rDataService.eventShareToken.insert(shareToken.value);
 
-    return {token: shareToken.value.token, expiresAt: shareToken.value.expiresAt};
+    return {token: shareToken.value.token, expiresAt: shareToken.value.expiresAt.toISOString()};
   }
 }

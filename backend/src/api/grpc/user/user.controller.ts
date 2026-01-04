@@ -20,6 +20,7 @@ import {
   SaveUsersToEventV2UseCase,
   SaveEventExpenseV2UseCase,
   GetEventExpensesV2UseCase,
+  CreateEventShareTokenV2UseCase,
 } from '#usecases/users/v2';
 
 @Controller()
@@ -36,6 +37,7 @@ export class UserController {
     private readonly saveUsersToEventV2UseCase: SaveUsersToEventV2UseCase,
     private readonly saveEventExpenseV2UseCase: SaveEventExpenseV2UseCase,
     private readonly getEventExpensesV2UseCase: GetEventExpensesV2UseCase,
+    private readonly createEventShareTokenV2UseCase: CreateEventShareTokenV2UseCase,
   ) {}
 
   @GrpcMethod('UserService', 'GetAllCurrencies')
@@ -81,8 +83,8 @@ export class UserController {
   }
 
   @GrpcMethod('UserService', 'GetEventInfoV2')
-  async getEventInfoV2(@Body() {eventId, pinCode}: EventIdDto & GetEventInfoQueryDto) {
-    return await this.getEventInfoV2UseCase.execute({eventId, pinCode});
+  async getEventInfoV2(@Body() {eventId, pinCode, token}: EventIdDto & GetEventInfoQueryDto & {token?: string}) {
+    return await this.getEventInfoV2UseCase.execute({eventId, pinCode, token});
   }
 
   @GrpcMethod('UserService', 'AddUsersToEventV2')
@@ -100,5 +102,10 @@ export class UserController {
   @GrpcMethod('UserService', 'CreateExpenseV2')
   async createExpenseV2(@Body() expense: CreateExpenseV2Dto & EventIdDto) {
     return this.saveEventExpenseV2UseCase.execute(expense);
+  }
+
+  @GrpcMethod('UserService', 'CreateEventShareTokenV2')
+  async createEventShareTokenV2(@Body() {eventId, pinCode}: EventIdDto & {pinCode: string}) {
+    return this.createEventShareTokenV2UseCase.execute({eventId, pinCode});
   }
 }
