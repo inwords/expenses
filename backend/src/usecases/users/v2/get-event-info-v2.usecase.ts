@@ -5,9 +5,20 @@ import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-s
 import {EventServiceAbstract} from '#domain/abstracts/event-service/event-service';
 import {IUserInfo} from '#domain/entities/user-info.entity';
 import {Injectable} from '@nestjs/common';
+import {Result, success, error, isError} from '#packages/result';
+import {
+  EventNotFoundError,
+  EventDeletedError,
+  InvalidPinCodeError,
+  InvalidTokenError,
+  TokenExpiredError,
+} from '#domain/errors/errors';
 
 type Input = {eventId: string; pinCode: string; token?: string} | {eventId: string; pinCode?: string; token: string};
-type Output = IEvent & {users: Array<IUserInfo>};
+type Output = Result<
+  IEvent & {users: Array<IUserInfo>},
+  EventNotFoundError | EventDeletedError | InvalidPinCodeError | InvalidTokenError | TokenExpiredError
+>;
 
 @Injectable()
 export class GetEventInfoV2UseCase implements UseCase<Input, Output> {
@@ -18,23 +29,44 @@ export class GetEventInfoV2UseCase implements UseCase<Input, Output> {
 
   public async execute({eventId, pinCode, token}: Input): Promise<Output> {
     const [event] = await this.rDataService.event.findById(eventId);
-    this.eventService.validateEventExists(event);
-    this.eventService.validateEventIsNotDeleted(event);
+
+    const eventExistsResult = this.eventService.isEventExists(event);
+    if (isError(eventExistsResult)) {
+      return eventExistsResult;
+    }
+
+    const eventNotDeletedResult = this.eventService.isEventNotDeleted(event);
+    if (isError(eventNotDeletedResult)) {
+      return eventNotDeletedResult;
+    }
 
     if (token) {
       const [shareToken] = await this.rDataService.eventShareToken.findByToken(token);
 
-      if (shareToken && shareToken.eventId === eventId && shareToken.expiresAt >= new Date()) {
-        const [users] = await this.rDataService.userInfo.findByEventId(eventId);
-
-        return {...event, users};
+      if (!shareToken) {
+        return error(new InvalidTokenError());
       }
+
+      if (shareToken.eventId !== eventId) {
+        return error(new InvalidTokenError());
+      }
+
+      if (shareToken.expiresAt < new Date()) {
+        return error(new TokenExpiredError());
+      }
+
+      const [users] = await this.rDataService.userInfo.findByEventId(eventId);
+
+      return success({...event, users});
     }
 
-    this.eventService.validatePinCode(event, pinCode);
+    const pinCodeResult = this.eventService.isValidPinCode(event, pinCode);
+    if (isError(pinCodeResult)) {
+      return pinCodeResult;
+    }
 
     const [users] = await this.rDataService.userInfo.findByEventId(eventId);
 
-    return {...event, users};
+    return success({...event, users});
   }
 }

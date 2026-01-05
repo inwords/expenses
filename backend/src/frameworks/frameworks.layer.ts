@@ -51,7 +51,6 @@ export class FrameworksLayer implements OnApplicationShutdown {
 }
 
 const initOrUpdateCurrencies = async (rDataService: RelationalDataServiceAbstract): Promise<void> => {
-  // SKIP_LOCKED и REPEATABLE READ нужен для исключения конкуренции между подами при одновременной попытке записи конфига
   await rDataService.transaction('REPEATABLE READ', async (ctx) => {
     const [currencies] = await rDataService.currency.findAll(
       {limit: CURRENCIES_LIST.length},

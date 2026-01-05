@@ -22,6 +22,7 @@ import {
   GetEventExpensesV2UseCase,
   CreateEventShareTokenV2UseCase,
 } from '#usecases/users/v2';
+import {isError} from '#packages/result';
 
 @Controller()
 export class UserController {
@@ -42,70 +43,140 @@ export class UserController {
 
   @GrpcMethod('UserService', 'GetAllCurrencies')
   async getAllCurrencies() {
-    return {currencies: await this.getAllCurrenciesUseCase.execute()};
+    const result = await this.getAllCurrenciesUseCase.execute();
+
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return {currencies: result.value};
   }
 
   @GrpcMethod('UserService', 'CreateEvent')
   async createEvent(@Body() body: CrateEventBodyDto) {
     const {users, ...event} = body;
 
-    return this.saveEventUseCase.execute({users, event});
+    const result = await this.saveEventUseCase.execute({users, event});
+
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return result.value;
   }
 
   @GrpcMethod('UserService', 'GetEventInfo')
   async getEventInfo(@Body() {eventId, pinCode}: EventIdDto & GetEventInfoQueryDto) {
-    return await this.getEventInfoUseCase.execute({eventId, pinCode});
+    const result = await this.getEventInfoUseCase.execute({eventId, pinCode});
+
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return result.value;
   }
 
   @GrpcMethod('UserService', 'DeleteEvent')
   async deleteEvent(@Body() body: EventIdDto & DeleteEventBodyDto) {
     const {eventId, pinCode} = body;
-    return await this.deleteEventUseCase.execute({eventId, pinCode});
+    const result = await this.deleteEventUseCase.execute({eventId, pinCode});
+
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return result.value;
   }
 
   @GrpcMethod('UserService', 'AddUsersToEvent')
   async addUserToEvent(@Body() body: AddUsersToEventDto & EventIdDto) {
     const {eventId, ...rest} = body;
 
-    return {users: await this.saveUsersToEventUseCase.execute({eventId, ...rest})};
+    const result = await this.saveUsersToEventUseCase.execute({eventId, ...rest});
+
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return {users: result.value};
   }
 
   @GrpcMethod('UserService', 'GetAllEventExpenses')
   async getAllEventExpenses(@Body() {eventId}: EventIdDto) {
-    const resp = {expenses: await this.getEventExpensesUseCase.execute({eventId})};
+    const result = await this.getEventExpensesUseCase.execute({eventId});
 
-    return resp;
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return {expenses: result.value};
   }
 
   @GrpcMethod('UserService', 'CreateExpense')
   async createExpense(@Body() expense: CreatedExpenseDto & EventIdDto) {
-    return this.saveEventExpenseUseCase.execute(expense);
+    const result = await this.saveEventExpenseUseCase.execute(expense);
+
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return result.value;
   }
 
   @GrpcMethod('UserService', 'GetEventInfoV2')
   async getEventInfoV2(@Body() {eventId, pinCode, token}: EventIdDto & GetEventInfoQueryDto & {token?: string}) {
-    return await this.getEventInfoV2UseCase.execute({eventId, pinCode, token});
+    const result = await this.getEventInfoV2UseCase.execute({eventId, pinCode, token});
+
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return result.value;
   }
 
   @GrpcMethod('UserService', 'AddUsersToEventV2')
   async addUserToEventV2(@Body() body: AddUsersToEventDto & EventIdDto) {
     const {eventId, ...rest} = body;
 
-    return {users: await this.saveUsersToEventV2UseCase.execute({eventId, ...rest})};
+    const result = await this.saveUsersToEventV2UseCase.execute({eventId, ...rest});
+
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return {users: result.value};
   }
 
   @GrpcMethod('UserService', 'GetAllEventExpensesV2')
   async getAllEventExpensesV2(@Body() {eventId, pinCode}: EventIdDto & GetEventExpensesBodyDto) {
-    return {expenses: await this.getEventExpensesV2UseCase.execute({eventId, pinCode})};
+    const result = await this.getEventExpensesV2UseCase.execute({eventId, pinCode});
+
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return {expenses: result.value};
   }
 
   @GrpcMethod('UserService', 'CreateExpenseV2')
   async createExpenseV2(@Body() expense: CreateExpenseV2Dto & EventIdDto) {
-    return this.saveEventExpenseV2UseCase.execute(expense);
+    const result = await this.saveEventExpenseV2UseCase.execute(expense);
+
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return result.value;
   }
 
   @GrpcMethod('UserService', 'CreateEventShareTokenV2')
   async createEventShareTokenV2(@Body() {eventId, pinCode}: EventIdDto & {pinCode: string}) {
-    return this.createEventShareTokenV2UseCase.execute({eventId, pinCode});
+    const result = await this.createEventShareTokenV2UseCase.execute({eventId, pinCode});
+
+    if (isError(result)) {
+      throw result.error;
+    }
+
+    return result.value;
   }
 }

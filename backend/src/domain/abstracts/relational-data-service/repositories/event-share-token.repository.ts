@@ -10,6 +10,10 @@ export abstract class EventShareTokenRepositoryAbstract {
     eventId: string,
     trx?: ITransaction,
   ) => Promise<[result: IEventShareToken | null, queryDetails: IQueryDetails]>;
+  abstract findAll: (
+    input: {limit: number},
+    trx?: ITransaction,
+  ) => Promise<[result: IEventShareToken[], queryDetails: IQueryDetails]>;
   abstract insert: (
     token: IEventShareToken,
     trx?: ITransaction,

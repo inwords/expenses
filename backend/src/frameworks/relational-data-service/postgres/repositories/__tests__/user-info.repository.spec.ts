@@ -101,4 +101,68 @@ describe('UserInfoRepository', () => {
       expect(queryDetails).toMatchSnapshot();
     });
   });
+
+  describe('findAll', () => {
+    it('should find all user infos with limit', async () => {
+      const userInfos = [
+        {
+          id: 'user-info-1',
+          name: 'John Doe',
+          eventId: 'event-1',
+          createdAt: new Date('2023-01-01T00:00:00Z'),
+          updatedAt: new Date('2023-01-01T00:00:00Z'),
+        },
+        {
+          id: 'user-info-2',
+          name: 'Jane Smith',
+          eventId: 'event-2',
+          createdAt: new Date('2023-01-02T00:00:00Z'),
+          updatedAt: new Date('2023-01-02T00:00:00Z'),
+        },
+      ];
+
+      await relationalDataService.userInfo.insert(userInfos[0]);
+      await relationalDataService.userInfo.insert(userInfos[1]);
+
+      const [result, queryDetails] = await relationalDataService.userInfo.findAll({limit: 10});
+
+      expect(result).toMatchObject(userInfos);
+      expect(queryDetails).toMatchSnapshot();
+    });
+
+    it('should respect limit parameter', async () => {
+      const userInfos = [
+        {
+          id: 'user-info-1',
+          name: 'John Doe',
+          eventId: 'event-1',
+          createdAt: new Date('2023-01-01T00:00:00Z'),
+          updatedAt: new Date('2023-01-01T00:00:00Z'),
+        },
+        {
+          id: 'user-info-2',
+          name: 'Jane Smith',
+          eventId: 'event-1',
+          createdAt: new Date('2023-01-02T00:00:00Z'),
+          updatedAt: new Date('2023-01-02T00:00:00Z'),
+        },
+        {
+          id: 'user-info-3',
+          name: 'Bob Johnson',
+          eventId: 'event-1',
+          createdAt: new Date('2023-01-03T00:00:00Z'),
+          updatedAt: new Date('2023-01-03T00:00:00Z'),
+        },
+      ];
+
+      await relationalDataService.userInfo.insert(userInfos[0]);
+      await relationalDataService.userInfo.insert(userInfos[1]);
+      await relationalDataService.userInfo.insert(userInfos[2]);
+
+      const [result, queryDetails] = await relationalDataService.userInfo.findAll({limit: 2});
+
+      expect(result).toHaveLength(2);
+      expect(queryDetails).toMatchSnapshot();
+    });
+  });
 });

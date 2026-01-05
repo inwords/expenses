@@ -5,16 +5,24 @@ import {IUserInfo} from '#domain/entities/user-info.entity';
 import {IEvent} from '#domain/entities/event.entity';
 import {UserInfoValueObject} from '#domain/value-objects/user-info.value-object';
 import {Injectable} from '@nestjs/common';
+import {Result, success, error} from '#packages/result';
+import {CurrencyNotFoundError} from '#domain/errors/errors';
 
 type Input = {users: Array<Omit<IUserInfo, 'id' | 'eventId'>>; event: Pick<IEvent, 'name' | 'currencyId' | 'pinCode'>};
-type Output = IEvent;
+type Output = Result<IEvent, CurrencyNotFoundError>;
 
 @Injectable()
 export class SaveEventUseCase implements UseCase<Input, Output> {
   constructor(private readonly rDataService: RelationalDataServiceAbstract) {}
 
-  public async execute({event, users}: Input) {
+  public async execute({event, users}: Input): Promise<Output> {
     return await this.rDataService.transaction(async (ctx) => {
+      const [currency] = await this.rDataService.currency.findById(event.currencyId, {ctx});
+
+      if (!currency) {
+        return error(new CurrencyNotFoundError());
+      }
+
       const eventValueObject = new EventValueObject(event);
 
       await this.rDataService.event.insert(eventValueObject.value, {ctx});
@@ -23,7 +31,7 @@ export class SaveEventUseCase implements UseCase<Input, Output> {
 
       await this.rDataService.userInfo.insert(usersValue, {ctx});
 
-      return {...eventValueObject.value, users: usersValue};
+      return success({...eventValueObject.value, users: usersValue});
     });
   }
 }

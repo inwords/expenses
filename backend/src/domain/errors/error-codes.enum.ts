@@ -11,4 +11,8 @@ export enum ErrorCode {
   // Generic errors
   VALIDATION_ERROR = 'B4006',
   INTERNAL_ERROR = 'B4007',
+
+  // Token errors
+  INVALID_TOKEN = 'B4008',
+  TOKEN_EXPIRED = 'B4009',
 }

@@ -6,6 +6,10 @@ export abstract class EventRepositoryAbstract {
     id: IEvent['id'],
     trx?: ITransactionWithLock,
   ) => Promise<[result: IEvent | null, queryDetails: IQueryDetails]>;
+  abstract findAll: (
+    input: {limit: number},
+    trx?: ITransaction,
+  ) => Promise<[result: IEvent[], queryDetails: IQueryDetails]>;
   abstract insert: (event: IEvent, trx?: ITransaction) => Promise<[result: undefined, queryDetails: IQueryDetails]>;
   abstract update: (
     id: IEvent['id'],

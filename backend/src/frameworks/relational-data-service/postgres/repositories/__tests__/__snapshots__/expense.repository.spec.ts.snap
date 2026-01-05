@@ -1,5 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ExpenseRepository findAll should find all expenses with limit 1`] = `
+{
+  "queryParameters": {},
+  "queryString": "SELECT "expense"."id" AS "expense_id", "expense"."description" AS "expense_description", "expense"."user_who_paid_id" AS "expense_user_who_paid_id", "expense"."currency_id" AS "expense_currency_id", "expense"."event_id" AS "expense_event_id", "expense"."expense_type" AS "expense_expense_type", "expense"."split_information" AS "expense_split_information", "expense"."created_at" AS "expense_created_at", "expense"."updated_at" AS "expense_updated_at" FROM "expense" "expense" LIMIT 10",
+}
+`;
+
+exports[`ExpenseRepository findAll should respect limit parameter 1`] = `
+{
+  "queryParameters": {},
+  "queryString": "SELECT "expense"."id" AS "expense_id", "expense"."description" AS "expense_description", "expense"."user_who_paid_id" AS "expense_user_who_paid_id", "expense"."currency_id" AS "expense_currency_id", "expense"."event_id" AS "expense_event_id", "expense"."expense_type" AS "expense_expense_type", "expense"."split_information" AS "expense_split_information", "expense"."created_at" AS "expense_created_at", "expense"."updated_at" AS "expense_updated_at" FROM "expense" "expense" LIMIT 2",
+}
+`;
+
 exports[`ExpenseRepository findByEventId should find expenses by event id 1`] = `
 {
   "queryParameters": {
