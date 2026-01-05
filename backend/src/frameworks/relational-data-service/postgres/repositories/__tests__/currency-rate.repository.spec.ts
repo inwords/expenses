@@ -100,8 +100,7 @@ describe('CurrencyRateRepository', () => {
         },
       ];
 
-      await relationalDataService.currencyRate.insert(currencyRates[0]);
-      await relationalDataService.currencyRate.insert(currencyRates[1]);
+      await relationalDataService.currencyRate.insert(currencyRates);
 
       const [result, queryDetails] = await relationalDataService.currencyRate.findAll({limit: 10});
 
@@ -143,9 +142,7 @@ describe('CurrencyRateRepository', () => {
         },
       ];
 
-      await relationalDataService.currencyRate.insert(currencyRates[0]);
-      await relationalDataService.currencyRate.insert(currencyRates[1]);
-      await relationalDataService.currencyRate.insert(currencyRates[2]);
+      await relationalDataService.currencyRate.insert(currencyRates);
 
       const [result, queryDetails] = await relationalDataService.currencyRate.findAll({limit: 2});
 

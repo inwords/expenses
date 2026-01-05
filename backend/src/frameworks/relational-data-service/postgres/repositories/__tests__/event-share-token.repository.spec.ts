@@ -134,8 +134,7 @@ describe('EventShareTokenRepository', () => {
     });
 
     it('should return null for non-existent event', async () => {
-      const [result, queryDetails] =
-        await relationalDataService.eventShareToken.findOneActiveByEventId('non-existent');
+      const [result, queryDetails] = await relationalDataService.eventShareToken.findOneActiveByEventId('non-existent');
 
       expect(result).toBeNull();
       expect(queryDetails).toMatchSnapshot();
@@ -162,8 +161,7 @@ describe('EventShareTokenRepository', () => {
         },
       ];
 
-      await relationalDataService.eventShareToken.insert(eventShareTokens[0]);
-      await relationalDataService.eventShareToken.insert(eventShareTokens[1]);
+      await relationalDataService.eventShareToken.insert(eventShareTokens);
 
       const [result, queryDetails] = await relationalDataService.eventShareToken.findAll({limit: 10});
 
@@ -196,9 +194,7 @@ describe('EventShareTokenRepository', () => {
         },
       ];
 
-      await relationalDataService.eventShareToken.insert(eventShareTokens[0]);
-      await relationalDataService.eventShareToken.insert(eventShareTokens[1]);
-      await relationalDataService.eventShareToken.insert(eventShareTokens[2]);
+      await relationalDataService.eventShareToken.insert(eventShareTokens);
 
       const [result, queryDetails] = await relationalDataService.eventShareToken.findAll({limit: 2});
 

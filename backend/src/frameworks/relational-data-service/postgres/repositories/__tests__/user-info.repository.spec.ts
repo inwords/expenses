@@ -121,8 +121,7 @@ describe('UserInfoRepository', () => {
         },
       ];
 
-      await relationalDataService.userInfo.insert(userInfos[0]);
-      await relationalDataService.userInfo.insert(userInfos[1]);
+      await relationalDataService.userInfo.insert(userInfos);
 
       const [result, queryDetails] = await relationalDataService.userInfo.findAll({limit: 10});
 
@@ -155,9 +154,7 @@ describe('UserInfoRepository', () => {
         },
       ];
 
-      await relationalDataService.userInfo.insert(userInfos[0]);
-      await relationalDataService.userInfo.insert(userInfos[1]);
-      await relationalDataService.userInfo.insert(userInfos[2]);
+      await relationalDataService.userInfo.insert(userInfos);
 
       const [result, queryDetails] = await relationalDataService.userInfo.findAll({limit: 2});
 

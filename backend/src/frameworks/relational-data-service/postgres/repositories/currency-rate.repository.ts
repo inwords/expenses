@@ -48,7 +48,7 @@ export class CurrencyRateRepository extends BaseRepository implements CurrencyRa
   };
 
   readonly insert: CurrencyRateRepositoryAbstract['insert'] = async (
-    input: ICurrencyRate,
+    input: ICurrencyRate | ICurrencyRate[],
     trx,
   ): Promise<[result: undefined, queryDetails: IQueryDetails]> => {
     const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;

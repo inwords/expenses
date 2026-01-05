@@ -12,8 +12,8 @@ export class EventService implements EventServiceAbstract {
   ): Result<boolean, EventNotFoundError | EventDeletedError | InvalidPinCodeError> {
     const existsResult = this.isEventExists(event);
 
-    if (isError(existsResult)) {
-      return existsResult;
+    if (!existsResult) {
+      return error(new EventNotFoundError());
     }
 
     const notDeletedResult = this.isEventNotDeleted(event);
@@ -31,15 +31,12 @@ export class EventService implements EventServiceAbstract {
     return success(true);
   }
 
-  isEventExists(event: IEvent | null | undefined): Result<boolean, EventNotFoundError> {
-    if (!event) {
-      return error(new EventNotFoundError());
-    }
-
-    return success(true);
+  isEventExists(event: IEvent | null | undefined): event is IEvent {
+    return Boolean(event);
   }
 
   isEventNotDeleted(event: IEvent): Result<boolean, EventDeletedError> {
+    console.log(event);
     if (event.deletedAt !== null) {
       return error(new EventDeletedError());
     }

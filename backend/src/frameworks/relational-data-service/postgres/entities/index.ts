@@ -5,4 +5,11 @@ import {ExpenseEntity} from './expense.entity';
 import {UserInfoEntity} from './user-info.entity';
 import {EventShareTokenEntity} from './event-share-token.entity';
 
-export const allEntities = [CurrencyEntity, EventEntity, CurrencyRateEntity, ExpenseEntity, UserInfoEntity, EventShareTokenEntity];
+export const allEntities = [
+  CurrencyEntity,
+  EventEntity,
+  CurrencyRateEntity,
+  ExpenseEntity,
+  UserInfoEntity,
+  EventShareTokenEntity,
+];

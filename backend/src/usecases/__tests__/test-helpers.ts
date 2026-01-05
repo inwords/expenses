@@ -97,6 +97,7 @@ export type RelationalStateChanges = {
   [K in keyof RelationalEntities]?: StateChanges<RelationalEntities[K]>;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type TestCase<UseCase extends {execute: (...args: any[]) => any}> = {
   name: string;
   initRelationalState: RelationalState;
@@ -113,13 +114,12 @@ export const prepareInitRelationalState = async ({
   initState: RelationalState;
 }): Promise<void> => {
   await Promise.all(
-    Object.entries(initState).map(async <T extends keyof RelationalEntities>([_key, value]: [
-      string,
-      RelationalEntities[T][],
-    ]) => {
-      const key = _key as T;
-      await entityOperations[key].insert(rDataService, value);
-    }),
+    Object.entries(initState).map(
+      async <T extends keyof RelationalEntities>([_key, value]: [string, RelationalEntities[T][]]) => {
+        const key = _key as T;
+        await entityOperations[key].insert(rDataService, value);
+      },
+    ),
   );
 };
 
@@ -159,7 +159,7 @@ export const validateRelationalStateChanges = async ({
   const expectedState = {...initState};
   for (const [_key, value] of Object.entries(stateChanges)) {
     const key = _key as keyof RelationalEntities;
-    // @ts-ignore
+    // @ts-expect-error Type mismatch between generic RelationalEntities[K] and specific entity arrays
     expectedState[key] = applyChanges(expectedState[key] ?? [], value);
   }
 

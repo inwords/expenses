@@ -9,7 +9,7 @@ import {Result, success, error} from '#packages/result';
 import {CurrencyNotFoundError} from '#domain/errors/errors';
 
 type Input = {users: Array<Omit<IUserInfo, 'id' | 'eventId'>>; event: Pick<IEvent, 'name' | 'currencyId' | 'pinCode'>};
-type Output = Result<IEvent, CurrencyNotFoundError>;
+type Output = Result<IEvent & {users: IUserInfo[]}, CurrencyNotFoundError>;
 
 @Injectable()
 export class SaveEventUseCase implements UseCase<Input, Output> {

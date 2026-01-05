@@ -65,7 +65,7 @@ export class EventShareTokenRepository extends BaseRepository implements EventSh
   };
 
   readonly insert: EventShareTokenRepositoryAbstract['insert'] = async (
-    input: IEventShareToken,
+    input: IEventShareToken | IEventShareToken[],
     trx,
   ): Promise<[result: undefined, queryDetails: IQueryDetails]> => {
     const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
@@ -84,10 +84,7 @@ export class EventShareTokenRepository extends BaseRepository implements EventSh
   ): Promise<[result: undefined, queryDetails: IQueryDetails]> => {
     const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
 
-    const query = this.getRepository(ctx)
-      .createQueryBuilder()
-      .delete()
-      .where('token = :token', {token});
+    const query = this.getRepository(ctx).createQueryBuilder().delete().where('token = :token', {token});
 
     const queryDetails = this.getQueryDetails(query);
 

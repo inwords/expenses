@@ -4,17 +4,17 @@ import {type IUserInfo} from '#domain/entities/user-info.entity';
 @Entity('user_info')
 export class UserInfoEntity implements IUserInfo {
   @PrimaryColumn({type: 'varchar'})
-  id: IUserInfo['id'];
+  id!: IUserInfo['id'];
 
   @Column({type: 'varchar'})
-  name: IUserInfo['name'];
+  name!: IUserInfo['name'];
 
   @Column({type: 'varchar'})
-  eventId: IUserInfo['eventId'];
+  eventId!: IUserInfo['eventId'];
 
   @Column({type: 'timestamptz'})
-  createdAt: IUserInfo['createdAt'];
+  createdAt!: IUserInfo['createdAt'];
 
   @Column({type: 'timestamptz'})
-  updatedAt: IUserInfo['updatedAt'];
+  updatedAt!: IUserInfo['updatedAt'];
 }

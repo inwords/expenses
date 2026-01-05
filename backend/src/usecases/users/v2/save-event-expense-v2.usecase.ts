@@ -38,15 +38,26 @@ export class SaveEventExpenseV2UseCase implements UseCase<Input, Output> {
         onLocked: 'nowait',
       });
 
-      const validationResult = this.eventService.isValidEvent(event, input.pinCode);
-      if (isError(validationResult)) {
-        return validationResult;
+      if (!this.eventService.isEventExists(event)) {
+        return error(new EventNotFoundError());
+      }
+
+      const notDeletedResult = this.eventService.isEventNotDeleted(event);
+
+      if (isError(notDeletedResult)) {
+        return notDeletedResult;
+      }
+
+      const pinCodeResult = this.eventService.isValidPinCode(event, input.pinCode);
+
+      if (isError(pinCodeResult)) {
+        return pinCodeResult;
       }
 
       if (event.currencyId === input.currencyId) {
-        let splitInformation: ISplitInfo[] = [];
+        const splitInformation: ISplitInfo[] = [];
 
-        for (let splitInfo of input.splitInformation) {
+        for (const splitInfo of input.splitInformation) {
           splitInformation.push({
             ...splitInfo,
             exchangedAmount: splitInfo.amount,
@@ -76,11 +87,18 @@ export class SaveEventExpenseV2UseCase implements UseCase<Input, Output> {
           return error(new CurrencyRateNotFoundError());
         }
 
-        const exchangeRate = currencyRate.rate[eventCurrencyCode.code] / currencyRate.rate[expenseCurrencyCode.code];
+        const expenseCurrencyRate = currencyRate.rate[expenseCurrencyCode.code];
+        const eventCurrencyRate = currencyRate.rate[eventCurrencyCode.code];
 
-        let splitInformation: ISplitInfo[] = [];
+        if (expenseCurrencyRate === undefined || eventCurrencyRate === undefined) {
+          return error(new CurrencyRateNotFoundError());
+        }
 
-        for (let splitInfo of input.splitInformation) {
+        const exchangeRate = eventCurrencyRate / expenseCurrencyRate;
+
+        const splitInformation: ISplitInfo[] = [];
+
+        for (const splitInfo of input.splitInformation) {
           splitInformation.push({
             ...splitInfo,
             exchangedAmount: Number(Number(splitInfo.amount * exchangeRate).toFixed(2)),

@@ -6,10 +6,7 @@ import {randomBytes} from 'crypto';
 const TOKEN_LENGTH_BYTES = 32;
 const DEFAULT_EXPIRATION_DAYS = 14;
 
-export type TEventShareTokenDefaultKeys = keyof Pick<
-  IEventShareToken,
-  'token' | 'expiresAt' | 'createdAt'
->;
+export type TEventShareTokenDefaultKeys = keyof Pick<IEventShareToken, 'token' | 'expiresAt' | 'createdAt'>;
 
 export const eventShareTokenDefaultValues: {
   [K in TEventShareTokenDefaultKeys]: () => IEventShareToken[K];

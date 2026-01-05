@@ -1,13 +1,22 @@
-import {Body, Controller, Delete, Get, HttpCode, Param, Post, Query} from '@nestjs/common';
+import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query} from '@nestjs/common';
 import {UserRoutes} from './user.constants';
-import {ApiTags} from '@nestjs/swagger';
+import {ApiResponse, ApiTags} from '@nestjs/swagger';
 
-import {CrateEventBodyDto} from './dto/create-event.dto';
-import {GetEventInfoQueryDto} from './dto/get-event-info.dto';
-import {EventIdDto} from './dto/event-id.dto';
-import {AddUsersToEventDto} from './dto/add-users-to-event.dto';
-import {CreatedExpenseDto} from './dto/create-expense.dto';
-import {DeleteEventBodyDto} from './dto/delete-event.dto';
+import {CurrencyResponseDto} from './dto/get-all-currencies.dto';
+import {CreateEventRequestDto, CreateEventResponseDto} from './dto/create-event.dto';
+import {
+  GetEventInfoParamsDto,
+  GetEventInfoRequestV1Dto,
+  GetEventInfoResponseDto,
+} from './dto/get-event-info.dto';
+import {DeleteEventParamsDto, DeleteEventRequestDto, DeleteEventResponseDto} from './dto/delete-event.dto';
+import {
+  AddUsersToEventParamsDto,
+  AddUsersToEventRequestDto,
+  AddUsersToEventResponseDto,
+} from './dto/add-users-to-event.dto';
+import {GetEventExpensesParamsDto, GetEventExpensesResponseDto} from './dto/get-event-expenses.dto';
+import {CreateExpenseParamsDto, CreateExpenseRequestV1Dto, CreateExpenseResponseDto} from './dto/create-expense.dto';
 
 import {GetAllCurrenciesUseCase} from '#usecases/users/get-all-currencies.usecase';
 import {GetEventExpensesUseCase} from '#usecases/users/get-event-expenses.usecase';
@@ -32,8 +41,9 @@ export class UserController {
   ) {}
 
   @Get(UserRoutes.getAllCurrencies)
-  @HttpCode(200)
-  async getAllCurrencies() {
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({status: HttpStatus.OK, type: [CurrencyResponseDto]})
+  async getAllCurrencies(): Promise<CurrencyResponseDto[]> {
     const result = await this.getAllCurrenciesUseCase.execute();
 
     if (isError(result)) {
@@ -44,8 +54,9 @@ export class UserController {
   }
 
   @Post(UserRoutes.createEvent)
-  @HttpCode(201)
-  async createEvent(@Body() body: CrateEventBodyDto) {
+  @HttpCode(HttpStatus.CREATED)
+  @ApiResponse({status: HttpStatus.CREATED, type: CreateEventResponseDto})
+  async createEvent(@Body() body: CreateEventRequestDto): Promise<CreateEventResponseDto> {
     const {users, ...event} = body;
 
     const result = await this.saveEventUseCase.execute({users, event});
@@ -58,7 +69,11 @@ export class UserController {
   }
 
   @Get(UserRoutes.getEventInfo)
-  async getEventInfo(@Param() {eventId}: EventIdDto, @Query() query: GetEventInfoQueryDto) {
+  @ApiResponse({status: HttpStatus.OK, type: GetEventInfoResponseDto})
+  async getEventInfo(
+    @Param() {eventId}: GetEventInfoParamsDto,
+    @Query() query: GetEventInfoRequestV1Dto,
+  ): Promise<GetEventInfoResponseDto> {
     const result = await this.getEventInfoUseCase.execute({eventId, pinCode: query.pinCode});
 
     if (isError(result)) {
@@ -69,8 +84,9 @@ export class UserController {
   }
 
   @Delete(UserRoutes.deleteEvent)
-  @HttpCode(200)
-  async deleteEvent(@Param() {eventId}: EventIdDto, @Body() body: DeleteEventBodyDto) {
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({status: HttpStatus.OK, type: DeleteEventResponseDto})
+  async deleteEvent(@Param() {eventId}: DeleteEventParamsDto, @Body() body: DeleteEventRequestDto): Promise<DeleteEventResponseDto> {
     const result = await this.deleteEventUseCase.execute({eventId, pinCode: body.pinCode});
 
     if (isError(result)) {
@@ -81,8 +97,12 @@ export class UserController {
   }
 
   @Post(UserRoutes.addUsersToEvent)
-  @HttpCode(201)
-  async addUserToEvent(@Param() {eventId}: EventIdDto, @Body() body: AddUsersToEventDto) {
+  @HttpCode(HttpStatus.CREATED)
+  @ApiResponse({status: HttpStatus.CREATED, type: [AddUsersToEventResponseDto]})
+  async addUserToEvent(
+    @Param() {eventId}: AddUsersToEventParamsDto,
+    @Body() body: AddUsersToEventRequestDto,
+  ): Promise<AddUsersToEventResponseDto[]> {
     const result = await this.saveUsersToEventUseCase.execute({eventId, ...body});
 
     if (isError(result)) {
@@ -93,7 +113,8 @@ export class UserController {
   }
 
   @Get(UserRoutes.getAllEventExpenses)
-  async getAllEventExpenses(@Param() {eventId}: EventIdDto) {
+  @ApiResponse({status: HttpStatus.OK, type: [GetEventExpensesResponseDto]})
+  async getAllEventExpenses(@Param() {eventId}: GetEventExpensesParamsDto): Promise<GetEventExpensesResponseDto[]> {
     const result = await this.getEventExpensesUseCase.execute({eventId});
 
     if (isError(result)) {
@@ -104,7 +125,8 @@ export class UserController {
   }
 
   @Post(UserRoutes.createExpense)
-  async createExpense(@Body() expense: CreatedExpenseDto, @Param() {eventId}: EventIdDto) {
+  @ApiResponse({status: HttpStatus.CREATED, type: CreateExpenseResponseDto})
+  async createExpense(@Body() expense: CreateExpenseRequestV1Dto, @Param() {eventId}: CreateExpenseParamsDto): Promise<CreateExpenseResponseDto> {
     const result = await this.saveEventExpenseUseCase.execute({...expense, eventId});
 
     if (isError(result)) {

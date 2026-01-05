@@ -11,7 +11,7 @@ export abstract class CurrencyRateRepositoryAbstract {
     trx?: ITransaction,
   ) => Promise<[result: ICurrencyRate[], queryDetails: IQueryDetails]>;
   abstract insert: (
-    currencyRate: ICurrencyRate,
+    currencyRate: ICurrencyRate | ICurrencyRate[],
     trx?: ITransaction,
   ) => Promise<[result: undefined, queryDetails: IQueryDetails]>;
 }

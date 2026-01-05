@@ -5,7 +5,7 @@ import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-s
 import {IUserInfo} from '#domain/entities/user-info.entity';
 import {Injectable} from '@nestjs/common';
 import {EventServiceAbstract} from '#domain/abstracts/event-service/event-service';
-import {Result, success, isError} from '#packages/result';
+import {Result, success, error, isError} from '#packages/result';
 import {EventNotFoundError, EventDeletedError, InvalidPinCodeError} from '#domain/errors/errors';
 
 type Input = {eventId: string; pinCode: string};
@@ -21,9 +21,21 @@ export class GetEventInfoUseCase implements UseCase<Input, Output> {
   public async execute({eventId, pinCode}: Input): Promise<Output> {
     const [event] = await this.rDataService.event.findById(eventId);
 
-    const validationResult = this.eventService.isValidEvent(event, pinCode);
-    if (isError(validationResult)) {
-      return validationResult;
+    if (!this.eventService.isEventExists(event)) {
+      return error(new EventNotFoundError());
+    }
+
+    const notDeletedResult = this.eventService.isEventNotDeleted(event);
+
+    if (isError(notDeletedResult)) {
+      console.log(notDeletedResult);
+      return notDeletedResult;
+    }
+
+    const pinCodeResult = this.eventService.isValidPinCode(event, pinCode);
+
+    if (isError(pinCodeResult)) {
+      return pinCodeResult;
     }
 
     const [users] = await this.rDataService.userInfo.findByEventId(eventId);

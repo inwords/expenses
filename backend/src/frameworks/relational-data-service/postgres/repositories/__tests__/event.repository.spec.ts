@@ -203,8 +203,7 @@ describe('EventRepository', () => {
         },
       ];
 
-      await relationalDataService.event.insert(events[0]);
-      await relationalDataService.event.insert(events[1]);
+      await relationalDataService.event.insert(events);
 
       const [result, queryDetails] = await relationalDataService.event.findAll({limit: 10});
 
@@ -243,10 +242,7 @@ describe('EventRepository', () => {
         },
       ];
 
-      await relationalDataService.event.insert(events[0]);
-      await relationalDataService.event.insert(events[1]);
-      await relationalDataService.event.insert(events[2]);
-
+      await relationalDataService.event.insert(events);
       const [result, queryDetails] = await relationalDataService.event.findAll({limit: 2});
 
       expect(result).toHaveLength(2);

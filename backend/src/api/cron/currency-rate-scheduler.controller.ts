@@ -7,9 +7,9 @@ export class CurrencyRateSchedulerController {
   constructor(private readonly fetchDailyCurrencyRatesUseCase: FetchDailyCurrencyRatesUseCase) {}
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, {
-    timeZone: 'UTC'
+    timeZone: 'UTC',
   })
-  async handleCron() {
+  async handleCron(): Promise<void> {
     await this.fetchDailyCurrencyRatesUseCase.execute();
   }
 }

@@ -1,10 +1,21 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {IsString, Length, ValidateNested} from 'class-validator';
 import {Type} from 'class-transformer';
-import {UserDto} from './user.dto';
 import {IUserInfo} from '#domain/entities/user-info.entity';
 
-export class AddUsersToEventDto {
+class UserDto {
+  @ApiProperty()
+  @IsString()
+  name!: string;
+}
+
+export class AddUsersToEventParamsDto {
+  @ApiProperty()
+  @IsString()
+  eventId!: string;
+}
+
+export class AddUsersToEventRequestDto {
   @ApiProperty({isArray: true, type: UserDto})
   @ValidateNested()
   @Type(() => UserDto)
@@ -14,4 +25,21 @@ export class AddUsersToEventDto {
   @IsString()
   @Length(4, 4)
   pinCode!: string;
+}
+
+export class AddUsersToEventResponseDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty()
+  eventId!: string;
+
+  @ApiProperty()
+  createdAt!: Date;
+
+  @ApiProperty()
+  updatedAt!: Date;
 }

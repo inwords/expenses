@@ -1,13 +1,20 @@
-import {Body, Controller, HttpCode, Param, Post} from '@nestjs/common';
+import {Body, Controller, HttpCode, HttpStatus, Param, Post} from '@nestjs/common';
 import {UserV2Routes} from './user.constants';
-import {ApiTags} from '@nestjs/swagger';
+import {ApiResponse, ApiTags} from '@nestjs/swagger';
 
-import {EventIdDto} from './dto/event-id.dto';
-import {AddUsersToEventDto} from './dto/add-users-to-event.dto';
-import {GetEventInfoBodyDto} from './dto/get-event-info-body.dto';
-import {GetEventExpensesBodyDto} from './dto/get-event-expenses-body.dto';
-import {CreateExpenseV2Dto} from './dto/create-expense-v2.dto';
-import {CreateShareTokenBodyDto} from './dto/create-share-token-body.dto';
+import {GetEventInfoParamsDto, GetEventInfoRequestV2Dto, GetEventInfoResponseDto} from './dto/get-event-info.dto';
+import {
+  AddUsersToEventParamsDto,
+  AddUsersToEventRequestDto,
+  AddUsersToEventResponseDto,
+} from './dto/add-users-to-event.dto';
+import {GetEventExpensesParamsDto, GetEventExpensesRequestV2Dto, GetEventExpensesResponseDto} from './dto/get-event-expenses.dto';
+import {CreateExpenseParamsDto, CreateExpenseRequestV2Dto, CreateExpenseResponseDto} from './dto/create-expense.dto';
+import {
+  CreateEventShareTokenParamsDto,
+  CreateEventShareTokenRequestDto,
+  CreateEventShareTokenResponseDto,
+} from './dto/create-event-share-token.dto';
 
 import {
   GetEventInfoV2UseCase,
@@ -30,7 +37,11 @@ export class UserV2Controller {
   ) {}
 
   @Post(UserV2Routes.getEventInfo)
-  async getEventInfo(@Param() {eventId}: EventIdDto, @Body() body: GetEventInfoBodyDto) {
+  @ApiResponse({status: HttpStatus.OK, type: GetEventInfoResponseDto})
+  async getEventInfo(
+    @Param() {eventId}: GetEventInfoParamsDto,
+    @Body() body: GetEventInfoRequestV2Dto,
+  ): Promise<GetEventInfoResponseDto> {
     const result = await this.getEventInfoV2UseCase.execute({eventId, pinCode: body.pinCode, token: body.token});
 
     if (isError(result)) {
@@ -41,8 +52,12 @@ export class UserV2Controller {
   }
 
   @Post(UserV2Routes.addUsersToEvent)
-  @HttpCode(201)
-  async addUserToEvent(@Param() {eventId}: EventIdDto, @Body() body: AddUsersToEventDto) {
+  @HttpCode(HttpStatus.CREATED)
+  @ApiResponse({status: HttpStatus.CREATED, type: [AddUsersToEventResponseDto]})
+  async addUserToEvent(
+    @Param() {eventId}: AddUsersToEventParamsDto,
+    @Body() body: AddUsersToEventRequestDto,
+  ): Promise<AddUsersToEventResponseDto[]> {
     const result = await this.saveUsersToEventV2UseCase.execute({eventId, ...body});
 
     if (isError(result)) {
@@ -53,7 +68,11 @@ export class UserV2Controller {
   }
 
   @Post(UserV2Routes.getAllEventExpenses)
-  async getAllEventExpenses(@Param() {eventId}: EventIdDto, @Body() body: GetEventExpensesBodyDto) {
+  @ApiResponse({status: HttpStatus.OK, type: [GetEventExpensesResponseDto]})
+  async getAllEventExpenses(
+    @Param() {eventId}: GetEventExpensesParamsDto,
+    @Body() body: GetEventExpensesRequestV2Dto,
+  ): Promise<GetEventExpensesResponseDto[]> {
     const result = await this.getEventExpensesV2UseCase.execute({eventId, pinCode: body.pinCode});
 
     if (isError(result)) {
@@ -64,7 +83,11 @@ export class UserV2Controller {
   }
 
   @Post(UserV2Routes.createExpense)
-  async createExpense(@Body() expense: CreateExpenseV2Dto, @Param() {eventId}: EventIdDto) {
+  @ApiResponse({status: HttpStatus.CREATED, type: CreateExpenseResponseDto})
+  async createExpense(
+    @Body() expense: CreateExpenseRequestV2Dto,
+    @Param() {eventId}: CreateExpenseParamsDto,
+  ): Promise<CreateExpenseResponseDto> {
     const result = await this.saveEventExpenseV2UseCase.execute({...expense, eventId});
 
     if (isError(result)) {
@@ -75,8 +98,12 @@ export class UserV2Controller {
   }
 
   @Post(UserV2Routes.createShareToken)
-  @HttpCode(201)
-  async createShareToken(@Param() {eventId}: EventIdDto, @Body() body: CreateShareTokenBodyDto) {
+  @HttpCode(HttpStatus.CREATED)
+  @ApiResponse({status: HttpStatus.CREATED, type: CreateEventShareTokenResponseDto})
+  async createShareToken(
+    @Param() {eventId}: CreateEventShareTokenParamsDto,
+    @Body() body: CreateEventShareTokenRequestDto,
+  ): Promise<CreateEventShareTokenResponseDto> {
     const result = await this.createEventShareTokenV2UseCase.execute({eventId, pinCode: body.pinCode});
 
     if (isError(result)) {

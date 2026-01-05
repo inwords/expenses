@@ -13,7 +13,7 @@ export abstract class CurrencyRepositoryAbstract {
     trx?: ITransaction,
   ) => Promise<[result: ICurrency[], queryDetails: IQueryDetails]>;
   abstract insert: (
-      user: ICurrency | ICurrency[],
-      trx?: ITransaction,
+    user: ICurrency | ICurrency[],
+    trx?: ITransaction,
   ) => Promise<[result: undefined, queryDetails: IQueryDetails]>;
 }

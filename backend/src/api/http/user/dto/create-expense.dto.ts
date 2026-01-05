@@ -1,5 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {IsDate, IsEnum, IsNumber, IsOptional, IsString, ValidateNested} from 'class-validator';
+import {IsDate, IsEnum, IsNumber, IsOptional, IsString, Length, ValidateNested} from 'class-validator';
 import {Type} from 'class-transformer';
 
 import {ExpenseType, ISplitInfo} from '#domain/entities/expense.entity';
@@ -14,7 +14,24 @@ class SplitInfoDto {
   amount!: number;
 }
 
-export class CreatedExpenseDto {
+class SplitInfo {
+  @ApiProperty()
+  userId!: string;
+
+  @ApiProperty()
+  amount!: number;
+
+  @ApiProperty()
+  exchangedAmount!: number;
+}
+
+export class CreateExpenseParamsDto {
+  @ApiProperty()
+  @IsString()
+  eventId!: string;
+}
+
+export class CreateExpenseRequestV1Dto {
   @ApiProperty()
   @IsString()
   description!: string;
@@ -29,7 +46,7 @@ export class CreatedExpenseDto {
 
   @ApiProperty()
   @IsEnum(ExpenseType)
-  expenseType: ExpenseType;
+  expenseType!: ExpenseType;
 
   @ApiProperty({isArray: true, type: SplitInfoDto})
   @ValidateNested()
@@ -41,4 +58,40 @@ export class CreatedExpenseDto {
   @IsDate()
   @Type(() => Date)
   createdAt?: Date;
+}
+
+export class CreateExpenseRequestV2Dto extends CreateExpenseRequestV1Dto {
+  @ApiProperty({description: 'Event PIN code', example: '1234'})
+  @IsString()
+  @Length(4, 4)
+  pinCode!: string;
+}
+
+export class CreateExpenseResponseDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  description!: string;
+
+  @ApiProperty()
+  userWhoPaidId!: string;
+
+  @ApiProperty()
+  currencyId!: string;
+
+  @ApiProperty()
+  eventId!: string;
+
+  @ApiProperty({enum: ExpenseType})
+  expenseType!: ExpenseType;
+
+  @ApiProperty({type: [SplitInfo]})
+  splitInformation!: SplitInfo[];
+
+  @ApiProperty()
+  createdAt!: Date;
+
+  @ApiProperty()
+  updatedAt!: Date;
 }

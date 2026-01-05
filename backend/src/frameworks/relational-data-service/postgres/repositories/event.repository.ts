@@ -56,7 +56,7 @@ export class EventRepository extends BaseRepository implements EventRepositoryAb
   };
 
   readonly insert: EventRepositoryAbstract['insert'] = async (
-    input: IEvent,
+    input: IEvent | IEvent[],
     trx,
   ): Promise<[result: undefined, queryDetails: IQueryDetails]> => {
     const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
@@ -76,11 +76,7 @@ export class EventRepository extends BaseRepository implements EventRepositoryAb
   ): Promise<[result: undefined, queryDetails: IQueryDetails]> => {
     const ctx = trx?.ctx instanceof EntityManager ? trx.ctx : undefined;
 
-    const query = this.getRepository(ctx)
-      .createQueryBuilder()
-      .update()
-      .set(data)
-      .where('id = :id', {id});
+    const query = this.getRepository(ctx).createQueryBuilder().update().set(data).where('id = :id', {id});
 
     const queryDetails = this.getQueryDetails(query);
 

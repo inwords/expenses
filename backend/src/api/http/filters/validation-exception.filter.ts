@@ -4,7 +4,7 @@ import {ErrorCode} from '#domain/errors/error-codes.enum';
 
 @Catch(BadRequestException)
 export class ValidationExceptionFilter implements ExceptionFilter {
-  private formatMessage(msg: any): string {
+  private formatMessage(msg: unknown): string {
     if (typeof msg === 'string') {
       return msg;
     }
@@ -20,10 +20,10 @@ export class ValidationExceptionFilter implements ExceptionFilter {
     return String(msg);
   }
 
-  catch(exception: BadRequestException, host: ArgumentsHost) {
+  catch(exception: BadRequestException, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const exceptionResponse = exception.getResponse() as any;
+    const exceptionResponse = exception.getResponse() as {message: unknown};
 
     const validationErrors = this.formatMessage(exceptionResponse.message);
 
