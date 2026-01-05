@@ -11,16 +11,19 @@ export class EventService implements EventServiceAbstract {
     pinCode: string,
   ): Result<boolean, EventNotFoundError | EventDeletedError | InvalidPinCodeError> {
     const existsResult = this.isEventExists(event);
+
     if (isError(existsResult)) {
       return existsResult;
     }
 
-    const notDeletedResult = this.isEventNotDeleted(event!);
+    const notDeletedResult = this.isEventNotDeleted(event);
+
     if (isError(notDeletedResult)) {
       return notDeletedResult;
     }
 
-    const pinCodeResult = this.isValidPinCode(event!, pinCode);
+    const pinCodeResult = this.isValidPinCode(event, pinCode);
+
     if (isError(pinCodeResult)) {
       return pinCodeResult;
     }
@@ -32,6 +35,7 @@ export class EventService implements EventServiceAbstract {
     if (!event) {
       return error(new EventNotFoundError());
     }
+
     return success(true);
   }
 
@@ -39,6 +43,7 @@ export class EventService implements EventServiceAbstract {
     if (event.deletedAt !== null) {
       return error(new EventDeletedError());
     }
+
     return success(true);
   }
 
@@ -46,6 +51,7 @@ export class EventService implements EventServiceAbstract {
     if (event.pinCode !== pinCode) {
       return error(new InvalidPinCodeError());
     }
+
     return success(true);
   }
 }
