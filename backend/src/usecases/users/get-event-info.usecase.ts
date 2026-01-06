@@ -28,7 +28,6 @@ export class GetEventInfoUseCase implements UseCase<Input, Output> {
     const notDeletedResult = this.eventService.isEventNotDeleted(event);
 
     if (isError(notDeletedResult)) {
-      console.log(notDeletedResult);
       return notDeletedResult;
     }
 

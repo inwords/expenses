@@ -36,7 +36,6 @@ export class EventService implements EventServiceAbstract {
   }
 
   isEventNotDeleted(event: IEvent): Result<boolean, EventDeletedError> {
-    console.log(event);
     if (event.deletedAt !== null) {
       return error(new EventDeletedError());
     }

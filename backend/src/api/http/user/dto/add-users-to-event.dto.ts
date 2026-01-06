@@ -43,3 +43,8 @@ export class AddUsersToEventResponseDto {
   @ApiProperty()
   updatedAt!: Date;
 }
+
+export class AddUsersToEventResponseWithUsersDto {
+  @ApiProperty({type: [AddUsersToEventResponseDto]})
+  users!: AddUsersToEventResponseDto[];
+}

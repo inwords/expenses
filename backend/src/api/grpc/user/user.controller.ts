@@ -12,12 +12,12 @@ import {DeleteEventParamsDto, DeleteEventRequestDto, DeleteEventResponseDto} fro
 import {
   AddUsersToEventParamsDto,
   AddUsersToEventRequestDto,
-  AddUsersToEventResponseDto,
+  AddUsersToEventResponseWithUsersDto,
 } from '#api/http/user/dto/add-users-to-event.dto';
 import {
   GetEventExpensesParamsDto,
   GetEventExpensesRequestV2Dto,
-  GetEventExpensesResponseDto,
+  GetEventExpensesResponseWithExpensesDto,
 } from '#api/http/user/dto/get-event-expenses.dto';
 import {
   CreateExpenseParamsDto,
@@ -113,7 +113,9 @@ export class UserController {
   }
 
   @GrpcMethod('UserService', 'AddUsersToEvent')
-  async addUserToEvent(@Body() body: AddUsersToEventRequestDto & AddUsersToEventParamsDto): Promise<AddUsersToEventResponseDto[]> {
+  async addUserToEvent(
+    @Body() body: AddUsersToEventRequestDto & AddUsersToEventParamsDto,
+  ): Promise<AddUsersToEventResponseWithUsersDto> {
     const {eventId, ...rest} = body;
 
     const result = await this.saveUsersToEventUseCase.execute({eventId, ...rest});
@@ -122,22 +124,26 @@ export class UserController {
       throw result.error;
     }
 
-    return result.value;
+    return {users: result.value};
   }
 
   @GrpcMethod('UserService', 'GetAllEventExpenses')
-  async getAllEventExpenses(@Body() {eventId}: GetEventExpensesParamsDto): Promise<GetEventExpensesResponseDto[]> {
+  async getAllEventExpenses(
+    @Body() {eventId}: GetEventExpensesParamsDto,
+  ): Promise<GetEventExpensesResponseWithExpensesDto> {
     const result = await this.getEventExpensesUseCase.execute({eventId});
 
     if (isError(result)) {
       throw result.error;
     }
 
-    return result.value;
+    return {expenses: result.value};
   }
 
   @GrpcMethod('UserService', 'CreateExpense')
-  async createExpense(@Body() expense: CreateExpenseRequestV1Dto & CreateExpenseParamsDto): Promise<CreateExpenseResponseDto> {
+  async createExpense(
+    @Body() expense: CreateExpenseRequestV1Dto & CreateExpenseParamsDto,
+  ): Promise<CreateExpenseResponseDto> {
     const result = await this.saveEventExpenseUseCase.execute(expense);
 
     if (isError(result)) {
@@ -161,7 +167,9 @@ export class UserController {
   }
 
   @GrpcMethod('UserService', 'AddUsersToEventV2')
-  async addUserToEventV2(@Body() body: AddUsersToEventRequestDto & AddUsersToEventParamsDto): Promise<AddUsersToEventResponseDto[]> {
+  async addUserToEventV2(
+    @Body() body: AddUsersToEventRequestDto & AddUsersToEventParamsDto,
+  ): Promise<AddUsersToEventResponseWithUsersDto> {
     const {eventId, ...rest} = body;
 
     const result = await this.saveUsersToEventV2UseCase.execute({eventId, ...rest});
@@ -170,24 +178,26 @@ export class UserController {
       throw result.error;
     }
 
-    return result.value;
+    return {users: result.value};
   }
 
   @GrpcMethod('UserService', 'GetAllEventExpensesV2')
   async getAllEventExpensesV2(
     @Body() {eventId, pinCode}: GetEventExpensesParamsDto & GetEventExpensesRequestV2Dto,
-  ): Promise<GetEventExpensesResponseDto[]> {
+  ): Promise<GetEventExpensesResponseWithExpensesDto> {
     const result = await this.getEventExpensesV2UseCase.execute({eventId, pinCode});
 
     if (isError(result)) {
       throw result.error;
     }
 
-    return result.value;
+    return {expenses: result.value};
   }
 
   @GrpcMethod('UserService', 'CreateExpenseV2')
-  async createExpenseV2(@Body() expense: CreateExpenseRequestV2Dto & CreateExpenseParamsDto): Promise<CreateExpenseResponseDto> {
+  async createExpenseV2(
+    @Body() expense: CreateExpenseRequestV2Dto & CreateExpenseParamsDto,
+  ): Promise<CreateExpenseResponseDto> {
     const result = await this.saveEventExpenseV2UseCase.execute(expense);
 
     if (isError(result)) {

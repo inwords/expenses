@@ -6,9 +6,13 @@ import {GetEventInfoParamsDto, GetEventInfoRequestV2Dto, GetEventInfoResponseDto
 import {
   AddUsersToEventParamsDto,
   AddUsersToEventRequestDto,
-  AddUsersToEventResponseDto,
+  AddUsersToEventResponseWithUsersDto,
 } from './dto/add-users-to-event.dto';
-import {GetEventExpensesParamsDto, GetEventExpensesRequestV2Dto, GetEventExpensesResponseDto} from './dto/get-event-expenses.dto';
+import {
+  GetEventExpensesParamsDto,
+  GetEventExpensesRequestV2Dto,
+  GetEventExpensesResponseDto,
+} from './dto/get-event-expenses.dto';
 import {CreateExpenseParamsDto, CreateExpenseRequestV2Dto, CreateExpenseResponseDto} from './dto/create-expense.dto';
 import {
   CreateEventShareTokenParamsDto,
@@ -53,18 +57,18 @@ export class UserV2Controller {
 
   @Post(UserV2Routes.addUsersToEvent)
   @HttpCode(HttpStatus.CREATED)
-  @ApiResponse({status: HttpStatus.CREATED, type: [AddUsersToEventResponseDto]})
+  @ApiResponse({status: HttpStatus.CREATED, type: AddUsersToEventResponseWithUsersDto})
   async addUserToEvent(
     @Param() {eventId}: AddUsersToEventParamsDto,
     @Body() body: AddUsersToEventRequestDto,
-  ): Promise<AddUsersToEventResponseDto[]> {
+  ): Promise<AddUsersToEventResponseWithUsersDto> {
     const result = await this.saveUsersToEventV2UseCase.execute({eventId, ...body});
 
     if (isError(result)) {
       throw result.error;
     }
 
-    return result.value;
+    return {users: result.value};
   }
 
   @Post(UserV2Routes.getAllEventExpenses)
