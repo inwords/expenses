@@ -32,7 +32,9 @@ export class SaveEventExpenseV2UseCase implements UseCase<Input, Output> {
 
   public async execute(input: Input): Promise<Output> {
     return this.rDataService.transaction(async (ctx) => {
-      const [event] = await this.rDataService.event.findById(input.eventId, {
+      const {pinCode, ...restInput} = input;
+
+      const [event] = await this.rDataService.event.findById(restInput.eventId, {
         ctx,
         lock: 'pessimistic_write',
         onLocked: 'nowait',
@@ -64,21 +66,21 @@ export class SaveEventExpenseV2UseCase implements UseCase<Input, Output> {
           });
         }
 
-        const expense = new ExpenseValueObject({...input, splitInformation}).value;
+        const expense = new ExpenseValueObject({...restInput, splitInformation}).value;
 
         await this.rDataService.expense.insert(expense, {ctx});
 
         return success(expense);
       } else {
-        const [expenseCurrencyCode] = await this.rDataService.currency.findById(input.currencyId, {ctx});
+        const [expenseCurrencyCode] = await this.rDataService.currency.findById(restInput.currencyId, {ctx});
         const [eventCurrencyCode] = await this.rDataService.currency.findById(event.currencyId, {ctx});
 
         if (!eventCurrencyCode || !expenseCurrencyCode) {
           return error(new CurrencyNotFoundError());
         }
 
-        const getDateForExchangeRate = input.createdAt
-          ? getDateWithoutTimeUTC(new Date(input.createdAt))
+        const getDateForExchangeRate = restInput.createdAt
+          ? getDateWithoutTimeUTC(new Date(restInput.createdAt))
           : getCurrentDateWithoutTimeUTC();
 
         const [currencyRate] = await this.rDataService.currencyRate.findByDate(getDateForExchangeRate, {ctx});
@@ -105,7 +107,7 @@ export class SaveEventExpenseV2UseCase implements UseCase<Input, Output> {
           });
         }
 
-        const expense = new ExpenseValueObject({...input, splitInformation}).value;
+        const expense = new ExpenseValueObject({...restInput, splitInformation}).value;
 
         await this.rDataService.expense.insert(expense, {ctx});
 
