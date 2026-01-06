@@ -55,7 +55,6 @@ export class GetEventExpensesResponseDto {
   updatedAt!: Date;
 }
 
-
 export class GetEventExpensesResponseWithExpensesDto {
   @ApiProperty({type: [GetEventExpensesResponseDto]})
   expenses!: GetEventExpensesResponseDto[];

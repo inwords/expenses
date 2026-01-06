@@ -4,11 +4,7 @@ import {ApiResponse, ApiTags} from '@nestjs/swagger';
 
 import {CurrencyResponseDto} from './dto/get-all-currencies.dto';
 import {CreateEventRequestDto, CreateEventResponseDto} from './dto/create-event.dto';
-import {
-  GetEventInfoParamsDto,
-  GetEventInfoRequestV1Dto,
-  GetEventInfoResponseDto,
-} from './dto/get-event-info.dto';
+import {GetEventInfoParamsDto, GetEventInfoRequestV1Dto, GetEventInfoResponseDto} from './dto/get-event-info.dto';
 import {DeleteEventParamsDto, DeleteEventRequestDto, DeleteEventResponseDto} from './dto/delete-event.dto';
 import {
   AddUsersToEventParamsDto,
@@ -86,7 +82,10 @@ export class UserController {
   @Delete(UserRoutes.deleteEvent)
   @HttpCode(HttpStatus.OK)
   @ApiResponse({status: HttpStatus.OK, type: DeleteEventResponseDto})
-  async deleteEvent(@Param() {eventId}: DeleteEventParamsDto, @Body() body: DeleteEventRequestDto): Promise<DeleteEventResponseDto> {
+  async deleteEvent(
+    @Param() {eventId}: DeleteEventParamsDto,
+    @Body() body: DeleteEventRequestDto,
+  ): Promise<DeleteEventResponseDto> {
     const result = await this.deleteEventUseCase.execute({eventId, pinCode: body.pinCode});
 
     if (isError(result)) {
@@ -126,7 +125,10 @@ export class UserController {
 
   @Post(UserRoutes.createExpense)
   @ApiResponse({status: HttpStatus.CREATED, type: CreateExpenseResponseDto})
-  async createExpense(@Body() expense: CreateExpenseRequestV1Dto, @Param() {eventId}: CreateExpenseParamsDto): Promise<CreateExpenseResponseDto> {
+  async createExpense(
+    @Body() expense: CreateExpenseRequestV1Dto,
+    @Param() {eventId}: CreateExpenseParamsDto,
+  ): Promise<CreateExpenseResponseDto> {
     const result = await this.saveEventExpenseUseCase.execute({...expense, eventId});
 
     if (isError(result)) {
