@@ -7,7 +7,7 @@ export abstract class EventServiceAbstract {
     event: IEvent | null | undefined,
     pinCode: string,
   ): Result<boolean, EventNotFoundError | EventDeletedError | InvalidPinCodeError>;
-  abstract isEventExists(event: IEvent | null | undefined): Result<boolean, EventNotFoundError>;
+  abstract isEventExists(event: IEvent | null | undefined): event is IEvent;
   abstract isEventNotDeleted(event: IEvent): Result<boolean, EventDeletedError>;
   abstract isValidPinCode(event: IEvent, pinCode: string): Result<boolean, InvalidPinCodeError>;
 }

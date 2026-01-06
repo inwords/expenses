@@ -1,10 +1,13 @@
 import {RelationalDataService} from '#frameworks/relational-data-service/postgres/relational-data-service';
 import {appDbConfig} from '#frameworks/relational-data-service/postgres/config';
+import {useFakeTimers} from '#usecases/__tests__/test-helpers';
 
 describe('EventShareTokenRepository', () => {
   let relationalDataService: RelationalDataService;
 
   beforeAll(async () => {
+    useFakeTimers();
+
     relationalDataService = new RelationalDataService({
       dbConfig: appDbConfig,
       showQueryDetails: true,
@@ -16,6 +19,7 @@ describe('EventShareTokenRepository', () => {
 
   afterAll(async () => {
     await relationalDataService.destroy();
+    jest.useRealTimers();
   });
 
   beforeEach(async () => {
@@ -27,7 +31,7 @@ describe('EventShareTokenRepository', () => {
       const eventShareToken = {
         token: 'test-token-123',
         eventId: 'event-1',
-        expiresAt: new Date('2025-12-31T23:59:59Z'),
+        expiresAt: new Date('2025-01-01T00:00:00Z'),
         createdAt: new Date('2023-01-01T00:00:00Z'),
       };
 
@@ -41,10 +45,13 @@ describe('EventShareTokenRepository', () => {
 
   describe('findByToken', () => {
     it('should find event share token by token', async () => {
+      const futureDate = new Date();
+      futureDate.setFullYear(futureDate.getFullYear() + 1);
+
       const eventShareToken = {
         token: 'test-token-123',
         eventId: 'event-1',
-        expiresAt: new Date('2025-12-31T23:59:59Z'),
+        expiresAt: futureDate,
         createdAt: new Date('2023-01-01T00:00:00Z'),
       };
 
@@ -134,8 +141,7 @@ describe('EventShareTokenRepository', () => {
     });
 
     it('should return null for non-existent event', async () => {
-      const [result, queryDetails] =
-        await relationalDataService.eventShareToken.findOneActiveByEventId('non-existent');
+      const [result, queryDetails] = await relationalDataService.eventShareToken.findOneActiveByEventId('non-existent');
 
       expect(result).toBeNull();
       expect(queryDetails).toMatchSnapshot();
@@ -162,8 +168,7 @@ describe('EventShareTokenRepository', () => {
         },
       ];
 
-      await relationalDataService.eventShareToken.insert(eventShareTokens[0]);
-      await relationalDataService.eventShareToken.insert(eventShareTokens[1]);
+      await relationalDataService.eventShareToken.insert(eventShareTokens);
 
       const [result, queryDetails] = await relationalDataService.eventShareToken.findAll({limit: 10});
 
@@ -196,9 +201,7 @@ describe('EventShareTokenRepository', () => {
         },
       ];
 
-      await relationalDataService.eventShareToken.insert(eventShareTokens[0]);
-      await relationalDataService.eventShareToken.insert(eventShareTokens[1]);
-      await relationalDataService.eventShareToken.insert(eventShareTokens[2]);
+      await relationalDataService.eventShareToken.insert(eventShareTokens);
 
       const [result, queryDetails] = await relationalDataService.eventShareToken.findAll({limit: 2});
 
@@ -209,10 +212,13 @@ describe('EventShareTokenRepository', () => {
 
   describe('deleteByToken', () => {
     it('should delete event share token by token', async () => {
+      const futureDate = new Date();
+      futureDate.setFullYear(futureDate.getFullYear() + 1);
+
       const eventShareToken = {
         token: 'test-token-123',
         eventId: 'event-1',
-        expiresAt: new Date('2025-12-31T23:59:59Z'),
+        expiresAt: futureDate,
         createdAt: new Date('2023-01-01T00:00:00Z'),
       };
 

@@ -14,7 +14,7 @@ import {
   TokenExpiredError,
 } from '#domain/errors/errors';
 
-type Input = {eventId: string; pinCode: string; token?: string} | {eventId: string; pinCode?: string; token: string};
+type Input = {eventId: string; pinCode?: string; token?: string};
 type Output = Result<
   IEvent & {users: Array<IUserInfo>},
   EventNotFoundError | EventDeletedError | InvalidPinCodeError | InvalidTokenError | TokenExpiredError
@@ -30,14 +30,14 @@ export class GetEventInfoV2UseCase implements UseCase<Input, Output> {
   public async execute({eventId, pinCode, token}: Input): Promise<Output> {
     const [event] = await this.rDataService.event.findById(eventId);
 
-    const eventExistsResult = this.eventService.isEventExists(event);
-    if (isError(eventExistsResult)) {
-      return eventExistsResult;
+    if (!this.eventService.isEventExists(event)) {
+      return error(new EventNotFoundError());
     }
 
-    const eventNotDeletedResult = this.eventService.isEventNotDeleted(event);
-    if (isError(eventNotDeletedResult)) {
-      return eventNotDeletedResult;
+    const notDeletedResult = this.eventService.isEventNotDeleted(event);
+
+    if (isError(notDeletedResult)) {
+      return notDeletedResult;
     }
 
     if (token) {
@@ -60,7 +60,12 @@ export class GetEventInfoV2UseCase implements UseCase<Input, Output> {
       return success({...event, users});
     }
 
+    if (!pinCode) {
+      return error(new InvalidPinCodeError());
+    }
+
     const pinCodeResult = this.eventService.isValidPinCode(event, pinCode);
+
     if (isError(pinCodeResult)) {
       return pinCodeResult;
     }

@@ -29,7 +29,7 @@ type BusinessError =
   CurrencyRateNotFoundError,
 )
 export class BusinessErrorFilter implements ExceptionFilter {
-  catch(exception: BusinessError, host: ArgumentsHost) {
+  catch(exception: BusinessError, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 

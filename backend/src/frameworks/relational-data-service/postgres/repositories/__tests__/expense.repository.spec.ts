@@ -148,8 +148,7 @@ describe('ExpenseRepository', () => {
         },
       ];
 
-      await relationalDataService.expense.insert(expenses[0]);
-      await relationalDataService.expense.insert(expenses[1]);
+      await relationalDataService.expense.insert(expenses);
 
       const [result, queryDetails] = await relationalDataService.expense.findAll({limit: 10});
 
@@ -212,9 +211,7 @@ describe('ExpenseRepository', () => {
         },
       ];
 
-      await relationalDataService.expense.insert(expenses[0]);
-      await relationalDataService.expense.insert(expenses[1]);
-      await relationalDataService.expense.insert(expenses[2]);
+      await relationalDataService.expense.insert(expenses);
 
       const [result, queryDetails] = await relationalDataService.expense.findAll({limit: 2});
 

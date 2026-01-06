@@ -1,21 +1,49 @@
 import * as process from 'process';
 import * as dotenv from 'dotenv';
+import {z} from 'zod';
+
 dotenv.config();
 
-export const config = () => {
+const envSchema = z.object({
+  POSTGRES_PORT: z.string(),
+  POSTGRES_USER_NAME: z.string(),
+  POSTGRES_PASSWORD: z.string(),
+  POSTGRES_DATABASE: z.string(),
+  POSTGRES_HOST: z.string(),
+  POSTGRES_SCHEMA: z.string(),
+  OPEN_EXCHANGE_RATES_API_ID: z.string(),
+  DEVTOOLS_SECRET: z.string(),
+});
+
+const validatedEnv = envSchema.parse(process.env);
+
+export const config = (): {
+  POSTGRES_PORT: string;
+  POSTGRES_USER_NAME: string;
+  POSTGRES_PASSWORD: string;
+  POSTGRES_DATABASE: string;
+  POSTGRES_HOST: string;
+  POSTGRES_SCHEMA: string;
+  POSTGRES_POOL_SIZE: number;
+  POSTGRES_MASTER_TARGET_SESSION_ATTRS: string;
+  POSTGRES_POOL_CONNECTION_TIMEOUT_MS: number;
+  POSTGRES_POOL_IDLE_TIMEOUT_MS: number;
+  OPEN_EXCHANGE_RATES_API_ID: string;
+  DEVTOOLS_SECRET: string;
+} => {
   return {
-    POSTGRES_PORT: process.env.POSTGRES_PORT,
-    POSTGRES_USER_NAME: process.env.POSTGRES_USER_NAME,
-    POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD,
-    POSTGRES_DATABASE: process.env.POSTGRES_DATABASE,
-    POSTGRES_HOST: process.env.POSTGRES_HOST,
-    POSTGRES_SCHEMA: process.env.POSTGRES_SCHEMA,
+    POSTGRES_PORT: validatedEnv.POSTGRES_PORT,
+    POSTGRES_USER_NAME: validatedEnv.POSTGRES_USER_NAME,
+    POSTGRES_PASSWORD: validatedEnv.POSTGRES_PASSWORD,
+    POSTGRES_DATABASE: validatedEnv.POSTGRES_DATABASE,
+    POSTGRES_HOST: validatedEnv.POSTGRES_HOST,
+    POSTGRES_SCHEMA: validatedEnv.POSTGRES_SCHEMA,
     POSTGRES_POOL_SIZE: 5,
     POSTGRES_MASTER_TARGET_SESSION_ATTRS: 'read-write',
     POSTGRES_POOL_CONNECTION_TIMEOUT_MS: 10_000,
     POSTGRES_POOL_IDLE_TIMEOUT_MS: 10_000,
-    OPEN_EXCHANGE_RATES_API_ID: process.env.OPEN_EXCHANGE_RATES_API_ID,
-    DEVTOOLS_SECRET: process.env.DEVTOOLS_SECRET,
+    OPEN_EXCHANGE_RATES_API_ID: validatedEnv.OPEN_EXCHANGE_RATES_API_ID,
+    DEVTOOLS_SECRET: validatedEnv.DEVTOOLS_SECRET,
   } as const;
 };
 

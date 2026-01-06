@@ -8,10 +8,18 @@ import {EventServiceAbstract} from '#domain/abstracts/event-service/event-servic
 import {IExpense, ISplitInfo} from '#domain/entities/expense.entity';
 import {ExpenseValueObject} from '#domain/value-objects/expense.value-object';
 import {Result, success, error, isError} from '#packages/result';
-import {EventNotFoundError, EventDeletedError, CurrencyNotFoundError, CurrencyRateNotFoundError} from '#domain/errors/errors';
+import {
+  EventNotFoundError,
+  EventDeletedError,
+  CurrencyNotFoundError,
+  CurrencyRateNotFoundError,
+} from '#domain/errors/errors';
 
 type Input = Omit<IExpense, 'createdAt' | 'id' | 'updatedAt'> & Partial<Pick<IExpense, 'createdAt'>>;
-type Output = Result<IExpense, EventNotFoundError | EventDeletedError | CurrencyNotFoundError | CurrencyRateNotFoundError>;
+type Output = Result<
+  IExpense,
+  EventNotFoundError | EventDeletedError | CurrencyNotFoundError | CurrencyRateNotFoundError
+>;
 
 @Injectable()
 export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
@@ -28,20 +36,20 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
         onLocked: 'nowait',
       });
 
-      const eventExistsResult = this.eventService.isEventExists(event);
-      if (isError(eventExistsResult)) {
-        return eventExistsResult;
+      if (!this.eventService.isEventExists(event)) {
+        return error(new EventNotFoundError());
       }
 
-      const eventNotDeletedResult = this.eventService.isEventNotDeleted(event);
-      if (isError(eventNotDeletedResult)) {
-        return eventNotDeletedResult;
+      const notDeletedResult = this.eventService.isEventNotDeleted(event);
+
+      if (isError(notDeletedResult)) {
+        return notDeletedResult;
       }
 
       if (event.currencyId === input.currencyId) {
-        let splitInformation: ISplitInfo[] = [];
+        const splitInformation: ISplitInfo[] = [];
 
-        for (let splitInfo of input.splitInformation) {
+        for (const splitInfo of input.splitInformation) {
           splitInformation.push({
             ...splitInfo,
             exchangedAmount: splitInfo.amount,
@@ -71,11 +79,18 @@ export class SaveEventExpenseUseCase implements UseCase<Input, Output> {
           return error(new CurrencyRateNotFoundError());
         }
 
-        const exchangeRate = currencyRate.rate[eventCurrencyCode.code] / currencyRate.rate[expenseCurrencyCode.code];
+        const expenseCurrencyRate = currencyRate.rate[expenseCurrencyCode.code];
+        const eventCurrencyRate = currencyRate.rate[eventCurrencyCode.code];
 
-        let splitInformation: ISplitInfo[] = [];
+        if (expenseCurrencyRate === undefined || eventCurrencyRate === undefined) {
+          return error(new CurrencyRateNotFoundError());
+        }
 
-        for (let splitInfo of input.splitInformation) {
+        const exchangeRate = eventCurrencyRate / expenseCurrencyRate;
+
+        const splitInformation: ISplitInfo[] = [];
+
+        for (const splitInfo of input.splitInformation) {
           splitInformation.push({
             ...splitInfo,
             exchangedAmount: Number(Number(splitInfo.amount * exchangeRate).toFixed(2)),

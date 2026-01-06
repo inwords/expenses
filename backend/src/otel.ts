@@ -5,28 +5,28 @@ import {OTLPMetricExporter} from '@opentelemetry/exporter-metrics-otlp-grpc';
 import {PeriodicExportingMetricReader} from '@opentelemetry/sdk-metrics';
 
 const traceExporter = new OTLPTraceExporter({
-    url: 'http://otelcollector:4317',
+  url: 'http://otelcollector:4317',
 });
 
 const metricExporter = new OTLPMetricExporter({
-    url: 'http://otelcollector:4317',
+  url: 'http://otelcollector:4317',
 });
 
 const metricReader = new PeriodicExportingMetricReader({
-    exporter: metricExporter,
-    exportIntervalMillis: 1000,
+  exporter: metricExporter,
+  exportIntervalMillis: 1000,
 });
 
 const sdk = new NodeSDK({
-    traceExporter: traceExporter,
-    instrumentations: [getNodeAutoInstrumentations()],
-    metricReader: metricReader,
+  traceExporter: traceExporter,
+  instrumentations: [getNodeAutoInstrumentations()],
+  metricReader: metricReader,
 });
 
-sdk.start()
+sdk.start();
 
 process.on('SIGTERM', async () => {
-    await sdk.shutdown();
-    console.log('OpenTelemetry shut down');
-    process.exit(0);
+  await sdk.shutdown();
+  console.log('OpenTelemetry shut down');
+  process.exit(0);
 });

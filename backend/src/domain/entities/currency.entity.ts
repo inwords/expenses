@@ -4,7 +4,7 @@ export enum CurrencyCode {
   RUB = 'RUB',
   JPY = 'JPY',
   TRY = 'TRY',
-  AED = 'AED'
+  AED = 'AED',
 }
 
 export interface ICurrency {

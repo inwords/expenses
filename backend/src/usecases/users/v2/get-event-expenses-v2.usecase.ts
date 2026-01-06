@@ -20,6 +20,7 @@ export class GetEventExpensesV2UseCase implements UseCase<Input, Output> {
     const [event] = await this.rDataService.event.findById(eventId);
 
     const validationResult = this.eventService.isValidEvent(event, pinCode);
+
     if (isError(validationResult)) {
       return validationResult;
     }

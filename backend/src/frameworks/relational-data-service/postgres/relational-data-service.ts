@@ -21,7 +21,7 @@ export class RelationalDataService implements RelationalDataServiceAbstract {
   readonly currencyRate: CurrencyRateRepository;
   readonly eventShareToken: EventShareTokenRepository;
 
-  constructor({dbConfig, showQueryDetails}: { dbConfig: DbConfig; showQueryDetails: boolean }) {
+  constructor({dbConfig, showQueryDetails}: {dbConfig: DbConfig; showQueryDetails: boolean}) {
     this.dbConfig = dbConfig;
     this.dataSource = new DataSource(createTypeormConfigDefault(dbConfig));
     this.transaction = this.dataSource.transaction.bind(this.dataSource);

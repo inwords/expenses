@@ -1,13 +1,35 @@
 import {Body, Controller} from '@nestjs/common';
 import {GrpcMethod} from '@nestjs/microservices';
-import {CrateEventBodyDto} from '#api/http/user/dto/create-event.dto';
-import {EventIdDto} from '#api/http/user/dto/event-id.dto';
-import {GetEventInfoQueryDto} from '#api/http/user/dto/get-event-info.dto';
-import {AddUsersToEventDto} from '#api/http/user/dto/add-users-to-event.dto';
-import {CreatedExpenseDto} from '#api/http/user/dto/create-expense.dto';
-import {DeleteEventBodyDto} from '#api/http/user/dto/delete-event.dto';
-import {GetEventExpensesBodyDto} from '#api/http/user/dto/get-event-expenses-body.dto';
-import {CreateExpenseV2Dto} from '#api/http/user/dto/create-expense-v2.dto';
+import {GetAllCurrenciesResponseDto} from '#api/http/user/dto/get-all-currencies.dto';
+import {CreateEventRequestDto, CreateEventResponseDto} from '#api/http/user/dto/create-event.dto';
+import {
+  GetEventInfoParamsDto,
+  GetEventInfoRequestV1Dto,
+  GetEventInfoRequestV2Dto,
+  GetEventInfoResponseDto,
+} from '#api/http/user/dto/get-event-info.dto';
+import {DeleteEventParamsDto, DeleteEventRequestDto, DeleteEventResponseDto} from '#api/http/user/dto/delete-event.dto';
+import {
+  AddUsersToEventParamsDto,
+  AddUsersToEventRequestDto,
+  AddUsersToEventResponseWithUsersDto,
+} from '#api/http/user/dto/add-users-to-event.dto';
+import {
+  GetEventExpensesParamsDto,
+  GetEventExpensesRequestV2Dto,
+  GetEventExpensesResponseWithExpensesDto,
+} from '#api/http/user/dto/get-event-expenses.dto';
+import {
+  CreateExpenseParamsDto,
+  CreateExpenseRequestV1Dto,
+  CreateExpenseRequestV2Dto,
+  CreateExpenseResponseDto,
+} from '#api/http/user/dto/create-expense.dto';
+import {
+  CreateEventShareTokenParamsDto,
+  CreateEventShareTokenRequestDto,
+  CreateEventShareTokenResponseDto,
+} from '#api/http/user/dto/create-event-share-token.dto';
 import {GetEventExpensesUseCase} from '#usecases/users/get-event-expenses.usecase';
 import {SaveEventExpenseUseCase} from '#usecases/users/save-event-expense.usecase';
 import {GetAllCurrenciesUseCase} from '#usecases/users/get-all-currencies.usecase';
@@ -42,7 +64,7 @@ export class UserController {
   ) {}
 
   @GrpcMethod('UserService', 'GetAllCurrencies')
-  async getAllCurrencies() {
+  async getAllCurrencies(): Promise<GetAllCurrenciesResponseDto> {
     const result = await this.getAllCurrenciesUseCase.execute();
 
     if (isError(result)) {
@@ -53,7 +75,7 @@ export class UserController {
   }
 
   @GrpcMethod('UserService', 'CreateEvent')
-  async createEvent(@Body() body: CrateEventBodyDto) {
+  async createEvent(@Body() body: CreateEventRequestDto): Promise<CreateEventResponseDto> {
     const {users, ...event} = body;
 
     const result = await this.saveEventUseCase.execute({users, event});
@@ -66,7 +88,9 @@ export class UserController {
   }
 
   @GrpcMethod('UserService', 'GetEventInfo')
-  async getEventInfo(@Body() {eventId, pinCode}: EventIdDto & GetEventInfoQueryDto) {
+  async getEventInfo(
+    @Body() {eventId, pinCode}: GetEventInfoParamsDto & GetEventInfoRequestV1Dto,
+  ): Promise<GetEventInfoResponseDto> {
     const result = await this.getEventInfoUseCase.execute({eventId, pinCode});
 
     if (isError(result)) {
@@ -77,7 +101,7 @@ export class UserController {
   }
 
   @GrpcMethod('UserService', 'DeleteEvent')
-  async deleteEvent(@Body() body: EventIdDto & DeleteEventBodyDto) {
+  async deleteEvent(@Body() body: DeleteEventParamsDto & DeleteEventRequestDto): Promise<DeleteEventResponseDto> {
     const {eventId, pinCode} = body;
     const result = await this.deleteEventUseCase.execute({eventId, pinCode});
 
@@ -89,7 +113,9 @@ export class UserController {
   }
 
   @GrpcMethod('UserService', 'AddUsersToEvent')
-  async addUserToEvent(@Body() body: AddUsersToEventDto & EventIdDto) {
+  async addUserToEvent(
+    @Body() body: AddUsersToEventRequestDto & AddUsersToEventParamsDto,
+  ): Promise<AddUsersToEventResponseWithUsersDto> {
     const {eventId, ...rest} = body;
 
     const result = await this.saveUsersToEventUseCase.execute({eventId, ...rest});
@@ -102,7 +128,9 @@ export class UserController {
   }
 
   @GrpcMethod('UserService', 'GetAllEventExpenses')
-  async getAllEventExpenses(@Body() {eventId}: EventIdDto) {
+  async getAllEventExpenses(
+    @Body() {eventId}: GetEventExpensesParamsDto,
+  ): Promise<GetEventExpensesResponseWithExpensesDto> {
     const result = await this.getEventExpensesUseCase.execute({eventId});
 
     if (isError(result)) {
@@ -113,7 +141,9 @@ export class UserController {
   }
 
   @GrpcMethod('UserService', 'CreateExpense')
-  async createExpense(@Body() expense: CreatedExpenseDto & EventIdDto) {
+  async createExpense(
+    @Body() expense: CreateExpenseRequestV1Dto & CreateExpenseParamsDto,
+  ): Promise<CreateExpenseResponseDto> {
     const result = await this.saveEventExpenseUseCase.execute(expense);
 
     if (isError(result)) {
@@ -124,7 +154,9 @@ export class UserController {
   }
 
   @GrpcMethod('UserService', 'GetEventInfoV2')
-  async getEventInfoV2(@Body() {eventId, pinCode, token}: EventIdDto & GetEventInfoQueryDto & {token?: string}) {
+  async getEventInfoV2(
+    @Body() {eventId, pinCode, token}: GetEventInfoParamsDto & GetEventInfoRequestV2Dto,
+  ): Promise<GetEventInfoResponseDto> {
     const result = await this.getEventInfoV2UseCase.execute({eventId, pinCode, token});
 
     if (isError(result)) {
@@ -135,7 +167,9 @@ export class UserController {
   }
 
   @GrpcMethod('UserService', 'AddUsersToEventV2')
-  async addUserToEventV2(@Body() body: AddUsersToEventDto & EventIdDto) {
+  async addUserToEventV2(
+    @Body() body: AddUsersToEventRequestDto & AddUsersToEventParamsDto,
+  ): Promise<AddUsersToEventResponseWithUsersDto> {
     const {eventId, ...rest} = body;
 
     const result = await this.saveUsersToEventV2UseCase.execute({eventId, ...rest});
@@ -148,7 +182,9 @@ export class UserController {
   }
 
   @GrpcMethod('UserService', 'GetAllEventExpensesV2')
-  async getAllEventExpensesV2(@Body() {eventId, pinCode}: EventIdDto & GetEventExpensesBodyDto) {
+  async getAllEventExpensesV2(
+    @Body() {eventId, pinCode}: GetEventExpensesParamsDto & GetEventExpensesRequestV2Dto,
+  ): Promise<GetEventExpensesResponseWithExpensesDto> {
     const result = await this.getEventExpensesV2UseCase.execute({eventId, pinCode});
 
     if (isError(result)) {
@@ -159,7 +195,9 @@ export class UserController {
   }
 
   @GrpcMethod('UserService', 'CreateExpenseV2')
-  async createExpenseV2(@Body() expense: CreateExpenseV2Dto & EventIdDto) {
+  async createExpenseV2(
+    @Body() expense: CreateExpenseRequestV2Dto & CreateExpenseParamsDto,
+  ): Promise<CreateExpenseResponseDto> {
     const result = await this.saveEventExpenseV2UseCase.execute(expense);
 
     if (isError(result)) {
@@ -170,7 +208,9 @@ export class UserController {
   }
 
   @GrpcMethod('UserService', 'CreateEventShareTokenV2')
-  async createEventShareTokenV2(@Body() {eventId, pinCode}: EventIdDto & {pinCode: string}) {
+  async createEventShareTokenV2(
+    @Body() {eventId, pinCode}: CreateEventShareTokenParamsDto & CreateEventShareTokenRequestDto,
+  ): Promise<CreateEventShareTokenResponseDto> {
     const result = await this.createEventShareTokenV2UseCase.execute({eventId, pinCode});
 
     if (isError(result)) {

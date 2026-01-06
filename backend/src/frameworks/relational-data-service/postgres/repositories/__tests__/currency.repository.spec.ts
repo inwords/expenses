@@ -56,11 +56,9 @@ describe('CurrencyRepository', () => {
       ];
 
       const [, queryDetails] = await relationalDataService.currency.insert(currencies);
-      const [result1] = await relationalDataService.currency.findById('currency-1');
-      const [result2] = await relationalDataService.currency.findById('currency-2');
+      const [result] = await relationalDataService.currency.findAll({limit: 2});
 
-      expect(result1).toMatchObject(currencies[0]);
-      expect(result2).toMatchObject(currencies[1]);
+      expect(result).toMatchObject(currencies);
       expect(queryDetails).toMatchSnapshot();
     });
   });
@@ -101,7 +99,7 @@ describe('CurrencyRepository', () => {
           code: CurrencyCode.EUR,
           createdAt: new Date('2023-01-01T00:00:00Z'),
           updatedAt: new Date('2023-01-01T00:00:00Z'),
-        }
+        },
       ];
 
       await relationalDataService.currency.insert(currencies);

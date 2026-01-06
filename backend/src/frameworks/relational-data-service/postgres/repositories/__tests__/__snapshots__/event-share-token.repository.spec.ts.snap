@@ -45,7 +45,7 @@ exports[`EventShareTokenRepository findOneActiveByEventId should find active tok
 {
   "queryParameters": {
     "eventId": "event-1",
-    "now": 2026-01-04T19:24:39.347Z,
+    "now": 2024-02-01T00:00:00.000Z,
   },
   "queryString": "SELECT "event_share_token"."token" AS "event_share_token_token", "event_share_token"."event_id" AS "event_share_token_event_id", "event_share_token"."expires_at" AS "event_share_token_expires_at", "event_share_token"."created_at" AS "event_share_token_created_at" FROM "event_share_token" "event_share_token" WHERE "event_share_token"."event_id" = :eventId AND "event_share_token"."expires_at" >= :now ORDER BY "event_share_token"."expires_at" DESC",
 }
@@ -55,7 +55,7 @@ exports[`EventShareTokenRepository findOneActiveByEventId should return most rec
 {
   "queryParameters": {
     "eventId": "event-1",
-    "now": 2026-01-04T19:24:39.606Z,
+    "now": 2024-02-01T00:00:00.000Z,
   },
   "queryString": "SELECT "event_share_token"."token" AS "event_share_token_token", "event_share_token"."event_id" AS "event_share_token_event_id", "event_share_token"."expires_at" AS "event_share_token_expires_at", "event_share_token"."created_at" AS "event_share_token_created_at" FROM "event_share_token" "event_share_token" WHERE "event_share_token"."event_id" = :eventId AND "event_share_token"."expires_at" >= :now ORDER BY "event_share_token"."expires_at" DESC",
 }
@@ -65,7 +65,7 @@ exports[`EventShareTokenRepository findOneActiveByEventId should return null for
 {
   "queryParameters": {
     "eventId": "event-1",
-    "now": 2026-01-04T19:24:39.481Z,
+    "now": 2024-02-01T00:00:00.000Z,
   },
   "queryString": "SELECT "event_share_token"."token" AS "event_share_token_token", "event_share_token"."event_id" AS "event_share_token_event_id", "event_share_token"."expires_at" AS "event_share_token_expires_at", "event_share_token"."created_at" AS "event_share_token_created_at" FROM "event_share_token" "event_share_token" WHERE "event_share_token"."event_id" = :eventId AND "event_share_token"."expires_at" >= :now ORDER BY "event_share_token"."expires_at" DESC",
 }
@@ -75,7 +75,7 @@ exports[`EventShareTokenRepository findOneActiveByEventId should return null for
 {
   "queryParameters": {
     "eventId": "non-existent",
-    "now": 2026-01-04T19:24:39.674Z,
+    "now": 2024-02-01T00:00:00.000Z,
   },
   "queryString": "SELECT "event_share_token"."token" AS "event_share_token_token", "event_share_token"."event_id" AS "event_share_token_event_id", "event_share_token"."expires_at" AS "event_share_token_expires_at", "event_share_token"."created_at" AS "event_share_token_created_at" FROM "event_share_token" "event_share_token" WHERE "event_share_token"."event_id" = :eventId AND "event_share_token"."expires_at" >= :now ORDER BY "event_share_token"."expires_at" DESC",
 }
@@ -86,7 +86,7 @@ exports[`EventShareTokenRepository insert should insert event share token correc
   "queryParameters": {
     "orm_param_0": "test-token-123",
     "orm_param_1": "event-1",
-    "orm_param_2": 2025-12-31T23:59:59.000Z,
+    "orm_param_2": 2025-01-01T00:00:00.000Z,
     "orm_param_3": 2023-01-01T00:00:00.000Z,
   },
   "queryString": "INSERT INTO "event_share_token" AS "EventShareTokenEntity"("token", "event_id", "expires_at", "created_at") VALUES (:orm_param_0, :orm_param_1, :orm_param_2, :orm_param_3)",

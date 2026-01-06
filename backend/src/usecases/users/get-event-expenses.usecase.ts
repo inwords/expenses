@@ -3,7 +3,7 @@ import {UseCase} from '#packages/use-case';
 import {RelationalDataServiceAbstract} from '#domain/abstracts/relational-data-service/relational-data-service';
 import {EventServiceAbstract} from '#domain/abstracts/event-service/event-service';
 import {IExpense} from '#domain/entities/expense.entity';
-import {Result, success, isError} from '#packages/result';
+import {Result, success, error, isError} from '#packages/result';
 import {EventNotFoundError, EventDeletedError} from '#domain/errors/errors';
 
 type Input = Pick<IExpense, 'eventId'>;
@@ -19,14 +19,14 @@ export class GetEventExpensesUseCase implements UseCase<Input, Output> {
   public async execute({eventId}: Input): Promise<Output> {
     const [event] = await this.rDataService.event.findById(eventId);
 
-    const eventExistsResult = this.eventService.isEventExists(event);
-    if (isError(eventExistsResult)) {
-      return eventExistsResult;
+    if (!this.eventService.isEventExists(event)) {
+      return error(new EventNotFoundError());
     }
 
-    const eventNotDeletedResult = this.eventService.isEventNotDeleted(event);
-    if (isError(eventNotDeletedResult)) {
-      return eventNotDeletedResult;
+    const notDeletedResult = this.eventService.isEventNotDeleted(event);
+
+    if (isError(notDeletedResult)) {
+      return notDeletedResult;
     }
 
     const [expenses] = await this.rDataService.expense.findByEventId(eventId);

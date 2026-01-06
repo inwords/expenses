@@ -8,7 +8,7 @@ import {join} from 'path';
 import {BusinessErrorFilter} from './api/http/filters/business-error.filter';
 import {ValidationExceptionFilter} from './api/http/filters/validation-exception.filter';
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(

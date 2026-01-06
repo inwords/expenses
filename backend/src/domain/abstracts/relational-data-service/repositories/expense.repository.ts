@@ -10,5 +10,8 @@ export abstract class ExpenseRepositoryAbstract {
     input: {limit: number},
     trx?: ITransaction,
   ) => Promise<[result: IExpense[], queryDetails: IQueryDetails]>;
-  abstract insert: (expense: IExpense, trx?: ITransaction) => Promise<[result: undefined, queryDetails: IQueryDetails]>;
+  abstract insert: (
+    expense: IExpense | IExpense[],
+    trx?: ITransaction,
+  ) => Promise<[result: undefined, queryDetails: IQueryDetails]>;
 }

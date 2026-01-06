@@ -7,14 +7,14 @@ export class CurrencyRateEntity implements ICurrencyRate {
   @PrimaryColumn({
     type: 'date',
   })
-  date: DateWithoutTime; //2024-12-31
+  date!: DateWithoutTime; //2024-12-31
 
   @Column({type: 'jsonb'})
-  rate: Record<string, number>;
+  rate!: Record<string, number>;
 
   @Column({type: 'timestamptz'})
-  createdAt: ICurrencyRate['createdAt'];
+  createdAt!: ICurrencyRate['createdAt'];
 
   @Column({type: 'timestamptz'})
-  updatedAt: ICurrencyRate['updatedAt'];
+  updatedAt!: ICurrencyRate['updatedAt'];
 }

@@ -15,7 +15,7 @@ export abstract class EventShareTokenRepositoryAbstract {
     trx?: ITransaction,
   ) => Promise<[result: IEventShareToken[], queryDetails: IQueryDetails]>;
   abstract insert: (
-    token: IEventShareToken,
+    token: IEventShareToken | IEventShareToken[],
     trx?: ITransaction,
   ) => Promise<[result: undefined, queryDetails: IQueryDetails]>;
   abstract deleteByToken: (

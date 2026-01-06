@@ -13,7 +13,7 @@ import {CURRENCIES_LIST} from '../constants';
 export const providers: Provider[] = [
   {
     provide: RelationalDataServiceAbstract,
-    useFactory: async () => {
+    useFactory: async (): Promise<RelationalDataService> => {
       const relationalDataService = new RelationalDataService({
         showQueryDetails: false,
         dbConfig: appDbConfig,
@@ -27,7 +27,7 @@ export const providers: Provider[] = [
   },
   {
     provide: CurrencyRateServiceAbstract,
-    useFactory: () => {
+    useFactory: (): CurrencyRateService => {
       return new CurrencyRateService(new HttpService());
     },
   },
@@ -45,7 +45,7 @@ export const providers: Provider[] = [
 export class FrameworksLayer implements OnApplicationShutdown {
   constructor(private readonly relationalDataService: RelationalDataServiceAbstract) {}
 
-  async onApplicationShutdown() {
+  async onApplicationShutdown(): Promise<void> {
     await this.relationalDataService.destroy();
   }
 }

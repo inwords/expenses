@@ -1,5 +1,5 @@
 import {Controller, Get} from '@nestjs/common';
-import {HealthCheck, HealthCheckService} from '@nestjs/terminus';
+import {HealthCheck, HealthCheckService, HealthCheckResult, HealthIndicatorResult} from '@nestjs/terminus';
 import {HealthCheckUseCase} from '#usecases/health/health-check.usecase';
 import {HealthRoutes} from './health.constants';
 
@@ -12,7 +12,7 @@ export class HealthController {
 
   @Get()
   @HealthCheck()
-  check() {
-    return this.healthCheckService.check([() => this.healthCheckUseCase.execute()]);
+  check(): Promise<HealthCheckResult> {
+    return this.healthCheckService.check([(): Promise<HealthIndicatorResult> => this.healthCheckUseCase.execute()]);
   }
 }
