@@ -4,6 +4,7 @@ import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
+import com.inwords.expenses.feature.events.domain.model.EventShareToken
 import com.inwords.expenses.feature.events.domain.model.Person
 
 internal interface EventsRemoteStore {
@@ -47,5 +48,10 @@ internal interface EventsRemoteStore {
         pinCode: String,
         localPersons: List<Person>
     ): IoResult<List<Person>>
+
+    suspend fun createEventShareToken(
+        eventServerId: String,
+        pinCode: String,
+    ): IoResult<EventShareToken>
 
 }

@@ -9,6 +9,8 @@ import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.core.utils.SuspendLazy
 import com.inwords.expenses.feature.events.data.network.dto.AddPersonsToEventRequest
 import com.inwords.expenses.feature.events.data.network.dto.CreateEventRequest
+import com.inwords.expenses.feature.events.data.network.dto.CreateEventShareTokenRequest
+import com.inwords.expenses.feature.events.data.network.dto.CreateEventShareTokenResponse
 import com.inwords.expenses.feature.events.data.network.dto.CreateUserDto
 import com.inwords.expenses.feature.events.data.network.dto.DeleteEventRequest
 import com.inwords.expenses.feature.events.data.network.dto.EventDto
@@ -17,6 +19,7 @@ import com.inwords.expenses.feature.events.data.network.dto.UserDto
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
+import com.inwords.expenses.feature.events.domain.model.EventShareToken
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore.DeleteEventResult
@@ -32,6 +35,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import kotlin.time.ExperimentalTime
 
 internal class EventsRemoteStoreImpl(
     private val client: SuspendLazy<HttpClient>,
@@ -125,6 +129,27 @@ internal class EventsRemoteStoreImpl(
                 )
             }.body<List<UserDto>>().mapIndexed { i, dto ->
                 dto.toPerson(localPersonId = localPersons[i].id)
+            }
+        }.toIoResult()
+    }
+
+    @OptIn(ExperimentalTime::class)
+    override suspend fun createEventShareToken(
+        eventServerId: String,
+        pinCode: String,
+    ): IoResult<EventShareToken> {
+        return client.requestWithExceptionHandling {
+            post {
+                url(hostConfig) {
+                    pathSegments = listOf("api", "v2", "user", "event", eventServerId, "share-token")
+                }
+                contentType(ContentType.Application.Json)
+                setBody(CreateEventShareTokenRequest(pinCode = pinCode))
+            }.body<CreateEventShareTokenResponse>().let { response ->
+                EventShareToken(
+                    token = response.token,
+                    expiresAt = response.expiresAt,
+                )
             }
         }.toIoResult()
     }
