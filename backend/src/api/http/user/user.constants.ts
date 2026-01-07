@@ -11,7 +11,7 @@ export const UserRoutes = {
 
 export const UserV2Routes = {
   root: '/v2/user',
-  getEventInfo: `/event/:eventId/info`,
+  getEventInfo: `/event/:eventId`,
   addUsersToEvent: `/event/:eventId/users`,
   getAllEventExpenses: `/event/:eventId/expenses`,
   createExpense: `/event/:eventId/expense`,
