@@ -7,11 +7,12 @@ import com.inwords.expenses.core.network.toIoResult
 import com.inwords.expenses.core.network.url
 import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.core.utils.SuspendLazy
-import com.inwords.expenses.feature.events.data.network.dto.AddUsersDto
+import com.inwords.expenses.feature.events.data.network.dto.AddPersonsToEventRequest
 import com.inwords.expenses.feature.events.data.network.dto.CreateEventRequest
 import com.inwords.expenses.feature.events.data.network.dto.CreateUserDto
 import com.inwords.expenses.feature.events.data.network.dto.DeleteEventRequest
 import com.inwords.expenses.feature.events.data.network.dto.EventDto
+import com.inwords.expenses.feature.events.data.network.dto.GetEventInfoRequest
 import com.inwords.expenses.feature.events.data.network.dto.UserDto
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
@@ -24,7 +25,6 @@ import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
-import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -46,11 +46,12 @@ internal class EventsRemoteStoreImpl(
         localPersons: List<Person>?,
     ): GetEventResult {
         val result = client.requestWithExceptionHandling {
-            get {
+            post {
                 url(hostConfig) {
-                    pathSegments = listOf("api", "user", "event", serverId)
-                    parameters.append("pinCode", pinCode)
+                    pathSegments = listOf("api", "v2", "user", "event", serverId, "info")
                 }
+                contentType(ContentType.Application.Json)
+                setBody(GetEventInfoRequest(pinCode = pinCode))
             }.body<EventDto>().toEventDetails(
                 localEventId = localId,
                 localPersons = localPersons,
@@ -113,12 +114,14 @@ internal class EventsRemoteStoreImpl(
         return client.requestWithExceptionHandling {
             post {
                 url(hostConfig) {
-                    pathSegments = listOf("api", "user", "event", eventServerId, "users")
-                    parameters.append("pinCode", pinCode)
+                    pathSegments = listOf("api", "v2", "user", "event", eventServerId, "users")
                 }
                 contentType(ContentType.Application.Json)
                 setBody(
-                    AddUsersDto(users = localPersons.map { it.toCreateUserDto() })
+                    AddPersonsToEventRequest(
+                        users = localPersons.map { it.toCreateUserDto() },
+                        pinCode = pinCode
+                    )
                 )
             }.body<List<UserDto>>().mapIndexed { i, dto ->
                 dto.toPerson(localPersonId = localPersons[i].id)

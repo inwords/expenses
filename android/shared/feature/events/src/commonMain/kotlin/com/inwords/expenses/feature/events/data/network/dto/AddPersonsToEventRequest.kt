@@ -4,7 +4,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class AddUsersDto(
+internal data class AddPersonsToEventRequest(
     @SerialName("users")
     val users: List<CreateUserDto>,
+
+    @SerialName("pinCode")
+    val pinCode: String,
 )

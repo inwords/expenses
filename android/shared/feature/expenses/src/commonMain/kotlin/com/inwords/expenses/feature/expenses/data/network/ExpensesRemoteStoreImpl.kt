@@ -11,6 +11,7 @@ import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.data.network.dto.CreateExpenseRequest
 import com.inwords.expenses.feature.expenses.data.network.dto.ExpenseDto
+import com.inwords.expenses.feature.expenses.data.network.dto.GetEventExpensesRequest
 import com.inwords.expenses.feature.expenses.data.network.dto.SplitInformationDto
 import com.inwords.expenses.feature.expenses.data.network.dto.SplitInformationRequest
 import com.inwords.expenses.feature.expenses.domain.model.Expense
@@ -20,7 +21,6 @@ import com.inwords.expenses.feature.expenses.domain.store.ExpensesRemoteStore
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -41,8 +41,10 @@ internal class ExpensesRemoteStoreImpl(
     ): IoResult<List<Expense>> {
         val serverId = event.serverId ?: return IoResult.Error.Failure // FIXME: non-fatal error
         return client.requestWithExceptionHandling {
-            get {
-                url(hostConfig) { pathSegments = listOf("api", "user", "event", serverId, "expenses") }
+            post {
+                url(hostConfig) { pathSegments = listOf("api", "v2", "user", "event", serverId, "expenses") }
+                contentType(ContentType.Application.Json)
+                setBody(GetEventExpensesRequest(pinCode = event.pinCode))
             }.body<List<ExpenseDto>>().mapNotNull { it.toExpense(localExpense = null, currencies, persons) }
         }.toIoResult()
     }
@@ -69,7 +71,7 @@ internal class ExpensesRemoteStoreImpl(
         val currencyServerId = expense.currency.serverId ?: return IoResult.Error.Failure // FIXME: non-fatal error, should not happen
         return client.requestWithExceptionHandling {
             post {
-                url(hostConfig) { pathSegments = listOf("api", "user", "event", serverId, "expense") }
+                url(hostConfig) { pathSegments = listOf("api", "v2", "user", "event", serverId, "expense") }
                 contentType(ContentType.Application.Json)
                 setBody(
                     CreateExpenseRequest(
@@ -87,7 +89,8 @@ internal class ExpensesRemoteStoreImpl(
                                 amount = expenseSplitWithPerson.originalAmount.doubleValue(false),
                             )
                         },
-                        description = expense.description
+                        description = expense.description,
+                        pinCode = event.pinCode
                     )
                 )
             }.body<ExpenseDto>().toExpense(expense, currencies, persons)
