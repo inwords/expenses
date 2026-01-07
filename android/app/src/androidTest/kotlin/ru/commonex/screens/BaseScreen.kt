@@ -12,9 +12,14 @@ internal abstract class BaseScreen {
     context(extension: ComposeContext)
     fun waitForElementWithText(
         text: String,
-        timeout: Long = 10000
+        count: Int = 1,
+        timeout: Long = 10000,
     ) {
-        extension.waitUntilAtLeastOneExists(hasText(text), timeout)
+        if (count == 1) {
+            extension.waitUntilAtLeastOneExists(hasText(text), timeout)
+        } else {
+            extension.waitUntilNodeCount(hasText(text), count, timeout)
+        }
     }
 
     context(extension: ComposeContext)
