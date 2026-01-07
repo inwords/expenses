@@ -73,6 +73,7 @@ class BasicInstrumentedTest {
             // Verify debts details and go back
             expensesScreen
                 .clickDebtDetails()
+                .waitUntilLoaded()
                 .verifyDebtAmount("60", "Test User 1", count = 2)
                 .goBack()
 

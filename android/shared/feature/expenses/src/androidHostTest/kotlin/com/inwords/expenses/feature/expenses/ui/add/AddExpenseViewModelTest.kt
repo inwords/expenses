@@ -560,6 +560,7 @@ internal class AddExpenseViewModelTest {
 
             // When
             viewModel.onConfirmClicked()
+            runCurrent()
             advanceUntilIdle()
 
             // Then

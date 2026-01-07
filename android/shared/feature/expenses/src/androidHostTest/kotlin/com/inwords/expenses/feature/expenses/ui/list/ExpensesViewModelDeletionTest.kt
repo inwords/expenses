@@ -320,6 +320,7 @@ internal class ExpensesViewModelDeletionTest {
 
             // Remove all events
             eventsFlow.value = emptyList()
+            advanceUntilIdle()
 
             val emptyState = awaitItem()
             assertIs<SimpleScreenState.Empty>(emptyState)
