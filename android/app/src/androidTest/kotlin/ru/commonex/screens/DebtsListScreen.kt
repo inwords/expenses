@@ -1,6 +1,9 @@
 package ru.commonex.screens
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import de.mannodermaus.junit5.compose.ComposeContext
@@ -11,17 +14,20 @@ import org.jetbrains.compose.resources.getString
 internal class DebtsListScreen : BaseScreen() {
 
     context(extension: ComposeContext)
-    suspend fun waitUntilLoaded(): DebtsListScreen {
+    suspend fun waitUntilLoaded(eventName: String): DebtsListScreen {
         val backLabel = getString(Res.string.common_back)
         extension.waitUntilAtLeastOneExists(hasContentDescription(backLabel), timeoutMillis = 10000)
+
+        waitForElementWithText(eventName)
         return this
     }
 
     context(extension: ComposeContext)
     fun verifyDebtAmount(amount: String, personName: String, count: Int = 1): DebtsListScreen {
         val debtText = "$amount Euro,  $personName"
-        waitForElementWithText(text = debtText, count = count)
-        assertElementsWithTextCount(text = debtText, count = count)
+        val matcher = hasTestTag("debts_list_debt_button") and hasText(debtText, substring = true)
+        extension.waitUntilNodeCount(matcher, count, timeoutMillis = 10000)
+        extension.onAllNodes(matcher).assertCountEquals(count)
         return this
     }
 

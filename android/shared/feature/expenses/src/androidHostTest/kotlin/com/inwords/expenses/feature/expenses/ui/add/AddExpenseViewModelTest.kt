@@ -112,6 +112,7 @@ internal class AddExpenseViewModelTest {
             awaitLoading()
 
             currentEventFlow.value = TestFixtures.eventDetails
+            advanceUntilIdle()
             val uiModel = awaitSuccess()
 
             assertEquals("", uiModel.description)
@@ -133,7 +134,7 @@ internal class AddExpenseViewModelTest {
             awaitLoading()
 
             // Drive combine to re-evaluate with null event
-            runCurrent()
+            advanceUntilIdle()
             currentPersonIdFlow.value = TestFixtures.person1.id
             currentEventFlow.value = null
 
@@ -153,6 +154,7 @@ internal class AddExpenseViewModelTest {
 
             currentEventFlow.value = TestFixtures.eventDetails
             currentPersonIdFlow.value = null
+            advanceUntilIdle()
 
             awaitErrorState()
             cancelAndIgnoreRemainingEvents()
@@ -519,7 +521,6 @@ internal class AddExpenseViewModelTest {
             // When
             viewModel.onConfirmClicked()
             runCurrent()
-            advanceUntilIdle()
 
             // Then
             coVerify(exactly = 1) {
@@ -562,7 +563,6 @@ internal class AddExpenseViewModelTest {
             // When
             viewModel.onConfirmClicked()
             runCurrent()
-            advanceUntilIdle()
 
             // Then
             coVerify(exactly = 1) {
@@ -600,7 +600,6 @@ internal class AddExpenseViewModelTest {
             // When
             viewModel.onConfirmClicked()
             runCurrent()
-            advanceUntilIdle()
 
             // Then
             coVerify(exactly = 0) { expensesInteractor.addExpenseEqualSplit(any(), any(), any(), any(), any(), any(), any()) }
@@ -812,7 +811,6 @@ internal class AddExpenseViewModelTest {
             // When - confirm with empty description
             viewModel.onConfirmClicked()
             runCurrent()
-            advanceUntilIdle()
 
             // Then - should use the default "no description" string
             coVerify(exactly = 1) {
@@ -847,7 +845,6 @@ internal class AddExpenseViewModelTest {
             // When
             viewModel.onConfirmClicked()
             runCurrent()
-            advanceUntilIdle()
 
             // Then
             coVerify(exactly = 1) {
@@ -1070,6 +1067,7 @@ internal class AddExpenseViewModelTest {
                 currencies = TestFixtures.eventDetails.currencies + newCurrency
             )
             currentEventFlow.value = updatedEventDetails
+            advanceUntilIdle()
 
             // Then - state should reflect the new persons and currencies
             val updated = awaitSuccess()
@@ -1105,7 +1103,6 @@ internal class AddExpenseViewModelTest {
             // When - try to confirm with invalid state
             viewModel.onConfirmClicked()
             runCurrent()
-            advanceUntilIdle()
 
             // Then - should not create expense or navigate
             coVerify(exactly = 0) { expensesInteractor.addExpenseCustomSplit(any(), any(), any(), any(), any(), any()) }
@@ -1130,7 +1127,6 @@ internal class AddExpenseViewModelTest {
             // When
             viewModel.onConfirmClicked()
             runCurrent()
-            advanceUntilIdle()
 
             // Then - should not call expense creation
             coVerify(exactly = 0) { expensesInteractor.addExpenseEqualSplit(any(), any(), any(), any(), any(), any(), any()) }
@@ -1175,7 +1171,8 @@ internal class AddExpenseViewModelTest {
                 override suspend fun getString(stringResource: StringResource, vararg formatArgs: Any): String {
                     return stringResource.key + formatArgs.joinToString()
                 }
-            }
+            },
+            viewModelScope = this.testScope.backgroundScope,
         )
     }
 

@@ -174,7 +174,6 @@ internal class ExpensesViewModelDeletionTest {
         // When
         viewModel.onDeleteOnlyLocalEventClick(TestFixtures.localEventUiModel)
         runCurrent()
-        advanceUntilIdle()
 
         // Then
         coVerify(exactly = 1) {
@@ -190,7 +189,6 @@ internal class ExpensesViewModelDeletionTest {
         // When
         viewModel.onDeleteOnlyLocalEventClick(TestFixtures.remoteDeletionFailedEventUiModel)
         runCurrent()
-        advanceUntilIdle()
 
         // Then
         coVerify(exactly = 1) {
@@ -286,6 +284,7 @@ internal class ExpensesViewModelDeletionTest {
             eventsDeletionStateFlow.value = mapOf(
                 TestFixtures.syncedEvent.id to EventDeletionState.Loading
             )
+            advanceUntilIdle()
 
             val loadingState = awaitItem()
             assertIs<SimpleScreenState.Success<ExpensesPaneUiModel>>(loadingState)
@@ -297,6 +296,7 @@ internal class ExpensesViewModelDeletionTest {
             eventsDeletionStateFlow.value = mapOf(
                 TestFixtures.syncedEvent.id to EventDeletionState.RemoteDeletionFailed
             )
+            advanceUntilIdle()
 
             val failedState = awaitItem()
             assertIs<SimpleScreenState.Success<ExpensesPaneUiModel>>(failedState)
@@ -343,7 +343,8 @@ internal class ExpensesViewModelDeletionTest {
             joinEventUseCase = joinEventUseCase,
             deleteEventUseCase = deleteEventUseCase,
             expensesInteractor = expensesInteractor,
-            settingsRepository = settingsRepository
+            settingsRepository = settingsRepository,
+            viewModelScope = this.testScope.backgroundScope,
         )
     }
     // endregion

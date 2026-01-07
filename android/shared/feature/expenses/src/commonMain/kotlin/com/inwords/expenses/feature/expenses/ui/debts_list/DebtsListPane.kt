@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.appbar.TopAppBarWithNavIconAndText
@@ -124,7 +125,11 @@ internal fun DebtsListPaneSuccess(
                             .padding(horizontal = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        DebtReplenishmentButton(debtorDebt, { onReplenishmentClick.invoke(debtor, debtorDebt) })
+                        DebtReplenishmentButton(
+                            modifier = Modifier.testTag("debts_list_debt_button"),
+                            debt = debtorDebt,
+                            onClick = { onReplenishmentClick.invoke(debtor, debtorDebt) },
+                        )
                     }
                 }
                 if (index == state.creditors.keys.size - 1) {

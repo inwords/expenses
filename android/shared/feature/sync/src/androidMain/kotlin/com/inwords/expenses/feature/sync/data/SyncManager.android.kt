@@ -36,18 +36,10 @@ actual class EventsSyncManager internal constructor(
                 WorkManager.getInstance(context)
                     .beginWith(CurrenciesPullWorker.buildCurrenciesPullRequest(eventId))
                     .then(EventPushWorker.buildEventPushRequest(eventId))
-                    .then(
-                        listOf(
-                            EventPersonsPushWorker.buildEventPersonsPushRequest(eventId),
-                            EventPullPersonsWorker.buildEventPullPersonsRequest(eventId)
-                        )
-                    )
-                    .then(
-                        listOf(
-                            EventExpensesPushWorker.buildEventExpensesPushRequest(eventId),
-                            EventExpensesPullWorker.buildEventExpensesPullRequest(eventId)
-                        )
-                    )
+                    .then(EventPersonsPushWorker.buildEventPersonsPushRequest(eventId))
+                    .then(EventPullPersonsWorker.buildEventPullPersonsRequest(eventId))
+                    .then(EventExpensesPushWorker.buildEventExpensesPushRequest(eventId))
+                    .then(EventExpensesPullWorker.buildEventExpensesPullRequest(eventId))
                     .enqueue()
             }
         }
