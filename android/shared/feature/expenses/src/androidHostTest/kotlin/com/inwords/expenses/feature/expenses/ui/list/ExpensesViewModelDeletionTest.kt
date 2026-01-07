@@ -28,6 +28,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlin.test.AfterTest
@@ -172,6 +173,7 @@ internal class ExpensesViewModelDeletionTest {
 
         // When
         viewModel.onDeleteOnlyLocalEventClick(TestFixtures.localEventUiModel)
+        runCurrent()
         advanceUntilIdle()
 
         // Then
@@ -187,6 +189,7 @@ internal class ExpensesViewModelDeletionTest {
 
         // When
         viewModel.onDeleteOnlyLocalEventClick(TestFixtures.remoteDeletionFailedEventUiModel)
+        runCurrent()
         advanceUntilIdle()
 
         // Then

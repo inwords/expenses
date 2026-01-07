@@ -518,6 +518,7 @@ internal class AddExpenseViewModelTest {
 
             // When
             viewModel.onConfirmClicked()
+            runCurrent()
             advanceUntilIdle()
 
             // Then
@@ -598,6 +599,7 @@ internal class AddExpenseViewModelTest {
 
             // When
             viewModel.onConfirmClicked()
+            runCurrent()
             advanceUntilIdle()
 
             // Then
@@ -809,6 +811,7 @@ internal class AddExpenseViewModelTest {
 
             // When - confirm with empty description
             viewModel.onConfirmClicked()
+            runCurrent()
             advanceUntilIdle()
 
             // Then - should use the default "no description" string
@@ -843,6 +846,7 @@ internal class AddExpenseViewModelTest {
 
             // When
             viewModel.onConfirmClicked()
+            runCurrent()
             advanceUntilIdle()
 
             // Then
@@ -1100,6 +1104,7 @@ internal class AddExpenseViewModelTest {
 
             // When - try to confirm with invalid state
             viewModel.onConfirmClicked()
+            runCurrent()
             advanceUntilIdle()
 
             // Then - should not create expense or navigate
@@ -1124,6 +1129,7 @@ internal class AddExpenseViewModelTest {
 
             // When
             viewModel.onConfirmClicked()
+            runCurrent()
             advanceUntilIdle()
 
             // Then - should not call expense creation
