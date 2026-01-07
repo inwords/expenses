@@ -1,1 +1,1 @@
-Use instructions from the root project's dir: `../.github/instructions/android.instructions.md`
+See the Android/iOS/KMM instructions: [`../.github/instructions/android.instructions.md`](../.github/instructions/android.instructions.md)
