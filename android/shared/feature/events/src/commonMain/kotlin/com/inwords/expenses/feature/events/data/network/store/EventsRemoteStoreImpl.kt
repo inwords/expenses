@@ -52,7 +52,7 @@ internal class EventsRemoteStoreImpl(
         val result = client.requestWithExceptionHandling {
             post {
                 url(hostConfig) {
-                    pathSegments = listOf("api", "v2", "user", "event", serverId, "info")
+                    pathSegments = listOf("api", "v2", "user", "event", serverId)
                 }
                 contentType(ContentType.Application.Json)
                 setBody(GetEventInfoRequest(pinCode = pinCode))
