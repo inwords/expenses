@@ -36,12 +36,23 @@ actual class EventsSyncManager internal constructor() {
                 if (jobs[eventId]?.isActive == true) return@launch
 
                 val newJob = launch {
-                    eventsComponent.currenciesPullTask.value.pullCurrencies() is IoResult.Success &&
-                        eventsComponent.eventPushTask.value.pushEvent(eventId) is IoResult.Success &&
-                        (eventsComponent.eventPersonsPushTask.value.pushEventPersons(eventId) is IoResult.Success ||
-                            eventsComponent.eventPullPersonsTask.value.pullEventPersons(eventId) is IoResult.Success) &&
-                        (expensesComponent.eventExpensesPushTask.value.pushEventExpenses(eventId) is IoResult.Success ||
-                            expensesComponent.eventExpensesPullTask.value.pullEventExpenses(eventId) is IoResult.Success)
+                    val currenciesResult = eventsComponent.currenciesPullTask.value.pullCurrencies()
+                    if (currenciesResult !is IoResult.Success) return@launch
+
+                    val eventPushResult = eventsComponent.eventPushTask.value.pushEvent(eventId)
+                    if (eventPushResult !is IoResult.Success) return@launch
+
+                    val personsPushResult = eventsComponent.eventPersonsPushTask.value.pushEventPersons(eventId)
+                    if (personsPushResult !is IoResult.Success) return@launch
+
+                    val personsPullResult = eventsComponent.eventPullPersonsTask.value.pullEventPersons(eventId)
+                    if (personsPullResult !is IoResult.Success) return@launch
+
+                    val expensesPushResult = expensesComponent.eventExpensesPushTask.value.pushEventExpenses(eventId)
+                    if (expensesPushResult !is IoResult.Success) return@launch
+
+                    val expensesPullResult = expensesComponent.eventExpensesPullTask.value.pullEventExpenses(eventId)
+                    if (expensesPullResult !is IoResult.Success) return@launch
                 }
 
                 jobs[eventId] = newJob
