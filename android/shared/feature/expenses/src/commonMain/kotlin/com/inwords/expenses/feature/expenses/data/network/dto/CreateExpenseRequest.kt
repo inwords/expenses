@@ -19,5 +19,8 @@ internal data class CreateExpenseRequest(
     val expenseType: String,
 
     @SerialName("splitInformation")
-    val splitInformation: List<SplitInformationRequest>
+    val splitInformation: List<SplitInformationRequest>,
+
+    @SerialName("pinCode")
+    val pinCode: String,
 )

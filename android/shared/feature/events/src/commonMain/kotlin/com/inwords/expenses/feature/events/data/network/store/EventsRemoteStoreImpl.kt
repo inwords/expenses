@@ -7,15 +7,19 @@ import com.inwords.expenses.core.network.toIoResult
 import com.inwords.expenses.core.network.url
 import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.core.utils.SuspendLazy
-import com.inwords.expenses.feature.events.data.network.dto.AddUsersDto
+import com.inwords.expenses.feature.events.data.network.dto.AddPersonsToEventRequest
 import com.inwords.expenses.feature.events.data.network.dto.CreateEventRequest
+import com.inwords.expenses.feature.events.data.network.dto.CreateEventShareTokenRequest
+import com.inwords.expenses.feature.events.data.network.dto.CreateEventShareTokenResponse
 import com.inwords.expenses.feature.events.data.network.dto.CreateUserDto
 import com.inwords.expenses.feature.events.data.network.dto.DeleteEventRequest
 import com.inwords.expenses.feature.events.data.network.dto.EventDto
+import com.inwords.expenses.feature.events.data.network.dto.GetEventInfoRequest
 import com.inwords.expenses.feature.events.data.network.dto.UserDto
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
+import com.inwords.expenses.feature.events.domain.model.EventShareToken
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
 import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore.DeleteEventResult
@@ -24,7 +28,6 @@ import com.inwords.expenses.feature.events.domain.store.remote.EventsRemoteStore
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
-import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -32,6 +35,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import kotlin.time.ExperimentalTime
 
 internal class EventsRemoteStoreImpl(
     private val client: SuspendLazy<HttpClient>,
@@ -46,11 +50,12 @@ internal class EventsRemoteStoreImpl(
         localPersons: List<Person>?,
     ): GetEventResult {
         val result = client.requestWithExceptionHandling {
-            get {
+            post {
                 url(hostConfig) {
-                    pathSegments = listOf("api", "user", "event", serverId)
-                    parameters.append("pinCode", pinCode)
+                    pathSegments = listOf("api", "v2", "user", "event", serverId, "info")
                 }
+                contentType(ContentType.Application.Json)
+                setBody(GetEventInfoRequest(pinCode = pinCode))
             }.body<EventDto>().toEventDetails(
                 localEventId = localId,
                 localPersons = localPersons,
@@ -113,15 +118,38 @@ internal class EventsRemoteStoreImpl(
         return client.requestWithExceptionHandling {
             post {
                 url(hostConfig) {
-                    pathSegments = listOf("api", "user", "event", eventServerId, "users")
-                    parameters.append("pinCode", pinCode)
+                    pathSegments = listOf("api", "v2", "user", "event", eventServerId, "users")
                 }
                 contentType(ContentType.Application.Json)
                 setBody(
-                    AddUsersDto(users = localPersons.map { it.toCreateUserDto() })
+                    AddPersonsToEventRequest(
+                        users = localPersons.map { it.toCreateUserDto() },
+                        pinCode = pinCode
+                    )
                 )
             }.body<List<UserDto>>().mapIndexed { i, dto ->
                 dto.toPerson(localPersonId = localPersons[i].id)
+            }
+        }.toIoResult()
+    }
+
+    @OptIn(ExperimentalTime::class)
+    override suspend fun createEventShareToken(
+        eventServerId: String,
+        pinCode: String,
+    ): IoResult<EventShareToken> {
+        return client.requestWithExceptionHandling {
+            post {
+                url(hostConfig) {
+                    pathSegments = listOf("api", "v2", "user", "event", eventServerId, "share-token")
+                }
+                contentType(ContentType.Application.Json)
+                setBody(CreateEventShareTokenRequest(pinCode = pinCode))
+            }.body<CreateEventShareTokenResponse>().let { response ->
+                EventShareToken(
+                    token = response.token,
+                    expiresAt = response.expiresAt,
+                )
             }
         }.toIoResult()
     }

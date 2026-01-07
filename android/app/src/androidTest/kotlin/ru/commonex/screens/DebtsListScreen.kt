@@ -12,8 +12,8 @@ internal class DebtsListScreen : BaseScreen() {
     context(extension: ComposeContext)
     fun verifyDebtAmount(amount: String, personName: String, count: Int = 1): DebtsListScreen {
         val debtText = "$amount Euro,  $personName"
-        waitForElementWithText(debtText)
-        assertElementsWithTextCount(debtText, count)
+        waitForElementWithText(text = debtText, count = count)
+        assertElementsWithTextCount(text = debtText, count = count)
         return this
     }
 
