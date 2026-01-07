@@ -11,9 +11,11 @@ import org.jetbrains.compose.resources.getString
 internal class DebtsListScreen : BaseScreen() {
 
     context(extension: ComposeContext)
-    suspend fun waitUntilLoaded(): DebtsListScreen {
+    suspend fun waitUntilLoaded(eventName: String): DebtsListScreen {
         val backLabel = getString(Res.string.common_back)
         extension.waitUntilAtLeastOneExists(hasContentDescription(backLabel), timeoutMillis = 10000)
+
+        waitForElementWithText(eventName)
         return this
     }
 

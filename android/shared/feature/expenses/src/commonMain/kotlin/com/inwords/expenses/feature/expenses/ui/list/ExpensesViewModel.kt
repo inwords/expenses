@@ -56,7 +56,8 @@ internal class ExpensesViewModel(
     private val deleteEventUseCase: DeleteEventUseCase,
     private val expensesInteractor: ExpensesInteractor,
     settingsRepository: SettingsRepository,
-) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
+    viewModelScope: CoroutineScope = CoroutineScope(SupervisorJob() + IO),
+) : ViewModel(viewModelScope = viewModelScope) {
 
     private var refreshJob: Job? = null
     private var joinEventJob: Job? = null

@@ -34,6 +34,7 @@ import expenses.shared.feature.expenses.generated.resources.Res
 import expenses.shared.feature.expenses.generated.resources.expenses_no_description
 import expenses.shared.feature.expenses.generated.resources.expenses_repayment_from
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,7 +51,8 @@ internal class AddExpenseViewModel(
     settingsRepository: SettingsRepository,
     private val replenishment: Replenishment?,
     private val stringProvider: StringProvider = DefaultStringProvider,
-) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
+    viewModelScope: CoroutineScope = CoroutineScope(SupervisorJob() + IO),
+) : ViewModel(viewModelScope = viewModelScope) {
 
     private data class AddExpenseScreenModel(
         val event: Event,
@@ -85,6 +87,8 @@ internal class AddExpenseViewModel(
             val amountRaw: String,
         )
     }
+
+    private var confirmJob: Job? = null
 
     private val selectedExpenseType = MutableStateFlow(replenishment?.let { ExpenseType.Replenishment } ?: ExpenseType.Spending)
     private val selectedCurrencyCode = MutableStateFlow(replenishment?.currencyCode)
@@ -314,7 +318,10 @@ internal class AddExpenseViewModel(
     fun onConfirmClicked() {
         val state = (_state.value as? SimpleScreenState.Success)?.data ?: return
 
-        viewModelScope.launch {
+        if (confirmJob?.isActive == true) {
+            return
+        }
+        confirmJob = viewModelScope.launch {
             val selectedCurrency = state.currencies.firstOrNull { it.selected }?.currency ?: return@launch
             val selectedPerson = state.persons.firstOrNull { it.selected }?.person ?: return@launch
             val description = state.description.trim().ifEmpty { stringProvider.getString(Res.string.expenses_no_description) }

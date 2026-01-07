@@ -112,6 +112,7 @@ internal class AddExpenseViewModelTest {
             awaitLoading()
 
             currentEventFlow.value = TestFixtures.eventDetails
+            runCurrent()
             val uiModel = awaitSuccess()
 
             assertEquals("", uiModel.description)
@@ -153,6 +154,7 @@ internal class AddExpenseViewModelTest {
 
             currentEventFlow.value = TestFixtures.eventDetails
             currentPersonIdFlow.value = null
+            runCurrent()
 
             awaitErrorState()
             cancelAndIgnoreRemainingEvents()
@@ -1070,6 +1072,7 @@ internal class AddExpenseViewModelTest {
                 currencies = TestFixtures.eventDetails.currencies + newCurrency
             )
             currentEventFlow.value = updatedEventDetails
+            runCurrent()
 
             // Then - state should reflect the new persons and currencies
             val updated = awaitSuccess()
@@ -1175,7 +1178,8 @@ internal class AddExpenseViewModelTest {
                 override suspend fun getString(stringResource: StringResource, vararg formatArgs: Any): String {
                     return stringResource.key + formatArgs.joinToString()
                 }
-            }
+            },
+            viewModelScope = this.testScope.backgroundScope,
         )
     }
 
