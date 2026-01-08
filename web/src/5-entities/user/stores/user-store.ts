@@ -33,7 +33,7 @@ export class UserStore {
     this.users = users;
   }
 
-  setCurrentUser(user: User) {
+  setCurrentUser(user: User | undefined) {
     this.currentUser = user;
   }
 }

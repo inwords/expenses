@@ -2,7 +2,7 @@ import {Box, Button, Card, CardActions, CardContent, Stack, Typography} from '@m
 import {observer} from 'mobx-react-lite';
 import {expenseStore} from '@/5-entities/expense/stores/expense-store';
 import {userStore} from '@/5-entities/user/stores/user-store';
-import {CURRENCIES_ID_TO_CURRENCY_CODE} from '@/5-entities/currency/constants';
+import {currencyStore} from '@/5-entities/currency/stores/currency-store';
 import {eventStore} from '@/5-entities/event/stores/event-store';
 
 export const ExpensesList = observer(() => {
@@ -30,7 +30,7 @@ export const ExpensesList = observer(() => {
                     {e.description}
 
                     <div>
-                      {e.amount} {CURRENCIES_ID_TO_CURRENCY_CODE[String(eventStore.currentEvent?.currencyId)]}
+                      {e.amount} {currencyStore.getCurrencyCode(eventStore.currentEvent?.currencyId)}
                     </div>
                   </Stack>
                 </Typography>
