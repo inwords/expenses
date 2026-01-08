@@ -14,6 +14,14 @@ export class CurrencyStore {
     });
   }
 
+  getCurrencyCode(currencyId: string | undefined): string {
+    if (!currencyId) {
+      return '';
+    }
+    const currency = this.currencies.find((c) => c.id === currencyId);
+    return currency?.code || '';
+  }
+
   setCurrencies(currencies: Array<Currency>) {
     this.currencies = currencies;
   }

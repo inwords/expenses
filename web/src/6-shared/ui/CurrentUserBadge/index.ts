@@ -1,0 +1,1 @@
+export {CurrentUserBadge} from './CurrentUserBadge';

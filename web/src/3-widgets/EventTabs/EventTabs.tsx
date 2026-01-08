@@ -9,6 +9,7 @@ import {AddExpenseModal} from '@/3-widgets/AddExpenseModal/AddExpenseModal';
 import {useState} from 'react';
 import {AddExpenseRefundModal} from '@/3-widgets/AddExpenseRefundModal/AddExpenseRefundModal';
 import {ExpenseRefundsList} from '@/3-widgets/ExpenseRefundsList/ExpenseRefundsList';
+import {DebtsList} from '@/3-widgets/DebtsList';
 
 export const EventTabs = observer(() => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -44,12 +45,7 @@ export const EventTabs = observer(() => {
         </>
       )}
 
-      {expenseStore.currentTab === 2 &&
-        Object.entries(expenseStore.currentUserDebts).map(([name, debt]) => (
-          <div key={name}>
-            {name}: {debt}
-          </div>
-        ))}
+      {expenseStore.currentTab === 2 && <DebtsList />}
 
       {expenseStore.currentTab === 3 && <ExpenseRefundsList />}
 
