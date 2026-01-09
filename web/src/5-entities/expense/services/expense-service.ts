@@ -11,7 +11,7 @@ import {ExpenseType} from '@/5-entities/expense/constants';
 import {userStore} from '@/5-entities/user/stores/user-store';
 
 export class ExpenseService {
-  async createExpense(data: CreateExpenseForm, id: string) {
+  async createExpense(data: CreateExpenseForm, id: string, pinCode: string) {
     const {amount, splitOption, ...rest} = data;
 
     const body = {
@@ -26,26 +26,26 @@ export class ExpenseService {
               return {...i, amount: Number(i.amount)};
             }),
     };
-    const resp = await createExpenseApi({...body, expenseType: ExpenseType.Expense});
+    const resp = await createExpenseApi({...body, expenseType: ExpenseType.Expense}, pinCode);
 
     expenseStore.setExpenses([...expenseStore.expenses, resp]);
   }
 
-  async fetchExpenses(eventId: string) {
-    const expenses = await getEventExpenses(eventId);
+  async fetchExpenses(eventId: string, pinCode: string) {
+    const expenses = await getEventExpenses(eventId, pinCode);
 
     expenseStore.setExpenses(expenses.filter((e: Expense | ExpenseRefund) => e.expenseType === ExpenseType.Expense));
     expenseStore.setExpenseRefunds(expenses.filter((e: Expense | ExpenseRefund) => e.expenseType === ExpenseType.Refund));
   }
 
-  async createExpenseRefund(expenseRefund: CreateExpenseRefundForm) {
+  async createExpenseRefund(expenseRefund: CreateExpenseRefundForm, pinCode: string) {
     const {userWhoReceiveId, amount, ...rest} = expenseRefund;
 
     const resp = await createExpenseApi({
       ...rest,
       expenseType: ExpenseType.Refund,
       splitInformation: [{userId: userWhoReceiveId, amount}],
-    });
+    }, pinCode);
 
     expenseStore.setExpenseRefunds([...expenseStore.expenseRefunds, resp]);
   }

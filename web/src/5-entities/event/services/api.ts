@@ -10,13 +10,13 @@ export const createEvent = async (event: CreateEvent) => {
   } catch (error) {}
 };
 
-export const getEventInfo = async (eventId: string, queryParams: Record<string, string>) => {
+export const getEventInfo = async (eventId: string, params: {pinCode?: string; token?: string}) => {
   try {
-    const query = new URLSearchParams(queryParams).toString();
-    const fetchUrl = `/user/event/${eventId}?${query}`;
+    const fetchUrl = `/v2/user/event/${eventId}`;
 
     return await httpClient.request(fetchUrl, {
-      method: 'GET',
+      method: 'POST',
+      body: JSON.stringify(params),
     });
   } catch (error) {
     console.error('An error occurred:', error);

@@ -1,6 +1,7 @@
 import {Dialog, DialogContent, DialogTitle} from '@mui/material';
 import {AddExpenseForm} from '@/4-features/CreateExpense/ui/AddExpenseForm';
 import {expenseService} from '@/5-entities/expense/services/expense-service';
+import {eventStore} from '@/5-entities/event/stores/event-store';
 
 interface Props {
   isOpen: boolean;
@@ -16,7 +17,9 @@ export const AddExpenseModal = ({isOpen, setIsOpen}: Props) => {
         <AddExpenseForm
           onSuccess={async (isOpen, d, id) => {
             setIsOpen(isOpen);
-            await expenseService.createExpense(d, id);
+            if (eventStore.currentEvent?.pinCode) {
+              await expenseService.createExpense(d, id, eventStore.currentEvent.pinCode);
+            }
           }}
         />
       </DialogContent>

@@ -12,23 +12,33 @@ import {useSearchParams} from 'react-router-dom';
 import {eventService} from '@/5-entities/event/services/event-service';
 import {currencyService} from '@/5-entities/currency/services/currency-service';
 import {EVENT_PAGE_ONBOARDING_STEPS} from '@/6-shared/constants/onboarding-steps';
+import {eventStore} from '@/5-entities/event/stores/event-store';
 
 export const EventPage = observer(() => {
   const {id} = useParams();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const pinCode = searchParams.get('pinCode');
+  const token = searchParams.get('token');
   const navigatedFromMainForm = location.state === 'navigateFromMainForm';
-  const canOpenPage = id && (pinCode || navigatedFromMainForm);
+  const canOpenPage = id && (token || navigatedFromMainForm);
 
   useEffect(() => {
     if (canOpenPage) {
-      if (!navigatedFromMainForm && pinCode) {
+      if (!navigatedFromMainForm && token) {
         void currencyService.fetchCurrencies();
-        void eventService.getEventInfo(id, {pinCode});
+
+        const params: {pinCode?: string; token?: string} = {};
+
+        if (token) {
+          params.token = token;
+        }
+
+        void eventService.getEventInfo(id, params);
       }
 
-      void expenseService.fetchExpenses(id);
+      if (eventStore.currentEvent?.pinCode) {
+        void expenseService.fetchExpenses(id, eventStore.currentEvent.pinCode);
+      }
     }
   }, []);
 

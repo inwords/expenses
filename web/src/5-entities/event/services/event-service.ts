@@ -4,8 +4,8 @@ import {CreateEvent} from '@/5-entities/event/types/types';
 import {eventStore} from '@/5-entities/event/stores/event-store';
 
 export class EventService {
-  async getEventInfo(eventId: string, queryParams: Record<string, string>) {
-    const resp = await getEventInfoApi(eventId, queryParams);
+  async getEventInfo(eventId: string, params: {pinCode?: string; token?: string}) {
+    const resp = await getEventInfoApi(eventId, params);
 
     userStore.setUsers(resp.users);
     eventStore.setCurrentEvent(resp);

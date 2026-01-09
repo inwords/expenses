@@ -21,17 +21,19 @@ export const DebtsList = observer(() => {
   return (
     <Box display="flex" justifyContent={'center'} padding={'0 10px'}>
       <Stack minWidth={300} maxWidth={540} spacing={2} width="100%">
-        {debts.map(([userName, debtAmount]) => {
-          const creditorUser = userStore.users.find((u) => u.name === userName);
+        {debts.map(([userId, debtAmount]) => {
+          const creditorUser = userStore.users.find((u) => u.id === userId);
+
+          if (!creditorUser) return null;
 
           return (
-            <Card key={userName}>
+            <Card key={userId}>
               <CardContent>
                 <Stack direction="row" spacing={2} alignItems="center">
-                  <Avatar variant="rounded">{userName[0]}</Avatar>
+                  <Avatar variant="rounded">{creditorUser.name[0]}</Avatar>
 
                   <Box flex={1}>
-                    <Typography variant="h6">{userName}</Typography>
+                    <Typography variant="h6">{creditorUser.name}</Typography>
                     <Typography variant="body2" color="text.secondary">
                       Ваша задолженность
                     </Typography>
@@ -48,11 +50,11 @@ export const DebtsList = observer(() => {
                   variant="contained"
                   onClick={() => {
                     expenseStore.setCurrentExpenseRefund({
-                      description: `Возврат долга для ${userName}`,
+                      description: `Возврат долга для ${creditorUser.name}`,
                       amount: debtAmount,
                       userWhoPaidId: userStore.currentUser?.id,
                       currencyId: eventStore.currentEvent?.currencyId,
-                      userWhoReceiveId: creditorUser?.id,
+                      userWhoReceiveId: creditorUser.id,
                     });
                     expenseStore.setIsExpenseRefundModalOpen(true);
                   }}

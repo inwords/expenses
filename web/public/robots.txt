@@ -1,0 +1,10 @@
+# CommonEx robots.txt
+
+User-agent: *
+Allow: /
+
+# Disallow admin or sensitive pages if any
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://commonex.ru/sitemap.xml
