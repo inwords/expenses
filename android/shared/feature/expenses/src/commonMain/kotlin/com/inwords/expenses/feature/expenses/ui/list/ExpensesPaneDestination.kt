@@ -9,6 +9,7 @@ import com.inwords.expenses.core.navigation.NavModule
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.feature.events.api.EventDeletionStateManager
 import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
+import com.inwords.expenses.feature.events.domain.EventsSyncStateHolder
 import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.GetEventsUseCase
 import com.inwords.expenses.feature.events.domain.JoinEventUseCase
@@ -26,6 +27,7 @@ fun getExpensesPaneNavModule(
     getEventsUseCaseLazy: Lazy<GetEventsUseCase>,
     deleteEventUseCaseLazy: Lazy<DeleteEventUseCase>,
     expensesInteractorLazy: Lazy<ExpensesInteractor>,
+    eventsSyncStateHolderLazy: Lazy<EventsSyncStateHolder>,
     joinEventUseCaseLazy: Lazy<JoinEventUseCase>,
     settingsRepositoryLazy: Lazy<SettingsRepository>,
 ): NavModule {
@@ -41,6 +43,7 @@ fun getExpensesPaneNavModule(
                         joinEventUseCase = joinEventUseCaseLazy.value,
                         deleteEventUseCase = deleteEventUseCaseLazy.value,
                         expensesInteractor = expensesInteractorLazy.value,
+                        eventsSyncStateHolder = eventsSyncStateHolderLazy.value,
                         settingsRepository = settingsRepositoryLazy.value,
                     )
                 }

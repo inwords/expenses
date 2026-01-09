@@ -1,7 +1,7 @@
 package com.inwords.expenses.feature.sync.domain
 
-import com.inwords.expenses.core.utils.collectIn
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
+import com.inwords.expenses.feature.events.domain.EventsSyncStateHolder
 import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.model.Person
 import com.inwords.expenses.feature.expenses.domain.ExpensesInteractor
@@ -14,41 +14,52 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.launch
 
 class EventsSyncObserver internal constructor(
     getCurrentEventStateUseCaseLazy: Lazy<GetCurrentEventStateUseCase>,
     expensesInteractorLazy: Lazy<ExpensesInteractor>,
+    eventsSyncStateHolderLazy: Lazy<EventsSyncStateHolder>,
     eventsSyncManagerLazy: Lazy<EventsSyncManager>
 ) {
     private val getCurrentEventStateUseCase by getCurrentEventStateUseCaseLazy
     private val expensesInteractor by expensesInteractorLazy
+    private val eventsSyncStateHolder by eventsSyncStateHolderLazy
     private val eventsSyncManager by eventsSyncManagerLazy
 
     /**
      * Should be called only once per process lifecycle
      */
     fun observeNewEventsIn(scope: CoroutineScope) {
-        merge(
-            getCurrentEventStateUseCase.currentEvent
-                .distinctUntilChanged { old, new ->
-                    old?.event?.id == new?.event?.id &&
-                        old?.persons?.personsToIdsSet() == new?.persons?.personsToIdsSet()
+        scope.launch {
+            merge(
+                getCurrentEventStateUseCase.currentEvent
+                    .distinctUntilChanged { old, new ->
+                        old?.event?.id == new?.event?.id &&
+                            old?.persons?.personsToIdsSet() == new?.persons?.personsToIdsSet()
+                    }
+                    .filterNotNull()
+                    .flatMapLatestNoBuffer { currentEvent ->
+                        expensesInteractor.getExpensesFlow(currentEvent.event.id).map { currentEvent to it }
+                    }
+                    .distinctUntilChanged { old, new ->
+                        old.second.expensesToIdsSet() == new.second.expensesToIdsSet()
+                    }
+                    .map { it.first.event },
+                expensesInteractor.refreshExpenses
+            )
+                .conflate()
+                .collect { event ->
+                    eventsSyncManager.pushAllEventInfo(event.id)
+                    delay(3000) // do not launch sync more often than every 3 seconds
                 }
-                .filterNotNull()
-                .flatMapLatestNoBuffer { currentEvent ->
-                    expensesInteractor.getExpensesFlow(currentEvent.event.id).map { currentEvent to it }
-                }
-                .distinctUntilChanged { old, new ->
-                    old.second.expensesToIdsSet() == new.second.expensesToIdsSet()
-                }
-                .map { it.first.event },
-            expensesInteractor.refreshExpenses
-        )
-            .conflate()
-            .collectIn(scope) { event ->
-                eventsSyncManager.pushAllEventInfo(event.id)
-                delay(3000) // do not launch sync more often than every 3 seconds
+        }
+
+        scope.launch {
+            eventsSyncManager.getSyncState().collect { syncingEvents ->
+                eventsSyncStateHolder.setSyncState(syncingEvents)
             }
+        }
     }
 
     private fun List<Person>.personsToIdsSet(): Set<Long> {

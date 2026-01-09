@@ -11,6 +11,7 @@ import com.inwords.expenses.feature.events.domain.CreateEventUseCase
 import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
 import com.inwords.expenses.feature.events.domain.EventCreationStateHolder
 import com.inwords.expenses.feature.events.domain.EventDeletionStateManagerImpl
+import com.inwords.expenses.feature.events.domain.EventsSyncStateHolder
 import com.inwords.expenses.feature.events.domain.GetCurrenciesUseCase
 import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.GetEventsUseCase
@@ -153,8 +154,12 @@ class EventsComponent internal constructor(
         )
     }
 
-    val eventDeletionStateManager: Lazy<EventDeletionStateManager> = lazy {
+    val eventDeletionStateManagerLazy: Lazy<EventDeletionStateManager> = lazy {
         EventDeletionStateManagerImpl()
+    }
+
+    val eventsSyncStateHolderLazy: Lazy<EventsSyncStateHolder> = lazy {
+        EventsSyncStateHolder()
     }
 
 }

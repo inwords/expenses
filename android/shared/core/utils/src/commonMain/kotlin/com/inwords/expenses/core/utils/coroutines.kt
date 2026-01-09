@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.experimental.ExperimentalTypeInference
@@ -22,6 +23,7 @@ import kotlin.time.Duration
 val UI = Dispatchers.Main.immediate
 val DF = Dispatchers.Default
 val IO = Dispatchers.IO
+val UNCONFINED = Dispatchers.Unconfined
 
 fun <T> Flow<T>.collectIn(
     scope: CoroutineScope,
@@ -56,6 +58,22 @@ fun <T> Flow<T>.stateInWhileSubscribed(
             replayExpirationMillis = replayExpirationMillis
         ),
         initialValue = initialValue,
+    )
+}
+
+fun <T> Flow<T>.shareInWhileSubscribed(
+    scope: CoroutineScope,
+    replay: Int = 0,
+    stopTimeoutMillis: Long = 1500L,
+    replayExpirationMillis: Long = 1500L,
+): Flow<T> {
+    return this.shareIn(
+        scope = scope,
+        started = SharingStarted.WhileSubscribed(
+            stopTimeoutMillis = stopTimeoutMillis,
+            replayExpirationMillis = replayExpirationMillis
+        ),
+        replay = replay,
     )
 }
 

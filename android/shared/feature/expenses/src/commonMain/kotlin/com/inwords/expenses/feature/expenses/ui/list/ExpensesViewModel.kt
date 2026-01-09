@@ -5,13 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.core.utils.IO
+import com.inwords.expenses.core.utils.UNCONFINED
 import com.inwords.expenses.core.utils.asImmutableListAdapter
 import com.inwords.expenses.core.utils.debounceAfterInitial
 import com.inwords.expenses.core.utils.flatMapLatestNoBuffer
+import com.inwords.expenses.core.utils.shareInWhileSubscribed
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.feature.events.api.EventDeletionStateManager
 import com.inwords.expenses.feature.events.api.EventDeletionStateManager.EventDeletionState
 import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
+import com.inwords.expenses.feature.events.domain.EventsSyncStateHolder
 import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.GetEventsUseCase
 import com.inwords.expenses.feature.events.domain.JoinEventUseCase
@@ -34,7 +37,9 @@ import com.inwords.expenses.feature.expenses.ui.utils.toRoundedString
 import com.inwords.expenses.feature.menu.ui.MenuDialogDestination
 import com.inwords.expenses.feature.settings.api.SettingsRepository
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
@@ -44,7 +49,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import kotlin.time.Duration.Companion.milliseconds
 
 internal class ExpensesViewModel(
@@ -55,7 +62,9 @@ internal class ExpensesViewModel(
     private val joinEventUseCase: JoinEventUseCase,
     private val deleteEventUseCase: DeleteEventUseCase,
     private val expensesInteractor: ExpensesInteractor,
+    eventsSyncStateHolder: EventsSyncStateHolder,
     settingsRepository: SettingsRepository,
+    unconfinedDispatcher: CoroutineDispatcher = UNCONFINED,
     viewModelScope: CoroutineScope = CoroutineScope(SupervisorJob() + IO),
 ) : ViewModel(viewModelScope = viewModelScope) {
 
@@ -63,7 +72,7 @@ internal class ExpensesViewModel(
     private var joinEventJob: Job? = null
     private var recentlyRemovedEventJob: Job? = null
 
-    private val isRefreshing = MutableStateFlow(false)
+    private val pullToRefreshStateManager = PullToRefreshStateManager(eventsSyncStateHolder)
     private val recentlyRemovedEventName = MutableStateFlow<String?>(null)
 
     private val localEventsState = flow<SimpleScreenState<ExpensesPaneUiModel>> {
@@ -98,17 +107,29 @@ internal class ExpensesViewModel(
         }.let { emitAll(it) }
     }
 
+    private val expensesDetailsFlow = getCurrentEventStateUseCase.currentEvent
+        .flatMapLatestNoBuffer { currentEvent ->
+            if (currentEvent == null) {
+                flowOf(null)
+            } else {
+                expensesInteractor.getExpensesDetails(currentEvent)
+                    .debounceAfterInitial(500.milliseconds)
+            }
+        }
+
+    private val isRefreshingFlow = getCurrentEventStateUseCase.currentEvent
+        .flatMapLatestNoBuffer { currentEvent ->
+            if (currentEvent == null) {
+                flowOf(false)
+            } else {
+                pullToRefreshStateManager.isEventRefreshing(currentEvent.event.id)
+            }
+        }
+        .shareInWhileSubscribed(scope = viewModelScope + unconfinedDispatcher, replay = 1)
+
     val state: StateFlow<SimpleScreenState<ExpensesPaneUiModel>> = combine(
-        getCurrentEventStateUseCase.currentEvent
-            .flatMapLatestNoBuffer { currentEvent ->
-                if (currentEvent == null) {
-                    flowOf(null)
-                } else {
-                    expensesInteractor.getExpensesDetails(currentEvent)
-                        .debounceAfterInitial(500.milliseconds)
-                }
-            },
-        settingsRepository.getCurrentPersonId()
+        expensesDetailsFlow,
+        settingsRepository.getCurrentPersonId(),
     ) { expensesDetails, currentPersonId ->
         expensesDetails to currentPersonId
     }.flatMapLatestNoBuffer { (expensesDetails, currentPersonId) ->
@@ -141,15 +162,21 @@ internal class ExpensesViewModel(
                     expenses = expensesDetails.expenses.map { expense ->
                         expense.toUiModel(primaryCurrencyName = expensesDetails.event.primaryCurrency.name)
                     }.asImmutableListAdapter(),
-                    isRefreshing = false // TODO costyl
+                    isRefreshing = false // will be updated later by combining with isRefreshingFlow
                 )
             )
         )
     }
-        .combine(isRefreshing) { state, isRefreshing ->
+        .flowOn(viewModelScope.coroutineContext[CoroutineDispatcher] ?: IO)
+        .combine(isRefreshingFlow) { state, isRefreshing ->
             if (state is SimpleScreenState.Success) {
                 when (val data = state.data) {
-                    is ExpensesPaneUiModel.Expenses -> state.copy(data = data.copy(isRefreshing = isRefreshing))
+                    is ExpensesPaneUiModel.Expenses -> if (data.isRefreshing == isRefreshing) {
+                        state
+                    } else {
+                        state.copy(data = data.copy(isRefreshing = isRefreshing))
+                    }
+
                     is LocalEvents -> state
                 }
             } else {
@@ -157,9 +184,9 @@ internal class ExpensesViewModel(
             }
         }
         .stateInWhileSubscribed(
-            scope = viewModelScope,
+            scope = viewModelScope + unconfinedDispatcher,
             initialValue = SimpleScreenState.Loading,
-            replayExpirationMillis = 3000,
+            replayExpirationMillis = 1500L,
         )
 
     fun onMenuClick() {
@@ -213,12 +240,10 @@ internal class ExpensesViewModel(
     fun onRefresh() {
         val event = getCurrentEventStateUseCase.currentEvent.value?.event ?: return
 
+        pullToRefreshStateManager.onUserTriggeredRefresh(viewModelScope)
         refreshJob?.cancel()
-        refreshJob = viewModelScope.launch {
-            isRefreshing.value = true
-            expensesInteractor.onRefreshExpensesAsync(event)
-            delay(3000)
-            isRefreshing.value = false
+        refreshJob = viewModelScope.launch(start = CoroutineStart.UNDISPATCHED) {
+            expensesInteractor.enqueueAsyncExpensesRefresh(event)
         }
     }
 

@@ -12,6 +12,7 @@ import com.inwords.expenses.feature.events.api.EventsComponentFactory
 import com.inwords.expenses.feature.events.data.db.dao.CurrenciesDao
 import com.inwords.expenses.feature.events.data.db.dao.EventsDao
 import com.inwords.expenses.feature.events.data.db.dao.PersonsDao
+import com.inwords.expenses.feature.events.domain.EventsSyncStateHolder
 import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.store.local.CurrenciesLocalStore
 import com.inwords.expenses.feature.events.domain.store.local.EventsLocalStore
@@ -129,6 +130,8 @@ fun registerComponents(appContext: Context) {
                     get() = eventsComponent.value.getCurrentEventStateUseCaseLazy
                 override val expensesInteractorLazy: Lazy<ExpensesInteractor>
                     get() = expensesComponent.value.expensesInteractorLazy
+                override val eventsSyncStateHolderLazy: Lazy<EventsSyncStateHolder>
+                    get() = eventsComponent.value.eventsSyncStateHolderLazy
 
             }
         ).create()

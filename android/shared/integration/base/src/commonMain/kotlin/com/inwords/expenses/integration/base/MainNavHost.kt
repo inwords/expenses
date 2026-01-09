@@ -64,7 +64,7 @@ fun MainNavHost(
             ),
             getDeleteEventDialogNavModule(
                 navigationController = navigationController,
-                eventDeletionStateManagerLazy = eventsComponent.eventDeletionStateManager,
+                eventDeletionStateManagerLazy = eventsComponent.eventDeletionStateManagerLazy,
                 deleteEventUseCaseLazy = eventsComponent.deleteEventUseCaseLazy,
             ),
             getAddPersonsPaneNavModule(
@@ -89,10 +89,11 @@ fun MainNavHost(
             getExpensesPaneNavModule(
                 navigationController = navigationController,
                 getCurrentEventStateUseCaseLazy = eventsComponent.getCurrentEventStateUseCaseLazy,
-                eventDeletionStateManagerLazy = eventsComponent.eventDeletionStateManager,
+                eventDeletionStateManagerLazy = eventsComponent.eventDeletionStateManagerLazy,
                 getEventsUseCaseLazy = eventsComponent.getEventsUseCaseLazy,
                 deleteEventUseCaseLazy = eventsComponent.deleteEventUseCaseLazy,
                 expensesInteractorLazy = expensesComponent.expensesInteractorLazy,
+                eventsSyncStateHolderLazy = eventsComponent.eventsSyncStateHolderLazy,
                 joinEventUseCaseLazy = eventsComponent.joinEventUseCaseLazy,
                 settingsRepositoryLazy = settingsComponent.settingsRepositoryLazy,
             ),
