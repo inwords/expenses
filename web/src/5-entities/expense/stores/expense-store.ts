@@ -41,11 +41,8 @@ export class ExpenseStore {
   get currentUserDebts() {
     const debts = this.expenses.reduce<Record<string, number>>((prev, curr) => {
       if (curr.userWhoPaidId !== userStore.currentUser?.id) {
-
-        const userName = userStore.usersDictIdToName[curr.userWhoPaidId];
-
-        prev[userName] =
-          (prev[userName] || 0) +
+        prev[curr.userWhoPaidId] =
+          (prev[curr.userWhoPaidId] || 0) +
           curr.splitInformation.reduce((pre, cur) => {
             if (cur.userId === userStore.currentUser?.id) {
               pre += cur.exchangedAmount;
@@ -61,10 +58,8 @@ export class ExpenseStore {
     this.expenseRefunds.forEach((r) => {
       if (userStore.currentUser?.id === r.userWhoPaidId) {
         r.splitInformation.forEach((i) => {
-          const userName = userStore.usersDictIdToName[i.userId];
-
-          if (debts[userName]) {
-            debts[userName] -= i.exchangedAmount;
+          if (debts[i.userId]) {
+            debts[i.userId] -= i.exchangedAmount;
           }
         });
       }

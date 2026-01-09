@@ -12,6 +12,7 @@ import {SelectExpenseRefundOwner} from '@/4-features/AddExpenseRefund/ui/SelectE
 import {SelectExpenseRefundReceiver} from '@/4-features/AddExpenseRefund/ui/SelectExpenseRefundReceiver';
 import {expenseStore} from '@/5-entities/expense/stores/expense-store';
 import {expenseService} from '@/5-entities/expense/services/expense-service';
+import {eventStore} from '@/5-entities/event/stores/event-store';
 
 export const AddExpenseFormRefund = observer(() => {
   const {id} = useParams();
@@ -23,9 +24,9 @@ export const AddExpenseFormRefund = observer(() => {
   return (
     <FormContainer
       onSuccess={async (d) => {
-        if (id) {
+        if (id && eventStore.currentEvent?.pinCode) {
           expenseStore.setIsExpenseRefundModalOpen(false);
-          await expenseService.createExpenseRefund({...d, eventId: id});
+          await expenseService.createExpenseRefund({...d, eventId: id}, eventStore.currentEvent.pinCode);
         }
       }}
       defaultValues={initialValues}
