@@ -1,5 +1,6 @@
 package com.inwords.expenses.feature.expenses.ui.list
 
+import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,13 +31,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontStyle
@@ -143,9 +145,19 @@ private fun ExpensesPaneSuccess(
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
+            val collapsedFraction = scrollBehavior.state.collapsedFraction
+            val fadeStart = 0.8f
+            val fadeProgress = ((collapsedFraction - fadeStart) / (1f - fadeStart)).coerceIn(0f, 1f)
+            val easedProgress = FastOutLinearInEasing.transform(fadeProgress)
+            val appBarContainerColor = MaterialTheme.colorScheme.surface.copy(
+                alpha = 1f - easedProgress
+            )
             TopAppBar(
                 title = {
                     Box(
@@ -172,7 +184,12 @@ private fun ExpensesPaneSuccess(
                             )
                         }
                     }
-                }
+                },
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = appBarContainerColor,
+                    scrolledContainerColor = appBarContainerColor,
+                )
             )
         },
         floatingActionButton = {
@@ -183,8 +200,9 @@ private fun ExpensesPaneSuccess(
             )
         }
     ) { paddingValues ->
-        val topAndHorizontalPaddings = PaddingValues(
-            top = paddingValues.calculateTopPadding(),
+        val topPadding = paddingValues.calculateTopPadding()
+        val bottomPadding = paddingValues.calculateBottomPadding()
+        val horizontalPaddings = PaddingValues(
             start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
             end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
         )
@@ -193,64 +211,70 @@ private fun ExpensesPaneSuccess(
         PullToRefreshBox(
             modifier = Modifier
                 .fillMaxSize()
-                .consumeWindowInsets(topAndHorizontalPaddings)
-                .padding(topAndHorizontalPaddings),
+                .consumeWindowInsets(horizontalPaddings)
+                .padding(horizontalPaddings),
             state = pullToRefreshState,
             isRefreshing = state.isRefreshing,
             indicator = {
                 PullToRefreshDefaults.LoadingIndicator(
-                    modifier = Modifier.align(Alignment.TopCenter),
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = topPadding),
                     isRefreshing = state.isRefreshing,
                     state = pullToRefreshState,
                 )
             },
             onRefresh = onRefresh,
         ) {
-            Column(
+            val listState = rememberLazyListState()
+            LazyColumn(
                 modifier = modifier
                     .fillMaxSize()
+                    .consumeWindowInsets(PaddingValues(bottom = bottomPadding)),
+                state = listState,
+                contentPadding = PaddingValues(
+                    top = topPadding,
+                    bottom = 88.dp + bottomPadding,
+                ),
             ) {
-                EventInfoBlock(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    eventName = state.eventName,
-                    currentPersonName = state.currentPersonName
-                )
-
-                DebtsBlock(onDebtsDetailsClick, state, onReplenishmentClick)
-
-                Text(
-                    modifier = Modifier.padding(start = 16.dp, top = 24.dp, end = 16.dp, bottom = 4.dp),
-                    text = stringResource(Res.string.expenses_operations),
-                    style = MaterialTheme.typography.headlineMedium
-                )
-
-                val listState = rememberLazyListState()
-                LaunchedEffect(state.expenses.size) {
-                    if (state.expenses.isNotEmpty()) {
-                        listState.animateScrollToItem(0)
-                    }
+                item {
+                    EventInfoBlock(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        eventName = state.eventName,
+                        currentPersonName = state.currentPersonName
+                    )
                 }
 
-                val bottomPadding = paddingValues.calculateBottomPadding()
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .consumeWindowInsets(PaddingValues(bottom = bottomPadding))
-                        .padding(horizontal = 8.dp),
-                    state = listState,
-                    contentPadding = PaddingValues(bottom = 88.dp + bottomPadding),
-                ) {
-                    items(
-                        count = state.expenses.size,
-                        key = { index ->
-                            state.expenses[state.expenses.lastIndex - index].expenseId
-                        }
-                    ) { index ->
-                        val expense = state.expenses[state.expenses.lastIndex - index]
-                        ExpenseItem(expense, onRevertExpenseClick)
+                item {
+                    DebtsBlock(
+                        onDebtsDetailsClick = onDebtsDetailsClick,
+                        state = state,
+                        onReplenishmentClick = onReplenishmentClick,
+                    )
+                }
+
+                item {
+                    Text(
+                        modifier = Modifier.padding(start = 16.dp, top = 24.dp, end = 16.dp, bottom = 4.dp),
+                        text = stringResource(Res.string.expenses_operations),
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                }
+
+                items(
+                    count = state.expenses.size,
+                    key = { index ->
+                        state.expenses[state.expenses.lastIndex - index].expenseId
                     }
+                ) { index ->
+                    val expense = state.expenses[state.expenses.lastIndex - index]
+                    ExpenseItem(
+                        expense = expense,
+                        onRevertExpenseClick = onRevertExpenseClick,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
                 }
             }
         }
