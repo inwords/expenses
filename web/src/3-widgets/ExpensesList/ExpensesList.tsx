@@ -22,6 +22,17 @@ export const ExpensesList = observer(() => {
     <Box display="flex" justifyContent={'center'} padding={'0 10px'}>
       <Stack minWidth={300} maxWidth={540} spacing={2} width="100%">
         {getExpenses().map((e) => {
+          const currentUserDebt = e.splitInformation.reduce((prev, curr) => {
+            if (curr.userId === userStore.currentUser?.id) {
+              prev += +curr.exchangedAmount;
+            }
+
+            return prev;
+          }, 0);
+
+          const shouldShowReturnButton =
+            userStore.currentUser?.id !== e.userWhoPaidId && currentUserDebt > 0;
+
           return (
             <Card key={e.id}>
               <CardContent>
@@ -39,19 +50,13 @@ export const ExpensesList = observer(() => {
               </CardContent>
 
               <CardActions>
-                {userStore.currentUser?.id !== e.userWhoPaidId && (
+                {shouldShowReturnButton && (
                   <Button
                     variant="contained"
                     onClick={() => {
                       expenseStore.setCurrentExpenseRefund({
                         description: `Возврат за ${e.description}`,
-                        amount: e.splitInformation.reduce((prev, curr) => {
-                          if (curr.userId === userStore.currentUser?.id) {
-                            prev += +curr.exchangedAmount;
-                          }
-
-                          return prev;
-                        }, 0),
+                        amount: currentUserDebt,
                         userWhoPaidId: userStore.currentUser?.id,
                         currencyId: eventStore.currentEvent?.currencyId,
                         userWhoReceiveId: e.userWhoPaidId,

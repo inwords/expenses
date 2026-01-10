@@ -3,7 +3,6 @@ import {ExpensesList} from '@/3-widgets/ExpensesList/ExpensesList';
 import {expenseStore} from '@/5-entities/expense/stores/expense-store';
 import {expenseService} from '@/5-entities/expense/services/expense-service';
 import {observer} from 'mobx-react-lite';
-import {EventUsers} from '@/3-widgets/EventUsers/EventUsers';
 import {CreateExpense} from '@/4-features/CreateExpense/ui/CreateExpense';
 import {AddExpenseModal} from '@/3-widgets/AddExpenseModal/AddExpenseModal';
 import {useState} from 'react';
@@ -32,8 +31,6 @@ export const EventTabs = observer(() => {
           <Tab label="Мои задолжности" value={2} />
 
           <Tab label="Мои поступления" value={3} />
-
-          <Tab label="Участники поездки" value={4} />
         </Tabs>
       </Box>
 
@@ -49,7 +46,7 @@ export const EventTabs = observer(() => {
 
       {expenseStore.currentTab === 3 && <ExpenseRefundsList />}
 
-      {expenseStore.currentTab === 4 ? <EventUsers /> : <ExpensesList />}
+      <ExpensesList />
 
       <AddExpenseRefundModal />
     </>
