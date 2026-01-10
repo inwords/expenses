@@ -36,7 +36,7 @@ export const metadata: Metadata = {
       'Удобный сервис для учёта общих расходов в поездках и мероприятиях. Создавайте события, добавляйте участников и отслеживайте, кто кому должен.',
     images: [
       {
-        url: 'http://commonex.ru/og-image.png',
+        url: 'https://commonex.ru/og-image.png',
         width: 1200,
         height: 630,
         alt: 'CommonEx - Учёт общих расходов',

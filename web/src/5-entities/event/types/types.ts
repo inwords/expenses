@@ -9,3 +9,8 @@ export interface Event {
 }
 
 export type CreateEvent = Omit<Event, 'id' | 'users'> & {users: Array<Omit<User, 'id'>>};
+
+export interface CreateEventShareTokenResponse {
+  token: string;
+  expiresAt: string;
+}
