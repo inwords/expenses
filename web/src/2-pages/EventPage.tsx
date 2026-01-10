@@ -33,11 +33,19 @@ export const EventPage = observer(() => {
           params.token = token;
         }
 
-        void eventService.getEventInfo(id, params);
-      }
+        const fn = async () => {
+          await eventService.getEventInfo(id, params);
 
-      if (eventStore.currentEvent?.pinCode) {
-        void expenseService.fetchExpenses(id, eventStore.currentEvent.pinCode);
+          if (eventStore.currentEvent?.pinCode) {
+            void expenseService.fetchExpenses(id, eventStore.currentEvent.pinCode);
+          }
+        }
+
+        void fn();
+      } else {
+        if (eventStore.currentEvent?.pinCode) {
+          void expenseService.fetchExpenses(id, eventStore.currentEvent.pinCode);
+        }
       }
     }
   }, []);
