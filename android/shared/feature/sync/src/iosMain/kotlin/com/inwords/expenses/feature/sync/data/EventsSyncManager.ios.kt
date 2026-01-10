@@ -12,6 +12,9 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 
@@ -30,12 +33,16 @@ actual class EventsSyncManager internal constructor() {
 
     private val jobs = hashMapOf<Long, Job>()
 
+    private val syncingEvents = MutableStateFlow<Set<Long>>(emptySet())
+
     internal actual fun pushAllEventInfo(eventId: Long) {
         scope.launch {
             lock.withLock {
                 if (jobs[eventId]?.isActive == true) return@launch
 
                 val newJob = launch {
+                    setSyncing(eventId, true)
+
                     val currenciesResult = eventsComponent.currenciesPullTask.value.pullCurrencies()
                     if (currenciesResult !is IoResult.Success) return@launch
 
@@ -62,6 +69,7 @@ actual class EventsSyncManager internal constructor() {
                     lock.withLock {
                         if (jobs[eventId] == newJob) {
                             jobs.remove(eventId)
+                            setSyncing(eventId, false)
                         }
                     }
                 }
@@ -70,9 +78,31 @@ actual class EventsSyncManager internal constructor() {
     }
 
     actual suspend fun cancelEventSync(eventId: Long) {
-        lock.withLock {
+        val job = lock.withLock {
             jobs.remove(eventId)
-        }?.cancelAndJoin()
+        }
+        job?.cancelAndJoin()
+        if (job != null) {
+            lock.withLock {
+                if (eventId !in jobs) {
+                    setSyncing(eventId, false)
+                }
+            }
+        }
+    }
+
+    internal actual fun getSyncState(): Flow<Set<Long>> {
+        return syncingEvents
+    }
+
+    private fun setSyncing(eventId: Long, isSyncing: Boolean) {
+        syncingEvents.update { events ->
+            if (isSyncing) {
+                events + eventId
+            } else {
+                events - eventId
+            }
+        }
     }
 
 }

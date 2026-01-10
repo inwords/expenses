@@ -6,7 +6,10 @@ import androidx.work.WorkManager
 import com.inwords.expenses.core.utils.IO
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.sync.Mutex
@@ -52,6 +55,22 @@ actual class EventsSyncManager internal constructor(
                 workManager.cancelAllWorkByTag(getTagForEvent(eventId)).result.await()
             }
         }
+    }
+
+    internal actual fun getSyncState(): Flow<Set<Long>> {
+        val eventTagPrefix = "$EVENTS_SYNC_WORKER_GROUP:"
+        return WorkManager.getInstance(context)
+            .getWorkInfosByTagFlow(EVENTS_SYNC_WORKER_GROUP)
+            .map { workInfos ->
+                workInfos.asSequence()
+                    .filter { !it.state.isFinished }
+                    .mapNotNullTo(HashSet()) { workInfo ->
+                        workInfo.tags.firstOrNull { tag -> tag.startsWith(eventTagPrefix) }
+                            ?.removePrefix(eventTagPrefix)
+                            ?.toLongOrNull()
+                    }
+            }
+            .distinctUntilChanged()
     }
 
 }

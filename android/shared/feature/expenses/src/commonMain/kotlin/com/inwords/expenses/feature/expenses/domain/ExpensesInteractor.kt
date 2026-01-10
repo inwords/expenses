@@ -158,7 +158,7 @@ class ExpensesInteractor internal constructor(
         expensesLocalStore.upsert(event, revertedExpense)
     }
 
-    internal suspend fun onRefreshExpensesAsync(event: Event) {
+    internal suspend fun enqueueAsyncExpensesRefresh(event: Event) {
         _refreshExpenses.emit(event)
     }
 

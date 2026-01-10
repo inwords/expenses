@@ -196,7 +196,7 @@ internal fun getTagForEvent(eventId: Long): String {
     return "$EVENTS_SYNC_WORKER_GROUP:$eventId"
 }
 
-private const val EVENTS_SYNC_WORKER_GROUP = "events_sync"
+internal const val EVENTS_SYNC_WORKER_GROUP = "events_sync"
 
 private const val KEY_EVENT_ID = "EVENT_ID"
 
@@ -231,4 +231,5 @@ private fun <B : WorkRequest.Builder<B, *>, W : WorkRequest> WorkRequest.Builder
     return setConstraints(Constraints(requiredNetworkType = NetworkType.CONNECTED))
         .setBackoffCriteria(BackoffPolicy.LINEAR, MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
         .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+        .addTag(EVENTS_SYNC_WORKER_GROUP)
 }

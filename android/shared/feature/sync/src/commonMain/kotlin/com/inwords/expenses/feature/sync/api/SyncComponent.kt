@@ -18,6 +18,7 @@ class SyncComponent internal constructor(
         EventsSyncObserver(
             getCurrentEventStateUseCaseLazy = deps.getCurrentEventStateUseCaseLazy,
             expensesInteractorLazy = deps.expensesInteractorLazy,
+            eventsSyncStateHolderLazy = deps.eventsSyncStateHolderLazy,
             eventsSyncManagerLazy = eventsSyncManagerLazy
         )
     }

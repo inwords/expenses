@@ -6,6 +6,7 @@ import com.inwords.expenses.core.ui.utils.SimpleScreenState
 import com.inwords.expenses.feature.events.api.EventDeletionStateManager
 import com.inwords.expenses.feature.events.api.EventDeletionStateManager.EventDeletionState
 import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
+import com.inwords.expenses.feature.events.domain.EventsSyncStateHolder
 import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.GetEventsUseCase
 import com.inwords.expenses.feature.events.domain.JoinEventUseCase
@@ -108,6 +109,9 @@ internal class ExpensesViewModelDeletionTest {
     private val joinEventUseCase = mockk<JoinEventUseCase>(relaxed = true)
     private val deleteEventUseCase = mockk<DeleteEventUseCase>(relaxed = true)
     private val expensesInteractor = mockk<ExpensesInteractor>(relaxed = true)
+    private val eventsSyncStateHolder = mockk<EventsSyncStateHolder>(relaxed = true) {
+        every { getStateFor(any()) } returns MutableStateFlow(false)
+    }
     private val settingsRepository = mockk<SettingsRepository>(relaxed = true) {
         coEvery { getCurrentPersonId() } returns currentPersonIdFlow
     }
@@ -343,7 +347,9 @@ internal class ExpensesViewModelDeletionTest {
             joinEventUseCase = joinEventUseCase,
             deleteEventUseCase = deleteEventUseCase,
             expensesInteractor = expensesInteractor,
+            eventsSyncStateHolder = eventsSyncStateHolder,
             settingsRepository = settingsRepository,
+            unconfinedDispatcher = testDispatcher,
             viewModelScope = this.testScope.backgroundScope,
         )
     }
