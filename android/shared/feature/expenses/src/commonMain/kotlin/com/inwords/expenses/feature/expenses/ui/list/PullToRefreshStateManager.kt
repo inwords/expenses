@@ -9,11 +9,16 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.concurrent.atomics.AtomicReference
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -23,30 +28,46 @@ internal class PullToRefreshStateManager(
     private val eventsSyncStateHolder: EventsSyncStateHolder
 ) {
 
-    private val userTriggeredRefresh = MutableStateFlow(false)
+    private val userTriggeredRefreshEventId = MutableStateFlow<Long?>(null)
 
     private val job = AtomicReference<Job?>(null)
 
-    @OptIn(FlowPreview::class)
     fun isEventRefreshing(eventId: Long): Flow<Boolean> {
-        val syncState = eventsSyncStateHolder.getStateFor(eventId)
-            .debounce { isSyncing -> if (isSyncing) Duration.ZERO else 500.milliseconds }
+        return userTriggeredRefreshEventId
+            .map { it == eventId }
+            .distinctUntilChanged()
+    }
 
-        return combine(
-            syncState,
-            userTriggeredRefresh
-        ) { isSyncing, isUserTriggered ->
-            isSyncing || isUserTriggered
+    @OptIn(FlowPreview::class)
+    fun onUserTriggeredRefresh(scope: CoroutineScope, eventId: Long) {
+        scope.launch(start = CoroutineStart.UNDISPATCHED) {
+            userTriggeredRefreshEventId.value = eventId
+            job.exchange(coroutineContext[Job])?.cancelAndJoin()
+            userTriggeredRefreshEventId.value = eventId // in case it was reset while waiting for cancellation
+
+            val startedAt = Clock.System.now()
+
+            val syncState = eventsSyncStateHolder.getStateFor(eventId)
+                .debounce { isSyncing -> if (isSyncing) Duration.ZERO else 500.milliseconds }
+
+            val started = withTimeoutOrNull(MIN_REFRESH_DISPLAY_TIME) {
+                syncState.firstOrNull { it }
+            } != null
+
+            if (started) {
+                withTimeoutOrNull(10.seconds) {
+                    syncState.first { !it }
+                }
+            }
+
+            delay(MIN_REFRESH_DISPLAY_TIME - (Clock.System.now() - startedAt))
+
+            userTriggeredRefreshEventId.value = null
         }
     }
 
-    fun onUserTriggeredRefresh(scope: CoroutineScope) {
-        scope.launch(start = CoroutineStart.UNDISPATCHED) {
-            userTriggeredRefresh.value = true
-            job.exchange(coroutineContext[Job])?.cancelAndJoin()
-            userTriggeredRefresh.value = true // in case it was reset while waiting for cancellation
-            delay(1.5.seconds)
-            userTriggeredRefresh.value = false
-        }
+    private companion object {
+
+        private val MIN_REFRESH_DISPLAY_TIME = 1500.milliseconds
     }
 }
