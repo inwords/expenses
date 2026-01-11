@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -38,6 +39,7 @@ import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class ExpensesViewModelRefreshTest {
@@ -134,7 +136,8 @@ internal class ExpensesViewModelRefreshTest {
             val initialData = initialState.data as Expenses
             assertFalse(initialData.isRefreshing)
 
-            eventSyncStateFlow.value = true
+            // Trigger user refresh - this sets isRefreshing to true immediately
+            viewModel.onRefresh()
             advanceUntilIdle()
 
             val refreshingState = awaitItem()
@@ -142,7 +145,16 @@ internal class ExpensesViewModelRefreshTest {
             val refreshingData = refreshingState.data as Expenses
             assertTrue(refreshingData.isRefreshing)
 
+            // Set sync state to true - this should be detected by the refresh lifecycle
+            // (debounce is 0ms when syncing, so it's detected immediately)
+            eventSyncStateFlow.value = true
+            advanceUntilIdle()
+
+            // Set sync state to false - this triggers a 500ms debounce before the refresh lifecycle detects it
             eventSyncStateFlow.value = false
+            // Advance time to pass the debounce (500ms) and minimum display time (1500ms)
+            // The delay in onUserTriggeredRefresh ensures minimum display time is met
+            advanceTimeBy(2100.milliseconds)
             advanceUntilIdle()
 
             val stoppedState = awaitItem()
