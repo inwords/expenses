@@ -240,7 +240,7 @@ internal class ExpensesViewModel(
     fun onRefresh() {
         val event = getCurrentEventStateUseCase.currentEvent.value?.event ?: return
 
-        pullToRefreshStateManager.onUserTriggeredRefresh(viewModelScope)
+        pullToRefreshStateManager.onUserTriggeredRefresh(viewModelScope, event.id)
         refreshJob?.cancel()
         refreshJob = viewModelScope.launch(start = CoroutineStart.UNDISPATCHED) {
             expensesInteractor.enqueueAsyncExpensesRefresh(event)
