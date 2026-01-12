@@ -11,7 +11,10 @@ plugins {
 kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_11)
-        freeCompilerArgs.add("-Xdata-flow-based-exhaustiveness")
+        freeCompilerArgs.addAll(
+            "-Xdata-flow-based-exhaustiveness",
+            "-Xreturn-value-checker=check"
+        )
         extraWarnings.set(true)
     }
 }

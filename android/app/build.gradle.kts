@@ -14,8 +14,11 @@ kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_11)
 
-        freeCompilerArgs.add("-Xcontext-parameters")
-        freeCompilerArgs.add("-Xdata-flow-based-exhaustiveness")
+        freeCompilerArgs.addAll(
+            "-Xcontext-parameters",
+            "-Xdata-flow-based-exhaustiveness",
+            "-Xreturn-value-checker=check"
+        )
         extraWarnings.set(true)
     }
 }

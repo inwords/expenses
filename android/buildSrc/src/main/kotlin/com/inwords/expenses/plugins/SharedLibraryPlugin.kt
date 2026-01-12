@@ -33,6 +33,12 @@ class SharedLibraryPlugin : Plugin<Project> {
             }
         }
 
-        kotlin.compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+        kotlin.compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+            freeCompilerArgs.addAll(
+                "-Xdata-flow-based-exhaustiveness",
+                "-Xreturn-value-checker=check"
+            )
+        }
     }
 }
