@@ -44,7 +44,6 @@ class SharedKmmLibraryPlugin : Plugin<Project> {
 
         fun KotlinMultiplatformExtension.applyKmmDefaults(iosBaseName: String) {
             listOf(
-                iosX64(),
                 iosArm64(),
                 iosSimulatorArm64()
             ).forEach {
@@ -56,7 +55,6 @@ class SharedKmmLibraryPlugin : Plugin<Project> {
 
             sourceSets.apply {
                 iosArm64()
-                iosX64()
                 iosSimulatorArm64()
             }
         }
