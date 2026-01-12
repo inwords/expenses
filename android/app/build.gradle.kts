@@ -17,7 +17,8 @@ kotlin {
         freeCompilerArgs.addAll(
             "-Xcontext-parameters",
             "-Xdata-flow-based-exhaustiveness",
-            "-Xreturn-value-checker=check"
+            "-Xreturn-value-checker=check",
+            "-Xexplicit-backing-fields",
         )
         extraWarnings.set(true)
     }

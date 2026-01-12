@@ -37,7 +37,8 @@ class SharedKmmLibraryPlugin : Plugin<Project> {
                 extraWarnings.set(true)
                 freeCompilerArgs.addAll(
                     "-Xdata-flow-based-exhaustiveness",
-                    "-Xreturn-value-checker=check"
+                    "-Xreturn-value-checker=check",
+                    "-Xexplicit-backing-fields",
                 )
             }
         }

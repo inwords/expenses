@@ -40,8 +40,8 @@ internal class JoinEventViewModel(
         eventAccessCode = initialPinCode.filteredPinCode(),
         joining = EventJoiningState.None,
     )
-    private val _state = MutableStateFlow(initialState)
-    val state: StateFlow<JoinEventPaneUiModel> = _state
+    val state: StateFlow<JoinEventPaneUiModel>
+        field = MutableStateFlow(initialState)
 
     init {
         if (initialState.eventId.isNotBlank() && initialState.eventAccessCode.isNotBlank()) {
@@ -50,13 +50,13 @@ internal class JoinEventViewModel(
     }
 
     fun onEventIdChanged(eventId: String) {
-        _state.update { value ->
+        state.update { value ->
             value.copy(eventId = eventId.filteredEventId(), joining = EventJoiningState.None)
         }
     }
 
     fun onEventAccessCodeChanged(eventAccessCode: String) {
-        _state.update { value ->
+        state.update { value ->
             value.copy(eventAccessCode = eventAccessCode.filteredPinCode(), joining = EventJoiningState.None)
         }
     }
@@ -64,7 +64,7 @@ internal class JoinEventViewModel(
     fun onConfirmClicked() {
         confirmJob?.cancel()
 
-        val state = _state.updateAndGet { currentState ->
+        val state = state.updateAndGet { currentState ->
             currentState.copy(joining = EventJoiningState.Joining)
         }
         confirmJob = viewModelScope.launch {
@@ -85,7 +85,7 @@ internal class JoinEventViewModel(
 
                         JoinEventResult.Error.OtherError -> stringProvider.getString(DesignRes.string.error_other)
                     }
-                    _state.update { currentState ->
+                    this@JoinEventViewModel.state.update { currentState ->
                         currentState.copy(joining = EventJoiningState.Error(errorMessage))
                     }
                 }
