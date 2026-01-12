@@ -1,6 +1,6 @@
 package com.inwords.expenses.plugins
 
-import com.android.build.api.dsl.androidLibrary
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getByType
@@ -14,26 +14,22 @@ class SharedKmmLibraryPlugin : Plugin<Project> {
         project.pluginManager.apply("org.jetbrains.kotlin.multiplatform")
 
         val kotlin = project.extensions.getByType<KotlinMultiplatformExtension>()
+        val kotlinAndroid = kotlin.extensions.getByType<KotlinMultiplatformAndroidLibraryTarget>()
 
-        kotlin.apply {
-            androidLibrary {
-                compileSdk = 36
-                minSdk = 26
+        kotlinAndroid.apply {
+            compileSdk = 36
+            minSdk = 26
 
-                compilations.configureEach {
-                    compileTaskProvider.configure {
-                        compilerOptions {
-                            jvmTarget.set(JvmTarget.JVM_11)
-                        }
+            compilations.configureEach {
+                compileTaskProvider.configure {
+                    compilerOptions {
+                        jvmTarget.set(JvmTarget.JVM_11)
                     }
-                }
-
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_11)
                 }
             }
 
             compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_11)
                 extraWarnings.set(true)
                 freeCompilerArgs.addAll(
                     "-Xdata-flow-based-exhaustiveness",

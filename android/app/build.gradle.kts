@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(buildSrc.plugins.android.application)
-    alias(buildSrc.plugins.kotlin.android)
     alias(shared.plugins.compose.compiler)
     alias(shared.plugins.android.junit5)
     alias(shared.plugins.sentry.android.gradle)

@@ -1,6 +1,6 @@
 package com.inwords.expenses.plugins
 
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -12,7 +12,6 @@ class SharedLibraryPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         project.plugins.apply("com.android.library")
-        project.plugins.apply("kotlin-android")
 
         val android = project.extensions.getByType<LibraryExtension>()
         val kotlin = project.extensions.getByType<KotlinAndroidProjectExtension>()
