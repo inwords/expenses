@@ -16,6 +16,17 @@ class SharedKmmLibraryPlugin : Plugin<Project> {
         val kotlin = project.extensions.getByType<KotlinMultiplatformExtension>()
         val kotlinAndroid = kotlin.extensions.getByType<KotlinMultiplatformAndroidLibraryTarget>()
 
+        kotlin.apply {
+            compilerOptions {
+                extraWarnings.set(true)
+                freeCompilerArgs.addAll(
+                    "-Xdata-flow-based-exhaustiveness",
+                    "-Xreturn-value-checker=check",
+                    "-Xexplicit-backing-fields",
+                )
+            }
+        }
+
         kotlinAndroid.apply {
             compileSdk = 36
             minSdk = 26
@@ -30,12 +41,6 @@ class SharedKmmLibraryPlugin : Plugin<Project> {
 
             compilerOptions {
                 jvmTarget.set(JvmTarget.JVM_11)
-                extraWarnings.set(true)
-                freeCompilerArgs.addAll(
-                    "-Xdata-flow-based-exhaustiveness",
-                    "-Xreturn-value-checker=check",
-                    "-Xexplicit-backing-fields",
-                )
             }
         }
     }
