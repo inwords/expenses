@@ -34,13 +34,13 @@ class SharedKmmLibraryPlugin : Plugin<Project> {
             compilations.configureEach {
                 compileTaskProvider.configure {
                     compilerOptions {
-                        jvmTarget.set(JvmTarget.JVM_11)
+                        jvmTarget.set(JvmTarget.JVM_17)
                     }
                 }
             }
 
             compilerOptions {
-                jvmTarget.set(JvmTarget.JVM_11)
+                jvmTarget.set(JvmTarget.JVM_17)
             }
         }
     }
