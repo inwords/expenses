@@ -16,7 +16,7 @@ kotlinx-atomicfu = "0.29.0" # https://github.com/Kotlin/kotlinx-atomicfu/release
 compose-bom = "2026.01.00" # https://developer.android.com/jetpack/androidx/releases/compose
 compose-multiplatform = "1.10.0" # https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
 
-jupiter = "5.14.1" # https://docs.junit.org/current/release-notes/index.html
+jupiter = "6.0.2" # https://docs.junit.org/current/release-notes/index.html
 
 [libraries]
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }

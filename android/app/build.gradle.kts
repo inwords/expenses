@@ -67,6 +67,7 @@ android {
         @Suppress("UNUSED")
         val autotest by creating {
             initWith(getByName("release"))
+            isShrinkResources = false
             proguardFile("proguard-rules-autotest.pro")
             testProguardFile("proguard-test-rules.pro")
             signingConfig = signingConfigs.getByName("debug")
@@ -86,9 +87,9 @@ android {
         @Suppress("UnstableApiUsage")
         managedDevices {
             allDevices {
-                create<ManagedVirtualDevice>("pixel6Api33Atd") {
+                create<ManagedVirtualDevice>("pixel6Api35Atd") {
                     device = "Pixel 6"
-                    apiLevel = 33
+                    apiLevel = 35
                     systemImageSource = "aosp-atd"
                     testedAbi = "x86_64"
                 }
