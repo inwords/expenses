@@ -1,4 +1,4 @@
-
+-processkotlinnullchecks remove_message
 
 -keepclassmembers class * extends com.google.protobuf.GeneratedMessageLite* {
    <fields>;

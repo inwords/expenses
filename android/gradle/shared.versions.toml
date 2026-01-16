@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.2.21" # https://github.com/jetbrains/kotlin/releases https://kotlinlang.org/docs/releases.html#release-details
+kotlin = "2.3.0" # https://github.com/jetbrains/kotlin/releases https://kotlinlang.org/docs/releases.html#release-details
 ksp = "2.3.4" # https://github.com/google/ksp/releases
 
 room = "2.8.4" # https://developer.android.com/jetpack/androidx/releases/room
@@ -13,10 +13,10 @@ coroutines = "1.10.2" # https://github.com/Kotlin/kotlinx.coroutines/releases
 kotlinx-serialization = "1.9.0" # https://github.com/Kotlin/kotlinx.serialization/releases
 kotlinx-atomicfu = "0.29.0" # https://github.com/Kotlin/kotlinx-atomicfu/releases TODO remove when atomicfu plugin is fixed
 
-compose-bom = "2025.12.01" # https://developer.android.com/jetpack/androidx/releases/compose
-compose-multiplatform = "1.10.0-rc02" # https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
+compose-bom = "2026.01.00" # https://developer.android.com/jetpack/androidx/releases/compose
+compose-multiplatform = "1.10.0" # https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
 
-jupiter = "5.14.1" # https://docs.junit.org/current/release-notes/index.html
+jupiter = "6.0.2" # https://docs.junit.org/current/release-notes/index.html
 
 [libraries]
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
@@ -41,9 +41,9 @@ kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime",
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version = "0.4.0" } # https://github.com/Kotlin/kotlinx.collections.immutable/releases
 kotlinx-atomicfu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version.ref = "kotlinx-atomicfu" } # https://github.com/Kotlin/kotlinx-atomicfu/releases TODO remove when atomicfu plugin is fixed
 
-lifecycle-runtime-compose-multiplatform = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version = "2.9.6" }
-lifecycle-viewmodel-compose-multiplatform = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-compose", version = "2.9.6" }
-lifecycle-viewmodel-navigation3-multiplatform = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-navigation3", version = "2.10.0-alpha05" }
+lifecycle-runtime-compose-multiplatform = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version = "2.10.0-alpha07" } # https://mvnrepository.com/artifact/org.jetbrains.androidx.lifecycle/lifecycle-runtime-compose
+lifecycle-viewmodel-compose-multiplatform = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-compose", version = "2.10.0-alpha07" } # https://mvnrepository.com/artifact/org.jetbrains.androidx.lifecycle/lifecycle-viewmodel-compose
+lifecycle-viewmodel-navigation3-multiplatform = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-navigation3", version = "2.10.0-alpha07" } # https://mvnrepository.com/artifact/org.jetbrains.androidx.lifecycle/lifecycle-viewmodel-navigation3
 
 work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version = "2.11.0" } # https://developer.android.com/jetpack/androidx/releases/work
 core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.17.0" } # https://developer.android.com/jetpack/androidx/releases/core
@@ -76,7 +76,7 @@ androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version
 androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version = "3.7.0" }
 androidx-test-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version = "2.3.0" }
 androidx-test-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version = "1.4.1" }
-androidx-compose-ui-test-android = { group = "androidx.compose.ui", name = "ui-test-android", version = "1.10.0" }
+androidx-compose-ui-test-android = { group = "androidx.compose.ui", name = "ui-test-android", version = "1.10.1" }
 junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "jupiter" }
 junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "jupiter" }
 junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "jupiter" }
@@ -92,8 +92,9 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
 wire = { id = "com.squareup.wire", version = "5.4.0" } # https://square.github.io/wire/changelog/
 gradle-versions-checker = { id = "com.github.ben-manes.versions", version = "0.53.0" }
-android-junit5 = { id = "de.mannodermaus.android-junit5", version = "1.14.0.0" } # https://github.com/mannodermaus/android-junit5/releases
+# android-junit5 - wait for >2.0.0 release, 2.0.0 is broken https://github.com/mannodermaus/android-junit-framework/issues/402#issuecomment-3718336113
+android-junit5 = { id = "de.mannodermaus.android-junit", version = "2.0.1" } # https://github.com/mannodermaus/android-junit5/releases
 # https://github.com/getsentry/sentry-kotlin-multiplatform?tab=readme-ov-file#cocoa-sdk-version-compatibility-table
 sentry-kotlin-multiplatform = { id = "io.sentry.kotlin.multiplatform.gradle", version = "0.23.0" } # https://github.com/getsentry/sentry-kotlin-multiplatform/blob/main/CHANGELOG.md
-sentry-android-gradle = { id = "io.sentry.android.gradle", version = "5.12.2" } # https://github.com/getsentry/sentry-android-gradle-plugin/blob/main/CHANGELOG.md
-androidx-baselineprofile = { id = "androidx.baselineprofile", version = "1.4.1" }
+sentry-android-gradle = { id = "io.sentry.android.gradle", version = "6.0.0-rc.1" } # https://github.com/getsentry/sentry-android-gradle-plugin/blob/main/CHANGELOG.md
+androidx-baselineprofile = { id = "androidx.baselineprofile", version = "1.5.0-alpha01" }

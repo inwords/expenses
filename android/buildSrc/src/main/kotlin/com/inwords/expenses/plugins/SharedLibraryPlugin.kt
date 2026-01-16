@@ -1,6 +1,6 @@
 package com.inwords.expenses.plugins
 
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -12,7 +12,6 @@ class SharedLibraryPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         project.plugins.apply("com.android.library")
-        project.plugins.apply("kotlin-android")
 
         val android = project.extensions.getByType<LibraryExtension>()
         val kotlin = project.extensions.getByType<KotlinAndroidProjectExtension>()
@@ -28,11 +27,18 @@ class SharedLibraryPlugin : Plugin<Project> {
             }
 
             compileOptions {
-                sourceCompatibility = JavaVersion.VERSION_11
-                targetCompatibility = JavaVersion.VERSION_11
+                sourceCompatibility = JavaVersion.VERSION_17
+                targetCompatibility = JavaVersion.VERSION_17
             }
         }
 
-        kotlin.compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+        kotlin.compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.addAll(
+                "-Xdata-flow-based-exhaustiveness",
+                "-Xreturn-value-checker=check",
+                "-Xexplicit-backing-fields",
+            )
+        }
     }
 }

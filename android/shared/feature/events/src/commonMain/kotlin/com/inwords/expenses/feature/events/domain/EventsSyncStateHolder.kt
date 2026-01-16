@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.map
 
 class EventsSyncStateHolder internal constructor() {
 
-    private val _state = MutableStateFlow<Set<Long>>(emptySet())
-    val state: StateFlow<Set<Long>> = _state
+    val state: StateFlow<Set<Long>>
+        field = MutableStateFlow<Set<Long>>(emptySet())
 
     fun setSyncState(syncingEvents: Set<Long>) {
-        _state.value = syncingEvents
+        state.value = syncingEvents
     }
 
     fun getStateFor(eventId: Long): Flow<Boolean> {

@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(buildSrc.plugins.android.application)
-    alias(buildSrc.plugins.kotlin.android)
     alias(shared.plugins.compose.compiler)
     alias(shared.plugins.android.junit5)
     alias(shared.plugins.sentry.android.gradle)
@@ -12,10 +11,14 @@ plugins {
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_11)
+        jvmTarget.set(JvmTarget.JVM_17)
 
-        freeCompilerArgs.add("-Xcontext-parameters")
-        freeCompilerArgs.add("-Xdata-flow-based-exhaustiveness")
+        freeCompilerArgs.addAll(
+            "-Xcontext-parameters",
+            "-Xdata-flow-based-exhaustiveness",
+            "-Xreturn-value-checker=check",
+            "-Xexplicit-backing-fields",
+        )
         extraWarnings.set(true)
     }
 }
@@ -64,6 +67,7 @@ android {
         @Suppress("UNUSED")
         val autotest by creating {
             initWith(getByName("release"))
+            isShrinkResources = false
             proguardFile("proguard-rules-autotest.pro")
             testProguardFile("proguard-test-rules.pro")
             signingConfig = signingConfigs.getByName("debug")
@@ -72,8 +76,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     testOptions {
@@ -83,9 +87,9 @@ android {
         @Suppress("UnstableApiUsage")
         managedDevices {
             allDevices {
-                create<ManagedVirtualDevice>("pixel6Api33Atd") {
+                create<ManagedVirtualDevice>("pixel6Api35Atd") {
                     device = "Pixel 6"
-                    apiLevel = 33
+                    apiLevel = 35
                     systemImageSource = "aosp-atd"
                     testedAbi = "x86_64"
                 }

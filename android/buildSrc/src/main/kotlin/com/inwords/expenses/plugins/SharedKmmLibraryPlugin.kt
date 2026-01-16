@@ -1,6 +1,6 @@
 package com.inwords.expenses.plugins
 
-import com.android.build.api.dsl.androidLibrary
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getByType
@@ -14,28 +14,33 @@ class SharedKmmLibraryPlugin : Plugin<Project> {
         project.pluginManager.apply("org.jetbrains.kotlin.multiplatform")
 
         val kotlin = project.extensions.getByType<KotlinMultiplatformExtension>()
+        val kotlinAndroid = kotlin.extensions.getByType<KotlinMultiplatformAndroidLibraryTarget>()
 
         kotlin.apply {
-            androidLibrary {
-                compileSdk = 36
-                minSdk = 26
+            compilerOptions {
+                extraWarnings.set(true)
+                freeCompilerArgs.addAll(
+                    "-Xdata-flow-based-exhaustiveness",
+                    "-Xreturn-value-checker=check",
+                    "-Xexplicit-backing-fields",
+                )
+            }
+        }
 
-                compilations.configureEach {
-                    compileTaskProvider.configure {
-                        compilerOptions {
-                            jvmTarget.set(JvmTarget.JVM_11)
-                        }
+        kotlinAndroid.apply {
+            compileSdk = 36
+            minSdk = 26
+
+            compilations.configureEach {
+                compileTaskProvider.configure {
+                    compilerOptions {
+                        jvmTarget.set(JvmTarget.JVM_17)
                     }
-                }
-
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_11)
                 }
             }
 
             compilerOptions {
-                extraWarnings.set(true)
-                freeCompilerArgs.add("-Xdata-flow-based-exhaustiveness")
+                jvmTarget.set(JvmTarget.JVM_17)
             }
         }
     }
@@ -44,7 +49,6 @@ class SharedKmmLibraryPlugin : Plugin<Project> {
 
         fun KotlinMultiplatformExtension.applyKmmDefaults(iosBaseName: String) {
             listOf(
-                iosX64(),
                 iosArm64(),
                 iosSimulatorArm64()
             ).forEach {
@@ -56,7 +60,6 @@ class SharedKmmLibraryPlugin : Plugin<Project> {
 
             sourceSets.apply {
                 iosArm64()
-                iosX64()
                 iosSimulatorArm64()
             }
         }

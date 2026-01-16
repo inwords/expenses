@@ -2,7 +2,6 @@ import com.android.build.api.dsl.ManagedVirtualDevice
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(buildSrc.plugins.kotlin.android)
     alias(buildSrc.plugins.android.test)
     alias(shared.plugins.androidx.baselineprofile)
     // https://github.com/androidx/androidx/blob/22f430ac409089812ce985bfa303fccff93cd095/benchmark/baseline-profile-gradle-plugin/src/main/kotlin/androidx/baselineprofile/gradle/apptarget/BaselineProfileAppTargetPlugin.kt#L48
@@ -10,8 +9,12 @@ plugins {
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_11)
-        freeCompilerArgs.add("-Xdata-flow-based-exhaustiveness")
+        jvmTarget.set(JvmTarget.JVM_17)
+        freeCompilerArgs.addAll(
+            "-Xdata-flow-based-exhaustiveness",
+            "-Xreturn-value-checker=check",
+            "-Xexplicit-backing-fields",
+        )
         extraWarnings.set(true)
     }
 }
@@ -21,8 +24,8 @@ android {
     compileSdk = 36
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     defaultConfig {

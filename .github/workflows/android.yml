@@ -90,7 +90,8 @@ jobs:
 
       - name: Run UI tests on GMD
         run: >
-          ./gradlew :app:pixel6Api33AtdAutotestAndroidTest
+          ./gradlew :app:pixel6Api35AtdAutotestAndroidTest
+          -Dcom.android.tools.r8.disableApiModeling
           -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect
           -Pandroid.experimental.testOptions.managedDevices.setupTimeoutMinutes=20
           -Pandroid.experimental.testOptions.managedDevices.maxConcurrentDevices=1

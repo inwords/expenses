@@ -26,11 +26,11 @@ class ExpensesInteractor internal constructor(
     private val currencyExchanger: CurrencyExchanger = CurrencyExchanger(),
 ) {
 
-    private val _refreshExpenses = MutableSharedFlow<Event>(
-        extraBufferCapacity = 2,
-        onBufferOverflow = BufferOverflow.SUSPEND
-    )
-    val refreshExpenses: Flow<Event> = _refreshExpenses
+    val refreshExpenses: Flow<Event>
+        field = MutableSharedFlow<Event>(
+            extraBufferCapacity = 2,
+            onBufferOverflow = BufferOverflow.SUSPEND
+        )
 
     private val expensesLocalStore by expensesLocalStoreLazy
     private val currenciesLocalStore by currenciesLocalStoreLazy
@@ -159,7 +159,7 @@ class ExpensesInteractor internal constructor(
     }
 
     internal suspend fun enqueueAsyncExpensesRefresh(event: Event) {
-        _refreshExpenses.emit(event)
+        refreshExpenses.emit(event)
     }
 
     private suspend fun exchanger(event: Event, originalCurrency: Currency): ((BigDecimal) -> BigDecimal)? {

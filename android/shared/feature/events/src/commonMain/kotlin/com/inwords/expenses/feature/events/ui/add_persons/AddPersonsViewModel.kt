@@ -24,17 +24,17 @@ internal class AddPersonsViewModel(
 
     private var confirmJob: Job? = null
 
-    private val _state = MutableStateFlow(AddPersonsPaneUiModel("", emptyList()))
-    val state: StateFlow<AddPersonsPaneUiModel> = _state
+    val state: StateFlow<AddPersonsPaneUiModel>
+        field = MutableStateFlow(AddPersonsPaneUiModel("", emptyList()))
 
     fun onOwnerNameChanged(ownerName: String) {
-        _state.update { value ->
+        state.update { value ->
             value.copy(ownerName = ownerName)
         }
     }
 
     fun onParticipantNameChanged(index: Int, participantName: String) {
-        _state.update { value ->
+        state.update { value ->
             value.copy(persons = value.persons.toMutableList().apply {
                 set(index, participantName)
             })
@@ -42,7 +42,7 @@ internal class AddPersonsViewModel(
     }
 
     fun onAddParticipantClicked() {
-        _state.update { value ->
+        state.update { value ->
             value.copy(persons = value.persons + "")
         }
     }
@@ -51,7 +51,7 @@ internal class AddPersonsViewModel(
         // TODO mvp
         confirmJob?.cancel()
         confirmJob = viewModelScope.launch {
-            val state = _state.value
+            val state = state.value
 
             eventCreationStateHolder.draftOwner(state.ownerName)
             eventCreationStateHolder.draftOtherPersons(state.persons)

@@ -1,16 +1,16 @@
 [versions]
-android-gradle-plugin = "8.13.2" # https://developer.android.com/build/releases/gradle-plugin#fixed_issues
-kotlin = "2.2.21"
+android-gradle-plugin = "9.0.0-rc03" # https://developer.android.com/build/releases/gradle-plugin#fixed_issues
+kotlin = "2.3.0"
 
 [libraries]
 agp = { group = "com.android.tools.build", name = "gradle", version.ref = "android-gradle-plugin" }
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+ksp-gradle-plugin = { group = "com.google.devtools.ksp", name = "symbol-processing-gradle-plugin", version = "2.3.4" }
 
 [plugins]
 android-application = { id = "com.android.application" }
 android-library = { id = "com.android.library" }
 android-test = { id = "com.android.test" }
-kotlin-android = { id = "org.jetbrains.kotlin.android" }
 
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform" }

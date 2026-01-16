@@ -4,6 +4,7 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 buildscript {
     dependencies {
         classpath(buildSrc.kotlin.gradle.plugin)
+        classpath(buildSrc.ksp.gradle.plugin)
     }
 }
 
@@ -14,7 +15,6 @@ plugins {
     alias(buildSrc.plugins.android.test) apply false
     alias(buildSrc.plugins.android.library) apply false
     alias(buildSrc.plugins.android.kotlin.multiplatform.library) apply false
-    alias(buildSrc.plugins.kotlin.android) apply false
     alias(buildSrc.plugins.kotlin.multiplatform) apply false
     alias(shared.plugins.compose.compiler) apply false
     alias(shared.plugins.compose.multiplatform.compiler) apply false

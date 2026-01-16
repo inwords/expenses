@@ -10,7 +10,7 @@ This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application 
 
 **Key Technologies:**
 
-- Kotlin 2.2.21 with Compose compiler plugin
+- Kotlin 2.3.0 with Compose compiler plugin
 - Jetpack Compose with Material3 design system
 - Ktor client for networking with Cronet backend (Android) and Darwin backend (iOS)
 - Room database with KSP for code generation
@@ -20,8 +20,8 @@ This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application 
 - Multiplatform-resources for resource management
 - WorkManager for background sync tasks
 - Protocol Buffers (Wire) for settings serialization
-- Gradle 8.14.3 with Kotlin DSL and version catalogs
-- Android Gradle Plugin 8.13.1
+- Gradle 9.2.1 with Kotlin DSL and version catalogs
+- Android Gradle Plugin 9.0.0-rc03
 - Target: Android API 36, Min API 26
 
 **Project Size:** ~50 modules across shared core libraries, feature modules, and platform-specific implementations.
@@ -44,9 +44,9 @@ This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application 
 
 ### Prerequisites
 
-- JDK 22+ (Project uses JVM target 11, daemon configured for JDK 22/Temurin)
+- JDK 22+ (Project uses JVM target 17, daemon configured for JDK 22/Temurin)
 - Android SDK with API 36
-- Gradle 8.14.3 (use wrapper)
+- Gradle 9.2.1 (use wrapper)
 
 ### Essential Commands
 
@@ -80,9 +80,8 @@ This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application 
 # Run instrumented tests (requires device/emulator)
 .\gradlew.bat :app:connectedAutotestAndroidTest
 
-# Run tests on managed devices (cloud/emulator testing)
-.\gradlew.bat allDevicesCheck
-.\gradlew.bat pixel6Api34Check
+# Run instrumented tests with Gradle Managed Devices
+./gradlew :app:pixel6Api35AtdAutotestAndroidTest -Dcom.android.tools.r8.disableApiModeling
 ```
 
 #### Code Quality
@@ -241,9 +240,9 @@ gradle/                       # Version catalogs and properties
 
 ### Testing Strategy
 
-- **Unit tests:** JUnit 5 with test extensions for Android
+- **Unit tests:** JUnit 6 with test extensions for Android
 - **Instrumented tests:** Android Test with Compose testing
-- **Device testing:** Managed devices configured in `pixel6Api34*` tasks
+- **Device testing:** Managed devices configured in `pixel6Api35*` tasks
 
 ## Common Development Tasks
 
@@ -314,9 +313,9 @@ gradle/                       # Version catalogs and properties
 
 ### Required Tools
 
-- **JDK 22 (Temurin)** (Project targets JVM 11)
+- **JDK 22 (Temurin)** (Project targets JVM 17)
 - **Android SDK** with API 36 (compile target)
-- **Gradle 8.14.3** (use wrapper, do not install separately)
+- **Gradle 9.2.1** (use wrapper, do not install separately)
 - **Git** for version control
 
 ### IDE Configuration
@@ -352,10 +351,10 @@ Before submitting changes, run these validation steps:
 .\gradlew.bat assembleAutotest
 
 # 8. Optional: Run instrumented tests (requires device/emulator)
-.\gradlew.bat :app:connectedAutotestAndroidTest
+.\gradlew.bat :app:connectedAutotestAndroidTest -Dcom.android.tools.r8.disableApiModeling
 
 # 9. Optional: Run managed device tests (local Gradle Managed Devices testing)
-.\gradlew.bat pixel6Api34Check
+./gradlew :app:pixel6Api35AtdAutotestAndroidTest -Dcom.android.tools.r8.disableApiModeling
 ```
 
 ### Quick Validation (for small changes)
