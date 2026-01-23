@@ -16,6 +16,7 @@ import com.inwords.expenses.feature.events.data.db.entity.PersonEntity
 import com.inwords.expenses.feature.expenses.data.db.dao.ExpensesDao
 import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseEntity
 import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseSplitEntity
+import com.inwords.expenses.integration.databases.data.migration.MIGRATION_1_2
 
 @Database(
     entities = [
@@ -30,7 +31,7 @@ import com.inwords.expenses.feature.expenses.data.db.entity.ExpenseSplitEntity
     autoMigrations = [
 
     ],
-    version = 1
+    version = 2
 )
 @ConstructedBy(AppDatabaseConstructor::class)
 internal abstract class AppDatabase : RoomDatabase() {
@@ -47,7 +48,7 @@ internal fun createAppDatabase(
     return builder
         .setQueryCoroutineContext(IO.limitedParallelism(4))
         .setJournalMode(RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
-        .fallbackToDestructiveMigration(dropAllTables = true) // FIXME remove before prod
+        .addMigrations(MIGRATION_1_2)
         .setDriver(BundledSQLiteDriver())
         .addCallback(RoomOnCreateCallback())
         .build()

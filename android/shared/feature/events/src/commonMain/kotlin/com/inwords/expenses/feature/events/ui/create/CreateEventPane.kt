@@ -151,6 +151,11 @@ private fun CreateEventPanePreview() {
                         currencyName = "Japanese Yen",
                         currencyCode = "JPY",
                         selected = false
+                    ),
+                    CurrencyInfoUiModel(
+                        currencyName = "UAE Dirham",
+                        currencyCode = "AED",
+                        selected = false
                     )
                 )
             ),

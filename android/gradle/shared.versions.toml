@@ -21,6 +21,7 @@ jupiter = "6.0.2" # https://docs.junit.org/current/release-notes/index.html
 [libraries]
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
 sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version = "2.6.2" } # https://developer.android.com/jetpack/androidx/releases/sqlite
 datastore-core-okio = { group = "androidx.datastore", name = "datastore-core-okio", version.ref = "datastore" }
 datastore-android = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
@@ -92,7 +93,6 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
 wire = { id = "com.squareup.wire", version = "5.4.0" } # https://square.github.io/wire/changelog/
 gradle-versions-checker = { id = "com.github.ben-manes.versions", version = "0.53.0" }
-# android-junit5 - wait for >2.0.0 release, 2.0.0 is broken https://github.com/mannodermaus/android-junit-framework/issues/402#issuecomment-3718336113
 android-junit5 = { id = "de.mannodermaus.android-junit", version = "2.0.1" } # https://github.com/mannodermaus/android-junit5/releases
 # https://github.com/getsentry/sentry-kotlin-multiplatform?tab=readme-ov-file#cocoa-sdk-version-compatibility-table
 sentry-kotlin-multiplatform = { id = "io.sentry.kotlin.multiplatform.gradle", version = "0.23.0" } # https://github.com/getsentry/sentry-kotlin-multiplatform/blob/main/CHANGELOG.md
