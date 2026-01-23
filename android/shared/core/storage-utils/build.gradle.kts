@@ -24,7 +24,7 @@ kotlin {
                 implementation(shared.room.runtime)
 
                 implementation(shared.datastore.core.okio)
-                implementation(shared.kotlinx.atomicfu) // TODO remove when atomicfu plugin is fixed
+                implementation(shared.kotlinx.atomicfu)
 
                 implementation(shared.ionspin.kotlin.bignum)
             }

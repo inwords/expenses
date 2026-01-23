@@ -80,7 +80,7 @@ This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application 
 # Run instrumented tests (requires device/emulator)
 .\gradlew.bat :app:connectedAutotestAndroidTest
 
-# Run device tests (requres device/emulator) (includes Room tests)
+# Run device tests (requires device/emulator) (includes Room tests)
 .\gradlew.bat connectedAndroidDeviceTest
 
 # Run instrumented tests with Gradle Managed Devices
@@ -351,7 +351,6 @@ When adding support for a new currency (e.g., AED), update all the following:
 ### Known TODOs and Technical Debt
 
 - Several "TODO mvp" comments indicate MVP-level implementations that need improvement
-- Atomicfu plugin issues mentioned in multiple build files
 - Some String vs Double type inconsistencies in network DTOs
 - User agent configuration needs finalization in HTTP client
 
