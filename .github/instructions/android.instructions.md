@@ -80,7 +80,7 @@ This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application 
 # Run instrumented tests (requires device/emulator)
 .\gradlew.bat :app:connectedAutotestAndroidTest
 
-# Run device tests (requres device/emulator) (includes Room tests)
+# Run device tests (requires device/emulator) (includes Room tests)
 .\gradlew.bat connectedAndroidDeviceTest
 
 # Run instrumented tests with Gradle Managed Devices
