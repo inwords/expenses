@@ -20,7 +20,7 @@ kotlin {
             dependencies {
                 implementation(project(":shared:core:utils"))
 
-                implementation(shared.kotlinx.atomicfu) // TODO remove when atomicfu plugin is fixed
+                implementation(shared.kotlinx.atomicfu)
             }
         }
     }
