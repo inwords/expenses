@@ -65,7 +65,7 @@ jobs:
 
   ui_tests_android:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 30
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
@@ -91,10 +91,13 @@ jobs:
       - name: Run UI tests on GMD
         run: >
           ./gradlew :app:pixel6Api35AtdAutotestAndroidTest
+          pixel6Api35AtdAndroidDeviceTest
           -Dcom.android.tools.r8.disableApiModeling
           -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect
           -Pandroid.experimental.testOptions.managedDevices.setupTimeoutMinutes=20
           -Pandroid.experimental.testOptions.managedDevices.maxConcurrentDevices=1
+          --no-daemon
+          --continue
 
       - name: Upload test reports
         if: always()

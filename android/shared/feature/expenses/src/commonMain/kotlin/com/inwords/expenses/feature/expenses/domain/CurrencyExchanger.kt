@@ -12,6 +12,7 @@ internal class CurrencyExchanger(
         "RUB" to BigDecimal.fromDouble(77.5011),
         "TRY" to BigDecimal.fromDouble(42.5014),
         "JPY" to BigDecimal.fromDouble(156.0960),
+        "AED" to BigDecimal.fromDouble(3.6725),
         "USD" to BigDecimal.fromDouble(1.0),
     )
 ) {

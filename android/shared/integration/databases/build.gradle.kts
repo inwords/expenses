@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.ManagedVirtualDevice
 import com.inwords.expenses.plugins.SharedKmmLibraryPlugin.Companion.applyKmmDefaults
 
 plugins {
@@ -13,6 +14,27 @@ kotlin {
         @Suppress("UnstableApiUsage")
         optimization {
             consumerKeepRules.files.add(file("consumer-rules.pro"))
+        }
+
+        androidResources {
+            enable = true
+        }
+
+        withDeviceTest {
+            animationsDisabled = true
+            execution = "ANDROIDX_TEST_ORCHESTRATOR"
+
+            @Suppress("UnstableApiUsage")
+            managedDevices {
+                allDevices {
+                    create<ManagedVirtualDevice>("pixel6Api35Atd") {
+                        device = "Pixel 6"
+                        apiLevel = 35
+                        systemImageSource = "aosp-atd"
+                        testedAbi = "x86_64"
+                    }
+                }
+            }
         }
     }
 
@@ -47,6 +69,14 @@ kotlin {
                 implementation(shared.compose.runtime)
             }
         }
+        @Suppress("unused")
+        val androidDeviceTest by getting {
+            dependencies {
+                implementation(shared.room.testing)
+                implementation(shared.androidx.test.runner)
+                implementation(shared.androidx.test.ext.junit)
+            }
+        }
     }
 
     compilerOptions {
@@ -61,6 +91,8 @@ dependencies {
     kspAndroid(shared.room.compiler)
     add("kspIosArm64", shared.room.compiler)
     add("kspIosSimulatorArm64", shared.room.compiler)
+
+    androidTestUtil(shared.androidx.test.orchestrator)
 }
 
 room {

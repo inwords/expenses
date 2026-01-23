@@ -441,6 +441,11 @@ internal fun mockAddExpenseScreenUiModel(): AddExpensePaneUiModel {
                 currencyName = "Russian Ruble",
                 selected = false
             ),
+            CurrencyInfoUiModel(
+                currencyCode = "AED",
+                currencyName = "UAE Dirham",
+                selected = false
+            ),
         ),
         expenseType = ExpenseType.Spending,
         persons = persistentListOf(
