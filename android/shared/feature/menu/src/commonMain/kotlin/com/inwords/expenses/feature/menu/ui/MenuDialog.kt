@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.AssistChipDefaults
@@ -31,6 +32,7 @@ import com.inwords.expenses.core.ui.design.theme.CommonExTheme
 import com.inwords.expenses.core.ui.utils.clipEntryOf
 import com.inwords.expenses.core.utils.IO
 import expenses.shared.feature.menu.generated.resources.Res
+import expenses.shared.feature.menu.generated.resources.menu_add_participants_action
 import expenses.shared.feature.menu.generated.resources.menu_choose_person_action
 import expenses.shared.feature.menu.generated.resources.menu_copy_action
 import expenses.shared.feature.menu.generated.resources.menu_join_other_event
@@ -46,6 +48,7 @@ internal fun MenuDialog(
     onJoinEventClicked: () -> Unit,
     onLeaveEventClicked: () -> Unit,
     onChoosePersonClicked: () -> Unit,
+    onAddParticipantsClicked: () -> Unit,
     onShareClicked: () -> Unit,
     onPrivacyPolicyClicked: () -> Unit,
     onTermsOfUseClicked: () -> Unit,
@@ -129,6 +132,26 @@ internal fun MenuDialog(
 
         Row(
             modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onAddParticipantsClicked)
+                .padding(16.dp),
+        ) {
+            Icon(
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .align(Alignment.CenterVertically),
+                imageVector = Icons.Outlined.Add,
+                contentDescription = null
+            )
+            Text(
+                modifier = Modifier.align(Alignment.CenterVertically),
+                text = stringResource(Res.string.menu_add_participants_action),
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+
+        Row(
+            modifier = Modifier
                 .clickable(onClick = onJoinEventClicked)
                 .fillMaxWidth()
                 .padding(16.dp),
@@ -191,6 +214,7 @@ private fun MenuDialogPreview() {
             onJoinEventClicked = {},
             onLeaveEventClicked = {},
             onChoosePersonClicked = {},
+            onAddParticipantsClicked = {},
             onShareClicked = {},
             onPrivacyPolicyClicked = {},
             onTermsOfUseClicked = {},
@@ -210,6 +234,7 @@ private fun MenuDialogEmptyShareUrlPreview() {
             onJoinEventClicked = {},
             onLeaveEventClicked = {},
             onChoosePersonClicked = {},
+            onAddParticipantsClicked = {},
             onShareClicked = {},
             onPrivacyPolicyClicked = {},
             onTermsOfUseClicked = {},

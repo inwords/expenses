@@ -39,6 +39,7 @@ fun getMenuDialogNavModule(
                 onJoinEventClicked = viewModel::onJoinEventClicked,
                 onLeaveEventClicked = viewModel::onLeaveEventClicked,
                 onChoosePersonClicked = viewModel::onChoosePersonClicked,
+                onAddParticipantsClicked = viewModel::onAddParticipantClicked,
                 onShareClicked = viewModel::onShareClicked,
                 onPrivacyPolicyClicked = viewModel::onPrivacyPolicyClicked,
                 onTermsOfUseClicked = viewModel::onTermsOfUseClicked,
