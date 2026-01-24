@@ -7,6 +7,7 @@ import com.inwords.expenses.feature.events.data.db.store.EventsLocalStoreImpl
 import com.inwords.expenses.feature.events.data.db.store.PersonsLocalStoreImpl
 import com.inwords.expenses.feature.events.data.network.store.CurrenciesRemoteStoreImpl
 import com.inwords.expenses.feature.events.data.network.store.EventsRemoteStoreImpl
+import com.inwords.expenses.feature.events.domain.AddParticipantsToCurrentEventUseCase
 import com.inwords.expenses.feature.events.domain.CreateEventUseCase
 import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
 import com.inwords.expenses.feature.events.domain.EventCreationStateHolder
@@ -150,6 +151,13 @@ class EventsComponent internal constructor(
 
     val leaveEventUseCaseLazy: Lazy<LeaveEventUseCase> = lazy {
         LeaveEventUseCase(
+            settingsRepositoryLazy = deps.settingsRepositoryLazy,
+        )
+    }
+
+    val addParticipantsToCurrentEventUseCaseLazy: Lazy<AddParticipantsToCurrentEventUseCase> = lazy {
+        AddParticipantsToCurrentEventUseCase(
+            eventsLocalStoreLazy = eventsLocalStore,
             settingsRepositoryLazy = deps.settingsRepositoryLazy,
         )
     }

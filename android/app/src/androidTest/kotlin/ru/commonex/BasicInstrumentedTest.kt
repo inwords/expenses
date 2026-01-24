@@ -244,6 +244,59 @@ class BasicInstrumentedTest {
         }
     }
 
+    /**
+     * Tests adding participants to an existing event:
+     * - Create event with one participant
+     * - Open menu and navigate to "Add participant" screen
+     * - Add multiple participants
+     * - Verify participants can be selected via Choose Person menu
+     * - Verify that an equal expense can be added successfully after new participants are added
+     */
+    @Test
+    fun testAddParticipantsToExistingEvent() {
+        extension.runTest {
+            val eventName = "Test Event"
+
+            // Create event with one participant
+            createLocalEvent(eventName)
+
+            // Add participants via menu
+            ExpensesScreen()
+                .openMenu()
+                .addParticipant()
+                .addParticipant("New Test User 1")
+                .addParticipant("New Test User 2")
+                .clickContinueButton()
+                .waitUntilLoadedEmpty()
+                .verifyCurrentPerson(eventName, "Test User 1")
+
+            // Verify new participants can be selected
+            ExpensesScreen()
+                .openMenu()
+                .chooseParticipant()
+                .waitUntilLoaded("Test User 1")
+                .selectPerson("New Test User 1")
+                .waitUntilLoadedEmpty()
+                .verifyCurrentPerson(eventName, "New Test User 1")
+
+            ExpensesScreen()
+                .openMenu()
+                .chooseParticipant()
+                .waitUntilLoaded("New Test User 1")
+                .selectPerson("New Test User 2")
+                .waitUntilLoadedEmpty()
+                .verifyCurrentPerson(eventName, "New Test User 2")
+
+            // Verify that an equal expense can be added successfully after new participants are added
+            ExpensesScreen()
+                .clickAddExpense()
+                .enterDescription("Test Expense")
+                .enterAmount("300")
+                .clickConfirm()
+                .verifyExpenseAmount("-300")
+        }
+    }
+
     private suspend fun ComposeContext.createLocalEvent(eventName: String): ExpensesScreen {
         return LocalEventsScreen()
             .clickCreateEvent()

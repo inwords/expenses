@@ -20,6 +20,7 @@ import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.HandleDeeplinks
 import com.inwords.expenses.core.navigation.rememberNavigationController
 import com.inwords.expenses.feature.events.api.EventsComponent
+import com.inwords.expenses.feature.events.ui.add_participants.getAddParticipantsToEventPaneNavModule
 import com.inwords.expenses.feature.events.ui.add_persons.getAddPersonsPaneNavModule
 import com.inwords.expenses.feature.events.ui.choose_person.getChoosePersonPaneNavModule
 import com.inwords.expenses.feature.events.ui.create.getCreateEventPaneNavModule
@@ -78,6 +79,10 @@ fun MainNavHost(
                 getCurrentEventStateUseCaseLazy = eventsComponent.getCurrentEventStateUseCaseLazy,
                 settingsRepositoryLazy = settingsComponent.settingsRepositoryLazy,
                 expensesScreenDestination = ExpensesPaneDestination,
+            ),
+            getAddParticipantsToEventPaneNavModule(
+                navigationController = navigationController,
+                addParticipantsToCurrentEventUseCaseLazy = eventsComponent.addParticipantsToCurrentEventUseCaseLazy,
             ),
 
             getAddExpensePaneNavModule(

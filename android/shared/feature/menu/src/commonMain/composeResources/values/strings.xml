@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="menu_choose_person_action">Choose participant</string>
+    <string name="menu_add_participants_action">Add participants</string>
     <string name="menu_copy_action">Copy</string>
     <string name="menu_join_other_event">Join another event</string>
     <string name="menu_open_events_list">To events list</string>

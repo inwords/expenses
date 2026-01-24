@@ -8,6 +8,7 @@ import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
 import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.LeaveEventUseCase
+import com.inwords.expenses.feature.events.ui.add_participants.AddParticipantsToEventPaneDestination
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneDestination
 import com.inwords.expenses.feature.events.ui.join.JoinEventPaneDestination
 import com.inwords.expenses.feature.share.api.ShareManager
@@ -62,6 +63,11 @@ internal class MenuViewModel(
     fun onChoosePersonClicked() {
         navigationController.popBackStack()
         navigationController.navigateTo(ChoosePersonPaneDestination)
+    }
+
+    fun onAddParticipantClicked() {
+        navigationController.popBackStack()
+        navigationController.navigateTo(AddParticipantsToEventPaneDestination)
     }
 
     fun onShareClicked() {
