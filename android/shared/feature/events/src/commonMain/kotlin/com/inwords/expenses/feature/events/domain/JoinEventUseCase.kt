@@ -28,6 +28,8 @@ class JoinEventUseCase internal constructor(
 
         sealed interface Error : JoinEventResult {
             data object InvalidAccessCode : Error
+            data object InvalidToken : Error
+            data object TokenExpired : Error
             data object EventNotFound : Error
             data object OtherError : Error
         }
@@ -51,14 +53,22 @@ class JoinEventUseCase internal constructor(
         }
     }
 
-    internal suspend fun joinEvent(eventServerId: String, accessCode: String): JoinEventResult {
+    internal suspend fun joinEvent(
+        eventServerId: String,
+        accessCode: String?,
+        token: String?
+    ): JoinEventResult {
+        require((accessCode != null) xor (token != null)) {
+            "Either pinCode or token must be provided"
+        }
+
         val localEvent = eventsLocalStore.getEventWithDetailsByServerId(eventServerId)
         if (localEvent != null) {
             settingsRepository.setCurrentEventId(localEvent.event.id)
             return JoinEventResult.NewCurrentEvent(localEvent)
         }
 
-        val joinEventResult = joinRemoteEvent(serverId = eventServerId, pinCode = accessCode)
+        val joinEventResult = joinRemoteEvent(serverId = eventServerId, pinCode = accessCode, token = token)
 
         when (joinEventResult) {
             is JoinEventResult.NewCurrentEvent -> {
@@ -67,6 +77,8 @@ class JoinEventUseCase internal constructor(
 
             JoinEventResult.Error.EventNotFound,
             JoinEventResult.Error.InvalidAccessCode,
+            JoinEventResult.Error.InvalidToken,
+            JoinEventResult.Error.TokenExpired,
             JoinEventResult.Error.OtherError -> Unit
         }
 
@@ -75,7 +87,8 @@ class JoinEventUseCase internal constructor(
 
     private suspend fun joinRemoteEvent(
         serverId: String,
-        pinCode: String,
+        pinCode: String?,
+        token: String?,
     ): JoinEventResult {
         val currenciesBeforeSync = currenciesLocalStore.getCurrencies().first()
         val currencies = if (currenciesBeforeSync.isEmpty() || currenciesBeforeSync.any { it.serverId == null }) {
@@ -87,17 +100,33 @@ class JoinEventUseCase internal constructor(
             currenciesBeforeSync
         }
 
-        val remoteEvent = when (val eventResult = eventsRemoteStore.getEvent(
-            localId = 0L,
-            serverId = serverId,
-            pinCode = pinCode,
-            currencies = currencies,
-            localPersons = null
-        )) {
-            is GetEventResult.Event -> eventResult.event
-            is GetEventResult.Error -> return when (eventResult.error) {
+        val getEventResult = if (token == null) {
+            eventsRemoteStore.getEventByAccessCode(
+                localId = 0L,
+                serverId = serverId,
+                pinCode = pinCode!!,
+                currencies = currencies,
+                localPersons = null
+            )
+        } else {
+            eventsRemoteStore.getEventByToken(
+                localId = 0L,
+                serverId = serverId,
+                token = token,
+                currencies = currencies,
+                localPersons = null
+            )
+        }
+
+        val remoteEvent = when (getEventResult) {
+            is GetEventResult.Event -> getEventResult.event
+
+            is GetEventResult.Error -> return when (getEventResult.error) {
                 EventNetworkError.InvalidAccessCode -> JoinEventResult.Error.InvalidAccessCode
+                EventNetworkError.InvalidToken -> JoinEventResult.Error.InvalidToken
+                EventNetworkError.TokenExpired -> JoinEventResult.Error.TokenExpired
                 EventNetworkError.NotFound -> JoinEventResult.Error.EventNotFound
+
                 EventNetworkError.Gone -> {
                     deleteEventUseCase.deleteLocalEventByServerId(serverId)
                     JoinEventResult.Error.EventNotFound

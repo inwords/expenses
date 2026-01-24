@@ -17,6 +17,8 @@
     <string name="events_info_with_person">%1$s — %2$s</string>
     <string name="events_join_description">Enter the event ID and access code to join</string>
     <string name="events_join_error_invalid_credentials">Invalid event ID or access code</string>
+    <string name="events_join_error_invalid_token">Invalid link</string>
+    <string name="events_join_error_expired_token">Link has expired. Please request a new link or enter the code manually</string>
     <string name="events_name_placeholder">Title</string>
     <string name="events_owner_label">My name is</string>
     <string name="events_participants_label">Also participate</string>

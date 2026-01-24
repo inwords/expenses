@@ -29,7 +29,7 @@ class EventPullPersonsTask internal constructor(
         val localEvent = eventsLocalStore.getEventWithDetails(eventId) ?: return@withContext IoResult.Error.Failure
         if (localEvent.event.serverId == null) return@withContext IoResult.Error.Failure
 
-        val remoteResult = eventsRemoteStore.getEvent(
+        val remoteResult = eventsRemoteStore.getEventByAccessCode(
             localId = localEvent.event.id,
             serverId = localEvent.event.serverId,
             pinCode = localEvent.event.pinCode,

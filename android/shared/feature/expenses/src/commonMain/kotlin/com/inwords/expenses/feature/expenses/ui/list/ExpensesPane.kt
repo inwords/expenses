@@ -314,7 +314,7 @@ private fun ExpenseItem(
             .clickable { onRevertExpenseClick.invoke(expense) }
             .fillMaxWidth()
             .border(
-                border = AssistChipDefaults.assistChipBorder(false),
+                border = AssistChipDefaults.assistChipBorder(enabled = false),
                 shape = MaterialTheme.shapes.small,
             ),
         horizontalArrangement = Arrangement.SpaceBetween

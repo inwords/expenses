@@ -1,8 +1,10 @@
 package com.inwords.expenses.core.network
 
+import com.inwords.expenses.core.network.dto.ErrorResponseDto
 import com.inwords.expenses.core.utils.IoResult
 import com.inwords.expenses.core.utils.SuspendLazy
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.RedirectResponseException
 import io.ktor.client.plugins.ServerResponseException
@@ -47,5 +49,14 @@ inline fun HttpRequestBuilder.url(config: HostConfig, crossinline block: URLBuil
         protocol = config.protocol
         host = config.host
         block(this)
+    }
+}
+
+suspend fun NetworkResult.Error.Http.Client.getErrorCode(): String? {
+    return try {
+        exception.response.body<ErrorResponseDto>().code // FIXME parse and propagate other fields too
+    } catch (_: ContentConvertException) {
+        // TODO add log
+        null
     }
 }

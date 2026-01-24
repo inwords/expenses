@@ -16,9 +16,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class JoinEventPaneDestination(
     @SerialName("eventId")
-    val eventId: String, // no default value so that is is added as a **path parameter** to deep link
+    val eventId: String, // no default value so that is added as a **path parameter** to deep link
     @SerialName("pinCode")
     val pinCode: String = "",
+    @SerialName("token")
+    val token: String = "",
 ) : Destination {
 
     constructor() : this(eventId = "")
@@ -41,6 +43,7 @@ fun getJoinEventPaneNavModule(
                         joinEventUseCase = joinEventUseCaseLazy.value,
                         initialEventId = key.eventId,
                         initialPinCode = key.pinCode,
+                        initialToken = key.token,
                     )
                 }
             })

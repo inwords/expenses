@@ -2,11 +2,13 @@ package com.inwords.expenses.feature.menu.ui
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
@@ -15,22 +17,27 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inwords.expenses.core.ui.design.legal.LegalBlock
 import com.inwords.expenses.core.ui.design.theme.CommonExTheme
 import com.inwords.expenses.core.ui.utils.clipEntryOf
-import com.inwords.expenses.core.utils.IO
+import com.inwords.expenses.feature.menu.ui.MenuDialogUiModel.ShareState
+import com.inwords.expenses.feature.menu.ui.MenuDialogUiModel.ShareState.Companion.canShare
 import expenses.shared.feature.menu.generated.resources.Res
 import expenses.shared.feature.menu.generated.resources.menu_add_participants_action
 import expenses.shared.feature.menu.generated.resources.menu_choose_person_action
@@ -38,10 +45,9 @@ import expenses.shared.feature.menu.generated.resources.menu_copy_action
 import expenses.shared.feature.menu.generated.resources.menu_join_other_event
 import expenses.shared.feature.menu.generated.resources.menu_open_events_list
 import expenses.shared.feature.menu.generated.resources.menu_share_action
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 internal fun MenuDialog(
     state: MenuDialogUiModel,
@@ -50,10 +56,19 @@ internal fun MenuDialog(
     onChoosePersonClicked: () -> Unit,
     onAddParticipantsClicked: () -> Unit,
     onShareClicked: () -> Unit,
+    onCopyClicked: () -> Unit,
+    onTextCopied: () -> Unit,
     onPrivacyPolicyClicked: () -> Unit,
     onTermsOfUseClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val clipboard = LocalClipboard.current
+    (state.shareState as? ShareState.PendingClipboardCopy)?.let { pendingCopy ->
+        LaunchedEffect(pendingCopy.shareText) {
+            clipboard.setClipEntry(clipEntryOf(state.eventName, pendingCopy.shareText))
+            onTextCopied()
+        }
+    }
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -62,7 +77,10 @@ internal fun MenuDialog(
     ) {
         Row(
             modifier = Modifier
-                .clickable(onClick = onShareClicked)
+                .clickable(
+                    enabled = state.shareState.canShare,
+                    onClick = onShareClicked
+                )
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
@@ -81,31 +99,33 @@ internal fun MenuDialog(
                 style = MaterialTheme.typography.bodyLarge
             )
 
-            val coroutineScope = rememberCoroutineScope()
-            val clipboard = LocalClipboard.current
-            Text(
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .border(
-                        border = AssistChipDefaults.assistChipBorder(true),
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .clickable(
-                        enabled = state.shareUrl != null
-                    ) {
-                        val shareUrl = state.shareUrl ?: return@clickable
-                        val eventName = state.eventName
-                        coroutineScope.launch(IO) {
-                            clipboard.setClipEntry(
-                                clipEntryOf(eventName, shareUrl)
-                            )
-                        }
-                    }
-                    .padding(8.dp),
-                text = stringResource(Res.string.menu_copy_action),
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodyLarge
-            )
+            val isLoading = state.shareState is ShareState.Loading
+            Box(
+                modifier = Modifier.align(Alignment.CenterVertically),
+                contentAlignment = Alignment.Center
+            ) {
+                // Always render Text to preserve intrinsic size for any font scale
+                Text(
+                    modifier = Modifier
+                        .alpha(if (isLoading) 0f else 1f)
+                        .then(if (isLoading) Modifier.clearAndSetSemantics {} else Modifier)
+                        .border(
+                            border = AssistChipDefaults.assistChipBorder(enabled = state.shareState.canShare),
+                            shape = MaterialTheme.shapes.small
+                        )
+                        .clickable(
+                            enabled = state.shareState.canShare,
+                            onClick = onCopyClicked
+                        )
+                        .padding(8.dp),
+                    text = stringResource(Res.string.menu_copy_action),
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                if (isLoading) {
+                    LoadingIndicator(modifier = Modifier.size(24.dp))
+                }
+            }
         }
 
         HorizontalDivider()
@@ -209,13 +229,18 @@ private fun MenuDialogPreview() {
         MenuDialog(
             state = MenuDialogUiModel(
                 eventName = "Пример события",
-                shareUrl = "https://commonex.ru/event/ASDASD?pinCode=1234"
+                shareState = ShareState.Idle(
+                    serverId = "ASDASD",
+                    pinCode = "1234",
+                ),
             ),
             onJoinEventClicked = {},
             onLeaveEventClicked = {},
             onChoosePersonClicked = {},
             onAddParticipantsClicked = {},
             onShareClicked = {},
+            onCopyClicked = {},
+            onTextCopied = {},
             onPrivacyPolicyClicked = {},
             onTermsOfUseClicked = {},
         )
@@ -229,13 +254,39 @@ private fun MenuDialogEmptyShareUrlPreview() {
         MenuDialog(
             state = MenuDialogUiModel(
                 eventName = "Пример события",
-                shareUrl = null
+                shareState = ShareState.Ready(
+                    shareText = "Какой-то текст и ссылка https://commonex.ru/event/ASDASD?pinCode=1234"
+                ),
             ),
             onJoinEventClicked = {},
             onLeaveEventClicked = {},
             onChoosePersonClicked = {},
             onAddParticipantsClicked = {},
             onShareClicked = {},
+            onCopyClicked = {},
+            onTextCopied = {},
+            onPrivacyPolicyClicked = {},
+            onTermsOfUseClicked = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun MenuDialogLoadingPreview() {
+    CommonExTheme {
+        MenuDialog(
+            state = MenuDialogUiModel(
+                eventName = "Пример события",
+                shareState = ShareState.Loading,
+            ),
+            onJoinEventClicked = {},
+            onLeaveEventClicked = {},
+            onChoosePersonClicked = {},
+            onAddParticipantsClicked = {},
+            onShareClicked = {},
+            onCopyClicked = {},
+            onTextCopied = {},
             onPrivacyPolicyClicked = {},
             onTermsOfUseClicked = {},
         )

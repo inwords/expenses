@@ -8,6 +8,7 @@ import androidx.navigation3.scene.DialogSceneStrategy.Companion.dialog
 import com.inwords.expenses.core.navigation.Destination
 import com.inwords.expenses.core.navigation.NavModule
 import com.inwords.expenses.core.navigation.NavigationController
+import com.inwords.expenses.feature.events.domain.CreateShareTokenUseCase
 import com.inwords.expenses.feature.events.domain.GetCurrentEventStateUseCase
 import com.inwords.expenses.feature.events.domain.LeaveEventUseCase
 import com.inwords.expenses.feature.share.api.ShareManager
@@ -20,7 +21,8 @@ fun getMenuDialogNavModule(
     navigationController: NavigationController,
     getCurrentEventStateUseCaseLazy: Lazy<GetCurrentEventStateUseCase>,
     leaveEventUseCaseLazy: Lazy<LeaveEventUseCase>,
-    shareManagerLazy: Lazy<ShareManager>
+    shareManagerLazy: Lazy<ShareManager>,
+    createShareTokenUseCaseLazy: Lazy<CreateShareTokenUseCase>,
 ): NavModule {
     return NavModule(MenuDialogDestination.serializer()) {
         entry<MenuDialogDestination>(metadata = dialog()) {
@@ -30,7 +32,8 @@ fun getMenuDialogNavModule(
                         navigationController = navigationController,
                         getCurrentEventStateUseCase = getCurrentEventStateUseCaseLazy.value,
                         leaveEventUseCase = leaveEventUseCaseLazy.value,
-                        shareManagerLazy = shareManagerLazy
+                        shareManagerLazy = shareManagerLazy,
+                        createShareTokenUseCaseLazy = createShareTokenUseCaseLazy,
                     )
                 }
             })
@@ -41,6 +44,8 @@ fun getMenuDialogNavModule(
                 onChoosePersonClicked = viewModel::onChoosePersonClicked,
                 onAddParticipantsClicked = viewModel::onAddParticipantClicked,
                 onShareClicked = viewModel::onShareClicked,
+                onCopyClicked = viewModel::onCopyClicked,
+                onTextCopied = viewModel::onTextCopied,
                 onPrivacyPolicyClicked = viewModel::onPrivacyPolicyClicked,
                 onTermsOfUseClicked = viewModel::onTermsOfUseClicked,
             )

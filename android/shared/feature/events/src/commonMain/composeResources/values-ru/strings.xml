@@ -17,6 +17,8 @@
     <string name="events_info_with_person">%1$s — %2$s</string>
     <string name="events_join_description">Введите ID события и код доступа, чтобы присоединиться</string>
     <string name="events_join_error_invalid_credentials">Неверный ID события или код доступа</string>
+    <string name="events_join_error_invalid_token">Недействительная ссылка</string>
+    <string name="events_join_error_expired_token">Срок действия ссылки истёк. Попросите отправить вам новую ссылку или введите код события вручную</string>
     <string name="events_name_placeholder">Название</string>
     <string name="events_owner_label">Меня зовут</string>
     <string name="events_participants_label">Ещё участвуют</string>
