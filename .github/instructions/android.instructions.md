@@ -29,7 +29,7 @@ This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application 
 **App Features:**
 
 - Event creation and deletion
-- Person management within events
+- Person management within events (create initially / add to existing events)
 - Joining events via invite links
 - Expense recording with currency conversion
 - Debt calculation and split management
@@ -157,7 +157,14 @@ shared/                       # Kotlin Multiplatform shared code
   │   ├── ui-utils/           # Compose UI utilities
   │   └── ktor-client-cronet/ # Custom Cronet Engine implementation for Ktor
   ├── feature/                # Feature modules
-  │   ├── events/             # Event management (create, join, person management)
+  │   ├── events/             # Event management (create, join, add participants to existing event or during event creation)
+  │   │   └── ui/
+  │   │       ├── add_persons/        # Add participants during event creation
+  │   │       ├── add_participants/   # Add participants to existing event
+  │   │       ├── choose_person/      # Choose current person (participant)
+  │   │       ├── create/             # Create new event
+  │   │       ├── join/               # Join existing event
+  │   │       └── ...
   │   ├── expenses/           # Expense tracking (recording, debts, splits)
   │   ├── settings/           # App settings
   │   ├── menu/               # Navigation menu
@@ -323,6 +330,24 @@ When adding new data or schema changes for existing users:
 - Compose Multiplatform for shared UI components
 - Platform-specific implementations in `androidMain`/`iosMain` source sets
 - For navigation, use Navigation 3 library with helpers from `shared:core:navigation`
+
+### Adding Participants to Existing Events
+
+The "Add participants" feature allows users to add new participants to an existing event:
+
+- **Entry point**: Menu dialog → "Add participants" option
+- **UI**: Full-screen pane (`AddParticipantsToEventPane`) similar to the one used in event creation flow
+- **Domain**: `AddParticipantsToCurrentEventUseCase` handles adding participants locally
+- **Sync**: New participants are stored locally immediately (offline-first) with `serverId = null`
+- **Background sync**: `EventPersonsPushTask` automatically syncs new participants to server
+- **Location**: `shared/feature/events/src/commonMain/kotlin/.../ui/add_participants/`
+- **Key files**:
+  - `AddParticipantsToEventPane.kt` - UI composable
+  - `AddParticipantsToEventViewModel.kt` - ViewModel with state management
+  - `AddParticipantsToCurrentEventUseCase.kt` - Domain use case
+  - `AddParticipantsToEventPaneDestination.kt` - Navigation destination
+
+The confirm button is disabled when there are no participants or all participant names are empty (checked via `isConfirmEnabled` computed property).
 
 ### Adding a New Currency
 

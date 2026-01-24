@@ -92,6 +92,8 @@ This document defines core domain terms and the primary sources of truth for the
 ### Events and People
 - `EventDetails` bundles the current event, currencies, persons, and primary currency.
 - Event creation generates a 4-digit pin code and creates the initial owner plus other persons.
+- Participants can be added to existing events via the "Add participants" menu option (Android) or modal (Web).
+- New participants are stored locally immediately (offline-first) and synced to server via `EventPersonsPushTask`.
 - Joining an event uses `serverId` + pin code or share token; errors map to invalid access code, not found, or gone.
 - Event share tokens include `token` and `expiresAt` and are requested with a pin code.
 
