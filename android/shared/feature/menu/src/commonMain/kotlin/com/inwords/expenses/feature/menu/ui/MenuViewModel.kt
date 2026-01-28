@@ -183,9 +183,9 @@ internal class MenuViewModel(
             }
 
             is ShareState.Ready -> shareState.shareText
+            is ShareState.PendingClipboardCopy -> shareState.shareText
 
-            ShareState.Loading,
-            is ShareState.PendingClipboardCopy -> null
+            ShareState.Loading -> null
         }
     }
 

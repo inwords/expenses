@@ -253,6 +253,7 @@ internal class EventsRemoteStoreImpl(
 
             HttpStatusCode.Forbidden -> EventNetworkError.InvalidToken
             HttpStatusCode.NotFound -> EventNetworkError.NotFound
+            HttpStatusCode.Gone -> EventNetworkError.Gone
             else -> EventNetworkError.OtherError
         }
     }
