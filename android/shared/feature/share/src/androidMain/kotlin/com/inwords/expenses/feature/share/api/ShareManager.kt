@@ -12,7 +12,7 @@ actual class ShareManager internal constructor(
 ) {
 
     @OptIn(ExperimentalResourceApi::class)
-    actual suspend fun shareUrl(title: String, url: String) {
+    actual suspend fun shareText(title: String, url: String) {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_SUBJECT, title)

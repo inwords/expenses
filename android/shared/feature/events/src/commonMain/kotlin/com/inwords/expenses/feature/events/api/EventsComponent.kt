@@ -9,6 +9,7 @@ import com.inwords.expenses.feature.events.data.network.store.CurrenciesRemoteSt
 import com.inwords.expenses.feature.events.data.network.store.EventsRemoteStoreImpl
 import com.inwords.expenses.feature.events.domain.AddParticipantsToCurrentEventUseCase
 import com.inwords.expenses.feature.events.domain.CreateEventUseCase
+import com.inwords.expenses.feature.events.domain.CreateShareTokenUseCase
 import com.inwords.expenses.feature.events.domain.DeleteEventUseCase
 import com.inwords.expenses.feature.events.domain.EventCreationStateHolder
 import com.inwords.expenses.feature.events.domain.EventDeletionStateManagerImpl
@@ -168,6 +169,12 @@ class EventsComponent internal constructor(
 
     val eventsSyncStateHolderLazy: Lazy<EventsSyncStateHolder> = lazy {
         EventsSyncStateHolder()
+    }
+
+    val createShareTokenUseCaseLazy: Lazy<CreateShareTokenUseCase> = lazy {
+        CreateShareTokenUseCase(
+            eventsRemoteStoreLazy = eventsRemoteStore,
+        )
     }
 
 }

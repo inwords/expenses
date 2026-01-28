@@ -37,6 +37,7 @@ kotlin {
                 implementation(shared.coroutines.core)
 
                 implementation(shared.kotlinx.serialization.json)
+                implementation(shared.kotlinx.datetime)
                 implementation(shared.kotlinx.collections.immutable)
 
                 implementation(shared.lifecycle.runtime.compose.multiplatform)

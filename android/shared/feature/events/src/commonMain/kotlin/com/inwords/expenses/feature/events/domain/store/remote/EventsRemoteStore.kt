@@ -1,38 +1,51 @@
 package com.inwords.expenses.feature.events.domain.store.remote
 
 import com.inwords.expenses.core.utils.IoResult
+import com.inwords.expenses.feature.events.domain.CreateShareTokenUseCase.CreateShareTokenResult
 import com.inwords.expenses.feature.events.domain.model.Currency
 import com.inwords.expenses.feature.events.domain.model.Event
 import com.inwords.expenses.feature.events.domain.model.EventDetails
-import com.inwords.expenses.feature.events.domain.model.EventShareToken
 import com.inwords.expenses.feature.events.domain.model.Person
 
 internal interface EventsRemoteStore {
 
     sealed interface EventNetworkError {
-        data object InvalidAccessCode : EventNetworkError
-        data object NotFound : EventNetworkError
-        data object Gone : EventNetworkError
-        data object OtherError : EventNetworkError
+        sealed interface ByAccessCode : EventNetworkError
+        sealed interface ByToken : EventNetworkError
+
+        data object InvalidAccessCode : ByAccessCode
+        data object InvalidToken : ByToken
+        data object TokenExpired : ByToken
+        data object NotFound : ByAccessCode, ByToken
+        data object Gone : ByAccessCode, ByToken
+        data object OtherError : ByAccessCode, ByToken
     }
 
-    sealed interface GetEventResult {
-        data class Event(val event: EventDetails) : GetEventResult
-        data class Error(val error: EventNetworkError) : GetEventResult
+    sealed interface GetEventResult<T : EventNetworkError> {
+        data class Event<T : EventNetworkError>(val event: EventDetails) : GetEventResult<T>
+        data class Error<T : EventNetworkError>(val error: T) : GetEventResult<T>
     }
 
     sealed interface DeleteEventResult {
         data object Deleted : DeleteEventResult
-        data class Error(val error: EventNetworkError) : DeleteEventResult
+        data class Error(val error: EventNetworkError.ByAccessCode) : DeleteEventResult
     }
 
-    suspend fun getEvent(
+    suspend fun getEventByAccessCode(
         localId: Long,
         serverId: String,
         pinCode: String,
         currencies: List<Currency>,
         localPersons: List<Person>?,
-    ): GetEventResult
+    ): GetEventResult<EventNetworkError.ByAccessCode>
+
+    suspend fun getEventByToken(
+        localId: Long,
+        serverId: String,
+        token: String,
+        currencies: List<Currency>,
+        localPersons: List<Person>?,
+    ): GetEventResult<EventNetworkError.ByToken>
 
     suspend fun createEvent(
         event: Event,
@@ -52,6 +65,6 @@ internal interface EventsRemoteStore {
     suspend fun createEventShareToken(
         eventServerId: String,
         pinCode: String,
-    ): IoResult<EventShareToken>
+    ): CreateShareTokenResult
 
 }

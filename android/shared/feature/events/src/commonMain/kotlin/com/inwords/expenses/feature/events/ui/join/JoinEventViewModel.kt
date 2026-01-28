@@ -12,7 +12,9 @@ import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneDest
 import com.inwords.expenses.feature.events.ui.join.JoinEventPaneUiModel.EventJoiningState
 import expenses.shared.core.ui_design.generated.resources.error_other
 import expenses.shared.feature.events.generated.resources.Res
+import expenses.shared.feature.events.generated.resources.events_join_error_expired_token
 import expenses.shared.feature.events.generated.resources.events_join_error_invalid_credentials
+import expenses.shared.feature.events.generated.resources.events_join_error_invalid_token
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -29,6 +31,7 @@ internal class JoinEventViewModel(
     private val stringProvider: StringProvider = DefaultStringProvider,
     initialEventId: String,
     initialPinCode: String,
+    initialToken: String,
 ) : ViewModel(viewModelScope = CoroutineScope(SupervisorJob() + IO)) {
 
     private val eventIdRegex = "[0-9A-HJKMNP-TV-Z]".toRegex()
@@ -44,8 +47,12 @@ internal class JoinEventViewModel(
         field = MutableStateFlow(initialState)
 
     init {
-        if (initialState.eventId.isNotBlank() && initialState.eventAccessCode.isNotBlank()) {
-            onConfirmClicked()
+        // Auto-trigger join if we have initial token or accessCode
+        if (initialState.eventId.isNotBlank()) {
+            val filteredToken = initialToken.filteredToken().ifBlank { null }
+            if (filteredToken != null) {
+                onConfirmClicked(eventToken = filteredToken)
+            }
         }
     }
 
@@ -61,7 +68,7 @@ internal class JoinEventViewModel(
         }
     }
 
-    fun onConfirmClicked() {
+    fun onConfirmClicked(eventToken: String? = null) {
         confirmJob?.cancel()
 
         val state = state.updateAndGet { currentState ->
@@ -70,7 +77,8 @@ internal class JoinEventViewModel(
         confirmJob = viewModelScope.launch {
             val result = joinEventUseCase.joinEvent(
                 eventServerId = state.eventId,
-                accessCode = state.eventAccessCode
+                accessCode = state.eventAccessCode.ifBlank { null }.takeIf { eventToken == null },
+                token = eventToken,
             )
 
             when (result) {
@@ -79,12 +87,17 @@ internal class JoinEventViewModel(
                 )
 
                 is JoinEventResult.Error -> {
-                    val errorMessage = when (result) {
-                        JoinEventResult.Error.EventNotFound,
-                        JoinEventResult.Error.InvalidAccessCode -> stringProvider.getString(Res.string.events_join_error_invalid_credentials)
+                    val errorMessage = stringProvider.getString(
+                        when (result) {
+                            JoinEventResult.Error.EventNotFound,
+                            JoinEventResult.Error.InvalidAccessCode -> Res.string.events_join_error_invalid_credentials
 
-                        JoinEventResult.Error.OtherError -> stringProvider.getString(DesignRes.string.error_other)
-                    }
+                            JoinEventResult.Error.InvalidToken -> Res.string.events_join_error_invalid_token
+                            JoinEventResult.Error.TokenExpired -> Res.string.events_join_error_expired_token
+
+                            JoinEventResult.Error.OtherError -> DesignRes.string.error_other
+                        }
+                    )
                     this@JoinEventViewModel.state.update { currentState ->
                         currentState.copy(joining = EventJoiningState.Error(errorMessage))
                     }
@@ -103,6 +116,10 @@ internal class JoinEventViewModel(
 
     private fun String.filteredPinCode(): String {
         return this.filter { it.isDigit() }
+    }
+
+    private fun String.filteredToken(): String {
+        return this.filter { it.isLetterOrDigit() }
     }
 
 }

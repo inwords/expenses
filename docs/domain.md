@@ -51,11 +51,12 @@ This document defines core domain terms and the primary sources of truth for the
 - Canonical model: `backend/src/domain/entities/currency-rate.entity.ts`.
 
 ### Event Share Token
-- Token used to share or join an event (V2).
+- Temporary access credential for event sharing.
 - Fields: token, eventId, expiresAt, createdAt.
 - Token default: 32 random bytes encoded as hex (64 chars).
 - Default expiry: 14 days from creation.
 - Existing active token is reused when creating a new share token for the same event.
+- Exchanged for permanent PIN code upon successful join via token.
 - Canonical model: `backend/src/domain/entities/event-share-token.entity.ts`.
 
 ## Domain Rules and Flows (Backend)
@@ -94,8 +95,9 @@ This document defines core domain terms and the primary sources of truth for the
 - Event creation generates a 4-digit pin code and creates the initial owner plus other persons.
 - Participants can be added to existing events via the "Add participants" menu option (Android) or modal (Web).
 - New participants are stored locally immediately (offline-first) and synced to server via `EventPersonsPushTask`.
-- Joining an event uses `serverId` + pin code or share token; errors map to invalid access code, not found, or gone.
+- Joining an event uses `serverId` + pin code or share token; errors map to invalid access code, invalid token, token expired, not found, or gone.
 - Event share tokens include `token` and `expiresAt` and are requested with a pin code.
+- Share token generation falls back to PIN-based link with warning if network request fails (offline mode).
 
 ### Expenses and Splits
 - `Expense` includes the payer (`person`), currency, type, timestamp, and split list.

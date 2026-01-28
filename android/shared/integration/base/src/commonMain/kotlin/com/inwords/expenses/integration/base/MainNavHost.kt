@@ -119,6 +119,7 @@ fun MainNavHost(
                 getCurrentEventStateUseCaseLazy = eventsComponent.getCurrentEventStateUseCaseLazy,
                 leaveEventUseCaseLazy = eventsComponent.leaveEventUseCaseLazy,
                 shareManagerLazy = shareComponent.shareManagerLazy,
+                createShareTokenUseCaseLazy = eventsComponent.createShareTokenUseCaseLazy,
             )
         )
     }

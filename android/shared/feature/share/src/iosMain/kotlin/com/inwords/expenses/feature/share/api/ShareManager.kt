@@ -9,7 +9,7 @@ import platform.UIKit.UIApplication
 actual class ShareManager internal constructor() {
 
     @OptIn(BetaInteropApi::class)
-    actual suspend fun shareUrl(title: String, url: String) {
+    actual suspend fun shareText(title: String, url: String) {
         val activityItems = listOf(
             NSString.create(string = "$title\n$url")
         )
