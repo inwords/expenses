@@ -27,7 +27,7 @@ internal data class MenuDialogUiModel(
      * [eventName] - title of the share content
      * [fullText] - full text to share (with title)
      */
-    class ShareText(
+    data class ShareText(
         val eventName: String,
         val fullText: String,
     )
