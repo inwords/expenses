@@ -50,7 +50,7 @@ internal class JoinEventViewModel(
         // Auto-trigger join if we have initial token or accessCode
         if (initialState.eventId.isNotBlank()) {
             val filteredToken = initialToken.filteredToken().ifBlank { null }
-            if (filteredToken != null) {
+            if (filteredToken != null || initialState.eventAccessCode.isNotBlank()) {
                 onConfirmClicked(eventToken = filteredToken)
             }
         }

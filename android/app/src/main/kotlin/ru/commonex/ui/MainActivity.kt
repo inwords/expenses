@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.ReportDrawn
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import com.inwords.expenses.core.navigation.DeeplinkProvider
@@ -31,7 +32,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onNewIntent(intent: Intent) {
+    @VisibleForTesting
+    public override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         deeplinkProvider.supplyIntent(intent)
     }

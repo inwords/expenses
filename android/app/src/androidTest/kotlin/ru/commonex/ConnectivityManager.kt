@@ -29,10 +29,7 @@ internal object ConnectivityManager {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         val cm = appContext.getSystemService(ConnectivityManager::class.java)
 
-        val currentNetwork = cm.activeNetwork
-        if (currentNetwork == null || !isValidated(cm, currentNetwork)) {
-            return
-        }
+        cm.activeNetwork ?: return
 
         val latch = CountDownLatch(1)
         val callback = object : ConnectivityManager.NetworkCallback() {
@@ -55,11 +52,6 @@ internal object ConnectivityManager {
         } finally {
             cm.unregisterNetworkCallback(callback)
         }
-    }
-
-    private fun isValidated(cm: ConnectivityManager, network: Network): Boolean {
-        return cm.getNetworkCapabilities(network)
-            ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
     }
 
 }
