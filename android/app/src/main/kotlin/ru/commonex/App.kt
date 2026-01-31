@@ -34,7 +34,7 @@ class App : Application(), Configuration.Provider {
             )
         }
 
-        registerComponents(this)
+        registerComponents(this, production = !BuildConfig.DEBUG)
 
         enableSync()
     }

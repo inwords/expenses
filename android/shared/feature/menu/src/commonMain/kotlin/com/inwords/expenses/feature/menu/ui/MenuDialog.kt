@@ -38,6 +38,7 @@ import com.inwords.expenses.core.ui.design.theme.CommonExTheme
 import com.inwords.expenses.core.ui.utils.clipEntryOf
 import com.inwords.expenses.feature.menu.ui.MenuDialogUiModel.ShareState
 import com.inwords.expenses.feature.menu.ui.MenuDialogUiModel.ShareState.Companion.canShare
+import com.inwords.expenses.feature.menu.ui.MenuDialogUiModel.ShareText
 import expenses.shared.feature.menu.generated.resources.Res
 import expenses.shared.feature.menu.generated.resources.menu_add_participants_action
 import expenses.shared.feature.menu.generated.resources.menu_choose_person_action
@@ -65,7 +66,7 @@ internal fun MenuDialog(
     val clipboard = LocalClipboard.current
     (state.shareState as? ShareState.PendingClipboardCopy)?.let { pendingCopy ->
         LaunchedEffect(pendingCopy.shareText) {
-            clipboard.setClipEntry(clipEntryOf(state.eventName, pendingCopy.shareText))
+            clipboard.setClipEntry(clipEntryOf(state.eventName, pendingCopy.shareText.fullText))
             onTextCopied()
         }
     }
@@ -255,7 +256,10 @@ private fun MenuDialogEmptyShareUrlPreview() {
             state = MenuDialogUiModel(
                 eventName = "Пример события",
                 shareState = ShareState.Ready(
-                    shareText = "Какой-то текст и ссылка https://commonex.ru/event/ASDASD?pinCode=1234"
+                    shareText = ShareText(
+                        eventName = "Пример события",
+                        fullText = "Пример события\n\nКакой-то текст и ссылка https://commonex.ru/event/ASDASD?pinCode=1234",
+                    )
                 ),
             ),
             onJoinEventClicked = {},

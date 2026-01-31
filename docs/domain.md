@@ -96,6 +96,7 @@ This document defines core domain terms and the primary sources of truth for the
 - Participants can be added to existing events via the "Add participants" menu option (Android) or modal (Web).
 - New participants are stored locally immediately (offline-first) and synced to server via `EventPersonsPushTask`.
 - Joining an event uses `serverId` + pin code or share token; errors map to invalid access code, invalid token, token expired, not found, or gone.
+- Mobile deeplinks with `?token=` or `?pinCode=` prefill and auto-trigger join.
 - Event share tokens include `token` and `expiresAt` and are requested with a pin code.
 - Share token generation falls back to PIN-based link with warning if network request fails (offline mode).
 

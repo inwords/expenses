@@ -1,18 +1,24 @@
 package ru.commonex
 
+import android.content.ClipboardManager
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.test.platform.app.InstrumentationRegistry
 import de.mannodermaus.junit5.compose.ComposeContext
 import de.mannodermaus.junit5.compose.createAndroidComposeExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
+import ru.commonex.screens.ChoosePersonScreen
 import ru.commonex.screens.ExpensesScreen
 import ru.commonex.screens.LocalEventsScreen
+import ru.commonex.screens.MenuDialogScreen
 import ru.commonex.ui.MainActivity
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-// .\gradlew.bat :app:connectedAutotestAndroidTest
+// .\gradlew :app:connectedAutotestAndroidTest -Dcom.android.tools.r8.disableApiModeling
 @OptIn(ExperimentalTestApi::class)
 @ExtendWith(ConnectivityExtension::class)
 class BasicInstrumentedTest {
@@ -25,8 +31,8 @@ class BasicInstrumentedTest {
      * Tests the complete event creation and expenses flow:
      * - Create event with multiple participants
      * - Add expense with equal split (default)
-     * - Add expense with non-equal split
-     * - Cancel an expense and verify revert
+     * - Add expense with custom split
+     * - Cancel an expense and verify revert entry
      * - Verify debt calculations
      * - Switch to a different person and verify view updates
      */
@@ -102,6 +108,84 @@ class BasicInstrumentedTest {
                 .waitUntilLoaded("Test User 2")
                 .selectPerson("Test User 2")
                 .waitUntilLoadedEmpty()
+        }
+    }
+
+    /**
+     * Tests deeplink auto-join with secure token:
+     * - Create event
+     * - Copy share link (token) from menu
+     * - Remove local event copy
+     * - Open deeplink and verify auto-join flow
+     */
+    @Test
+    fun testDeeplinkJoinWithShareToken() {
+        extension.runTest {
+            val eventName = "Deeplink token event"
+
+            createLocalEvent(eventName)
+
+            val menu = ExpensesScreen().openMenu()
+                .waitUntilCopyEnabled()
+                .clickCopyShareLink() // wait for event to be synced
+            val shareUrl = waitForShareUrl(expectedParam = "token")
+
+            menu
+                .openEventsList()
+                .swipeToRevealActions(eventName)
+                .clickDeleteLocalOnly()
+                .assertEventNotExists(eventName)
+
+            triggerActivityOnNewIntent(shareUrl)
+
+            ChoosePersonScreen()
+                .waitUntilLoaded("Test User 1")
+                .selectPerson("Test User 1")
+                .waitUntilLoadedEmpty()
+                .verifyCurrentPerson(eventName, "Test User 1")
+        }
+    }
+
+    /**
+     * Tests deeplink auto-join with PIN code fallback:
+     * - Create event
+     * - Disable network and copy share link (pinCode)
+     * - Re-enable network and remove local event copy
+     * - Open deeplink and verify auto-join flow
+     */
+    @Test
+    fun testDeeplinkJoinWithPinCodeFallback() {
+        extension.runTest {
+            val eventName = "Deeplink pin event"
+
+            createLocalEvent(eventName)
+
+            val menu = ExpensesScreen().openMenu()
+                .waitUntilCopyEnabled() // wait for event to be synced
+
+            val shareUrl = try {
+                ConnectivityManager.turnOffDataAndWifi()
+
+                menu.clickCopyShareLink()
+
+                waitForShareUrl(expectedParam = "pinCode")
+            } finally {
+                ConnectivityManager.turnOnData()
+            }
+
+            MenuDialogScreen()
+                .openEventsList()
+                .swipeToRevealActions(eventName)
+                .clickDeleteLocalOnly()
+                .assertEventNotExists(eventName)
+
+            triggerActivityOnNewIntent(shareUrl)
+
+            ChoosePersonScreen()
+                .waitUntilLoaded("Test User 1")
+                .selectPerson("Test User 1")
+                .waitUntilLoadedEmpty()
+                .verifyCurrentPerson(eventName, "Test User 1")
         }
     }
 
@@ -306,6 +390,44 @@ class BasicInstrumentedTest {
             .enterOwnerName("Test User 1")
             .clickContinueButton()
             .waitUntilLoadedEmpty()
+    }
+
+    context(extension: ComposeContext)
+    private fun waitForShareUrl(expectedParam: String, timeoutMs: Long = 10000): String {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val clipboard = context.getSystemService(ClipboardManager::class.java)
+
+        var shareUrl: String? = null
+        extension.waitUntil(timeoutMillis = timeoutMs) {
+            val text = clipboard.primaryClip
+                ?.getItemAt(0)
+                ?.coerceToText(context)
+                ?: return@waitUntil false
+
+            val match = shareUrlRegex.find(text)
+            if (match != null && match.groupValues[1] == expectedParam) {
+                shareUrl = match.value
+                return@waitUntil true
+            } else {
+                return@waitUntil false
+            }
+        }
+
+        return shareUrl!!
+    }
+
+    private fun triggerActivityOnNewIntent(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        }
+        extension.scenario.onActivity {
+            it.onNewIntent(intent)
+        }
+    }
+
+    private companion object {
+
+        private val shareUrlRegex = Regex("https://commonex\\.ru/event/[A-Za-z0-9]+\\?(token|pinCode)=[A-Za-z0-9]+")
     }
 
 }

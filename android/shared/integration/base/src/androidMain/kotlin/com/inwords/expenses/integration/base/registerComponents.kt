@@ -29,7 +29,7 @@ import com.inwords.expenses.feature.sync.api.SyncComponentFactory
 import com.inwords.expenses.integration.databases.api.DatabasesComponentFactory
 import io.ktor.client.HttpClient
 
-fun registerComponents(appContext: Context) {
+fun registerComponents(appContext: Context, production: Boolean) {
     val settingsComponent = lazy {
         SettingsComponentFactory(
             deps = object : SettingsComponentFactory.Deps {
@@ -46,7 +46,7 @@ fun registerComponents(appContext: Context) {
     }
 
     val networkComponent = lazy {
-        NetworkComponentFactory(appContext).create()
+        NetworkComponentFactory(appContext, production = production).create()
     }
 
     val shareComponent = lazy {

@@ -5,7 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.ui.utils.DefaultStringProvider
 import com.inwords.expenses.core.ui.utils.StringProvider
-import com.inwords.expenses.core.ui.utils.fullDateFormat
+import com.inwords.expenses.core.ui.utils.formatLocalDate
+import com.inwords.expenses.core.ui.utils.getFullDateFormat
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
@@ -17,6 +18,7 @@ import com.inwords.expenses.feature.events.ui.add_participants.AddParticipantsTo
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneDestination
 import com.inwords.expenses.feature.events.ui.join.JoinEventPaneDestination
 import com.inwords.expenses.feature.menu.ui.MenuDialogUiModel.ShareState
+import com.inwords.expenses.feature.menu.ui.MenuDialogUiModel.ShareText
 import com.inwords.expenses.feature.share.api.ShareManager
 import expenses.shared.feature.menu.generated.resources.Res
 import expenses.shared.feature.menu.generated.resources.menu_share_fallback_message
@@ -32,9 +34,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format
-import kotlinx.datetime.toLocalDateTime
 
 internal class MenuViewModel(
     private val navigationController: NavigationController,
@@ -126,7 +125,7 @@ internal class MenuViewModel(
             val shareText = getOrCreateShareTextForState(eventName, state.shareState) ?: return@launch
 
             withContext(UI) {
-                shareManager.shareText(eventName, shareText)
+                shareManager.shareText(subject = shareText.eventName, fullText = shareText.fullText)
             }
 
             shareState.value = ShareState.Ready(shareText)
@@ -175,7 +174,7 @@ internal class MenuViewModel(
     private suspend fun getOrCreateShareTextForState(
         eventName: String,
         shareState: ShareState,
-    ): String? {
+    ): ShareText? {
         return when (shareState) {
             is ShareState.Idle -> {
                 shareState.serverId ?: return null
@@ -189,12 +188,12 @@ internal class MenuViewModel(
         }
     }
 
-    private suspend fun createShareTokenAndGenerateShareText(eventName: String, serverId: String, pinCode: String): String {
-        return when (val tokenResult = createShareTokenUseCase.createShareToken(serverId, pinCode)) {
+    private suspend fun createShareTokenAndGenerateShareText(eventName: String, serverId: String, pinCode: String): ShareText {
+        val fullText = when (val tokenResult = createShareTokenUseCase.createShareToken(serverId, pinCode)) {
             is CreateShareTokenResult.Created -> {
                 val token = tokenResult.token.token
                 val shareUrl = "https://commonex.ru/event/$serverId?token=$token"
-                val expiresDate = tokenResult.token.expiresAt.toLocalDateTime(TimeZone.currentSystemDefault()).date.format(fullDateFormat)
+                val expiresDate = tokenResult.token.expiresAt.formatLocalDate(getFullDateFormat())
 
                 stringProvider.getString(Res.string.menu_share_secure_message, eventName, shareUrl, expiresDate)
             }
@@ -205,6 +204,7 @@ internal class MenuViewModel(
                 stringProvider.getString(Res.string.menu_share_fallback_message, eventName, shareUrl)
             }
         }
+        return ShareText(eventName = eventName, fullText = fullText)
     }
 
 }
