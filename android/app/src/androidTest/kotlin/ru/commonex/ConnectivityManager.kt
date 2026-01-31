@@ -29,8 +29,6 @@ internal object ConnectivityManager {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         val cm = appContext.getSystemService(ConnectivityManager::class.java)
 
-        cm.activeNetwork ?: return
-
         val latch = CountDownLatch(1)
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onLost(network: Network) {
@@ -45,6 +43,11 @@ internal object ConnectivityManager {
         }
 
         cm.registerDefaultNetworkCallback(callback)
+
+        val capabilities = cm.getNetworkCapabilities(cm.activeNetwork)
+        if (capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) != true) {
+            latch.countDown()
+        }
         try {
             if (!latch.await(10, TimeUnit.SECONDS)) {
                 error("Timed out waiting for device to go offline")
