@@ -31,6 +31,7 @@ private val MonthNames.Companion.RUSSIAN_FULL by lazy(mode = LazyThreadSafetyMod
 }
 
 private val fullDateFormats = LazyFormatMap(
+    defaultLocale = "en",
     keys = setOf("en", "ru"),
     keyFallbackMap = mapOf(
         "by" to "ru",
@@ -58,6 +59,7 @@ fun getFullDateFormat(locale: Locale = Locale.current): DateTimeFormat<LocalDate
 }
 
 private val defaultDateTimeFormats = LazyFormatMap(
+    defaultLocale = "en",
     keys = setOf("en", "ru"),
     keyFallbackMap = mapOf(
         "by" to "ru",

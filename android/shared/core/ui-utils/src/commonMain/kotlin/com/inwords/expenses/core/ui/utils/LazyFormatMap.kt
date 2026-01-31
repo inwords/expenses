@@ -3,6 +3,7 @@ package com.inwords.expenses.core.ui.utils
 import kotlinx.datetime.format.DateTimeFormat
 
 internal class LazyFormatMap<T : Any>(
+    private val defaultLocale: String,
     keys: Set<String>,
     keyFallbackMap: Map<String, String>,
     createValueForKey: (String) -> DateTimeFormat<T>,
@@ -28,7 +29,9 @@ internal class LazyFormatMap<T : Any>(
     }
 
     fun getValue(key: String): DateTimeFormat<T> {
-        return map[key]?.value ?: throw NoSuchElementException("Key '$key' is not present in the map")
+        return map[key]?.value
+            ?: map[defaultLocale]?.value
+            ?: throw NoSuchElementException("Key '$key' is not present in the map")
     }
 
 }
