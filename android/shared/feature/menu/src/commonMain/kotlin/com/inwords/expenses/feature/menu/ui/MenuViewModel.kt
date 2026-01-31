@@ -5,7 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.inwords.expenses.core.navigation.NavigationController
 import com.inwords.expenses.core.ui.utils.DefaultStringProvider
 import com.inwords.expenses.core.ui.utils.StringProvider
-import com.inwords.expenses.core.ui.utils.fullDateFormat
+import com.inwords.expenses.core.ui.utils.formatLocalDate
+import com.inwords.expenses.core.ui.utils.getFullDateFormat
 import com.inwords.expenses.core.utils.IO
 import com.inwords.expenses.core.utils.UI
 import com.inwords.expenses.core.utils.stateInWhileSubscribed
@@ -32,9 +33,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format
-import kotlinx.datetime.toLocalDateTime
 
 internal class MenuViewModel(
     private val navigationController: NavigationController,
@@ -194,7 +192,7 @@ internal class MenuViewModel(
             is CreateShareTokenResult.Created -> {
                 val token = tokenResult.token.token
                 val shareUrl = "https://commonex.ru/event/$serverId?token=$token"
-                val expiresDate = tokenResult.token.expiresAt.toLocalDateTime(TimeZone.currentSystemDefault()).date.format(fullDateFormat)
+                val expiresDate = tokenResult.token.expiresAt.formatLocalDate(getFullDateFormat())
 
                 stringProvider.getString(Res.string.menu_share_secure_message, eventName, shareUrl, expiresDate)
             }
