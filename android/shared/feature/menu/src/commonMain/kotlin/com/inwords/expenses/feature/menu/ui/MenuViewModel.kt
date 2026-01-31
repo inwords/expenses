@@ -18,6 +18,7 @@ import com.inwords.expenses.feature.events.ui.add_participants.AddParticipantsTo
 import com.inwords.expenses.feature.events.ui.choose_person.ChoosePersonPaneDestination
 import com.inwords.expenses.feature.events.ui.join.JoinEventPaneDestination
 import com.inwords.expenses.feature.menu.ui.MenuDialogUiModel.ShareState
+import com.inwords.expenses.feature.menu.ui.MenuDialogUiModel.ShareText
 import com.inwords.expenses.feature.share.api.ShareManager
 import expenses.shared.feature.menu.generated.resources.Res
 import expenses.shared.feature.menu.generated.resources.menu_share_fallback_message
@@ -124,7 +125,7 @@ internal class MenuViewModel(
             val shareText = getOrCreateShareTextForState(eventName, state.shareState) ?: return@launch
 
             withContext(UI) {
-                shareManager.shareText(eventName, shareText)
+                shareManager.shareText(subject = shareText.eventName, fullText = shareText.fullText)
             }
 
             shareState.value = ShareState.Ready(shareText)
@@ -173,7 +174,7 @@ internal class MenuViewModel(
     private suspend fun getOrCreateShareTextForState(
         eventName: String,
         shareState: ShareState,
-    ): String? {
+    ): ShareText? {
         return when (shareState) {
             is ShareState.Idle -> {
                 shareState.serverId ?: return null
@@ -187,8 +188,8 @@ internal class MenuViewModel(
         }
     }
 
-    private suspend fun createShareTokenAndGenerateShareText(eventName: String, serverId: String, pinCode: String): String {
-        return when (val tokenResult = createShareTokenUseCase.createShareToken(serverId, pinCode)) {
+    private suspend fun createShareTokenAndGenerateShareText(eventName: String, serverId: String, pinCode: String): ShareText {
+        val fullText = when (val tokenResult = createShareTokenUseCase.createShareToken(serverId, pinCode)) {
             is CreateShareTokenResult.Created -> {
                 val token = tokenResult.token.token
                 val shareUrl = "https://commonex.ru/event/$serverId?token=$token"
@@ -203,6 +204,7 @@ internal class MenuViewModel(
                 stringProvider.getString(Res.string.menu_share_fallback_message, eventName, shareUrl)
             }
         }
+        return ShareText(eventName = eventName, fullText = fullText)
     }
 
 }

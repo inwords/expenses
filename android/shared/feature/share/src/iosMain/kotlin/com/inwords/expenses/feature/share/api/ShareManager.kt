@@ -9,9 +9,10 @@ import platform.UIKit.UIApplication
 actual class ShareManager internal constructor() {
 
     @OptIn(BetaInteropApi::class)
-    actual suspend fun shareText(title: String, url: String) {
+    actual suspend fun shareText(subject: String, fullText: String) {
+        // iOS UIActivityViewController doesn't use subject separately, just share the full text
         val activityItems = listOf(
-            NSString.create(string = "$title\n$url")
+            NSString.create(string = fullText)
         )
         val activityViewController = UIActivityViewController(activityItems = activityItems, applicationActivities = null)
 

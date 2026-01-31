@@ -12,11 +12,13 @@ actual class ShareManager internal constructor(
 ) {
 
     @OptIn(ExperimentalResourceApi::class)
-    actual suspend fun shareText(title: String, url: String) {
+    actual suspend fun shareText(subject: String, fullText: String) {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, title)
-            putExtra(Intent.EXTRA_TEXT, "$title\n$url")
+            if (subject.isNotBlank()) {
+                putExtra(Intent.EXTRA_SUBJECT, subject)
+            }
+            putExtra(Intent.EXTRA_TEXT, fullText)
         }
 
         val chooserTitle = getString(Res.string.share_chooser_title)
