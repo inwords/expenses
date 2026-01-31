@@ -8,10 +8,10 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 internal class CurrencyExchanger(
     // How many units of each currency equals 1 USD
     private val usdToOtherRates: Map<String, BigDecimal> = hashMapOf(
-        "EUR" to BigDecimal.fromDouble(0.8619),
-        "RUB" to BigDecimal.fromDouble(77.5011),
-        "TRY" to BigDecimal.fromDouble(42.5014),
-        "JPY" to BigDecimal.fromDouble(156.0960),
+        "EUR" to BigDecimal.fromDouble(0.8436),
+        "RUB" to BigDecimal.fromDouble(76.3834),
+        "TRY" to BigDecimal.fromDouble(43.4272),
+        "JPY" to BigDecimal.fromDouble(154.7350),
         "AED" to BigDecimal.fromDouble(3.6725),
         "USD" to BigDecimal.fromDouble(1.0),
     )

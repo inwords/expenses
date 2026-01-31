@@ -41,7 +41,7 @@ internal class ExpensesLocalStoreImpl(
     }
 
     override suspend fun upsert(event: Event, expenses: List<Expense>): List<Expense> {
-        return expenses.map { expense -> upsert(event, expense) }
+        return expenses.map { expense -> upsert(event, expense) } // TODO batch insert
     }
 
     override suspend fun updateExpenseSplitExchangedAmount(
