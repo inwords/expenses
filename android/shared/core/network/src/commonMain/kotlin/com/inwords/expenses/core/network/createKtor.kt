@@ -12,6 +12,7 @@ import kotlinx.serialization.json.Json
 
 internal fun <T : HttpClientEngineConfig> createKtor(
     httpClientEngine: HttpClientEngineFactory<T>,
+    enableLogging: Boolean = false,
     block: HttpClientConfig<T>.() -> Unit
 ): HttpClient {
     return HttpClient(httpClientEngine) {
@@ -29,7 +30,11 @@ internal fun <T : HttpClientEngineConfig> createKtor(
 
         install(Logging) {
             logger = getLogger()
-            level = LogLevel.NONE
+            level = if (enableLogging) {
+                LogLevel.ALL
+            } else {
+                LogLevel.NONE
+            }
         }
     }
 }

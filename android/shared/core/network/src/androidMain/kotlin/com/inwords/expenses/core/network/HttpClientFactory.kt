@@ -11,7 +11,10 @@ import org.chromium.net.DnsOptions
 import org.chromium.net.QuicOptions
 import java.io.File
 
-internal actual class HttpClientFactory(private val context: Context) {
+internal actual class HttpClientFactory(
+    private val context: Context,
+    private val enableLogging: Boolean
+) {
 
     actual suspend fun createHttpClient(): HttpClient {
         return withContext(IO) {
@@ -54,7 +57,7 @@ internal actual class HttpClientFactory(private val context: Context) {
     }
 
     private fun createKtor(cronetEngine: CronetEngine): HttpClient {
-        return createKtor(Cronet(cronetEngine)) {
+        return createKtor(Cronet(cronetEngine), enableLogging = enableLogging) {
             engine {
                 this.pipelining = true
                 this.followRedirects = false
