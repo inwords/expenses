@@ -1,0 +1,56 @@
+name: "CommonEx Android UI Tests"
+
+# Output directory for test reports
+outputDir: "build/reports/marathon"
+
+# Vendor-specific configuration for Android
+vendorConfiguration:
+  type: "Android"
+  # APK paths are relative to this Marathonfile location
+  # Using autotest build type for UI tests (R8 optimized but not shrunk/obfuscated)
+  applicationApk: "app/build/outputs/apk/autotest/app-autotest.apk"
+  testApplicationApk: "app/build/outputs/apk/androidTest/autotest/app-autotest-androidTest.apk"
+  # Auto-grant runtime permissions during installation
+  autoGrantPermission: true
+  # Clear app data between test batches to isolate tests
+  applicationPmClear: true
+  testApplicationPmClear: true
+  # Use local test parser (bytecode analysis)
+  testParserConfiguration:
+    type: "local"
+  # Screen recording configuration for debugging failed tests
+  screenRecordConfiguration:
+    preferableRecorderType: "screenshot"
+    videoConfiguration:
+      enabled: false
+      width: 720
+      height: 1280
+      bitrateMbps: 2
+      timeLimit: 180
+    screenshotConfiguration:
+      enabled: false
+      width: 720
+      height: 1280
+      delayMs: 500
+
+# Batching strategy - run each test in isolation
+batchingStrategy:
+  type: "isolate"
+
+# Retry strategy - handle flaky tests
+retryStrategy:
+  type: "fixed-quota"
+  totalAllowedRetryQuota: 6
+  retryPerTestQuota: 2
+
+# Enable debug output for troubleshooting
+debug: false
+
+# Test output timeout (2 minutes per test)
+testOutputTimeoutMillis: 120000
+
+# Test batch timeout (5 minutes per batch)
+testBatchTimeoutMillis: 300000
+
+# Uncompleted test retry quota
+uncompletedTestRetryQuota: 3

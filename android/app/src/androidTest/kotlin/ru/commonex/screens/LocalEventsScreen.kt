@@ -1,11 +1,11 @@
 package ru.commonex.screens
 
+import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
-import de.mannodermaus.junit5.compose.ComposeContext
 import expenses.shared.feature.events.generated.resources.Res
 import expenses.shared.feature.events.generated.resources.events_create
 import expenses.shared.feature.events.generated.resources.events_create_join_description
@@ -18,86 +18,86 @@ import org.jetbrains.compose.resources.getString
 
 internal class LocalEventsScreen : BaseScreen() {
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun waitUntilLoaded(): LocalEventsScreen {
         val createLabel = getString(Res.string.events_create)
         waitForElementWithText(createLabel)
         return this
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun clickCreateEvent(): CreateEventScreen {
         val createLabel = getString(Res.string.events_create)
-        extension.onNodeWithText(createLabel).performClick()
+        rule.onNodeWithText(createLabel).performClick()
         return CreateEventScreen()
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun clickJoinEvent(): JoinEventScreen {
         val joinLabel = getString(Res.string.events_join)
-        extension.onNodeWithText(joinLabel).performClick()
+        rule.onNodeWithText(joinLabel).performClick()
         return JoinEventScreen()
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     fun clickEvent(eventName: String): ChoosePersonScreen {
         waitForElementWithText(eventName)
-        extension.onNodeWithText(eventName).performClick()
+        rule.onNodeWithText(eventName).performClick()
         return ChoosePersonScreen()
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     fun swipeToRevealActions(eventName: String): LocalEventsScreen {
         waitForElementWithText(eventName)
-        extension.onNodeWithText(eventName).performTouchInput { swipeLeft() }
+        rule.onNodeWithText(eventName).performTouchInput { swipeLeft() }
         return this
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun clickDeleteEverywhere(): DeleteEventDialogScreen {
         val deleteEverywhereLabel = getString(Res.string.events_delete_everywhere)
         waitForElementWithText(deleteEverywhereLabel)
-        extension.onNodeWithText(deleteEverywhereLabel).performClick()
+        rule.onNodeWithText(deleteEverywhereLabel).performClick()
         return DeleteEventDialogScreen()
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun clickDeleteLocalOnly(): LocalEventsScreen {
         val deleteLocalOnlyLabel = getString(Res.string.events_delete_local_only)
         waitForElementWithText(deleteLocalOnlyLabel)
-        extension.onNodeWithText(deleteLocalOnlyLabel).performClick()
+        rule.onNodeWithText(deleteLocalOnlyLabel).performClick()
         return this
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun clickKeepEvent(): LocalEventsScreen {
         val keepEventLabel = getString(Res.string.events_keep_event)
         waitForElementWithText(keepEventLabel)
-        extension.onNodeWithText(keepEventLabel).performClick()
+        rule.onNodeWithText(keepEventLabel).performClick()
         return this
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     fun swipeBack(eventName: String): LocalEventsScreen {
         waitForElementWithText(eventName)
-        extension.onNodeWithText(eventName).performTouchInput { swipeRight() }
+        rule.onNodeWithText(eventName).performTouchInput { swipeRight() }
         return this
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     fun assertEventExists(eventName: String): LocalEventsScreen {
         waitForElementWithText(eventName)
         assertElementWithTextExists(eventName)
         return this
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     fun assertEventNotExists(eventName: String): LocalEventsScreen {
         waitForElementWithTextDoesNotExist(eventName)
         return this
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun assertCreateJoinDescriptionVisible(): LocalEventsScreen {
         val description = getString(Res.string.events_create_join_description)
         waitForElementWithText(description)
@@ -105,7 +105,7 @@ internal class LocalEventsScreen : BaseScreen() {
         return this
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun assertEventDeletedSnackbar(eventName: String): LocalEventsScreen {
         val message = getString(Res.string.events_event_deleted, eventName)
         waitForElementWithText(message)

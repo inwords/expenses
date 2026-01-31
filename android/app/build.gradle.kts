@@ -137,13 +137,13 @@ dependencies {
 
     testImplementation(shared.junit.jupiter.api)
     testRuntimeOnly(shared.junit.jupiter.engine)
-    androidTestImplementation(shared.junit.jupiter.api)
-    androidTestImplementation(shared.junit.jupiter.params)
+
     androidTestImplementation(shared.androidx.test.ext.junit)
     androidTestImplementation(shared.androidx.test.runner)
     androidTestImplementation(shared.androidx.test.espresso.core)
     androidTestUtil(shared.androidx.test.orchestrator)
     androidTestImplementation(shared.androidx.compose.ui.test.android)
+    androidTestImplementation(shared.androidx.compose.ui.test.junit4)
 
     androidTestImplementation(project(":shared:feature:events")) // FIXME: use textFixtures ScreenObjects for tests
     androidTestImplementation(project(":shared:feature:expenses"))

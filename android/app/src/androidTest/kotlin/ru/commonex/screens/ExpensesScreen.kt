@@ -1,9 +1,9 @@
 package ru.commonex.screens
 
+import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import de.mannodermaus.junit5.compose.ComposeContext
 import expenses.shared.feature.events.generated.resources.events_info_with_person
 import expenses.shared.feature.expenses.generated.resources.Res
 import expenses.shared.feature.expenses.generated.resources.expenses_details
@@ -14,14 +14,14 @@ import org.jetbrains.compose.resources.getString
 import expenses.shared.feature.events.generated.resources.Res as EventsRes
 
 internal class ExpensesScreen : BaseScreen() {
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun waitUntilLoadedEmpty(): ExpensesScreen {
         val noneLabel = getString(Res.string.expenses_none)
         waitForElementWithText(noneLabel)
         return this
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun verifyCurrentPerson(eventName: String, personName: String): ExpensesScreen {
         val titleText = getString(EventsRes.string.events_info_with_person, eventName, personName)
         waitForElementWithText(titleText)
@@ -29,48 +29,48 @@ internal class ExpensesScreen : BaseScreen() {
         return this
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun clickAddExpense(): AddExpenseScreen {
         val operationLabel = getString(Res.string.expenses_operation)
-        extension.onNodeWithText(operationLabel).performClick()
+        rule.onNodeWithText(operationLabel).performClick()
         return AddExpenseScreen()
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     fun openMenu(): MenuDialogScreen {
-        extension.onNodeWithTag("expenses_menu_button").performClick()
+        rule.onNodeWithTag("expenses_menu_button").performClick()
         return MenuDialogScreen()
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     fun clickOnExpense(description: String): ExpenseDetailsDialog {
         waitForElementWithText(description)
-        extension.onNodeWithText(description).performClick()
+        rule.onNodeWithText(description).performClick()
         return ExpenseDetailsDialog()
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun clickDebtDetails(): DebtsListScreen {
         val detailsLabel = getString(Res.string.expenses_details)
-        extension.onNodeWithText(detailsLabel).performClick()
+        rule.onNodeWithText(detailsLabel).performClick()
         return DebtsListScreen()
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     fun verifyExpenseAmount(amount: String): ExpensesScreen {
         waitForElementWithText(amount)
         assertElementWithTextExists(amount)
         return this
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     fun verifyExpenseExists(description: String): ExpensesScreen {
         waitForElementWithText(description)
         assertElementWithTextExists(description)
         return this
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun verifyRevertedExpenseExists(originalExpenseDescription: String): ExpensesScreen {
         val description = getString(Res.string.expenses_revert_description, originalExpenseDescription)
         return verifyExpenseExists(description)

@@ -12,17 +12,19 @@ import kotlinx.coroutines.asExecutor
 
 class App : Application(), Configuration.Provider {
 
+    private val production = !BuildConfig.DEBUG && BuildConfig.BUILD_TYPE != "autotest"
+
     override fun onCreate() {
         super.onCreate()
 
-        initializeSentry(production = !BuildConfig.DEBUG)
+        initializeSentry(production = production)
 
-        if (BuildConfig.DEBUG) {
+        if (!production) {
             StrictMode.setThreadPolicy(
                 StrictMode.ThreadPolicy.Builder()
                     .detectAll()
                     .penaltyLog()
-                    .penaltyDialog()
+                    .penaltyFlashScreen()
                     .build()
             )
 
@@ -34,7 +36,7 @@ class App : Application(), Configuration.Provider {
             )
         }
 
-        registerComponents(this, production = !BuildConfig.DEBUG)
+        registerComponents(this, production = production)
 
         enableSync()
     }
@@ -44,10 +46,10 @@ class App : Application(), Configuration.Provider {
             .setWorkerCoroutineContext(IO)
             .setTaskExecutor(IO.limitedParallelism(4).asExecutor())
             .setMinimumLoggingLevel(
-                if (BuildConfig.DEBUG) {
-                    Log.INFO
-                } else {
+                if (production) {
                     Log.ASSERT
+                } else {
+                    Log.INFO
                 }
             )
             .build()

@@ -3,13 +3,14 @@ package ru.commonex
 import android.content.ClipboardManager
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.junit4.ComposeTestRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import de.mannodermaus.junit5.compose.ComposeContext
-import de.mannodermaus.junit5.compose.createAndroidComposeExtension
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.Rule
+import org.junit.Test
+import org.junit.rules.RuleChain
+import org.junit.runner.RunWith
 import ru.commonex.screens.ChoosePersonScreen
 import ru.commonex.screens.ExpensesScreen
 import ru.commonex.screens.LocalEventsScreen
@@ -18,14 +19,18 @@ import ru.commonex.ui.MainActivity
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
+// TODO bring back JUnit5 when it is able to work with Marathon
 // .\gradlew :app:connectedAutotestAndroidTest -Dcom.android.tools.r8.disableApiModeling
-@OptIn(ExperimentalTestApi::class)
-@ExtendWith(ConnectivityExtension::class)
+@RunWith(AndroidJUnit4::class)
 class BasicInstrumentedTest {
 
-    @RegisterExtension
-    @ExperimentalTestApi
-    private val extension = createAndroidComposeExtension<MainActivity>()
+    private val composeRule = createAndroidComposeRule<MainActivity>()
+    private val connectivityRule = ConnectivityRule()
+
+    @get:Rule
+    val ruleChain: RuleChain = RuleChain
+        .outerRule(connectivityRule)
+        .around(composeRule)
 
     /**
      * Tests the complete event creation and expenses flow:
@@ -37,59 +42,57 @@ class BasicInstrumentedTest {
      * - Switch to a different person and verify view updates
      */
     @Test
-    fun testBasicNewEventAndExpensesFlow() {
-        extension.runTest {
-            // Create event and add participants
-            val eventName = "UI Test Event"
-            val expensesScreen = LocalEventsScreen()
-                .clickCreateEvent()
-                .enterEventName(eventName)
-                .selectCurrency("Euro")
-                .clickContinueButton()
-                .enterOwnerName("Test User 1")
-                .addParticipant("Test User 2")
-                .addParticipant("Test User 3")
-                .clickContinueButton()
-                .waitUntilLoadedEmpty()
-                .verifyCurrentPerson(eventName, "Test User 1")
+    fun testBasicNewEventAndExpensesFlow() = composeRule.runTest {
+        // Create event and add participants
+        val eventName = "UI Test Event"
+        val expensesScreen = LocalEventsScreen()
+            .clickCreateEvent()
+            .enterEventName(eventName)
+            .selectCurrency("Euro")
+            .clickContinueButton()
+            .enterOwnerName("Test User 1")
+            .addParticipant("Test User 2")
+            .addParticipant("Test User 3")
+            .clickContinueButton()
+            .waitUntilLoadedEmpty()
+            .verifyCurrentPerson(eventName, "Test User 1")
 
-            // Add first expense (equal split - default)
-            expensesScreen
-                .clickAddExpense()
-                .enterDescription("Булка")
-                .enterAmount("120")
-                .clickConfirm()
-                .verifyExpenseAmount("-120")
+        // Add first expense (equal split - default)
+        expensesScreen
+            .clickAddExpense()
+            .enterDescription("Булка")
+            .enterAmount("120")
+            .clickConfirm()
+            .verifyExpenseAmount("-120")
 
-            // Add second expense with non-equal split
-            expensesScreen
-                .clickAddExpense()
-                .enterDescription("Хот-дог")
-                .enterAmount("180")
-                .clickEqualSplitSwitch()
-                .clickConfirm()
-                .verifyExpenseAmount("-180")
+        // Add second expense with non-equal split
+        expensesScreen
+            .clickAddExpense()
+            .enterDescription("Хот-дог")
+            .enterAmount("180")
+            .clickEqualSplitSwitch()
+            .clickConfirm()
+            .verifyExpenseAmount("-180")
 
-            // Cancel first expense
-            expensesScreen
-                .clickOnExpense("Булка")
-                .clickCancelExpense()
-                .verifyRevertedExpenseExists("Булка")
+        // Cancel first expense
+        expensesScreen
+            .clickOnExpense("Булка")
+            .clickCancelExpense()
+            .verifyRevertedExpenseExists("Булка")
 
-            // Verify debts details and go back
-            expensesScreen
-                .clickDebtDetails()
-                .waitUntilLoaded(eventName)
-                .verifyDebtAmount("60", "Test User 1", count = 2)
-                .goBack()
+        // Verify debts details and go back
+        expensesScreen
+            .clickDebtDetails()
+            .waitUntilLoaded(eventName)
+            .verifyDebtAmount("60", "Test User 1", count = 2)
+            .goBack()
 
-            // Switch to a different person via menu and verify title updates
-            ExpensesScreen()
-                .openMenu()
-                .chooseParticipant()
-                .selectPerson("Test User 2")
-                .verifyCurrentPerson(eventName, "Test User 2")
-        }
+        // Switch to a different person via menu and verify title updates
+        ExpensesScreen()
+            .openMenu()
+            .chooseParticipant()
+            .selectPerson("Test User 2")
+            .verifyCurrentPerson(eventName, "Test User 2")
     }
 
     /**
@@ -100,15 +103,13 @@ class BasicInstrumentedTest {
      */
     @OptIn(ExperimentalEncodingApi::class)
     @Test
-    fun testJoinExistingEvent() {
-        extension.runTest {
-            LocalEventsScreen()
-                .clickJoinEvent()
-                .joinEvent("01JYC8BX30EKQYWBRTPKVX6S26", Base64.decode("NTc=").decodeToString() + Base64.decode("NTQ=").decodeToString()) // FIXME: costyl
-                .waitUntilLoaded("Test User 2")
-                .selectPerson("Test User 2")
-                .waitUntilLoadedEmpty()
-        }
+    fun testJoinExistingEvent() = composeRule.runTest {
+        LocalEventsScreen()
+            .clickJoinEvent()
+            .joinEvent("01JYC8BX30EKQYWBRTPKVX6S26", Base64.decode("NTc=").decodeToString() + Base64.decode("NTQ=").decodeToString()) // FIXME: costyl
+            .waitUntilLoaded("Test User 2")
+            .selectPerson("Test User 2")
+            .waitUntilLoadedEmpty()
     }
 
     /**
@@ -119,31 +120,29 @@ class BasicInstrumentedTest {
      * - Open deeplink and verify auto-join flow
      */
     @Test
-    fun testDeeplinkJoinWithShareToken() {
-        extension.runTest {
-            val eventName = "Deeplink token event"
+    fun testDeeplinkJoinWithShareToken() = composeRule.runTest {
+        val eventName = "Deeplink token event"
 
-            createLocalEvent(eventName)
+        createLocalEvent(eventName)
 
-            val menu = ExpensesScreen().openMenu()
-                .waitUntilCopyEnabled()
-                .clickCopyShareLink() // wait for event to be synced
-            val shareUrl = waitForShareUrl(expectedParam = "token")
+        val menu = ExpensesScreen().openMenu()
+            .waitUntilCopyEnabled()
+            .clickCopyShareLink() // wait for event to be synced
+        val shareUrl = waitForShareUrl(expectedParam = "token")
 
-            menu
-                .openEventsList()
-                .swipeToRevealActions(eventName)
-                .clickDeleteLocalOnly()
-                .assertEventNotExists(eventName)
+        menu
+            .openEventsList()
+            .swipeToRevealActions(eventName)
+            .clickDeleteLocalOnly()
+            .assertEventNotExists(eventName)
 
-            triggerActivityOnNewIntent(shareUrl)
+        triggerActivityOnNewIntent(shareUrl)
 
-            ChoosePersonScreen()
-                .waitUntilLoaded("Test User 1")
-                .selectPerson("Test User 1")
-                .waitUntilLoadedEmpty()
-                .verifyCurrentPerson(eventName, "Test User 1")
-        }
+        ChoosePersonScreen()
+            .waitUntilLoaded("Test User 1")
+            .selectPerson("Test User 1")
+            .waitUntilLoadedEmpty()
+            .verifyCurrentPerson(eventName, "Test User 1")
     }
 
     /**
@@ -154,39 +153,37 @@ class BasicInstrumentedTest {
      * - Open deeplink and verify auto-join flow
      */
     @Test
-    fun testDeeplinkJoinWithPinCodeFallback() {
-        extension.runTest {
-            val eventName = "Deeplink pin event"
+    fun testDeeplinkJoinWithPinCodeFallback() = composeRule.runTest {
+        val eventName = "Deeplink pin event"
 
-            createLocalEvent(eventName)
+        createLocalEvent(eventName)
 
-            val menu = ExpensesScreen().openMenu()
-                .waitUntilCopyEnabled() // wait for event to be synced
+        val menu = ExpensesScreen().openMenu()
+            .waitUntilCopyEnabled() // wait for event to be synced
 
-            val shareUrl = try {
-                ConnectivityManager.turnOffDataAndWifi()
+        val shareUrl = try {
+            ConnectivityManager.turnOffDataAndWifi()
 
-                menu.clickCopyShareLink()
+            menu.clickCopyShareLink()
 
-                waitForShareUrl(expectedParam = "pinCode")
-            } finally {
-                ConnectivityManager.turnOnData()
-            }
-
-            MenuDialogScreen()
-                .openEventsList()
-                .swipeToRevealActions(eventName)
-                .clickDeleteLocalOnly()
-                .assertEventNotExists(eventName)
-
-            triggerActivityOnNewIntent(shareUrl)
-
-            ChoosePersonScreen()
-                .waitUntilLoaded("Test User 1")
-                .selectPerson("Test User 1")
-                .waitUntilLoadedEmpty()
-                .verifyCurrentPerson(eventName, "Test User 1")
+            waitForShareUrl(expectedParam = "pinCode")
+        } finally {
+            ConnectivityManager.turnOnData()
         }
+
+        MenuDialogScreen()
+            .openEventsList()
+            .swipeToRevealActions(eventName)
+            .clickDeleteLocalOnly()
+            .assertEventNotExists(eventName)
+
+        triggerActivityOnNewIntent(shareUrl)
+
+        ChoosePersonScreen()
+            .waitUntilLoaded("Test User 1")
+            .selectPerson("Test User 1")
+            .waitUntilLoadedEmpty()
+            .verifyCurrentPerson(eventName, "Test User 1")
     }
 
     /**
@@ -198,49 +195,47 @@ class BasicInstrumentedTest {
      * - Verify empty state appears after all events deleted
      */
     @Test
-    fun testLocalEventsDeletionFlow() {
-        extension.runTest {
-            val event1 = "Delete test event 1"
-            val event2 = "Delete test event 2"
+    fun testLocalEventsDeletionFlow() = composeRule.runTest {
+        val event1 = "Delete test event 1"
+        val event2 = "Delete test event 2"
 
-            createLocalEvent(event1)
-            ExpensesScreen().openMenu().openEventsList()
-            createLocalEvent(event2)
+        createLocalEvent(event1)
+        ExpensesScreen().openMenu().openEventsList()
+        createLocalEvent(event2)
 
-            // Test switching between events
-            ExpensesScreen()
-                .openMenu()
-                .openEventsList()
-                .assertEventExists(event1)
-                .assertEventExists(event2)
-                // Switch to event1
-                .clickEvent(event1)
-                .selectPerson("Test User 1")
-                .waitUntilLoadedEmpty()
-                // Go back and switch to event2
-                .openMenu()
-                .openEventsList()
-                .clickEvent(event2)
-                .selectPerson("Test User 1")
-                .waitUntilLoadedEmpty()
+        // Test switching between events
+        ExpensesScreen()
+            .openMenu()
+            .openEventsList()
+            .assertEventExists(event1)
+            .assertEventExists(event2)
+            // Switch to event1
+            .clickEvent(event1)
+            .selectPerson("Test User 1")
+            .waitUntilLoadedEmpty()
+            // Go back and switch to event2
+            .openMenu()
+            .openEventsList()
+            .clickEvent(event2)
+            .selectPerson("Test User 1")
+            .waitUntilLoadedEmpty()
 
-            // Now test deletion
-            ExpensesScreen()
-                .openMenu()
-                .openEventsList()
-                // Delete first event
-                .swipeToRevealActions(event1)
-                .clickDeleteLocalOnly()
-                .assertEventNotExists(event1)
-                .assertEventDeletedSnackbar(event1)
-                .assertEventExists(event2)
-                // Delete second event
-                .swipeToRevealActions(event2)
-                .clickDeleteLocalOnly()
-                .assertEventNotExists(event2)
-                // Verify empty state after all events deleted
-                .assertCreateJoinDescriptionVisible()
-        }
+        // Now test deletion
+        ExpensesScreen()
+            .openMenu()
+            .openEventsList()
+            // Delete first event
+            .swipeToRevealActions(event1)
+            .clickDeleteLocalOnly()
+            .assertEventNotExists(event1)
+            .assertEventDeletedSnackbar(event1)
+            .assertEventExists(event2)
+            // Delete second event
+            .swipeToRevealActions(event2)
+            .clickDeleteLocalOnly()
+            .assertEventNotExists(event2)
+            // Verify empty state after all events deleted
+            .assertCreateJoinDescriptionVisible()
     }
 
     /**
@@ -252,30 +247,28 @@ class BasicInstrumentedTest {
      */
     @Offline
     @Test
-    fun testLocalEventsKeepEvent() {
-        extension.runTest {
-            val event1 = "Keep via button"
-            val event2 = "Keep via swipe back"
+    fun testLocalEventsKeepEvent() = composeRule.runTest {
+        val event1 = "Keep via button"
+        val event2 = "Keep via swipe back"
 
-            createLocalEvent(event1)
-            ExpensesScreen().openMenu().openEventsList()
-            createLocalEvent(event2)
+        createLocalEvent(event1)
+        ExpensesScreen().openMenu().openEventsList()
+        createLocalEvent(event2)
 
-            ExpensesScreen()
-                .openMenu()
-                .openEventsList()
-                // Test keeping via button
-                .swipeToRevealActions(event1)
-                .clickKeepEvent()
-                .assertEventExists(event1)
-                // Test keeping via swipe back
-                .swipeToRevealActions(event2)
-                .swipeBack(event2)
-                .assertEventExists(event2)
-                // Both events should still exist
-                .assertEventExists(event1)
-                .assertEventExists(event2)
-        }
+        ExpensesScreen()
+            .openMenu()
+            .openEventsList()
+            // Test keeping via button
+            .swipeToRevealActions(event1)
+            .clickKeepEvent()
+            .assertEventExists(event1)
+            // Test keeping via swipe back
+            .swipeToRevealActions(event2)
+            .swipeBack(event2)
+            .assertEventExists(event2)
+            // Both events should still exist
+            .assertEventExists(event1)
+            .assertEventExists(event2)
     }
 
     /**
@@ -285,22 +278,20 @@ class BasicInstrumentedTest {
      * - Confirm in dialog
      */
     @Test
-    fun testSyncedEventDeleteEverywhere() {
-        extension.runTest {
-            val eventName = "Synced event to delete"
+    fun testSyncedEventDeleteEverywhere() = composeRule.runTest {
+        val eventName = "Synced event to delete"
 
-            createLocalEvent(eventName)
+        createLocalEvent(eventName)
 
-            ExpensesScreen()
-                .openMenu()
-                .openEventsList()
-                .swipeToRevealActions(eventName)
-                .clickDeleteEverywhere()
-                // Confirm deletion in dialog
-                .confirmDeletion()
-                .assertEventNotExists(eventName)
-                .assertCreateJoinDescriptionVisible()
-        }
+        ExpensesScreen()
+            .openMenu()
+            .openEventsList()
+            .swipeToRevealActions(eventName)
+            .clickDeleteEverywhere()
+            // Confirm deletion in dialog
+            .confirmDeletion()
+            .assertEventNotExists(eventName)
+            .assertCreateJoinDescriptionVisible()
     }
 
     /**
@@ -310,22 +301,20 @@ class BasicInstrumentedTest {
      * - Verify event still exists
      */
     @Test
-    fun testSyncedEventDeleteEverywhereCanceled() {
-        extension.runTest {
-            val eventName = "Synced event keep"
+    fun testSyncedEventDeleteEverywhereCanceled() = composeRule.runTest {
+        val eventName = "Synced event keep"
 
-            createLocalEvent(eventName)
+        createLocalEvent(eventName)
 
-            ExpensesScreen()
-                .openMenu()
-                .openEventsList()
-                .swipeToRevealActions(eventName)
-                .clickDeleteEverywhere()
-                // Cancel deletion in dialog
-                .keepEvent()
-                // Event should still exist
-                .assertEventExists(eventName)
-        }
+        ExpensesScreen()
+            .openMenu()
+            .openEventsList()
+            .swipeToRevealActions(eventName)
+            .clickDeleteEverywhere()
+            // Cancel deletion in dialog
+            .keepEvent()
+            // Event should still exist
+            .assertEventExists(eventName)
     }
 
     /**
@@ -337,51 +326,50 @@ class BasicInstrumentedTest {
      * - Verify that an equal expense can be added successfully after new participants are added
      */
     @Test
-    fun testAddParticipantsToExistingEvent() {
-        extension.runTest {
-            val eventName = "Test Event"
+    fun testAddParticipantsToExistingEvent() = composeRule.runTest {
+        val eventName = "Test Event"
 
-            // Create event with one participant
-            createLocalEvent(eventName)
+        // Create event with one participant
+        createLocalEvent(eventName)
 
-            // Add participants via menu
-            ExpensesScreen()
-                .openMenu()
-                .addParticipant()
-                .addParticipant("New Test User 1")
-                .addParticipant("New Test User 2")
-                .clickContinueButton()
-                .waitUntilLoadedEmpty()
-                .verifyCurrentPerson(eventName, "Test User 1")
+        // Add participants via menu
+        ExpensesScreen()
+            .openMenu()
+            .addParticipant()
+            .addParticipant("New Test User 1")
+            .addParticipant("New Test User 2")
+            .clickContinueButton()
+            .waitUntilLoadedEmpty()
+            .verifyCurrentPerson(eventName, "Test User 1")
 
-            // Verify new participants can be selected
-            ExpensesScreen()
-                .openMenu()
-                .chooseParticipant()
-                .waitUntilLoaded("Test User 1")
-                .selectPerson("New Test User 1")
-                .waitUntilLoadedEmpty()
-                .verifyCurrentPerson(eventName, "New Test User 1")
+        // Verify new participants can be selected
+        ExpensesScreen()
+            .openMenu()
+            .chooseParticipant()
+            .waitUntilLoaded("Test User 1")
+            .selectPerson("New Test User 1")
+            .waitUntilLoadedEmpty()
+            .verifyCurrentPerson(eventName, "New Test User 1")
 
-            ExpensesScreen()
-                .openMenu()
-                .chooseParticipant()
-                .waitUntilLoaded("New Test User 1")
-                .selectPerson("New Test User 2")
-                .waitUntilLoadedEmpty()
-                .verifyCurrentPerson(eventName, "New Test User 2")
+        ExpensesScreen()
+            .openMenu()
+            .chooseParticipant()
+            .waitUntilLoaded("New Test User 1")
+            .selectPerson("New Test User 2")
+            .waitUntilLoadedEmpty()
+            .verifyCurrentPerson(eventName, "New Test User 2")
 
-            // Verify that an equal expense can be added successfully after new participants are added
-            ExpensesScreen()
-                .clickAddExpense()
-                .enterDescription("Test Expense")
-                .enterAmount("300")
-                .clickConfirm()
-                .verifyExpenseAmount("-300")
-        }
+        // Verify that an equal expense can be added successfully after new participants are added
+        ExpensesScreen()
+            .clickAddExpense()
+            .enterDescription("Test Expense")
+            .enterAmount("300")
+            .clickConfirm()
+            .verifyExpenseAmount("-300")
     }
 
-    private suspend fun ComposeContext.createLocalEvent(eventName: String): ExpensesScreen {
+    context(rule: ComposeTestRule)
+    private suspend fun createLocalEvent(eventName: String): ExpensesScreen {
         return LocalEventsScreen()
             .clickCreateEvent()
             .enterEventName(eventName)
@@ -392,13 +380,13 @@ class BasicInstrumentedTest {
             .waitUntilLoadedEmpty()
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     private fun waitForShareUrl(expectedParam: String, timeoutMs: Long = 10000): String {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val clipboard = context.getSystemService(ClipboardManager::class.java)
 
         var shareUrl: String? = null
-        extension.waitUntil(timeoutMillis = timeoutMs) {
+        rule.waitUntil(timeoutMillis = timeoutMs) {
             val text = clipboard.primaryClip
                 ?.getItemAt(0)
                 ?.coerceToText(context)
@@ -420,7 +408,7 @@ class BasicInstrumentedTest {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
-        extension.scenario.onActivity {
+        composeRule.activityRule.scenario.onActivity {
             it.onNewIntent(intent)
         }
     }

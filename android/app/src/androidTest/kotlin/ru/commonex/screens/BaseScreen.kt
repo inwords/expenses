@@ -1,43 +1,46 @@
 package ru.commonex.screens
 
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
-import de.mannodermaus.junit5.compose.ComposeContext
 
+@OptIn(ExperimentalTestApi::class)
 internal abstract class BaseScreen {
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     fun waitForElementWithText(
         text: String,
         count: Int = 1,
         timeout: Long = 10000,
     ) {
         if (count == 1) {
-            extension.waitUntilAtLeastOneExists(hasText(text), timeout)
+            rule.waitUntilAtLeastOneExists(hasText(text), timeout)
         } else {
-            extension.waitUntilNodeCount(hasText(text), count, timeout)
+            rule.waitUntilNodeCount(hasText(text), count, timeout)
         }
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     fun waitForElementWithTextDoesNotExist(
         text: String,
         timeout: Long = 10000
     ) {
-        extension.waitUntilDoesNotExist(hasText(text), timeout)
+        rule.waitUntilDoesNotExist(hasText(text), timeout)
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     fun assertElementWithTextExists(text: String) {
-        extension.onNodeWithText(text).assertIsDisplayed()
+        rule.onNodeWithText(text).assertIsDisplayed()
     }
 
-    context(extension: ComposeContext)
+    context(rule: SemanticsNodeInteractionsProvider)
     fun assertElementsWithTextCount(text: String, count: Int) {
-        extension
+        rule
             .onAllNodesWithText(text, substring = true)
             .assertCountEquals(count)
     }
