@@ -88,7 +88,56 @@ This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application 
 
 # Run device tests with Gradle Managed Devices (includes Room tests)
 ./gradlew :app:pixel6Api35AtdAndroidDeviceTest
+
+# Run instrumented tests with Marathon (requires marathon CLI installed)
+# First build APKs, then run marathon from the android/ directory
+.\gradlew :app:assembleAutotest :app:assembleAutotestAndroidTest -Dcom.android.tools.r8.disableApiModeling
+marathon
 ```
+
+#### Marathon Test Runner
+
+[Marathon](https://docs.marathonlabs.io/) is a cross-platform test runner optimized for stability and performance. It provides:
+- Intelligent test sharding and batching
+- Automatic retry of flaky tests
+- Parallel execution across multiple devices
+- Detailed HTML reports with screenshots/video
+
+**Installation (Windows):**
+```powershell
+# Download latest release from https://github.com/MarathonLabs/marathon/releases
+# Extract and add to PATH, e.g.:
+$env:Path += ";C:\tools\marathon-0.10.4\bin"
+```
+
+**Running tests with Marathon:**
+```powershell
+# Ensure emulator/device is running and visible via `adb devices`
+# Build APKs first
+.\gradlew :app:assembleAutotest :app:assembleAutotestAndroidTest -Dcom.android.tools.r8.disableApiModeling
+
+# Run from android/ directory (where Marathonfile is located)
+marathon
+
+# Reports are generated in build/reports/marathon/
+```
+
+**Marathonfile configuration:** Located at `android/Marathonfile`. Key settings:
+- `applicationApk` / `testApplicationApk`: Paths to APKs
+- `autoGrantPermission`: Auto-grant runtime permissions
+- `testParserConfiguration`: Use `type: "local"` for JUnit 4 bytecode analysis
+- `retryStrategy`: Configure retry behavior for flaky tests
+- `batchingStrategy`: Group tests for efficient execution
+
+**Critical: JUnit 4 requirement for Marathon CLI:**
+Marathon's local test parser uses bytecode analysis to discover tests. It only recognizes `org.junit.Test` (JUnit 4) annotations, **not** `org.junit.jupiter.api.Test` (JUnit 5). This is why instrumented tests use JUnit 4 while unit tests can use JUnit 5.
+
+If you see `NoTestCasesFoundException` with Marathon, verify:
+1. Test class uses `@RunWith(AndroidJUnit4::class)`
+2. Test methods use `org.junit.Test` (not `org.junit.jupiter.api.Test`)
+3. Marathonfile has `testParserConfiguration: type: "local"`
+
+See [Marathon documentation](https://docs.marathonlabs.io/runner/android/configure) for all configuration options.
 
 #### Code Quality
 
@@ -201,6 +250,7 @@ gradle/                       # Version catalogs and properties
 - **ProGuard:** `app/proguard-rules.pro` (minimal rules for Cronet and protobuf)
 - **ProGuard:** `app/proguard-rules-autotest.pro` (rules for android tests)
 - **ProGuard:** `app/proguard-test-rules.pro` (rules for android tests)
+- **Marathonfile:** `android/Marathonfile` (Marathon CLI configuration)
 
 ### Version Catalog Structure
 
@@ -229,6 +279,7 @@ gradle/                       # Version catalogs and properties
 - **KSP errors:** Usually resolved by clean build
 - **Version conflicts:** Check `gradle/shared.versions.toml` for centralized versions
 - **iOS build issues:** Ensure Xcode is properly configured for the `iosApp` module
+- **Marathon finds no tests:** Verify tests use JUnit 4 annotations (`@RunWith(AndroidJUnit4::class)`, `org.junit.Test`)
 
 ### Package Structure
 
@@ -576,10 +627,74 @@ class AddExpenseViewModel(
 
 ### Testing Strategy
 
-- **Unit tests:** JUnit 6 with test extensions for Android
-- **Instrumented tests:** Android Test with Compose testing
+- **Unit tests:** JUnit 6 for host/JVM tests
+- **Instrumented tests (non-UI):** Android Tests with JUnit 6
+- **Instrumented tests (Compose UI tests):** Android Tests with JUnit 4 and MArathon. `ComposeTestRule` with context receivers pattern.
 - **Room tests:** androidx.room:room-testing (example `MigrationTest.kt` in `androidDeviceTest` source set)
 - **Device testing:** Managed devices configured in `pixel6Api35*` tasks
+- **Marathon runner:** Cross-platform test runner for CI with retries and sharding
+
+### Instrumented Test Architecture
+
+The instrumented tests use a **Page Object / Screen Object pattern** with Kotlin context receivers:
+
+```
+app/src/androidTest/kotlin/ru/commonex/
+├── BasicInstrumentedTest.kt      # Main test class with @RunWith(AndroidJUnit4::class)
+├── ConnectivityRule.kt           # JUnit 4 Rule for network control (@Offline annotation)
+├── ConnectivityManager.kt        # Shell commands for wifi/data control
+├── testUtils.kt                  # runTest utility for reducing boilerplate
+└── screens/                      # Screen objects using context receivers
+    ├── BaseScreen.kt             # Base class with common wait/assert helpers
+    ├── ExpensesScreen.kt
+    ├── LocalEventsScreen.kt
+    └── ...
+```
+
+**Key patterns:**
+
+1. **Context receivers for ComposeTestRule:** Screen methods use `context(rule: ComposeTestRule)` to access the test rule without explicit parameter passing:
+   ```kotlin
+   context(rule: ComposeTestRule)
+   suspend fun clickCreateEvent(): CreateEventScreen {
+       rule.onNodeWithText(label).performClick()
+       return CreateEventScreen()
+   }
+   ```
+
+2. **Test structure with RuleChain:** Tests use `RuleChain` to order rules correctly:
+   ```kotlin
+   private val composeRule = createAndroidComposeRule<MainActivity>()
+   private val connectivityRule = ConnectivityRule()
+
+   @get:Rule
+   val ruleChain: RuleChain = RuleChain
+       .outerRule(connectivityRule)
+       .around(composeRule)
+   ```
+
+3. **Utility for test execution:** Tests use `runTest` extension from `testUtils.kt` to reduce boilerplate:
+   ```kotlin
+   @Test
+   fun testSomeFlow() = composeRule.runTest {
+       LocalEventsScreen()
+           .clickCreateEvent()
+           .enterEventName("Test")
+           // ...
+   }
+   ```
+   This utility wraps the test in `runBlocking` and provides `ComposeTestRule` as a context receiver.
+   
+   **Note:** `TestScope`/`StandardTestDispatcher` cannot be used with Compose because UI operations must run on the main thread. For instrumented tests, `runBlocking` is appropriate since the device/emulator runs in real-time anyway.
+
+4. **@Offline annotation:** Custom annotation + `ConnectivityRule` for tests requiring network control:
+   ```kotlin
+   @Offline
+   @Test
+   fun testOfflineFlow() = runBlocking { ... }
+   ```
+
+**Important:** Instrumented tests must use **JUnit 4** (not JUnit 5) for Marathon CLI compatibility. Marathon's local test parser only recognizes `org.junit.Test` annotations, not `org.junit.jupiter.api.Test`.
 
 ## Common Development Tasks
 
@@ -674,14 +789,17 @@ Events are shared via secure token-based links that expire in 14 days:
 #### Deeplink Instrumented Tests (Android)
 
 - **Location**: `android/app/src/androidTest/kotlin/ru/commonex/BasicInstrumentedTest.kt`
+- **Framework**: JUnit 4 (required for Marathon compatibility)
 - **Covers**: share link generation, clipboard extraction, local event removal, and deeplink auto-join for both `token` and `pinCode`.
 - **Prereqs**:
   - Device/emulator must allow clipboard access in tests.
   - Network toggling uses `svc wifi/data` via instrumentation (see `ConnectivityManager`); avoid running on devices where these shell commands are blocked.
 - **Implementation notes**:
+  - Tests use `RuleChain` with `ConnectivityRule` (outer) and `createAndroidComposeRule` (inner).
+  - Screen objects use Kotlin context receivers: `context(rule: ComposeTestRule)`.
   - Wait for Copy to become enabled before reading clipboard (`MenuDialogScreen.waitUntilCopyEnabled()`).
   - Deeplink tests expect `https://commonex.ru/event/{id}?token=...` or `?pinCode=...` extracted from clipboard text.
-  - Use `Activity.onNewIntent()` to feed deeplinks into the running activity (don’t create a new ActivityScenario).
+  - Use `composeRule.activityRule.scenario.onActivity { it.onNewIntent(intent) }` to feed deeplinks.
 
 #### Combining Instrumented Tests
 
@@ -798,7 +916,7 @@ Before submitting changes, run these validation steps:
 # 6. Build release variant (includes R8 optimization)
 .\gradlew assembleRelease
 
-# 7. Build autotest variant (includes R8 optimization, but no shrinking and no obfuscation)
+# 7. Build autotest variant (release-like, includes R8 optimization, but no shrinking and no obfuscation)
 .\gradlew assembleAutotest
 
 # 8. Optional: Run instrumented tests (requires device/emulator)
@@ -806,6 +924,10 @@ Before submitting changes, run these validation steps:
 
 # 9. Optional: Run managed device tests (local Gradle Managed Devices testing)
 .\gradlew :app:pixel6Api35AtdAutotestAndroidTest -Dcom.android.tools.r8.disableApiModeling
+
+# 10. Optional: Run instrumented tests with Marathon (requires device/emulator + marathon CLI)
+.\gradlew :app:assembleAutotest :app:assembleAutotestAndroidTest -Dcom.android.tools.r8.disableApiModeling
+marathon
 ```
 
 ### Quick Validation (for small changes)

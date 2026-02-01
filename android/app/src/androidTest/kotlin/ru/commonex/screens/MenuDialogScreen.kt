@@ -1,10 +1,11 @@
 package ru.commonex.screens
 
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isEnabled
+import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import de.mannodermaus.junit5.compose.ComposeContext
 import expenses.shared.feature.menu.generated.resources.Res
 import expenses.shared.feature.menu.generated.resources.menu_add_participants_action
 import expenses.shared.feature.menu.generated.resources.menu_choose_person_action
@@ -12,40 +13,41 @@ import expenses.shared.feature.menu.generated.resources.menu_copy_action
 import expenses.shared.feature.menu.generated.resources.menu_open_events_list
 import org.jetbrains.compose.resources.getString
 
+@OptIn(ExperimentalTestApi::class)
 internal class MenuDialogScreen : BaseScreen() {
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun openEventsList(): LocalEventsScreen {
         val openEventsLabel = getString(Res.string.menu_open_events_list)
-        extension.onNodeWithText(openEventsLabel).performClick()
+        rule.onNodeWithText(openEventsLabel).performClick()
         return LocalEventsScreen().waitUntilLoaded()
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun chooseParticipant(): ChoosePersonScreen {
         val choosePersonLabel = getString(Res.string.menu_choose_person_action)
-        extension.onNodeWithText(choosePersonLabel).performClick()
+        rule.onNodeWithText(choosePersonLabel).performClick()
         return ChoosePersonScreen()
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun addParticipant(): AddParticipantsToEventScreen {
         val addParticipantsLabel = getString(Res.string.menu_add_participants_action)
-        extension.onNodeWithText(addParticipantsLabel).performClick()
+        rule.onNodeWithText(addParticipantsLabel).performClick()
         return AddParticipantsToEventScreen()
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun waitUntilCopyEnabled(timeout: Long = 10000): MenuDialogScreen {
         val copyLabel = getString(Res.string.menu_copy_action)
-        extension.waitUntilAtLeastOneExists(hasText(copyLabel) and isEnabled(), timeout)
+        rule.waitUntilAtLeastOneExists(hasText(copyLabel) and isEnabled(), timeout)
         return this
     }
 
-    context(extension: ComposeContext)
+    context(rule: ComposeTestRule)
     suspend fun clickCopyShareLink(): MenuDialogScreen {
         val copyLabel = getString(Res.string.menu_copy_action)
-        extension.onNodeWithText(copyLabel).performClick()
+        rule.onNodeWithText(copyLabel).performClick()
         return this
     }
 }
