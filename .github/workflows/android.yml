@@ -66,6 +66,11 @@ jobs:
   ui_tests_android:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      API_LEVEL: 35
+      AVD_TARGET: google_atd
+      AVD_ARCH: x86_64
+      AVD_PROFILE: pixel_6
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
@@ -88,25 +93,67 @@ jobs:
       - name: Accept Android SDK licenses
         run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-      - name: Run UI tests on GMD
+      - name: Install Marathon CLI
+        run: |
+          MARATHON_VERSION="0.10.4"
+          curl -L -o marathon.zip "https://github.com/MarathonLabs/marathon/releases/download/${MARATHON_VERSION}/marathon-${MARATHON_VERSION}.zip"
+          unzip marathon.zip -d $HOME
+          echo "$HOME/marathon-${MARATHON_VERSION}/bin" >> $GITHUB_PATH
+
+      - name: Build APKs for UI tests
+        env:
+          CI: true
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: >
-          ./gradlew :app:pixel6Api35AtdAutotestAndroidTest
-          pixel6Api35AtdAndroidDeviceTest
-          -Dcom.android.tools.r8.disableApiModeling
-          -Pandroid.testoptions.manageddevices.emulator.gpu=swiftshader_indirect
-          -Pandroid.experimental.testOptions.managedDevices.setupTimeoutMinutes=20
-          -Pandroid.experimental.testOptions.managedDevices.maxConcurrentDevices=1
-          --no-daemon
+          ./gradlew :app:assembleAutotest 
+          :app:assembleAutotestAndroidTest 
+          -Dcom.android.tools.r8.disableApiModeling 
+          --no-daemon 
           --continue
 
-      - name: Upload test reports
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ env.API_LEVEL }}-${{ env.AVD_TARGET }}-${{ env.AVD_ARCH }}-${{ env.AVD_PROFILE }}
+
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ env.API_LEVEL }}
+          target: ${{ env.AVD_TARGET }}
+          arch: ${{ env.AVD_ARCH }}
+          profile: ${{ env.AVD_PROFILE }}
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+
+      # Run tests using cached AVD snapshot (no-snapshot-save to avoid overwriting cache)
+      - name: Run UI tests with Marathon
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ env.API_LEVEL }}
+          target: ${{ env.AVD_TARGET }}
+          arch: ${{ env.AVD_ARCH }}
+          profile: ${{ env.AVD_PROFILE }}
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          working-directory: ./android
+          script: marathon
+
+      - name: Upload Marathon test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ui-test-reports
+          name: marathon-test-reports
           path: |
-            ${{ github.workspace }}/android/app/build/reports/androidTests/managedDevice/
-            ${{ github.workspace }}/android/app/build/outputs/androidTest-results/managedDevice/
+            ${{ github.workspace }}/android/build/reports/marathon/
 
   build_ios:
     runs-on: macos-latest

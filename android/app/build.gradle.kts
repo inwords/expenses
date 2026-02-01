@@ -144,6 +144,7 @@ dependencies {
     androidTestImplementation(shared.androidx.test.espresso.core)
     androidTestUtil(shared.androidx.test.orchestrator)
     androidTestImplementation(shared.androidx.compose.ui.test.android)
+    androidTestImplementation("com.malinskiy.adam:android-junit4-test-annotation-producer:0.5.10")
 
     androidTestImplementation(project(":shared:feature:events")) // FIXME: use textFixtures ScreenObjects for tests
     androidTestImplementation(project(":shared:feature:expenses"))
