@@ -19,8 +19,11 @@ vendorConfiguration:
   testApplicationPmClear: true
   # Use remote test parser for JUnit 5 support
   # Local parser uses bytecode analysis which doesn't work with JUnit 5
+  # The adam test annotation producer helps with test discovery
   testParserConfiguration:
     type: "remote"
+    instrumentationArgs:
+      listener: "com.malinskiy.adam.junit4.android.listener.TestAnnotationProducer"
   # Timeout configuration for ADB operations (ISO 8601 duration format)
   timeoutConfiguration:
     shell: "PT5M"
