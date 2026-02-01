@@ -133,9 +133,12 @@ jobs:
           target: ${{ env.AVD_TARGET }}
           arch: ${{ env.AVD_ARCH }}
           profile: ${{ env.AVD_PROFILE }}
+          cores: 4
+          ram-size: 8G
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
+          disable-spellchecker: true
           working-directory: ./android
           script: echo "Generated AVD snapshot for caching."
 
@@ -146,9 +149,12 @@ jobs:
           target: ${{ env.AVD_TARGET }}
           arch: ${{ env.AVD_ARCH }}
           profile: ${{ env.AVD_PROFILE }}
+          cores: 4
+          ram-size: 8G
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
+          disable-spellchecker: true
           working-directory: ./android
           script: marathon
 
