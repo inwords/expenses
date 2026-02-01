@@ -21,6 +21,13 @@ vendorConfiguration:
   # Local parser uses bytecode analysis which doesn't work with JUnit 5
   testParserConfiguration:
     type: "remote"
+  # Timeout configuration for ADB operations (ISO 8601 duration format)
+  timeoutConfiguration:
+    shell: "PT5M"
+    install: "PT5M"
+    screenrecorder: "PT3M"
+  # Wait for devices to be ready
+  waitForDevicesTimeoutMillis: 180000
   # Screen recording configuration for debugging failed tests
   screenRecordConfiguration:
     preferableRecorderType: "screenshot"
@@ -50,13 +57,16 @@ retryStrategy:
 ignoreFailures: false
 
 # Enable debug output for troubleshooting
-debug: false
+debug: true
 
-# Test output timeout (2 minutes per test)
-testOutputTimeoutMillis: 120000
+# Test output timeout (5 minutes per test for JUnit 5 parsing)
+testOutputTimeoutMillis: 300000
 
-# Device initialization timeout (3 minutes for remote test parsing)
-deviceInitializationTimeoutMillis: 180000
+# Test batch timeout (10 minutes)
+testBatchTimeoutMillis: 600000
+
+# Device initialization timeout (5 minutes for remote test parsing)
+deviceInitializationTimeoutMillis: 300000
 
 # Uncompleted test retry quota
 uncompletedTestRetryQuota: 3
