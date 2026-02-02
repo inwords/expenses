@@ -168,7 +168,7 @@ class BasicInstrumentedTest {
 
             waitForShareUrl(expectedParam = "pinCode")
         } finally {
-            ConnectivityManager.turnOnData()
+            ConnectivityManager.turnOnDataAndWifi()
         }
 
         MenuDialogScreen()
