@@ -1,7 +1,6 @@
 package ru.commonex.screens
 
 import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasText
@@ -38,7 +37,7 @@ internal abstract class BaseScreen {
         rule.onNodeWithText(text).assertIsDisplayed()
     }
 
-    context(rule: SemanticsNodeInteractionsProvider)
+    context(rule: ComposeTestRule)
     fun assertElementsWithTextCount(text: String, count: Int) {
         rule
             .onAllNodesWithText(text, substring = true)

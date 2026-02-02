@@ -30,7 +30,7 @@ internal class ConnectivityRule : TestRule {
                     base.evaluate()
                 } finally {
                     if (isOffline) {
-                        ConnectivityManager.turnOnData()
+                        ConnectivityManager.turnOnDataAndWifi()
                     }
                 }
             }

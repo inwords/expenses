@@ -15,14 +15,43 @@ internal object ConnectivityManager {
         awaitNoValidatedNetwork()
     }
 
-    fun turnOnData() {
+    fun turnOnDataAndWifi() {
         sh("svc data enable")
         sh("svc wifi enable")
+        awaitValidatedNetwork()
     }
 
     private fun sh(cmd: String) {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         instrumentation.uiAutomation.executeShellCommand(cmd).use { /* close fd */ }
+    }
+
+    private fun awaitValidatedNetwork() {
+        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+        val cm = appContext.getSystemService(ConnectivityManager::class.java)
+
+        val latch = CountDownLatch(1)
+        val callback = object : ConnectivityManager.NetworkCallback() {
+            override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
+                if (caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)) {
+                    latch.countDown()
+                }
+            }
+        }
+
+        cm.registerDefaultNetworkCallback(callback)
+
+        val capabilities = cm.getNetworkCapabilities(cm.activeNetwork)
+        if (capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true) {
+            latch.countDown()
+        }
+        try {
+            if (!latch.await(15, TimeUnit.SECONDS)) {
+                error("Timed out waiting for device to go online")
+            }
+        } finally {
+            cm.unregisterNetworkCallback(callback)
+        }
     }
 
     private fun awaitNoValidatedNetwork() {
@@ -49,7 +78,7 @@ internal object ConnectivityManager {
             latch.countDown()
         }
         try {
-            if (!latch.await(10, TimeUnit.SECONDS)) {
+            if (!latch.await(15, TimeUnit.SECONDS)) {
                 error("Timed out waiting for device to go offline")
             }
         } finally {
