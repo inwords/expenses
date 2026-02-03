@@ -5,19 +5,11 @@ description: Propose and apply updates to repo docs and agent instructions based
 
 # Sync Docs From Session
 
-## Overview
+## Purpose
 
-Update documentation and instructions only from explicit, session-verified knowledge. Always propose edits first and get user confirmation before applying.
+Sync documentation and instructions to session-verified knowledge. Propose edits first; apply only after confirmation.
 
-## Required inputs (ask only for missing values)
-
-If the user asks to run the skill without providing knowledge items, draft a suggested list based on:
-- Explicit user statements in the current session.
-- Files changed or created in this session (paths only, no assumptions).
-
-Present the draft list as a numbered list and ask the user to confirm or edit it before making any file changes.
-
-Provide a short list of knowledge items with evidence from this session.
+## Inputs (ask only for missing values)
 
 Preferred input format (YAML list):
 
@@ -25,17 +17,55 @@ Preferred input format (YAML list):
   evidence: <user quote or file path/line observed in this session>
   scope: <optional; files or areas likely impacted>
 
-Example:
+If the user asks to run the skill without providing knowledge items, draft a suggested list with two sections:
 
-- statement: "Release tags do not trigger deployment; push tags only after manual deployment."
-  evidence: "User clarified in chat on 2026-02-03"
-  scope: "Android release instructions"
+- Tier A (explicit, auto-accepted)
+- Tier B (derived, needs confirmation)
 
-## Evidence rules
+Use these sources:
 
-- Accept only knowledge that is explicitly confirmed in this session (user statement or file content).
-- Do not add assumptions or general advice.
-- If evidence is missing or ambiguous, ask the user for clarification.
+- Explicit user statements in the current session.
+- Files changed or created in this session (paths only, no assumptions).
+- Doc discovery results (new README/guides and tooling folders).
+
+Present the draft list as a numbered list and ask the user to confirm or edit it before making any file changes.
+
+## Evidence tiers
+
+**Tier A: Explicit (auto-accepted)**
+
+- Direct user statements in this session
+- Files created, edited, or removed in this session
+
+**Tier B: Derived (confirm before changes)**
+
+- Inferences directly observable from files (no speculation)
+- Examples:
+    - New tool folder or README implies the tool is part of the workflow
+    - New README implies a parent doc should link to it
+    - Moved files imply backlinks should be updated
+
+Do not apply Tier B changes unless confirmed.
+
+## Pattern discovery (optional, derived)
+
+Propose **code patterns** or **architectural patterns** only when all are true:
+
+- The pattern appears in files edited in this session.
+- It appears at least twice (same file or multiple files).
+- The pattern is specific and actionable (not generic advice).
+- Evidence includes exact file paths and a short snippet reference.
+
+Otherwise, do not propose the pattern.
+
+## Doc discovery (before proposing edits)
+
+1) List new or updated docs in the session (README.md, docs/*, AGENTS.md).
+2) Identify new tooling folders (e.g., android/marathon, android/gradle/profiler).
+3) Choose the most appropriate level doc to link from:
+    - Project AGENTS.md for project-specific docs
+    - Root AGENTS.md only for cross-project docs
+4) Draft backlink proposals as Tier B items and ask for confirmation.
 
 ## What to update (repo-wide)
 
@@ -45,7 +75,7 @@ Example:
 - docs/*
 - Any other documentation files referenced by the user
 
-Prefer to point to existing sources of truth rather than duplicating content.
+Prefer links to a single source of truth over duplicated content.
 
 ## Workflow (propose-first)
 
@@ -61,6 +91,7 @@ Prefer to point to existing sources of truth rather than duplicating content.
 - Keep changes minimal and scoped to the evidence.
 - Follow the most specific instruction file when multiple exist.
 - Avoid duplicating content; link to the most specific doc instead.
+- Link propagation: when a new README or guide is added in a subfolder, add a short pointer from the most appropriate level doc.
 - Preserve existing structure and tone.
 - Maintain CRLF line endings.
 
