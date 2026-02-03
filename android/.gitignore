@@ -14,7 +14,8 @@
 .externalNativeBuild
 .cxx
 local.properties
-/marathon
+/marathon/*
+!/marathon/README.md
 /gradle-profiler/
 /gradle-user-home/
 /profile-out**
