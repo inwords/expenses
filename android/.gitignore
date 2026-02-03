@@ -16,6 +16,6 @@
 local.properties
 /marathon/*
 !/marathon/README.md
-/gradle-profiler/
+/gradle/profiler/
 /gradle-user-home/
 /profile-out**

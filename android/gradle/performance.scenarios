@@ -1,0 +1,26 @@
+# CommonEx Gradle Performance Scenarios
+# Run from android/ with:
+#   gradle-profiler --benchmark --scenario-file gradle/performance.scenarios <scenario-name>
+
+# Default scenario when none specified
+default-scenarios = ["debug_build"]
+
+# CI/CD build benchmark
+clean_build {
+    title = "CI/CD Clean Build"
+    cleanup-tasks = ["clean"]
+    tasks = ["testHostTest", ":app:assembleDebug", ":app:assembleRelease", ":app:bundleRelease"]
+    gradle-args = ["--no-configuration-cache"]
+    warm-ups = 2
+    iterations = 3
+}
+
+# Local debug benchmark
+debug_build {
+    title = "Local Debug Build"
+    cleanup-tasks = ["clean"]
+    tasks = [":app:assembleDebug"]
+    gradle-args = ["--no-configuration-cache"]
+    warm-ups = 2
+    iterations = 5
+}
