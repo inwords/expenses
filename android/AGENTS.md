@@ -1,6 +1,19 @@
 # Agent Instructions for Expenses (CommonEx) Android Project
 
-## Project Overview
+## Table of Contents
+
+- [Project Overview](#project-overview-reference)
+- [Standard Operating Procedures and Skills](#standard-operating-procedures-and-skills-workflow)
+- [Tooling Docs](#tooling-docs-reference)
+- [Build Instructions](#build-instructions-workflow)
+- [Project Architecture](#project-architecture-reference)
+- [Development Guidelines](#development-guidelines-reference)
+- [Common Development Tasks](#common-development-tasks-workflow)
+- [Debugging and Troubleshooting](#debugging-and-troubleshooting-reference)
+- [Environment Setup](#environment-setup-reference)
+- [Validation Steps](#validation-steps-workflow)
+
+## Project Overview (Reference)
 
 This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application that targets both Android and iOS platforms. The project uses **Jetpack Compose** for UI, **Ktor** for networking, **Room** for local database storage, and follows a modular
 architecture with feature-based organization.
@@ -33,16 +46,16 @@ architecture with feature-based organization.
 - Sync functionality with background workers
 - Deep linking support (commonex.ru domain)
 
-## Standard Operating Procedures and Skills
+## Standard Operating Procedures and Skills (Workflow)
 
 - Release workflow: use the `prepare-android-release` skill at `android/.agents/skills/prepare-android-release` for version bump, baseline profiles, and tagging.
 
-## Tooling Docs
+## Tooling Docs (Reference)
 
-- `android/marathon/README.md` - Local Marathon runner usage and setup notes (library extracted manually; binaries not in git).
+- `android/marathon/README.md` - Local Marathon runner usage and setup notes (library extracted manually; binaries not in git). Requires JUnit 4 annotations for test discovery; config in `android/Marathonfile`.
 - `android/gradle/README.md` - Gradle Profiler benchmarks and scenarios (`android/gradle/performance.scenarios`; profiler distribution in `android/gradle/profiler`).
 
-## Build Instructions
+## Build Instructions (Workflow)
 
 ### Prerequisites
 
@@ -53,6 +66,8 @@ architecture with feature-based organization.
 ### Essential Commands
 
 **Always use `.\gradlew` (Windows) for all operations. On MacOS use `./gradlew`.**
+
+Run commands from the `android/` directory unless a command explicitly says otherwise.
 
 #### Clean and Build
 
@@ -90,61 +105,7 @@ architecture with feature-based organization.
 
 # Run device tests with Gradle Managed Devices (includes Room tests)
 ./gradlew :app:pixel6Api35AtdAndroidDeviceTest
-
-# Run instrumented tests with Marathon (requires marathon CLI installed)
-# First build APKs, then run marathon from the android/ directory
-.\gradlew :app:assembleAutotest :app:assembleAutotestAndroidTest -Dcom.android.tools.r8.disableApiModeling
-marathon
 ```
-
-#### Marathon Test Runner
-
-[Marathon](https://docs.marathonlabs.io/) is a cross-platform test runner optimized for stability and performance. It provides:
-
-- Intelligent test sharding and batching
-- Automatic retry of flaky tests
-- Parallel execution across multiple devices
-- Detailed HTML reports with screenshots/video
-
-**Installation (Windows):**
-
-```powershell
-# Download latest release from https://github.com/MarathonLabs/marathon/releases
-# Extract and add to PATH, e.g.:
-$env:Path += ";C:\tools\marathon-0.10.4\bin"
-```
-
-**Running tests with Marathon:**
-
-```powershell
-# Ensure emulator/device is running and visible via `adb devices`
-# Build APKs first
-.\gradlew :app:assembleAutotest :app:assembleAutotestAndroidTest -Dcom.android.tools.r8.disableApiModeling
-
-# Run from android/ directory (where Marathonfile is located)
-marathon
-
-# Reports are generated in build/reports/marathon/
-```
-
-**Marathonfile configuration:** Located at `android/Marathonfile`. Key settings:
-
-- `applicationApk` / `testApplicationApk`: Paths to APKs
-- `autoGrantPermission`: Auto-grant runtime permissions
-- `testParserConfiguration`: Use `type: "local"` for JUnit 4 bytecode analysis
-- `retryStrategy`: Configure retry behavior for flaky tests
-- `batchingStrategy`: Group tests for efficient execution
-
-**Critical: JUnit 4 requirement for Marathon CLI:**
-Marathon's local test parser uses bytecode analysis to discover tests. It only recognizes `org.junit.Test` (JUnit 4) annotations, **not** `org.junit.jupiter.api.Test` (JUnit 5). This is why instrumented tests use JUnit 4 while unit tests can use JUnit 5.
-
-If you see `NoTestCasesFoundException` with Marathon, verify:
-
-1. Test class uses `@RunWith(AndroidJUnit4::class)`
-2. Test methods use `org.junit.Test` (not `org.junit.jupiter.api.Test`)
-3. Marathonfile has `testParserConfiguration: type: "local"`
-
-See [Marathon documentation](https://docs.marathonlabs.io/runner/android/configure) for all configuration options.
 
 #### Code Quality
 
@@ -196,7 +157,7 @@ See [Marathon documentation](https://docs.marathonlabs.io/runner/android/configu
 - Dependency updates command may take 5+ minutes and should not be interrupted
 - PowerShell users: Use `;` instead of `&&` for command chaining
 
-## Project Architecture
+## Project Architecture (Reference)
 
 ### Module Structure
 
@@ -257,7 +218,6 @@ gradle/                       # Version catalogs and properties
 - **ProGuard:** `app/proguard-rules.pro` (minimal rules for Cronet and protobuf)
 - **ProGuard:** `app/proguard-rules-autotest.pro` (rules for android tests)
 - **ProGuard:** `app/proguard-test-rules.pro` (rules for android tests)
-- **Marathonfile:** `android/Marathonfile` (Marathon CLI configuration)
 
 ### Version Catalog Structure
 
@@ -265,7 +225,7 @@ gradle/                       # Version catalogs and properties
 - **buildSrc.versions.toml:** Build plugins (AGP, Kotlin compiler)
 - Centralized version management prevents conflicts across 50+ modules
 
-## Development Guidelines
+## Development Guidelines (Reference)
 
 ### Making Changes
 
@@ -286,7 +246,6 @@ gradle/                       # Version catalogs and properties
 - **KSP errors:** Usually resolved by clean build
 - **Version conflicts:** Check `gradle/shared.versions.toml` for centralized versions
 - **iOS build issues:** Ensure Xcode is properly configured for the `iosApp` module
-- **Marathon finds no tests:** Verify tests use JUnit 4 annotations (`@RunWith(AndroidJUnit4::class)`, `org.junit.Test`)
 
 ### Package Structure
 
@@ -294,380 +253,9 @@ gradle/                       # Version catalogs and properties
 - **Namespace pattern:** Feature-based organization (`com.inwords.expenses.feature.{feature-name}`)
 - **MainActivity:** `ru.commonex.ui.MainActivity`
 
-### Coding Patterns
+### Coding Patterns (Reference)
 
-- **Dependency Injection:** Uses custom locator pattern in `shared:core:locator`
-- **Navigation:** Compose Navigation with deep linking support
-- **State Management:** ViewModels with StateFlow for UI state
-- **Database:** Room with KMP support, entities in feature modules
-- **Network:** Ktor client with Cronet backend for Android
-- **Async Operations:** Coroutines with structured concurrency
-
-### ViewModel Patterns
-
-#### Job Guard Pattern
-
-Prevent duplicate concurrent operations using nullable `Job?` with null check:
-
-```kotlin
-private var shareJob: Job? = null
-
-fun onShareClicked() {
-    if (shareJob != null) return  // Guard against concurrent execution
-
-    shareJob = viewModelScope.launch {
-        // ... async work
-    }.apply {
-        invokeOnCompletion { shareJob = null }  // Clear on completion (success or failure)
-    }
-}
-```
-
-Use `invokeOnCompletion` for cleanup instead of try-finally to handle both success and cancellation.
-
-#### StateFlow.update for Atomic Updates
-
-Use `update {}` instead of direct assignment for thread-safe state transitions:
-
-```kotlin
-state.update { currentState ->
-    currentState.copy(joining = EventJoiningState.Error(errorMessage))
-}
-```
-
-Use `updateAndGet` when you need both the operation and the updated value:
-
-```kotlin
-val state = state.updateAndGet { it.copy(joining = EventJoiningState.Joining) }
-```
-
-#### Property with Backing Field
-
-Expose immutable `StateFlow` while using mutable `MutableStateFlow` internally:
-
-```kotlin
-val state: StateFlow<UiModel>
-field = MutableStateFlow(initialState)
-```
-
-#### State Change Detection in Combine
-
-Track previous values to detect changes and trigger side effects:
-
-```kotlin
-val state = run {
-    var lastServerId: String? = null
-
-    combine(
-        eventFlow.onEach { event ->
-            val serverId = event?.serverId
-            if (lastServerId != serverId) {
-                lastServerId = serverId
-                shareState.value = ShareState.Idle(serverId)  // Reset on change
-            }
-        },
-        shareState
-    ) { event, shareState -> ... }
-}
-```
-
-### Compose UI Patterns
-
-#### State-Driven Side Effects (Clipboard, Share)
-
-Trigger platform operations via state changes rather than direct callbacks:
-
-```kotlin
-// ViewModel: Set state to trigger UI-side operation
-shareState.value = ShareState.PendingClipboardCopy(shareText)
-
-// Composable: React to state and perform operation
-(state.shareState as? ShareState.PendingClipboardCopy)?.let { pendingCopy ->
-    LaunchedEffect(pendingCopy.shareText) {
-        clipboard.setClipEntry(clipEntryOf(state.eventName, pendingCopy.shareText))
-        onTextCopied()  // Callback to transition state
-    }
-}
-
-// ViewModel: Transition to next state after operation
-fun onTextCopied() {
-    shareState.update { if (it is PendingClipboardCopy) Ready(it.shareText) else it }
-}
-```
-
-#### Accessibility-Safe Loading Swap
-
-When swapping between loading indicator and content, and it might cause UI jumping, preserve layout size and hide from screen readers:
-
-```kotlin
-Box(contentAlignment = Alignment.Center) {
-    // Always render content to preserve intrinsic size for any font scale
-    Text(
-        modifier = Modifier
-            .alpha(if (isLoading) 0f else 1f)
-            .then(if (isLoading) Modifier.clearAndSetSemantics {} else Modifier)
-            .clickable(enabled = !isLoading, onClick = onClick),
-        text = stringResource(Res.string.action)
-    )
-    if (isLoading) {
-        LoadingIndicator(modifier = Modifier.size(24.dp))
-    }
-}
-```
-
-- `alpha(0f)` hides visually but preserves layout
-- `clearAndSetSemantics {}` removes from accessibility tree when invisible
-- Never use fixed `dp` sizes for dynamic text content (breaks with font scale settings)
-
-#### Derived Values Without Remember
-
-Simple derived values from state parameters don't need `remember`:
-
-```kotlin
-val isLoading = state.shareState is ShareState.Loading  // Correct: recalculates on recomposition
-```
-
-Use `remember` only for expensive computations or mutable state that must survive recomposition.
-
-### UI State Modeling
-
-#### Sealed Interface with Computed Properties
-
-Define polymorphic behavior via extension properties in companion:
-
-```kotlin
-sealed interface ShareState {
-    data class Idle(val serverId: String?, val pinCode: String) : ShareState
-    data object Loading : ShareState
-    data class Ready(val shareText: String) : ShareState
-    data class PendingClipboardCopy(val shareText: String) : ShareState
-
-    companion object {
-        val ShareState.canShare: Boolean // Use computed property if it's clearly derived from state
-            get() = when (this) {
-                is Idle -> serverId != null
-                Loading -> false
-                is PendingClipboardCopy, is Ready -> true
-            }
-    }
-}
-```
-
-#### States Carrying Context Data
-
-Different states carry different data relevant to that state:
-
-- `Idle(serverId, pinCode)` - data needed to initiate action
-- `Ready(shareText)` - result of completed action
-- `PendingClipboardCopy(shareText)` - transient state triggering UI operation
-
-### Combining Data States with UI States
-
-Complex screens often need to combine data from repositories/use cases with transient UI states (refresh indicators, recently deleted items, etc.). Use layered combination to avoid recalculating expensive transformations.
-
-#### Layered State Combination Pattern
-
-Separate data flows from UI state flows and combine them at different layers:
-
-```kotlin
-// Layer 1: UI state flows (cheap, frequently changing)
-private val recentlyRemovedEventName = MutableStateFlow<String?>(null)
-private val isRefreshingFlow = currentEventFlow
-    .flatMapLatestNoBuffer { event ->
-        if (event == null) flowOf(false)
-        else pullToRefreshStateManager.isEventRefreshing(event.id)
-    }
-    .shareInWhileSubscribed(scope = viewModelScope, replay = 1)
-
-// Layer 2: Data flows combined with some UI state
-private val localEventsState = flow {
-    combine(
-        getEventsUseCase.getEvents(),           // Data
-        eventDeletionStateManager.state,        // Data
-        recentlyRemovedEventName,               // UI state (cheap)
-    ) { events, deletionState, removedName ->
-        // Transform to UI model
-    }.let { emitAll(it) }
-}
-
-// Layer 3: Final state - combine expensive data flow with cheap UI state last
-val state: StateFlow<ScreenState> = combine(
-    expensesDetailsFlow,
-    settingsRepository.getCurrentPersonId(),
-) { details, personId ->
-    // Expensive transformation here
-    details to personId
-}.flatMapLatestNoBuffer { (details, personId) ->
-    // Build UI model from data
-    flowOf(buildUiModel(details, personId))
-}
-    .combine(isRefreshingFlow) { state, isRefreshing ->
-        // Late combination: only update isRefreshing field
-        if (state is Success && state.data.isRefreshing != isRefreshing) {
-            state.copy(data = state.data.copy(isRefreshing = isRefreshing))
-        } else {
-            state
-        }
-    }
-    .stateInWhileSubscribed(scope = viewModelScope, initialValue = Loading)
-```
-
-Key principles:
-
-- **Separate cheap UI state from expensive data** - `isRefreshingFlow` changes frequently but shouldn't trigger data recalculation
-- **Combine UI state last** - After expensive transformations, so changes to UI state only update the final field
-- **Conditional updates** - Check if value actually changed before copying to avoid unnecessary emissions
-- **Use shareInWhileSubscribed for shared flows** - When the same flow is used in multiple combines
-
-#### Transient UI State with Auto-Clear
-
-For temporary UI states like "recently deleted" notifications:
-
-```kotlin
-private val recentlyRemovedEventName = MutableStateFlow<String?>(null)
-private var recentlyRemovedEventJob: Job? = null
-
-private fun handleEventRemoval(removedEvent: Event) {
-    recentlyRemovedEventName.value = null
-    recentlyRemovedEventJob?.cancel()
-
-    recentlyRemovedEventJob = viewModelScope.launch {
-        recentlyRemovedEventName.value = removedEvent.name
-        delay(3000) // Show for 3 seconds
-        recentlyRemovedEventName.value = null
-    }
-}
-```
-
-### Form Input Patterns
-
-#### Multiple Input Flows Combined
-
-For forms with many inputs, use separate `MutableStateFlow` for each input and combine them:
-
-```kotlin
-private val selectedCurrencyCode = MutableStateFlow<String?>(null)
-private val selectedPersonId = MutableStateFlow<Long?>(null)
-private val inputDescription = MutableStateFlow("")
-private val inputAmount = MutableStateFlow(AmountModel(null, ""))
-private val inputEqualSplit = MutableStateFlow(true)
-
-private val _state = combine(
-    dataFlow,
-    selectedCurrencyCode,
-    selectedPersonId,
-    inputDescription,
-    inputAmount,
-    inputEqualSplit,
-) { data, currency, person, description, amount, equalSplit ->
-    // Build screen model from all inputs
-}
-```
-
-#### Input with Fallback to Settings
-
-Use `flatMapLatestNoBuffer` to provide default from settings when user hasn't selected:
-
-```kotlin
-private val selectedPersonId = MutableStateFlow<Long?>(null)
-
-// In combine:
-selectedPersonId.flatMapLatestNoBuffer { selected ->
-    selected?.let { flowOf(it) } ?: settingsRepository.getCurrentPersonId()
-}
-```
-
-#### Lazy Set Initialization
-
-Initialize sets/collections from current state only on first interaction:
-
-```kotlin
-private val selectedIds = MutableStateFlow<Set<Long>?>(null) // null = all selected
-
-fun onItemClicked(id: Long) {
-    selectedIds.update { current ->
-        val ids = if (current == null) {
-            // Initialize from state on first click
-            (_state.value as? Success)?.data?.items
-                ?.mapTo(HashSet()) { it.id }
-                ?: return@update current
-        } else {
-            current
-        }
-
-        if (ids.contains(id)) ids - id else ids + id
-    }
-}
-```
-
-#### Raw + Parsed Input Model
-
-Store both raw string and parsed value for inputs requiring validation:
-
-```kotlin
-data class AmountModel(
-    val amount: BigDecimal?,  // Parsed value for calculations (null if invalid)
-    val amountRaw: String,    // Raw string to preserve user input in UI
-)
-
-fun onAmountChanged(input: String) {
-    val trimmed = input.trim()
-    inputAmount.value = AmountModel(
-        amount = trimmed.toBigDecimalOrNull(),
-        amountRaw = trimmed
-    )
-}
-```
-
-This allows validation (`amount != null`) while preserving exactly what user typed.
-
-#### Private Domain Model + Public UI Model
-
-Separate internal domain model from UI model for complex screens:
-
-```kotlin
-// Internal model with domain objects
-private val _state: StateFlow<SimpleScreenState<AddExpenseScreenModel>> = combine(...) { ... }
-
-// Public UI model for composables (no domain objects)
-val state: StateFlow<SimpleScreenState<AddExpensePaneUiModel>> = _state
-    .map { state ->
-        when (state) {
-            is SimpleScreenState.Success -> SimpleScreenState.Success(state.data.toUiModel())
-            SimpleScreenState.Loading -> SimpleScreenState.Loading
-            SimpleScreenState.Error -> SimpleScreenState.Error
-            SimpleScreenState.Empty -> SimpleScreenState.Empty
-        }
-    }
-    .stateInWhileSubscribed(viewModelScope, initialValue = SimpleScreenState.Loading)
-```
-
-Benefits:
-
-- Internal model can reference domain entities (Person, Currency)
-- UI model uses only primitive types and IDs
-- `toUiModel()` transformation is explicit and testable
-
-#### Pre-filled Forms from Navigation
-
-Initialize input flows from navigation arguments:
-
-```kotlin
-class AddExpenseViewModel(
-    private val replenishment: Replenishment?,  // Navigation argument
-) {
-    private val selectedExpenseType = MutableStateFlow(
-        replenishment?.let { ExpenseType.Replenishment } ?: ExpenseType.Spending
-    )
-    private val inputAmount = MutableStateFlow(
-        if (replenishment == null) {
-            AmountModel(null, "")
-        } else {
-            AmountModel(replenishment.amount.toBigDecimalOrNull(), replenishment.amount)
-        }
-    )
-}
-```
+See `android/docs/patterns.md` for ViewModel, Compose UI, state modeling, and form input patterns.
 
 ### Performance Considerations
 
@@ -679,7 +267,7 @@ class AddExpenseViewModel(
 
 - **Unit tests:** JUnit 6 for host/JVM tests
 - **Instrumented tests (non-UI):** Android Tests with JUnit 6
-- **Instrumented tests (Compose UI tests):** Android Tests with JUnit 4 and MArathon. `ComposeTestRule` with context receivers pattern.
+- **Instrumented tests (Compose UI tests):** Android Tests with JUnit 4 And Marathon. `ComposeTestRule` with context receivers pattern.
 - **Room tests:** androidx.room:room-testing (example `MigrationTest.kt` in `androidDeviceTest` source set)
 - **Device testing:** Managed devices configured in `pixel6Api35*` tasks
 - **Marathon runner:** Cross-platform test runner for CI with retries and sharding
@@ -744,9 +332,7 @@ app/src/androidTest/kotlin/ru/commonex/
    fun testOfflineFlow() = runBlocking { ... }
    ```
 
-**Important:** Instrumented tests must use **JUnit 4** (not JUnit 5) for Marathon CLI compatibility. Marathon's local test parser only recognizes `org.junit.Test` annotations, not `org.junit.jupiter.api.Test`.
-
-## Common Development Tasks
+## Common Development Tasks (Workflow)
 
 ### Adding a New Feature Module
 
@@ -907,7 +493,7 @@ When adding support for a new currency (e.g., AED), update all the following:
 - Some String vs Double type inconsistencies in network DTOs
 - User agent configuration needs finalization in HTTP client
 
-## Debugging and Troubleshooting
+## Debugging and Troubleshooting (Reference)
 
 ### Build Issues
 
@@ -929,7 +515,7 @@ When adding support for a new currency (e.g., AED), update all the following:
 - **R8 optimization:** Check `app/proguard-rules.pro` for keep rules
 - **Build times:** First build ~28s, incremental much faster with Gradle cache
 
-## Environment Setup
+## Environment Setup (Reference)
 
 ### Required Tools
 
@@ -944,7 +530,7 @@ When adding support for a new currency (e.g., AED), update all the following:
 - Enable Kotlin Multiplatform plugin
 - Configure JAVA_HOME to point to JDK 22
 
-## Validation Steps
+## Validation Steps (Workflow)
 
 Before submitting changes, run these validation steps:
 
@@ -976,9 +562,7 @@ Before submitting changes, run these validation steps:
 # 9. Optional: Run managed device tests (local Gradle Managed Devices testing)
 .\gradlew :app:pixel6Api35AtdAutotestAndroidTest -Dcom.android.tools.r8.disableApiModeling
 
-# 10. Optional: Run instrumented tests with Marathon (requires device/emulator + marathon CLI)
-.\gradlew :app:assembleAutotest :app:assembleAutotestAndroidTest -Dcom.android.tools.r8.disableApiModeling
-marathon
+# 10. Optional: Run instrumented tests with Marathon (requires device/emulator + marathon CLI) (see Marathon doc for details)
 ```
 
 ### Quick Validation (for small changes)

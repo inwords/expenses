@@ -1,6 +1,6 @@
 ---
 name: sync-docs-from-session
-description: Propose and apply updates to repo docs and agent instructions based on session-verified knowledge. Use when the user asks to sync/update instructions, AGENTS.md, README.md, or docs/* with new, non-obvious information learned in the current session.
+description: Propose and apply updates to repo docs and agent instructions based on session-verified knowledge. Use when the user asks to sync/update instructions, AGENTS.md, README.md, or docs/* and android/docs/* with new, non-obvious information learned in the current session.
 ---
 
 # Sync Docs From Session
@@ -60,7 +60,7 @@ Otherwise, do not propose the pattern.
 
 ## Doc discovery (before proposing edits)
 
-1) List new or updated docs in the session (README.md, docs/*, AGENTS.md).
+1) List new or updated docs in the session (README.md, docs/* and android/docs/*, AGENTS.md).
 2) Identify new tooling folders (e.g., android/marathon, android/gradle/profiler).
 3) Choose the most appropriate level doc to link from:
     - Project AGENTS.md for project-specific docs
@@ -72,7 +72,7 @@ Otherwise, do not propose the pattern.
 - AGENTS.md (root and project-level)
 - .github/instructions/*
 - README.md
-- docs/*
+- docs/* and android/docs/*
 - Any other documentation files referenced by the user
 
 Prefer links to a single source of truth over duplicated content.
