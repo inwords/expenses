@@ -36,9 +36,9 @@ This is a **Kotlin Multiplatform Mobile (KMM)** expenses management application 
 - Sync functionality with background workers
 - Deep linking support (commonex.ru domain)
 
-## Standard Operating Procedures
+## Standard Operating Procedures and Skills
 
-- [`../../android/app/SOP-RELEASE.md`](../../android/app/SOP-RELEASE.md) defines the release process for the Android application, including version bumping and performance profile generation.
+- Release workflow: use the `prepare-android-release` skill at `android/.agents/skills/prepare-android-release` for version bump, baseline profiles, and tagging.
 
 ## Build Instructions
 
