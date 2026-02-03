@@ -37,6 +37,11 @@ architecture with feature-based organization.
 
 - Release workflow: use the `prepare-android-release` skill at `android/.agents/skills/prepare-android-release` for version bump, baseline profiles, and tagging.
 
+## Tooling Docs
+
+- `android/marathon/README.md` - Local Marathon runner usage and setup notes (library extracted manually; binaries not in git).
+- `android/gradle/README.md` - Gradle Profiler benchmarks and scenarios (`android/gradle/performance.scenarios`; profiler distribution in `android/gradle/profiler`).
+
 ## Build Instructions
 
 ### Prerequisites
