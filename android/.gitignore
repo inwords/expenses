@@ -16,3 +16,5 @@
 local.properties
 /marathon
 /gradle-profiler/
+/gradle-user-home/
+/profile-out**
