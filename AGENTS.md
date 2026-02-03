@@ -6,10 +6,10 @@ CommonEx is a multi-platform expense sharing application with Android/iOS (KMM),
 
 - This file provides repo-wide guidance only. Do not duplicate project instructions.
 - Before editing, check for more specific instructions in subdirectories:
-  - Android/iOS/KMM: [`.github/instructions/android.instructions.md`](.github/instructions/android.instructions.md) (also referenced via `android/AGENTS.md`)
-  - Backend: [`.github/instructions/backend.instructions.md`](.github/instructions/backend.instructions.md) (also referenced via `backend/AGENTS.md`)
-  - Web: [`.github/instructions/web.instructions.md`](.github/instructions/web.instructions.md) (also referenced via `web/AGENTS.md`)
-  - Infra: [`.github/instructions/infra.instructions.md`](.github/instructions/infra.instructions.md) (also referenced via `infra/AGENTS.md`)
+  - Android/iOS/KMM: [`android/AGENTS.md`](android/AGENTS.md) (scoped by `.github/instructions/android.instructions.md`)
+  - Backend: [`backend/AGENTS.md`](backend/AGENTS.md) (scoped by `.github/instructions/backend.instructions.md`)
+  - Web: [`web/AGENTS.md`](web/AGENTS.md) (scoped by `.github/instructions/web.instructions.md`)
+  - Infra: [`infra/AGENTS.md`](infra/AGENTS.md) (scoped by `.github/instructions/infra.instructions.md`)
 - If instructions conflict, follow the most specific and recent document.
 
 ## Repository map
@@ -40,7 +40,6 @@ CommonEx is a multi-platform expense sharing application with Android/iOS (KMM),
 ## Documentation hygiene
 
 - Use .agents/skills/sync-docs-from-session to propose doc/instruction updates from session-verified knowledge.
-
 - Keep instructions short and linked rather than duplicated.
 - If you add new scoped instructions, update this file with a pointer.
 - Keep instructions up to date with any code or process changes.
