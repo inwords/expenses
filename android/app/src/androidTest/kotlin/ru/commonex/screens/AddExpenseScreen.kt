@@ -28,6 +28,12 @@ internal class AddExpenseScreen : BaseScreen() {
         return this
     }
 
+    context(rule: ComposeTestRule)
+    fun selectCurrency(currencyName: String): AddExpenseScreen {
+        rule.onNodeWithText(currencyName).performScrollTo().performClick()
+        return this
+    }
+
     /**
      * Clicks the equal split switch to toggle its state.
      * Default state is ON (equal split), so calling this will turn it OFF.
