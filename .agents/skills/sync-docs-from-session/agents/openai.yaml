@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sync Docs From Session"
+  short_description: "Sync repo docs and instructions from session"
+  default_prompt: "Use $sync-docs-from-session to draft doc updates from this session."
