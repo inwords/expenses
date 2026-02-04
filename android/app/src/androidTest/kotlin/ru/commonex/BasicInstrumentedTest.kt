@@ -96,6 +96,31 @@ class BasicInstrumentedTest {
     }
 
     /**
+     * Tests adding expenses for all supported currencies in a single event:
+     * - Create event
+     * - Add 1 expense for each supported currency
+     * - Wait until event is synced
+     * - Delete event everywhere
+     */
+    @Test
+    fun testAllSupportedCurrenciesExpenses() = composeRule.runTest {
+        val eventName = "Test event"
+
+        createLocalEvent(eventName)
+
+        addExpensesForCurrencies(supportedCurrencyNames)
+
+        ExpensesScreen()
+            .openMenu()
+            .waitUntilCopyEnabled()
+            .openEventsList()
+            .swipeToRevealActions(eventName)
+            .clickDeleteEverywhere()
+            .confirmDeletion()
+            .assertEventNotExists(eventName)
+    }
+
+    /**
      * Tests joining an existing remote event:
      * - Enter event ID and access code
      * - Select person from participants list
@@ -381,6 +406,22 @@ class BasicInstrumentedTest {
     }
 
     context(rule: ComposeTestRule)
+    private suspend fun addExpensesForCurrencies(currencies: List<String>) {
+        currencies.forEachIndexed { currencyIndex, currencyName ->
+            val description = "Expense $currencyName ${currencyIndex + 1}"
+            val amount = (currencyIndex + 1) * 10
+
+            ExpensesScreen()
+                .clickAddExpense()
+                .selectCurrency(currencyName)
+                .enterDescription(description)
+                .enterAmount(amount.toString())
+                .clickConfirm()
+                .verifyExpenseExists(description)
+        }
+    }
+
+    context(rule: ComposeTestRule)
     private fun waitForShareUrl(expectedParam: String, timeoutMs: Long = 10000): String {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val clipboard = context.getSystemService(ClipboardManager::class.java)
@@ -414,6 +455,15 @@ class BasicInstrumentedTest {
     }
 
     private companion object {
+
+        private val supportedCurrencyNames = listOf(
+            "Euro",
+            "US Dollar",
+            "Russian Ruble",
+            "Japanese Yen",
+            "Turkish Lira",
+            "UAE Dirham",
+        )
 
         private val shareUrlRegex = Regex("https://commonex\\.ru/event/[A-Za-z0-9]+\\?(token|pinCode)=[A-Za-z0-9]+")
     }

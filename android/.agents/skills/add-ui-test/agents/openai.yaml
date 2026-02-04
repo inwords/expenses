@@ -1,0 +1,4 @@
+interface:
+  display_name: "Add UI Test"
+  short_description: "Add Android Compose UI tests for CommonEx"
+  default_prompt: "Use $add-ui-test to add a long-scenario Compose UI test in the Android app."

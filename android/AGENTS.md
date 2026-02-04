@@ -267,7 +267,7 @@ See `android/docs/patterns.md` for ViewModel, Compose UI, state modeling, and fo
 
 - **Unit tests:** JUnit 6 for host/JVM tests
 - **Instrumented tests (non-UI):** Android Tests with JUnit 6
-- **Instrumented tests (Compose UI tests):** Android Tests with JUnit 4 And Marathon. `ComposeTestRule` with context receivers pattern.
+- **Instrumented tests (Compose UI E2E tests):** Android Tests with JUnit 4 And Marathon. `ComposeTestRule` with context receivers pattern. Run against the real backend; avoid mocks and hardcoded remote fixtures by creating required data in-test.
 - **Room tests:** androidx.room:room-testing (example `MigrationTest.kt` in `androidDeviceTest` source set)
 - **Device testing:** Managed devices configured in `pixel6Api35*` tasks
 - **Marathon runner:** Cross-platform test runner for CI with retries and sharding
@@ -331,6 +331,7 @@ app/src/androidTest/kotlin/ru/commonex/
    @Test
    fun testOfflineFlow() = runBlocking { ... }
    ```
+5. **Selectors:** Prefer test tags for new selectors, fall back to resource strings, and avoid raw literals unless unavoidable.
 
 ## Common Development Tasks (Workflow)
 
@@ -443,6 +444,7 @@ Events are shared via secure token-based links that expire in 14 days:
 - Prefer **scenario-composed tests** when they reduce setup cost and cover realistic flows (e.g., create → share token → remove local copy → join via deeplink).
 - Combine steps **only if** the flow is coherent and failure localization remains clear; keep each test’s intent obvious from its name and comments.
 - When combining, keep assertions at each critical transition (creation, share link, deletion, join) so failures are easy to pinpoint.
+- Avoid duplicate assertions between steps; keep each check unique to its transition.
 - Don’t hesitate to modify existing tests when they’re a better fit for new scenario checks; keep changes minimal and maintain clarity.
 
 ### Adding Participants to Existing Events
