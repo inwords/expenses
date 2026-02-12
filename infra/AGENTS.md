@@ -25,7 +25,7 @@ blue-green deployment for backend services.
 ### Nginx
 
 - Custom build with OpenTelemetry module (`ngx_otel_module`)
-- HTTP/2 and HTTP/3 (QUIC) support
+- HTTP1.1, HTTP/2 and HTTP/3 (QUIC) support
 - Brotli compression
 - SSL/TLS termination
 - Upstream load balancing for backend services
@@ -149,6 +149,13 @@ docker compose -f infra/docker-compose-prod.yml ps
 - **Custom Dockerfile**: `infra/nginx/Dockerfile`
 - Includes OpenTelemetry module configuration
 - Upstream configuration for backend services (blue-green)
+
+### SSL and Certificates
+
+- **Wildcard certificate** for `*.commonex.ru` (Certbot, single mount at `/etc/nginx/ssl/live/commonex.ru`)
+- **Certificate renewal** uses DNS-01 challenge (no HTTP ACME challenge location required)
+- **Main domain** (`commonex.ru`, `www.commonex.ru`): HTTP port 80 and HTTPS port 443
+- **API and gRPC subdomains** (`dev-api.commonex.ru`, `grpc.commonex.ru`): HTTPS-only; no plain HTTP access expected
 
 ### OpenTelemetry Configuration
 

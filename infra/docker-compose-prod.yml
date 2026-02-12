@@ -118,12 +118,6 @@ services:
       - "443:443/udp"
     volumes:
       - ./nginx/nginx-prod.conf:/etc/nginx/nginx.conf:ro
-      - /etc/commonex/ssl/certificate_chain.pem:/etc/nginx/ssl/certificate_chain.pem:ro
-      - /etc/commonex/ssl/certificate.key:/etc/nginx/ssl/certificate.key:ro
-      - /etc/commonex/ssl/certbot/live/dev-api.commonex.ru:/etc/nginx/ssl/live/dev-api.commonex.ru:ro
-      - /etc/commonex/ssl/certbot/archive/dev-api.commonex.ru:/etc/nginx/ssl/archive/dev-api.commonex.ru:ro
-      - /etc/commonex/ssl/certbot/live/grpc.commonex.ru:/etc/nginx/ssl/live/grpc.commonex.ru:ro
-      - /etc/commonex/ssl/certbot/archive/grpc.commonex.ru:/etc/nginx/ssl/archive/grpc.commonex.ru:ro
       - /etc/commonex/ssl/certbot/live/commonex.ru:/etc/nginx/ssl/live/commonex.ru:ro
       - /etc/commonex/ssl/certbot/archive/commonex.ru:/etc/nginx/ssl/archive/commonex.ru:ro
       - /etc/commonex/www/certbot/:/var/www/certbot/:ro
